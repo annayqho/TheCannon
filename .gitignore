@@ -1,0 +1,14 @@
+.??*
+*.pickle*
+*.fits*
+*~
+*.aux
+*.dvi
+*.log
+*.blg
+*.pyc
+vc.tex
+*.synctex.gz
+*.pdf
+*.eps
+*.png
