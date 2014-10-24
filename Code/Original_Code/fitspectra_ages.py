@@ -15,7 +15,8 @@ Copyright 2014 Melissa Ness.
 - extend to perform quadratic fitting
 """
 
-from astropy.io import fits as pyfits 
+#from astropy.io import fits as pyfits 
+import pyfits
 import scipy 
 import glob 
 import pickle
@@ -27,7 +28,7 @@ import numpy as np
 LARGE = 1e2 # sigma value to use for bad continuum-normalized data; MAGIC
 
 def weighted_median(values, weights, quantile):
-        """weighted_median
+    """weighted_median
 
     keywords
     --------
@@ -131,35 +132,35 @@ def get_normalized_test_data(testfile):
     testdata:
 
     """
-  name = testfile.split('/')[-2]
-  testdir = testfile.split('stars')[0]
-  if glob.glob(name+'.pickle'):
-      file_in2 = open(name+'.pickle', 'r') 
-      testdata = pickle.load(file_in2)
-      file_in2.close()
-      return testdata 
+    name = testfile.split('/')[-2]
+    testdir = testfile.split('stars')[0]
+    if glob.glob(name+'.pickle'):
+        file_in2 = open(name+'.pickle', 'r') 
+        testdata = pickle.load(file_in2)
+        file_in2.close()
+        return testdata 
 
-  a = open(testfile, 'r')
-  al2 = a.readlines()
-  bl2 = []
-  for each in al2:
-    bl2.append(testdir+each.strip())
-  for jj,each in enumerate(bl2):
-    a = pyfits.open(each) 
-    if shape(a[6].data) != (8575,):
-      ydata = a[1].data[0]
-      ysigma = a[2].data[0]
-      len_data  = len(a[1].data[0])
-      if jj == 0:
-          nlam = len(a[1].data[0])
-          testdata = np.zeros((nlam, len(bl2), 3))
-    if shape(a[1].data) == (8575,):
-      ydata = a[1].data
-      ysigma = a[2].data
-      len_data  = len(a[1].data)
-      if jj == 0:
-          nlam = len(a[1].data)
-          testdata = np.zeros((nlam, len(bl2), 3))
+    a = open(testfile, 'r')
+    al2 = a.readlines()
+    bl2 = []
+    for each in al2:
+      bl2.append(testdir+each.strip())
+    for jj,each in enumerate(bl2):
+        a = pyfits.open(each) 
+        if shape(a[6].data) != (8575,):
+            ydata = a[1].data[0]
+            ysigma = a[2].data[0]
+            len_data  = len(a[1].data[0])
+            if jj == 0:
+                nlam = len(a[1].data[0])
+                testdata = np.zeros((nlam, len(bl2), 3))
+        if shape(a[1].data) == (8575,):
+            ydata = a[1].data
+            ysigma = a[2].data
+            len_data  = len(a[1].data)
+            if jj == 0:
+                nlam = len(a[1].data)
+                testdata = np.zeros((nlam, len(bl2), 3))
     
     start_wl =  a[1].header['CRVAL1']
     diff_wl = a[1].header['CDELT1']
@@ -173,14 +174,14 @@ def get_normalized_test_data(testfile):
     testdata[:, jj, 0] = xdata
     testdata[:, jj, 1] = ydata
     testdata[:, jj, 2] = ysigma
-  testdata = continuum_normalize(testdata) # testdata
-  file_in = open(name+'.pickle', 'w')  
-  pickle.dump(testdata,  file_in)
-  file_in.close()
-  return testdata 
+    testdata = continuum_normalize(testdata) # testdata
+    file_in = open(name+'.pickle', 'w')  
+    pickle.dump(testdata,  file_in)
+    file_in.close()
+    return testdata 
 
 def get_normalized_training_data():
-    """
+  """
     inputs
     ------
     testfile: str
@@ -191,8 +192,7 @@ def get_normalized_training_data():
     returns
     -------
     dataall - the normalised test data 
-
-    """
+  """
   if glob.glob('normed_data.pickle'): 
         file_in2 = open('normed_data.pickle', 'r') 
         dataall, metaall, labels, Ametaall, cluster_name = pickle.load(file_in2)
@@ -360,7 +360,7 @@ def train(dataall, metaall, order, fn, Ametaall, cluster_name, logg_cut=100., te
    # dataall = dataall[:, good]
    # metaall = metaall[good]
 
-    diff_t = np.abs(array(metaall[:,0] - Ametaall[:,0]) ) 
+    diff_t = np.abs(np.array(metaall[:,0] - Ametaall[:,0]) ) 
     good = np.logical_and((metaall[:, 1] < logg_cut), (diff_t < 600. ) ) 
     dataall = dataall[:, good]
     metaall = metaall[good]
@@ -665,26 +665,27 @@ if __name__ == "__main__":
     fpickle2 = "coeffs_2nd_order.pickle"
     if not glob.glob(fpickle2):
         train(dataall, metaall, 2,  fpickle2, Ametaall, cluster_name, logg_cut= 40.,teff_cut = 0.)
-    a = open('all.txt', 'r') 
-    a = open('all_test2.txt', 'r') 
-    al = a.readlines()
-    bl = []
-    for each in al:
-      bl.append(each.strip()) 
-    for each in bl: 
-      testfile = each
-      self_flag = 2
+    self_flag = 2
     if self_flag < 1:
-      field = testfile.split('.txt')[0]+'_' #"4332_"
-      testdataall = get_normalized_test_data(testfile) # if flag is one, do on self 
-      testmetaall, inv_covars = infer_labels_nonlinear("coeffs_2nd_order.pickle", testdataall, field+"tags.pickle",-10.94,10.99) 
+        a = open('all.txt', 'r') 
+        a = open('all_test2.txt', 'r') 
+        al = a.readlines()
+        bl = []
+        for each in al:
+            bl.append(each.strip()) 
+        for each in bl: 
+            testfile = each
+            field = testfile.split('.txt')[0]+'_' #"4332_"
+            testdataall = get_normalized_test_data(testfile) # if flag is one, do on self 
+            testmetaall, inv_covars = infer_labels_nonlinear("coeffs_2nd_order.pickle", testdataall, field+"tags.pickle",-10.94,10.99) 
+    
     if self_flag == 1:
-      field = "self_"
-      file_in = open('normed_data.pickle', 'r') 
-      testdataall, metaall, labels = pickle.load(file_in)
-      lookatfits('coeffs.pickle',[1002],testdataall)
-      file_in.close() 
-      testmetaall, inv_covars = infer_labels("coeffs.pickle", testdataall, field+"tags.pickle",-10.980,11.43) 
+        field = "self_"
+        file_in = open('normed_data.pickle', 'r') 
+        testdataall, metaall, labels = pickle.load(file_in)
+        lookatfits('coeffs.pickle',[1002],testdataall)
+        file_in.close() 
+        testmetaall, inv_covars = infer_labels("coeffs.pickle", testdataall, field+"tags.pickle",-10.980,11.43) 
     if self_flag == 2:
       field = "self_2nd_order_"
       file_in = open('normed_data.pickle', 'r') 
