@@ -75,9 +75,9 @@ ax.set_ylabel("Star Number",fontsize = 20)
 
 image = chisq.T
 #b = np.insert(a, 3, values=0, axis=1)
-test = ax.imshow(image.T, cmap=plt.cm.bwr_r, interpolation="nearest", vmin = 0, vmax = 1,aspect = 'auto',origin = 'lower')
+test = ax.imshow(image.T, cmap=plt.cm.bwr_r, interpolation="nearest", vmin = 50, vmax = 100,aspect = 'auto',origin = 'lower')
 cb = fig.colorbar(test) 
 #cb.set_label("arcsinh($\chi$)", fontsize = 20 ) 
 cb.set_label("chisq value", fontsize = 20 )
 #fig.show()
-fig.savefig('chisq_map_findN6791.eps', transparent=True, bbox_inches='tight', pad_inches=0)
+fig.savefig('chisq_map_50to100.eps', transparent=True, bbox_inches='tight', pad_inches=0)

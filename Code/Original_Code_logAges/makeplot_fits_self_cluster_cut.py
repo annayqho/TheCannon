@@ -94,6 +94,7 @@ def plotfits():
     ax3 = fig.add_subplot(413)
     ax4 = fig.add_subplot(414)
     params_labels = [params[:,0], params[:,1], params[:,2] , params[:,3], covs_params[:,0,0]**0.5, covs_params[:,1,1]**0.5, covs_params[:,2,2]**0.5 , covs_params[:,3,3]**0.5]
+    print covs_params[:,3,3]**0.5
     cval = ['k', 'b', 'r', 'c'] 
     input_ASPCAP = [t, g, feh, age, t_err, g_err, feh_err, age_err] 
     listit_1 = [0,1,2,3]
