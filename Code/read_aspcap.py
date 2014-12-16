@@ -3,7 +3,7 @@
 ' The only one of these functions that The Cannon will interact with is getStars '
 ' This assumes that you have two kinds of files: a list of continuum pixels (determined in whatever way you want), and a file with training labels '
 
-from star import Star
+from stars import Stars
 import pyfits
 import numpy as np
 import os
@@ -17,7 +17,9 @@ def getSpectra(files):
         file_in = pyfits.open(fits_file)
         fluxes = np.array(file_in[1].data)
         if jj == 0:
+            global nstars
             nstars = len(files)
+            global npixels
             npixels = len(fluxes)
             spectra = np.zeros((nstars, npixels, 3))
         flux_errs = np.array((file_in[2].data))
@@ -62,49 +64,55 @@ def findGaps(spectra):
         allends.append(ends)
 
 def continuumNormalize(spectra):
-    ' For ASPCAP data, we fit a 2nd order Chebyshev polynomial to each segment of the continuum, and divide that segment by it '
-
+    ' Fit 2nd order Chebyshev polynomial to each segment of spectrum and divide by it '
     continua = np.zeros((nstars, npixels))
     normalized_spectra = np.ones((nstars, npixels, 3))
    
-    # pixlist is a list of "true" continuum pixels, as determined in this case by the Cannon method
-    pixlist = np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1)
-    pixlist = list(pixlist)
+    # pixlist is a list of "true" continuum pixels, det in this case by the Cannon
+    pixlist = list(np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1))
 
-    # Check for unphysical values
-    for jj in range(0, nstars):
-        isinf = np.isnan(spectra[jj,:,1]) |  np.isinf(spectra[jj,:,1]) | np.isnan(spectra[jj,:,2])
-        negerr = (spectra[jj,:,2] <= 0)
-        bad = isinf | negerr
-        spectra[jj,:,1][bad] = 0.
-        spectra[jj,:,2][bad] = np.Inf
-  
-    # Construct a variance array: [10,000] of length npixels
-    var_array = 100**2*np.ones(npixels)
-    var_array[pixlist] = 0.000
-    ivar = 1. / ((spectra[:, :, 2] ** 2) + var_array)
-    bad = np.isnan(ivar) | np.isinf(ivar)
-    ivar[bad] = 0
-
-    # We discard the edges of the fluxes, say 10 Angstroms, which is ~50 pixels
+    # We discard the edges of the fluxes: 10 Angstroms, which is ~50 pixels
     ## The regions with flux were found to be: [321, 3242] [3647, 6047], [6411, 8305]
     ## With edge cuts: [371, 3192], [3697, 5997], [6461, 8255]
     ## Corresponding to: [15218, 15743] [15931, 16367] [16549, 16887] 
 
-    split_spectrum = [spectra[:,371:3192,:], spectra[:,3697:5997,:], spectra[:,6461:8255,:]]
-    split_ivar = [ivar[:,371:3192], ivar[:,3697:5997], ivar[:,6461:8255]]
+    ranges = [[371,3192], [3697,5997], [6461,8255]]
+    LARGE = 200.
 
-    # Fit the Chebyshev polynomial
-    for i in range(len(split_spectrum)):
-        spectrum = split_spectrum[i]
-        ivar = split_ivar[i]
-        for jj in range(nstars):
-            fit = np.polynomial.chebyshev.Chebyshev.fit(x=spectrum[jj,:,0], y=spectrum[jj,:,1], w=ivar[jj], deg=3)
-            continuum = fit(spectrum[jj,:,0])
-            normalized_fluxes = spectrum[jj,:,1]/fit(spectrum[0,:,0])
-            normalized_flux_errs = spectrum[jj,:,2]/fit(spectrum[0,:,0])
+    # Fit the Chebyshev polynomial and continuum-normalize each region separately
+    for jj in range(nstars):
+        # Mask unphysical pixels
+        bad1 = np.invert(np.logical_and(np.isfinite(spectra[jj,:,1]),  np.isfinite(spectra[jj,:,2])))
+        bad = bad1 | (spectra[jj,:,2] <= 0)
+        spectra[jj,:,1][bad] = 0.
+        spectra[jj,:,2][bad] = np.Inf
 
-    #continuum = fit
+        var_array = 100**2*np.ones(npixels)
+        var_array[pixlist] = 0.000
+        ivar = 1. / ((spectra[jj, :, 2] ** 2) + var_array)
+        ivar = (np.ma.masked_invalid(ivar)).filled(0)
+        for i in range(len(ranges)):
+            start, stop = ranges[i][0], ranges[i][1]
+            spectrum = spectra[jj,start:stop,:]
+            ivar1 = ivar[start:stop]
+            fit = np.polynomial.chebyshev.Chebyshev.fit(x=spectrum[:,0], y=spectrum[:,1], w=ivar1, deg=3)
+            continua[jj,start:stop] = fit(spectrum[:,0])
+            normalized_fluxes = spectrum[:,1]/fit(spectra[0,start:stop,0])
+            bad = np.invert(np.isfinite(normalized_fluxes))
+            normalized_fluxes[bad] = 1.
+            normalized_flux_errs = spectrum[:,2]/fit(spectra[0,start:stop,0])
+            bad = np.logical_or(np.invert(np.isfinite(normalized_flux_errs)), normalized_flux_errs <= 0)
+            normalized_flux_errs[bad] = LARGE
+            normalized_spectra[jj,:,0] = spectra[jj,:,0]
+            normalized_spectra[jj,start:stop,1] = normalized_fluxes 
+            normalized_spectra[jj,start:stop,2] = normalized_flux_errs
+        
+        # Another unphysical pixel check
+        bad = spectra[jj,:,2] > LARGE
+        normalized_spectra[jj,np.logical_or(bad, bad1),1] = 1.
+        normalized_spectra[jj,np.logical_or(bad, bad1),2] = LARGE
+
+    return normalized_spectra, continua
 
 # These two functions are currently exactly the same because of the nature of the APOGEE set...this is for a sanity check where the test set == the training set
 def getTrainingFiles():
@@ -144,7 +152,6 @@ def getStars(isTraining):
     else:
         files = getTestFiles()
         training_labels = None
-    nstars = len(files)
     spectra = getSpectra(files)
     cont_norm_spectra = continuumNormalize(spectra)
     stars = Stars(files, cont_norm_spectra, training_labels)
