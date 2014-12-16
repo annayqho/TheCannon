@@ -4,11 +4,8 @@ from read_aspcap import getStars
 
 training_label_names = ['Teff', 'logg', 'FeH', 'age']
 
-training_set = getStars(training_label_names)
-test_set = getStars()
-
-#training_set = get_training_set(fitsfiles, traininglabels)
-#test_set = get_test_set(fitsfiles)
+training_set = getStars(isTraining=True)
+test_set = getStars(isTraining=False)
 
 #coefficients = train_model(training_set)
 #newlabels = estimate_labels(coefficients, test_set)
