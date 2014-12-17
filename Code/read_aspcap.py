@@ -1,7 +1,5 @@
 ' This is the file that the user will interact with. '
-' The purpose of the file is to read in the raw data and create a Star object, which consists of continuum-normalized spectra (fluxes, flux errs) as well as training labels. '
-' The only one of these functions that The Cannon will interact with is getStars '
-' This assumes that you have two kinds of files: a list of continuum pixels (determined in whatever way you want), and a file with training labels '
+' The purpose of the file is to read in the raw data and create a Stars object, which consists of continuum-normalized spectra (fluxes, flux errs) as well as training labels. '
 
 from stars import Stars
 import pyfits
@@ -123,7 +121,7 @@ def getTrainingFiles():
     for i in range(0, len(filenames)): # incorporate file location info
         filename = '../Data/APOGEE_Data' + filenames[i][1:] 
         filenames1.append(filename)
-    return filenames1
+    return np.array(filenames1)
 
 def getTestFiles():
     ' Return: filenames array of length (nteststars) ' 
@@ -133,26 +131,37 @@ def getTestFiles():
     for i in range(0, len(filenames)):
         filename = '../Data/APOGEE_Data' + filenames[i][1:] 
         filenames1.append(filename)
-    return filenames1
+    return np.array(filenames1)
 
 def getTrainingLabels():
-    ' Return: 2D array of size (nlabels, ntrainingstars) '
+    ' Return: 2D array of size (ntrainingstars, nlabels) '
     input1 = "starsin_SFD_Pleiades.txt"
     input2 = "ages_2.txt"
     T_est,g_est,feh_est,T_A, g_A, feh_A = np.loadtxt(input1, usecols = (4,6,8,3,5,7), unpack =1)
     age_est = np.loadtxt(input2, usecols = (0,), unpack =1)
     training_labels = np.array([T_est, g_est, feh_est, age_est])
-    return training_labels
+    apogee_labels = np.array([T_A, g_A, feh_A])
+    return training_labels.T, apogee_labels.T
 
-def getStars(isTraining):
+def discardStars(training_labels, apogee_labels):
+    ' Return: A mask telling you which stars to throw out '
+    diff_t = np.abs(apogee_labels[:,0]-training_labels[:,0]) # temp difference
+    logg_cut = 100.
+    diff_t_cut = 600.
+    bad = np.logical_and((diff_t < diff_t_cut), training_labels[:,1] < logg_cut)
+    return bad
+
+def getStars(isTraining, label_names):
     ' Constructs and returns a Stars object '
     if isTraining:
         files = getTrainingFiles()
-        training_labels = getTrainingLabels()
+        training_labels, apogee_labels = getTrainingLabels()
     else:
         files = getTestFiles()
         training_labels = None
     spectra = getSpectra(files)
     cont_norm_spectra = continuumNormalize(spectra)
-    stars = Stars(files, cont_norm_spectra, training_labels)
+    toDiscard = discardStars(training_labels, apogee_labels)
+    stars = Stars(files, cont_norm_spectra, [label_names, training_labels])
+    stars.removeStars(toDiscard)
     return stars
