@@ -1,3 +1,6 @@
+### ISSUES
+# if the training set is the same as the test set, and we remove stars from the training set (because of weirdness in the training labels, for example) do we also want to remove those stars from the test set? 
+
 ' This is the file that the user will interact with. '
 ' The purpose of the file is to read in the raw data and create a Stars object, which consists of continuum-normalized spectra (fluxes, flux errs) as well as training labels. '
 
@@ -9,15 +12,15 @@ import os
 npixels = 0
 nstars = 0
 
-def getSpectra(files):
+def get_spectra(files):
     ' Reads file list and returns spectra array, shape (npixels, nstars, 3) '
     for jj,fits_file in enumerate(files):
         file_in = pyfits.open(fits_file)
         fluxes = np.array(file_in[1].data)
         if jj == 0:
-            global nstars
+            global nstars 
             nstars = len(files)
-            global npixels
+            global npixels 
             npixels = len(fluxes)
             spectra = np.zeros((nstars, npixels, 3))
         flux_errs = np.array((file_in[2].data))
@@ -32,7 +35,7 @@ def getSpectra(files):
         spectra[jj, :, 2] = flux_errs
     return spectra
 
-def findGaps(spectra):
+def find_gaps(spectra):
 
     # - Find the gaps in the spectrum, assume a series of zeros with len(>=50 pix)
     # - There are a few stars for which the gap is not quite the same.  
@@ -61,7 +64,7 @@ def findGaps(spectra):
         allstarts.append(starts)
         allends.append(ends)
 
-def continuumNormalize(spectra):
+def continuum_normalize(spectra):
     ' Fit 2nd order Chebyshev polynomial to each segment of spectrum and divide by it '
     continua = np.zeros((nstars, npixels))
     normalized_spectra = np.ones((nstars, npixels, 3))
@@ -113,7 +116,7 @@ def continuumNormalize(spectra):
     return normalized_spectra, continua
 
 # These two functions are currently exactly the same because of the nature of the APOGEE set...this is for a sanity check where the test set == the training set
-def getTrainingFiles():
+def get_training_files():
     ' Return: filenames array of length (ntrainingstars) '
     readin = "starsin_SFD_Pleiades.txt"
     filenames = np.loadtxt(readin, usecols = (0,), dtype='string', unpack = 1)
@@ -123,7 +126,7 @@ def getTrainingFiles():
         filenames1.append(filename)
     return np.array(filenames1)
 
-def getTestFiles():
+def get_test_files():
     ' Return: filenames array of length (nteststars) ' 
     readin = "starsin_SFD_Pleiades.txt"
     filenames = np.loadtxt(readin, usecols = (0,), dtype='string', unpack = 1)
@@ -133,7 +136,7 @@ def getTestFiles():
         filenames1.append(filename)
     return np.array(filenames1)
 
-def getTrainingLabels():
+def get_training_labels():
     ' Return: 2D array of size (ntrainingstars, nlabels) '
     input1 = "starsin_SFD_Pleiades.txt"
     input2 = "ages_2.txt"
@@ -143,7 +146,7 @@ def getTrainingLabels():
     apogee_labels = np.array([T_A, g_A, feh_A])
     return training_labels.T, apogee_labels.T
 
-def discardStars(training_labels, apogee_labels):
+def discard_stars(training_labels, apogee_labels):
     ' Return: A mask telling you which stars to throw out '
     diff_t = np.abs(apogee_labels[:,0]-training_labels[:,0]) # temp difference
     logg_cut = 100.
@@ -151,17 +154,19 @@ def discardStars(training_labels, apogee_labels):
     bad = np.logical_and((diff_t < diff_t_cut), training_labels[:,1] < logg_cut)
     return bad
 
-def getStars(isTraining, label_names):
+def get_stars(is_training, label_names):
     ' Constructs and returns a Stars object '
-    if isTraining:
-        files = getTrainingFiles()
-        training_labels, apogee_labels = getTrainingLabels()
+    if is_training:
+        files = get_training_files()
+        training_labels, apogee_labels = get_training_labels()
     else:
-        files = getTestFiles()
+        files = get_test_files()
         training_labels = None
-    spectra = getSpectra(files)
-    cont_norm_spectra = continuumNormalize(spectra)
-    toDiscard = discardStars(training_labels, apogee_labels)
+    spectra = get_spectra(files)
+    cont_norm_spectra, continua = continuum_normalize(spectra)
     stars = Stars(files, cont_norm_spectra, [label_names, training_labels])
-    stars.removeStars(toDiscard)
-    return stars
+    to_discard = None
+    if is_training: # because the condition depends on the labels...
+        to_discard = discard_stars(training_labels, apogee_labels)
+        stars.remove_stars(to_discard)
+    return stars, to_discard
