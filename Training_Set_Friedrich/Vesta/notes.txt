@@ -1,0 +1,5 @@
+Nominal solar values: Teff = 5777K, logg = 4.44dex, M/H = 0.0
+Throughout all analyses, M/H was assumed to be equal to Fe/H
+Stellar params for each target spectrum were found through differential approach w.r.t. reference spectrum, arbitrarily taken as the Vesta 1 spectrum for the MIKE data and Vesta for the ESPaDOnS data
+
+
