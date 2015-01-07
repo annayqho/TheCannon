@@ -12,5 +12,4 @@ test_set, nothing = get_stars(False, training_label_names)
 model = train_model(training_set)
 cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
 
-training_labels = training_set.getLabelValues()
-plot(training_labels, cannon_labels)
+training_labels = training_set.get_label_values()
