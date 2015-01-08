@@ -1,14 +1,10 @@
-# This is the skeleton of the class used to extract spectra 
-# (wavelengths, fluxes, flux errs) for training and test stars, 
-# and training labels for the training stars. 
+"""
+This is the skeleton of the class used to establish the training set and test set for input into The Cannon.
 
-# Each survey or data type will inherit this class, ex. read_aspcap, 
-# read_rave, read_uves. The user will then fill in methods as described below.
+The user does not interact with this class. Instead, the user writes a child class that inherits from this class, and fills in methods that indicate how spectra (wavelengths, fluxes, flux errs) and training labels (for the training set) should be extracted from the raw data files, the conditions (if any) that determine which stars they want to discard.  
 
-# The goal of this class is to create a Stars object. 
-# Stars are represented by an array of continuum_normalized spectra 
-# (shape = nstars, npixels, 3) and, if they are a training set, 
-# labels (shape = nstars, nlabels).  
+The last method in this class, set_star_set, is not changed by the user. It creates the training_set and test_set using the methods defined by the user. Note: this method should probably be moved to a different file, but for now it lives here.
+"""
 
 from stars import Stars
 import pyfits
@@ -20,59 +16,70 @@ class ReadData():
     def __init__(self):
         pass
 
-    ### Functions that need to be filled in by the user:
+    ### The following functions need to be filled in by the user:
 
-    def get_training_files(): 
-       """ Returns: an array of length num_training_stars 
-        consisting of the filenames corresponding to the training set 
+    def get_spectra(files):
+        """
+        Extracts spectra (wavelengths, fluxes, fluxerrs) from raw data files
+        
+        Input: a list of data file names of length nstars 
+        Returns: a 3D float array of shape (nstars, npixels, 3) 
+        with spectra[:,:,0] = pixel wavelengths
+        spectra[:,:,1] = flux values
+        spectra[:,:,2] = flux err values
+        """
+
+    def continuum_normalize(spectra):
+        """
+        Continuum-normalizes the spectra. 
+
+        Input: spectra array, which is a 3D float array w/ shape (nstars,npixels,3)
+        Returns:    3D continuum-normalized spectra (shape=nstars,npixels,3)
+                    2D continuum array (shape=nstars,npixels)
+        """
+
+    def get_training_files():
         """ 
-           
+        Establishes which files correspond to the training set data. 
+
+        Returns: an array of filenames of length ntrainingstars 
+        """
+
     def get_test_files():
-        """ Returns: an array of length num_test_stars
-        consisting of the filenames corresponding to the test set 
         """
-
-    def get_wavelengths(filename):
-        """ Input: name (string) of the data file containing the spectrum 
-        Returns: np.array 
-        that is the spectrum's x-axis (wavelengths in Angstroms)  
-        """
-
-    def get_fluxes(filename):
-        """ Input: name (string) of the data file containing the spectrum 
-        Returns: np.array 
-        that is the y-axis (fluxes) of the spectrum
-        """
-
-    def get_fluxerrs(filename):
-        """ Input: name (string) of the data file containing the spectrum
-        Returns: np.array 
-        that is the errors in the spectrum's y-axis (fluxes)
+        Establishes which files correspond to the test set data.
+        
+        Returns an array of filenames of length nteststars 
         """
 
     def get_training_labels(filename):
-        """ Input: name (string) of the data file containing the labels
-        Returns: a 2D np.array (size = num_training_stars, num_labels) consisting of all the training labels 
+        """
+        Extracts training labels from file
+
+        Input: name (string) of the data file containing the labels
+        Returns: a 2D np.array (size = num_training_stars, num_labels) 
+        consisting of all the training labels 
         """
 
     def set_stars_to_discard():
-        ' Optional method, allows you to create a mask indicating which stars to throw out for whatever reason '
-        ' Returns a boolean array of len(nstars) where True means "throw out" and false means "keep" '
+        """
+        Enables the user to create a mask indicating which stars to throw out.
+        Sample criteria: logg within a specific range
+        
+        Returns: a boolean array of len(nstars) where True means "discard"
+        """
 
-    # Not sure what to do about this method
-    def continuum_normalize(spectra):
-        ' Reads the spectra object and applies some continuum normalization '
-        ' Returns (1) a continuum-normalized version of the spectra object, shape (nstars, npixels, 3) and (2) the continua, shape (nstars, npixels)'
+    ##### The following function is NOT changed by the user.
+    ##### This should probably live in a different file. 
 
-    ##### NOT changed by the user
+    def set_star_set(is_training, label_names):
+        """ 
+        Constructs and returns a Stars object, which consists of a set of spectra and (if it's the training set) training labels. Uses the methods defined above by the user.
 
-    def get_spectra(files):
-        ' Reads list of raw data files '
-        ' Returns spectra array, shape (npixels, nstars, 3) '
-
-    def get_stars(is_training, label_names):
-        ' This method is NOT changed by the user '
-        ' Constructs and returns a Stars object '
+        Input:  is_training boolean (True or False), True if it's the training set
+                label_names, a list of strings, ex. ['FeH', 'logg']
+        Returns: a Stars object, corresponding to ex. the training set
+        """
         if is_training:
             files = get_training_files()
             training_labels = get_training_labels()
@@ -80,10 +87,8 @@ class ReadData():
             files = get_test_files()
             training_labels = None
         spectra = get_spectra(files)
-        global nstars = spectra.shape[0]
-        global npixels = spectra.shape[1]
         cont_norm_spectra = continuum_normalize(spectra)
-        to_discard = discard_stars(training_labels, apogee_labels)
+        to_discard = set_stars_to_discard()
         stars = Stars(files, cont_norm_spectra, [label_names, training_labels])
         stars.removeStars(to_discard)
         return stars
