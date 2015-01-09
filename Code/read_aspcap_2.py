@@ -181,6 +181,7 @@ class ReadASPCAP(ReadData):
         """
         input1 = "starsin_SFD_Pleiades.txt"
         input2 = "ages_2.txt"
+        #input2 = "logAges.txt"
         T_est,g_est,feh_est,T_A, g_A, feh_A = np.loadtxt(input1, 
                 usecols = (4,6,8,3,5,7), unpack =1)
         age_est = np.loadtxt(input2, usecols = (0,), unpack =1)

@@ -40,7 +40,7 @@ def do_one_regression_at_fixed_scatter(spectra, x, scatter):
     try:
         coeff = np.linalg.solve(xTCinvx, xTCinvf) # this is the model!
     except np.linalg.linalg.LinAlgError:
-        print "np.linalg.linalg.LinAlgError in do_one_regression_at_fixed_scatter"
+        print "np.linalg.linalg.LinAlgError, do_one_regression_at_fixed_scatter"
         print MTCinvM, MTCinvx, spectra[:,0], spectra[:,1], spectra[:,2]
         print fluxes
     assert np.all(np.isfinite(coeff))
@@ -50,10 +50,10 @@ def do_one_regression_at_fixed_scatter(spectra, x, scatter):
 
 def do_one_regression(spectra, x):
     """
-    Optimizes to solve for coeffs (the model) and 
-    determines the scatter of the model at a single wavelength for all stars.
-    (The scatter - the deviation between obs. spectrum and model - 
-    is presumed to be wavelength-dependent)
+    Optimizes to find the scatter associated with the best-fit model.
+
+    This scatter is the deviation between the observed spectrum and the model.
+    It is wavelength-independent, so we perform this at a single wavelength.
 
     Input
     -----
@@ -64,8 +64,9 @@ def do_one_regression(spectra, x):
     -----
     output of do_one_regression_at_fixed_scatter
     """
-    # where does this come from??
+    # cover the full order of the scatter term, scatter << max term
     ln_scatter_vals = np.arange(np.log(0.0001), 0., 0.5) 
+    # will minimize over the range of scatter possibilities
     chis_eval = np.zeros_like(ln_scatter_vals)
     for jj, ln_scatter_val in enumerate(ln_scatter_vals):
         coeff, xTCinvx, chi, logdet_Cinv = do_one_regression_at_fixed_scatter(

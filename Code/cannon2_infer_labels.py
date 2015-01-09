@@ -10,7 +10,8 @@ def get_x(labels):
     Assumes that our model is quadratic in the labels
     """
     nlabels = len(labels)
-    x = labels # linear term
+    # should there be a [1] at the beginning of this vector?
+    x = labels # linear terms 
     # Quadratic terms: 
     for i in range(nlabels):
         for j in range(i, nlabels):
@@ -57,8 +58,7 @@ def infer_labels(num_labels, model, test_set):
         pixels = spectra[jj,:,0]
         fluxes = spectra[jj,:,1]
         fluxerrs = spectra[jj,:,2]
-        fluxes_norm = fluxes - coeffs_all[:,0] # ? code says "subtract the mean". but in the code it's written here coeffs[:,0] and I don't see why that should be the mean. I also don't see why we should subtract the mean...
-        # We have 15 coefficients in coeffs...
+        fluxes_norm = fluxes - coeffs_all[:,0] #pivot around small value 
         Cinv = 1. / (fluxerrs* 2 + scatters**2)
         # something I don't understand --
         coeffs = np.delete(coeffs_all, 0, axis=1) #since x0 = 1...
@@ -66,9 +66,7 @@ def infer_labels(num_labels, model, test_set):
         labels, covs = opt.curve_fit(
                 func, coeffs, fluxes_norm, sigma=weights, absolute_sigma = True)
         labels = labels + pivots
-        value_cut = -14 # no idea what this is...
-        coeffs_slice = coeffs[:,value_cut:]
-        MCM_rotate = np.dot(coeffs_slice.T, Cinv[:,None] * coeffs_slice)
+        MCM_rotate = np.dot(coeffs.T, Cinv[:,None] * coeffs)
         labels_all[jj,:] = labels
         MCM_rotate_all[jj,:,:] = MCM_rotate
         covs_all[jj,:,:] = covs
