@@ -20,11 +20,8 @@ def get_x(labels):
     x = np.array(x)
     return x
 
-# Extremely annoying...looks like scipy_optimize can't handle an array of parameters. Have to spell all the parameters out. 
-# So for now we have to hard-code the number of labels into here.  
-def func(coeffs, a, b, c, d):
-    labels = [a,b,c,d]
-    x = get_x(labels)
+def func(coeffs, *labels):
+    x = get_x(list(labels))
     return np.dot(coeffs, x)
 
 def infer_labels(num_labels, model, test_set):
@@ -63,8 +60,8 @@ def infer_labels(num_labels, model, test_set):
         # something I don't understand --
         coeffs = np.delete(coeffs_all, 0, axis=1) #since x0 = 1...
         weights = 1 / Cinv**0.5
-        labels, covs = opt.curve_fit(
-                func, coeffs, fluxes_norm, sigma=weights, absolute_sigma = True)
+        labels, covs = opt.curve_fit(func, coeffs, fluxes_norm, 
+                p0=np.repeat(1,nlabels), sigma=weights, absolute_sigma = True)
         labels = labels + pivots
         MCM_rotate = np.dot(coeffs.T, Cinv[:,None] * coeffs)
         labels_all[jj,:] = labels
