@@ -10,7 +10,6 @@ def get_x(labels):
     Assumes that our model is quadratic in the labels
     """
     nlabels = len(labels)
-    # should there be a [1] at the beginning of this vector?
     x = labels # linear terms 
     # Quadratic terms: 
     for i in range(nlabels):
@@ -55,11 +54,10 @@ def infer_labels(num_labels, model, test_set):
         pixels = spectra[jj,:,0]
         fluxes = spectra[jj,:,1]
         fluxerrs = spectra[jj,:,2]
-        fluxes_norm = fluxes - coeffs_all[:,0] #pivot around small value 
+        fluxes_norm = fluxes - coeffs_all[:,0]*1 # pivot around the leading term
         Cinv = 1. / (fluxerrs* 2 + scatters**2)
-        # something I don't understand --
-        coeffs = np.delete(coeffs_all, 0, axis=1) #since x0 = 1...
         weights = 1 / Cinv**0.5
+        coeffs = np.delete(coeffs_all, 0, axis=1) # take pivot into account
         labels, covs = opt.curve_fit(func, coeffs, fluxes_norm, 
                 p0=np.repeat(1,nlabels), sigma=weights, absolute_sigma = True)
         labels = labels + pivots
