@@ -1,18 +1,10 @@
 for the future:
-- should labels come in a particular format, like an ascii table? how flexible should the input be? how do you communicate what format these things need to be in?
-- scipy curve_fit: how can we make it general for any number of labels? 
-- what should the ultimate user interface look like?
-- general continuum normalization...?
-- read_data: how much flexibility & control should the user have? what assumptions can I make?
 - implement a series of checks to make sure the user has written something sensible
 - spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
-- cmopare output label to the training space, flag if extrapolation has taken place
-- create non-identical subsets of the trainnig set
+- compare output label to the training space, flag if extrapolation has taken place
+- create non-identical subsets of the training set
 - shot noise in the creation of a training set
 - check the scatter at each pixel
 
 I don't understand:
-:q
 - MCM_rotate_all matrix...what is it? it's the coefficients multiplied by the inverse covariance (1/errors^2). Just has to be the right shape for matrix multiplication to work. MKN will send me the maths in the next couple of days. 
-- subtracting the mean of the fluxes from each flux value...? it's subtracting the "mean" to keep things pivoting around small values, it's not the mean it's the 0th order coefficient
-- value_cut of -14. What is this? This is to get the array the right shape for the next step...it removes the 0th order coefficient, when there are 3 labels this becomes -9, which should be the value in fitspectra.py. This should not be a number it should be determined from the lengths of the coefficients. 

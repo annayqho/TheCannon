@@ -12,12 +12,10 @@ testset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = Non
 
 from spectral_model import SpectralModel
 
-model = SpectralModel(label_names, order) # order = quadratic, etc
-model.train(trainingset)
+model = SpectralModel(label_names, modeltype) # for the future, when we have different models for different pixels...
+model.train(trainingset) # sets attributes of the model, like coefficients etc
 
 # If you want to stop here and just save the model...
-
-import pickle
 
 model.write(filename)
 
