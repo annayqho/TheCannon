@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Cannon: Data-Driven Stellar Labels &mdash; TheCannon 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="TheCannon 1.0 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">TheCannon 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-cannon-data-driven-stellar-labels">
+<h1><em>The Cannon</em>: Data-Driven Stellar Labels<a class="headerlink" href="#the-cannon-data-driven-stellar-labels" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This is the software package used for <em>The Cannon</em>,
+a data-driven approach to determining stellar parameters
+and abundances (hereafter referred to as <em>labels</em>) corresponding to a
+vast set of stellar spectra.</p>
+<p>A brief overview of <em>The Cannon</em> is below. For more details, see our
+publication! :D</p>
+<p>For <em>The Cannon</em> to work, this vast set must have a subset of <em>reference
+objects</em>: spectra that already have high-fidelity labels. Labels for the
+remaining spectra are determined via a process called <em>label transfer.</em></p>
+<p>There are two fundamental steps in label transfer.</p>
+<ol class="arabic simple">
+<li>The <em>training step</em>: the reference objects are assembled into a
+<em>training set</em> that is used to solve for a flexible generative model
+(with ~80,000 parameters). The model describes the flux in every pixel
+of the continuum-normalized spectrum as a function of stellar labels.</li>
+<li>The <em>test step</em>: we assume that this generative model holds for all
+of the other objects in the survey (dubbed <em>survey objects</em>).
+Then, the spectra of the survey objects and the generative model from
+the reference objects allow us to solve for - or infer - the labels
+of the survey objects.</li>
+</ol>
+<p>A few notable features of this package are:</p>
+<ul class="simple">
+<li>Helpful (optional) methods for preparing spectra and labels to be
+fed into <em>The Cannon</em></li>
+<li>Generate a training set and a test set by supplying spectra and training
+labels</li>
+<li>Merge multiple training sets into one</li>
+<li>Generate a model by running the training set through Step 1 of <em>The Cannon</em></li>
+<li>Determine labels for the test set by running the model and training set
+through Step 2 of <em>The Cannon</em>.</li>
+</ul>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>The basic workflow for creating a training set and test set, solving for
+the model (Step 1) and finally determining labels (Step 2) is shown below.</p>
+<div class="section" id="step-1-prepare-data">
+<h3>Step 1: Prepare Data<a class="headerlink" href="#step-1-prepare-data" title="Permalink to this headline">¶</a></h3>
+<p><em>The Cannon</em> expects all spectra - for reference and survey objects -
+to be continuum-normalized in a consistent way, and sampled on a consistent
+rest-frame wavelength grid, with the same line-spread function. It also
+assumes that the flux variance, from photon noise and other sources, is
+known at each spectral pixel of each spectrum.</p>
+<p>The user is left to prepare the data him or herself, but we include
+some optional methods that may be helpful.</p>
+</div>
+<div class="section" id="step-2-construct-training-set">
+<h3>Step 2: Construct Training Set<a class="headerlink" href="#step-2-construct-training-set" title="Permalink to this headline">¶</a></h3>
+<p>The training set is a set of stars from the survey under consideration
+for which the user has spectra and also high-fidelity labels (that is,
+stellar parameters and element abundances that are deemed both accurate
+and precise.) The set of reference objects is critical, as the label
+transfer to the survey objects can only be as good as the quality of the
+training set.</p>
+<p>Labels for a training set will not necessarily come from the same data,
+and therefore spectra will not necessarily be in the same data format.
+For flexibility, <em>The Cannon</em> software package allows the user to construct
+training subsets, one data type each, and then merge the subsets.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="kn">import</span> <span class="nn">Dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fts_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vesta_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trainingset</span> <span class="o">=</span> <span class="n">mergesets</span><span class="p">(</span><span class="n">fts_trainingset</span><span class="p">,</span> <span class="n">vesta_trainingset</span><span class="p">,</span> <span class="n">cluster_trainingset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are a few ways to examine the dataset. You can retrieve the spectra
+as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pixels</span> <span class="o">=</span> <span class="n">trainingset</span><span class="o">.</span><span class="n">spectra</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span> <span class="o">=</span> <span class="n">trainingset</span><span class="o">.</span><span class="n">spectra</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxerrs</span> <span class="o">=</span> <span class="n">trainingset</span><span class="o">.</span><span class="n">spectra</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-3-construct-test-set">
+<h3>Step 3: Construct Test Set<a class="headerlink" href="#step-3-construct-test-set" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">testset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-4-the-cannon-step-1-generate-model">
+<h3>Step 4: <em>The Cannon</em> Step 1 - Generate Model<a class="headerlink" href="#step-4-the-cannon-step-1-generate-model" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spectral_model</span> <span class="kn">import</span> <span class="n">SpectralModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpectralModel</span><span class="p">(</span><span class="n">label_names</span><span class="p">,</span> <span class="n">modeltype</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">trainingset</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-5-the-cannon-step-2-infer-labels">
+<h3>Step 5: <em>The Cannon</em> Step 2 - Infer Labels<a class="headerlink" href="#step-5-the-cannon-step-2-infer-labels" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon_labels</span> <span class="kn">import</span> <span class="n">CannonLabels</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">labels</span> <span class="o">=</span> <span class="n">CannonLabels</span><span class="p">(</span><span class="n">label_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">labels</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">testset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><em>The Cannon</em>: Data-Driven Stellar Labels</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+<li><a class="reference internal" href="#step-1-prepare-data">Step 1: Prepare Data</a></li>
+<li><a class="reference internal" href="#step-2-construct-training-set">Step 2: Construct Training Set</a></li>
+<li><a class="reference internal" href="#step-3-construct-test-set">Step 3: Construct Test Set</a></li>
+<li><a class="reference internal" href="#step-4-the-cannon-step-1-generate-model">Step 4: <em>The Cannon</em> Step 1 - Generate Model</a></li>
+<li><a class="reference internal" href="#step-5-the-cannon-step-2-infer-labels">Step 5: <em>The Cannon</em> Step 2 - Infer Labels</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">TheCannon 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Anna Ho.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
