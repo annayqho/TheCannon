@@ -1,7 +1,6 @@
 *** Have you updated the Sphinx documentation???? ***
 
 next steps:
-- write "generally useful" methods that the user could choose (or not) to use in preparing data for use by The Cannon
 - write the ASPCAP implementation and make sure that the above works
 - write "merge" method for the Database class
 - check to make sure the Database class is working for ASPCAP

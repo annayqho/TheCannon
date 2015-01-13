@@ -5,10 +5,9 @@ import os
 """Provides basic optional methods for extracting spectra and labels from 
 a data file.
 
-Makes the following assumptions:
--- the file with spectra is aspcap .fits
--- the spectrum is continuous
--- the file with training labels is...
+Makes the following assumptions: the file with spectra is aspcap .fits,
+the spectrum is continuous
+the file with training labels is...
 
 Methods
 -------
@@ -22,9 +21,9 @@ def get_spectra(filenames):
 
     Input: a list of data file names 
     Returns: 3D float array 
-        spectra[:,:,0] = pixel wavelengths
-        spectra[:,:,1] = flux values
-        spectra[:,:,2] = flux err values
+    spectra[:,:,0] = pixel wavelengths
+    spectra[:,:,1] = flux values
+    spectra[:,:,2] = flux err values
     """
 
     for jj,fits_file in enumerate(filenames):
@@ -34,8 +33,8 @@ def get_spectra(filenames):
             nstars = len(filenames)
             npixels = len(fluxes)
             spectra = np.zeros((nstars, npixels, 3))
-            print "Constructing spectra array of shape (nstars, npixels, 3) = 
-            %s , %s, 3)" %(nstars, npixels)
+            print "Constructing spectra array, shape (nstars, npixels, 3)"
+            print "= (%s, %s, 3)" %(nstars, npixels)
         flux_errs = np.array((file_in[2].data))
         start_wl = file_in[1].header['CRVAL1']
         diff_wl = file_in[1].header['CDELT1']
@@ -57,7 +56,7 @@ def continuum_normalize(spectra):
 
     Input: spectra array, 2D float shape nstars,npixels,3
     Returns: 3D continuum-normalized spectra (nstars, npixels,3)
-            2D continuum array (nstars, npixels)
+    2D continuum array (nstars, npixels)
     """
 
     nstars = spectra.shape[0]
@@ -112,7 +111,7 @@ def get_training_labels(filename):
 
     Input: filename
     Returns: 2D np.array (size=ntrainingstars, nlabels) consisting of all
-        training labels
+    training labels
     """
 
     with open(filename, 'r') as f:

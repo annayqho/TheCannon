@@ -33,6 +33,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="#">TheCannon 1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -83,15 +86,18 @@ through Step 2 of <em>The Cannon</em>.</li>
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
 <p>The basic workflow for creating a training set and test set, solving for
 the model (Step 1) and finally determining labels (Step 2) is shown below.</p>
-<div class="section" id="step-1-prepare-data">
-<h3>Step 1: Prepare Data<a class="headerlink" href="#step-1-prepare-data" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="step-1-prepare-data-prepdata-py">
+<h3>Step 1: Prepare Data (<tt class="docutils literal"><span class="pre">prepdata.py</span></tt>)<a class="headerlink" href="#step-1-prepare-data-prepdata-py" title="Permalink to this headline">¶</a></h3>
 <p><em>The Cannon</em> expects all spectra - for reference and survey objects -
 to be continuum-normalized in a consistent way, and sampled on a consistent
 rest-frame wavelength grid, with the same line-spread function. It also
 assumes that the flux variance, from photon noise and other sources, is
 known at each spectral pixel of each spectrum.</p>
-<p>The user is left to prepare the data him or herself, but we include
-some optional methods that may be helpful.</p>
+<p>Preparing data thus involves: putting spectra into a 3D array
+(nstars, npixels, 3), putting label names into an array (nlabels),
+and putting training label values into a 2D array (nstars, nlabels).
+The user is left to do this him or herself, but we include some basic
+methods and functionalities in <tt class="docutils literal"><span class="pre">prep_data.py</span></tt> that might be helpful.</p>
 </div>
 <div class="section" id="step-2-construct-training-set">
 <h3>Step 2: Construct Training Set<a class="headerlink" href="#step-2-construct-training-set" title="Permalink to this headline">¶</a></h3>
@@ -141,20 +147,66 @@ as follows:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">labels</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">testset</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul class="simple">
-</ul>
 </div>
 </div>
+<div class="section" id="using-the-cannon">
+<h2>Using The Cannon<a class="headerlink" href="#using-the-cannon" title="Permalink to this headline">¶</a></h2>
+<p>The details of using The Cannon package are provided in the following sections:</p>
+<div class="section" id="prepare-data">
+<h3>Prepare Data<a class="headerlink" href="#prepare-data" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
-</ul>
+<div class="section" id="construct-training-set">
+<h3>Construct Training Set<a class="headerlink" href="#construct-training-set" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="construct-test-set">
+<h3>Construct Test Set<a class="headerlink" href="#construct-test-set" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="the-cannon-step-1-generate-model">
+<h3><em>The Cannon</em> Step 1: Generate Model<a class="headerlink" href="#the-cannon-step-1-generate-model" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="the-cannon-step-2-infer-labels">
+<h3><em>The Cannon</em> Step 2: Infer Labels<a class="headerlink" href="#the-cannon-step-2-infer-labels" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="module-prep_data">
+<span id="reference-api"></span><h2>Reference/API<a class="headerlink" href="#module-prep_data" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="prep_data.continuum_normalize">
+<tt class="descclassname">prep_data.</tt><tt class="descname">continuum_normalize</tt><big>(</big><em>spectra</em><big>)</big><a class="reference internal" href="_modules/prep_data.html#continuum_normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#prep_data.continuum_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum-normalizes a spectra array.</p>
+<p>Assumes that there are no gaps in the spectrum and fits a 2nd order
+Chebyshev polynomial. Divides spectrum by the polynomial.</p>
+<p>Input: spectra array, 2D float shape nstars,npixels,3
+Returns: 3D continuum-normalized spectra (nstars, npixels,3)
+2D continuum array (nstars, npixels)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="prep_data.get_spectra">
+<tt class="descclassname">prep_data.</tt><tt class="descname">get_spectra</tt><big>(</big><em>filenames</em><big>)</big><a class="reference internal" href="_modules/prep_data.html#get_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#prep_data.get_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts spectra from aspcap fits files</p>
+<p>Input: a list of data file names 
+Returns: 3D float array 
+spectra[:,:,0] = pixel wavelengths
+spectra[:,:,1] = flux values
+spectra[:,:,2] = flux err values</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="prep_data.get_training_labels">
+<tt class="descclassname">prep_data.</tt><tt class="descname">get_training_labels</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/prep_data.html#get_training_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#prep_data.get_training_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts training label names and values from file</p>
+<p>Assumes:
+&#8211; that the file format is as follows, with label names in first row
+&#8211; first row has a # then label names...
+&#8211; first column is the IDs...so strings
+&#8211; and the rest are floats
+&#8211; that you want <em>all</em> of the labels</p>
+<p>Input: filename
+Returns: 2D np.array (size=ntrainingstars, nlabels) consisting of all
+training labels</p>
+</dd></dl>
+
 </div>
 </div>
 
@@ -169,14 +221,22 @@ as follows:</p>
 <li><a class="reference internal" href="#"><em>The Cannon</em>: Data-Driven Stellar Labels</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a><ul>
-<li><a class="reference internal" href="#step-1-prepare-data">Step 1: Prepare Data</a></li>
+<li><a class="reference internal" href="#step-1-prepare-data-prepdata-py">Step 1: Prepare Data (<tt class="docutils literal"><span class="pre">prepdata.py</span></tt>)</a></li>
 <li><a class="reference internal" href="#step-2-construct-training-set">Step 2: Construct Training Set</a></li>
 <li><a class="reference internal" href="#step-3-construct-test-set">Step 3: Construct Test Set</a></li>
 <li><a class="reference internal" href="#step-4-the-cannon-step-1-generate-model">Step 4: <em>The Cannon</em> Step 1 - Generate Model</a></li>
 <li><a class="reference internal" href="#step-5-the-cannon-step-2-infer-labels">Step 5: <em>The Cannon</em> Step 2 - Infer Labels</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#using-the-cannon">Using The Cannon</a><ul>
+<li><a class="reference internal" href="#prepare-data">Prepare Data</a></li>
+<li><a class="reference internal" href="#construct-training-set">Construct Training Set</a></li>
+<li><a class="reference internal" href="#construct-test-set">Construct Test Set</a></li>
+<li><a class="reference internal" href="#the-cannon-step-1-generate-model"><em>The Cannon</em> Step 1: Generate Model</a></li>
+<li><a class="reference internal" href="#the-cannon-step-2-infer-labels"><em>The Cannon</em> Step 2: Infer Labels</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-prep_data">Reference/API</a></li>
 </ul>
 </li>
 </ul>
@@ -209,6 +269,9 @@ as follows:</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="#">TheCannon 1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>

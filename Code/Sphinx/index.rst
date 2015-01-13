@@ -1,11 +1,6 @@
-.. TheCannon documentation master file, created by
-   sphinx-quickstart on Tue Jan 13 11:07:08 2015.
-
-.. Much help from astropy: http://docs.astropy.org/en/stable/_sources/table/index.txt
-
-*************************************
+*****************************************
 *The Cannon*: Data-Driven Stellar Labels
-*************************************
+*****************************************
 
 Introduction
 ============
@@ -52,8 +47,8 @@ Getting Started
 The basic workflow for creating a training set and test set, solving for
 the model (Step 1) and finally determining labels (Step 2) is shown below.
 
-Step 1: Prepare Data
---------------------
+Step 1: Prepare Data (``prepdata.py``) 
+---------------------------------------
 
 *The Cannon* expects all spectra - for reference and survey objects - 
 to be continuum-normalized in a consistent way, and sampled on a consistent
@@ -61,11 +56,14 @@ rest-frame wavelength grid, with the same line-spread function. It also
 assumes that the flux variance, from photon noise and other sources, is 
 known at each spectral pixel of each spectrum.
 
-The user is left to prepare the data him or herself, but we include
-some optional methods that may be helpful. 
+Preparing data thus involves: putting spectra into a 3D array
+(nstars, npixels, 3), putting label names into an array (nlabels),
+and putting training label values into a 2D array (nstars, nlabels).
+The user is left to do this him or herself, but we include some basic 
+methods and functionalities in ``prep_data.py`` that might be helpful.
 
 Step 2: Construct Training Set
-------------------------------
+-------------------------------
 
 The training set is a set of stars from the survey under consideration
 for which the user has spectra and also high-fidelity labels (that is,
@@ -93,33 +91,46 @@ as follows:
 >>> fluxerrs = trainingset.spectra[:,:,2]
     
 Step 3: Construct Test Set
--------------------------
+---------------------------
 
     >>> testset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = None)
 
 Step 4: *The Cannon* Step 1 - Generate Model
--------------------------------------------
+---------------------------------------------
 
     >>> from spectral_model import SpectralModel
     >>> model = SpectralModel(label_names, modeltype) 
     >>> model.train(trainingset)
 
 Step 5: *The Cannon* Step 2 - Infer Labels
-------------------------------------------
+-------------------------------------------
 
     >>> from cannon_labels import CannonLabels
     >>> labels = CannonLabels(label_names)
     >>> labels.solve(model, testset)
 
-Contents:
+Using The Cannon
+===================
 
-.. toctree::
-   :maxdepth: 2
+The details of using The Cannon package are provided in the following sections:
 
-Indices and tables
-==================
+Prepare Data
+-------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Construct Training Set
+-----------------------
 
+Construct Test Set
+-------------------
+
+*The Cannon* Step 1: Generate Model
+------------------------------------
+
+*The Cannon* Step 2: Infer Labels
+----------------------------------
+
+Reference/API
+=============
+
+.. automodule:: prep_data
+    :members:
