@@ -1,6 +1,7 @@
 # A sample run of this Cannon rewrite.
 
 import os
+import matplotlib.pyplot as plt
 from read_aspcap_2 import ReadASPCAP
 from cannon1_train_model import train_model
 from cannon2_infer_labels import infer_labels
@@ -24,7 +25,7 @@ test_set, nothing = trial_run.set_star_set(False, training_label_names)
 training_labels = training_set.get_label_values()
 #training_labels.shape # (523, 4)
 Teff, logg, FeH, age = training_labels[:,0], training_labels[:,1], training_labels[:,2], training_labels[:,3]
-#hist(age) # plot the age distribution
+#plt.hist(age) # plot the age distribution
 
 # Run The Cannon
 model = train_model(training_set)
@@ -37,5 +38,5 @@ cannon_labels.shape # (553, 4)
 # Note that currently, there are more test stars than training stars because of the logg & Teff cuts. In order to compare the results, we need to perform the same filtering.
 filtered_cannon_labels = cannon_labels[to_discard]
 Cannon_Teff, Cannon_logg, Cannon_FeH, Cannon_age = filtered_cannon_labels[:,0], filtered_cannon_labels[:,1], filtered_cannon_labels[:,2], filtered_cannon_labels[:,3]
-scatter(Teff, Cannon_Teff)
+plt.scatter(Teff, Cannon_Teff)
 # etc
