@@ -184,16 +184,19 @@ The basic workflow for creating a training set and test set, solving for
 the model (Step 1) and finally determining labels (Step 2) is shown below.
 
 
-\section{Step 1: Prepare Data}
-\label{index:step-1-prepare-data}
+\section{Step 1: Prepare Data (\texttt{prepdata.py})}
+\label{index:step-1-prepare-data-prepdata-py}
 \emph{The Cannon} expects all spectra - for reference and survey objects -
 to be continuum-normalized in a consistent way, and sampled on a consistent
 rest-frame wavelength grid, with the same line-spread function. It also
 assumes that the flux variance, from photon noise and other sources, is
 known at each spectral pixel of each spectrum.
 
-The user is left to prepare the data him or herself, but we include
-some optional methods that may be helpful.
+Preparing data thus involves: putting spectra into a 3D array
+(nstars, npixels, 3), putting label names into an array (nlabels),
+and putting training label values into a 2D array (nstars, nlabels).
+The user is left to do this him or herself, but we include some basic
+methods and functionalities in \code{prep\_data.py} that might be helpful.
 
 
 \section{Step 2: Construct Training Set}
@@ -252,23 +255,84 @@ as follows:
 \PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{labels}\PYG{o}{.}\PYG{n}{solve}\PYG{p}{(}\PYG{n}{model}\PYG{p}{,} \PYG{n}{testset}\PYG{p}{)}
 \end{Verbatim}
 
-Contents:
+
+\chapter{Using The Cannon}
+\label{index:using-the-cannon}
+The details of using The Cannon package are provided in the following sections:
 
 
-\chapter{Indices and tables}
-\label{index:indices-and-tables}\begin{itemize}
-\item {} 
-\emph{genindex}
+\section{Prepare Data}
+\label{index:prepare-data}
 
-\item {} 
-\emph{modindex}
+\section{Construct Training Set}
+\label{index:construct-training-set}
 
-\item {} 
-\emph{search}
+\section{Construct Test Set}
+\label{index:construct-test-set}
 
-\end{itemize}
+\section{\emph{The Cannon} Step 1: Generate Model}
+\label{index:the-cannon-step-1-generate-model}
+
+\section{\emph{The Cannon} Step 2: Infer Labels}
+\label{index:the-cannon-step-2-infer-labels}
+
+\chapter{Reference/API}
+\label{index:reference-api}\label{index:module-prep_data}\index{prep\_data (module)}\index{continuum\_normalize() (in module prep\_data)}
+
+\begin{fulllineitems}
+\phantomsection\label{index:prep_data.continuum_normalize}\pysiglinewithargsret{\code{prep\_data.}\bfcode{continuum\_normalize}}{\emph{spectra}}{}
+Continuum-normalizes a spectra array.
+
+Assumes that there are no gaps in the spectrum and fits a 2nd order
+Chebyshev polynomial. Divides spectrum by the polynomial.
+
+Input: spectra array, 2D float shape nstars,npixels,3
+Returns: 3D continuum-normalized spectra (nstars, npixels,3)
+2D continuum array (nstars, npixels)
+
+\end{fulllineitems}
+
+\index{get\_spectra() (in module prep\_data)}
+
+\begin{fulllineitems}
+\phantomsection\label{index:prep_data.get_spectra}\pysiglinewithargsret{\code{prep\_data.}\bfcode{get\_spectra}}{\emph{filenames}}{}
+Extracts spectra from aspcap fits files
+
+Input: a list of data file names 
+Returns: 3D float array 
+spectra{[}:,:,0{]} = pixel wavelengths
+spectra{[}:,:,1{]} = flux values
+spectra{[}:,:,2{]} = flux err values
+
+\end{fulllineitems}
+
+\index{get\_training\_labels() (in module prep\_data)}
+
+\begin{fulllineitems}
+\phantomsection\label{index:prep_data.get_training_labels}\pysiglinewithargsret{\code{prep\_data.}\bfcode{get\_training\_labels}}{\emph{filename}}{}
+Extracts training label names and values from file
+
+Assumes:
+-- that the file format is as follows, with label names in first row
+-- first row has a \# then label names...
+-- first column is the IDs...so strings
+-- and the rest are floats
+-- that you want \emph{all} of the labels
+
+Input: filename
+Returns: 2D np.array (size=ntrainingstars, nlabels) consisting of all
+training labels
+
+\end{fulllineitems}
 
 
+
+\renewcommand{\indexname}{Python Module Index}
+\begin{theindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+\bigletter{p}
+\item {\texttt{prep\_data}}, \pageref{index:module-prep_data}
+\end{theindex}
 
 \renewcommand{\indexname}{Index}
 \printindex
