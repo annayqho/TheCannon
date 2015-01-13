@@ -1,4 +1,15 @@
-for the future:
+next steps:
+- get Sphinx documentation to work
+- write "generally useful" methods that the user could choose (or not) to use in preparing data for use by The Cannon
+- write the ASPCAP implementation and make sure that the above works
+- write "merge" method for the Database class
+- check to make sure the Database class is working for ASPCAP
+- write the implementation for all of the above with ASPCAP training set, and APOKASC test set.
+- write the implementation for all of the above with APOKASC training set, and APOKAC test set.
+- write the take-one-out test.
+---- then the file preparation process will be set.
+
+farther down the road:
 - implement a series of checks to make sure the user has written something sensible
 - spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
 - compare output label to the training space, flag if extrapolation has taken place
