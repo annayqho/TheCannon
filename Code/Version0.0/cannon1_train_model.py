@@ -34,7 +34,7 @@ def do_one_regression_at_fixed_scatter(spectra, x, scatter):
         inverse of the log determinant of the cov matrix
     """
     Cinv = 1. / (spectra[:, 2] ** 2 + scatter ** 2)  
-    xTCinvx = np.dot(x.T, Cinv[:, None] * x) # craziness b/c Cinv isnt a matrix
+    xTCinvx = np.dot(x.T, Cinv[:, None] * x) 
     fluxes = spectra[:, 1] 
     xTCinvf = np.dot(x.T, Cinv * fluxes)
     try:

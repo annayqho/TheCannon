@@ -1,6 +1,27 @@
 *** Have you updated the Sphinx documentation???? ***
 
-next steps:
+GOAL: First draft done by the end of the day on Friday.
+
+logistical stuff:
+- put these things into "issues" on github so that everyone can comment
+- get the new code working for exclusively APOGEE spectra
+
+new features:
+- Plot the coverage of label space in the training set
+- Histogram of what the S/N is in the training objects
+- Warning if the S/N of training spectra isn't high enough
+- Warning if the set size isn't big enough
+- Recognize if a spectrum has properties that are not covered by the spectral model. Auto-correlation of residual spectrum (if the residual is actually dominated by noise, should get a delta function)
+- Overplot the continuum pixels on the 0th order spectrum\
+- Plot of the leading coefficients as a function of wavelength
+- Histogram of the chi-sq of the fits, w/ a dashed line corresponding to DOF (npixels - nlabels)
+- triangle.py for the N labels (Foreman-Mackey)\
+- Warning if the answer is more than 2-sig away from the mean & variance of training labels
+- Overplot each Cannon best-fit spectrum with the original spectrum.
+- Imagine that the residual of each best-fit spectrum is a 1D list, stack them and sort by each of the labels. Then we will see whether all stars have deviations at a particular wavelength from the best-fit model irrespective of the label -- if the quadratic model is general enough, then the 2D residual should show nothing but noise. (Jo Bovy has done something similar?) -- don't forget to normalize by the sources of variance and scatter, see HW's e-mail
+
+for me:
+- scratch this idea of "merging datasets"
 - write the ASPCAP implementation and make sure that the above works
 - write "merge" method for the Database class
 - check to make sure the Database class is working for ASPCAP
@@ -10,9 +31,7 @@ next steps:
 ---- then the file preparation process will be set.
 
 farther down the road:
-- implement a series of checks to make sure the user has written something sensible
 - spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
-- compare output label to the training space, flag if extrapolation has taken place
 - create non-identical subsets of the training set
 - shot noise in the creation of a training set
 - check the scatter at each pixel
