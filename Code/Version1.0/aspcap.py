@@ -33,8 +33,10 @@ def get_spectra(files):
         if jj == 0: 
             nstars = len(files) 
             npixels = len(fluxes)
+            SNRs = np.zeros(nstars)
             spectra = np.zeros((nstars, npixels, 3))
         flux_errs = np.array((file_in[2].data))
+        SNRs[jj] = float(file_in[0].header['SNR'])
         start_wl = file_in[1].header['CRVAL1']
         diff_wl = file_in[1].header['CDELT1']
         val = diff_wl*(npixels) + start_wl
@@ -45,7 +47,7 @@ def get_spectra(files):
         spectra[jj, :, 1] = fluxes
         spectra[jj, :, 2] = flux_errs
     print "Loaded %s stellar spectra" %len(files)
-    return spectra
+    return spectra, SNRs
 
 def continuum_normalize(spectra):
     """Continuum-normalizes the spectra.

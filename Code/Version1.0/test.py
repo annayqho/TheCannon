@@ -20,7 +20,7 @@ filenames1 = [] # if I just replace the element, I lose the '.fits'
 for i in range(0, len(IDs)): # incorporate file location info
     filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + IDs[i][1:]
     filenames1.append(filename)
-spectra = get_spectra(filenames1)
+spectra, SNRs = get_spectra(filenames1)
 
 # Retrieve all training labels
 readin = "traininglabels.txt"
@@ -48,9 +48,8 @@ label_values = label_values[bad]
 # Normalize the spectra
 normalized_spectra, continua = continuum_normalize(spectra)
 
-# Initialize the training set
-# - 
-training_set = Dataset(IDs=IDs, spectra=normalized_spectra, label_names=label_names, label_values=label_values)
+# Initialize the training set 
+training_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=normalized_spectra, label_names=label_names, label_values=label_values)
 
 # CONSTRUCT TEST SET
 

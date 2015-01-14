@@ -35,12 +35,14 @@ class Dataset(object):
 
     """
 
-    def __init__(self, IDs, spectra, label_names, label_values=None):
+    def __init__(self, IDs, SNRs, spectra, label_names, label_values=None):
         self.IDs = IDs
+        self.SNRs = SNRs
         self.spectra = spectra 
         self.label_names = label_names
         self.label_values = label_values
         if label_values is not None:
+            self.plot_SNRs()
             self.plot_labelspace()
   
     def set_IDs(self, IDs):
@@ -55,11 +57,20 @@ class Dataset(object):
     def set_label_values(self, label_values):
         self.label_values = label_values
 
+    def plot_SNRs(self):
+        plt.hist(self.SNRs)
+        plt.title("Distribution of SNR in the Training Set")
+        figname = "trainingset_SNRdist.png"
+        plt.savefig(figname)
+        print "Diagnostic for SNR of training set"
+        print "Saved fig %s" %figname
+
     def plot_labelspace(self):
         for i in range(0, len(self.label_names)):
             name = self.label_names[i]
             vals = self.label_values[:,i]
             plt.hist(vals)
+            # Note: label names cannot have slashes 
             plt.title("Distribution of Label: %s" %name)
             figname = "labeldist_%s.png" %name
             plt.savefig(figname)
