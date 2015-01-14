@@ -2,14 +2,28 @@
 
 import os
 import matplotlib.pyplot as plt
-from read_aspcap_2 import ReadASPCAP
-from cannon1_train_model import train_model
-from cannon2_infer_labels import infer_labels
+import numpy as np
 
-training_label_names = ['Teff', 'logg', 'FeH', 'age']
-nlabels = len(training_label_names)
+from aspcap import get_spectra
+from aspcap import continuum_normalize
+from aspcap import get_training_labels
 
-# Extract data
+# CONSTRUCT TRAINING SET
+
+# Set training spectra
+readin = "traininglabels.txt"
+filenames = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
+filenames1 = [] # for some reason if I try to replace the element,
+                # it gets rid of the '.fits' at the end...very annoying
+for i in range(0, len(filenames)): # incorporate file location info
+    filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + filenames[i][1:]
+    filenames1.append(filename)
+spectra = get_spectra(filenames1)
+
+# Set training labels
+readin = "traininglabels.txt"
+label_names, label_values = get_training_labels(readin)
+
 trial_run = ReadASPCAP()
 training_set, to_discard = trial_run.set_star_set(True, training_label_names)
 test_set, nothing = trial_run.set_star_set(False, training_label_names)

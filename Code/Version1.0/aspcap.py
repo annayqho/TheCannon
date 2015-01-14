@@ -106,7 +106,7 @@ def get_training_labels(filename):
     """Extracts training labels from file.
 
     Assumes that the file has # then label names in first row, that first
-    column is the IDs (strings), that the remaining values are floats
+    column is the ID/filename (strings), that the remaining values are floats
     and that you want all of the labels. You can pick which ones you want
     later. 
 
