@@ -10,7 +10,7 @@ from aspcap import get_training_labels
 
 # CONSTRUCT TRAINING SET
 
-# Set training spectra
+# Retrieve all training spectra
 readin = "traininglabels.txt"
 filenames = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
 filenames1 = [] # for some reason if I try to replace the element,
@@ -20,9 +20,18 @@ for i in range(0, len(filenames)): # incorporate file location info
     filenames1.append(filename)
 spectra = get_spectra(filenames1)
 
-# Set training labels
+# Retrieve all training labels
 readin = "traininglabels.txt"
 label_names, label_values = get_training_labels(readin)
+
+# Optional: Set desired training labels
+cols = [1,2,3,4,5,6]
+colmask = np.zeros(len(label_names), dtype=bool)
+colmask[cols] = 1
+label_names = [label_names[i] for i in cols]
+label_values = label_values[:,colmask]
+
+# 
 
 trial_run = ReadASPCAP()
 training_set, to_discard = trial_run.set_star_set(True, training_label_names)

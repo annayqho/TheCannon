@@ -43,6 +43,7 @@ def get_spectra(files):
         spectra[jj, :, 0] = pixels
         spectra[jj, :, 1] = fluxes
         spectra[jj, :, 2] = flux_errs
+    print "Loaded %s stellar spectra" %len(files)
     return spectra
 
 def continuum_normalize(spectra):
@@ -106,9 +107,8 @@ def get_training_labels(filename):
     """Extracts training labels from file.
 
     Assumes that the file has # then label names in first row, that first
-    column is the ID/filename (strings), that the remaining values are floats
-    and that you want all of the labels. You can pick which ones you want
-    later. 
+    column is the ID (string), that the remaining values are floats
+    and that you want all of the labels. User picks specific labels later. 
 
     Input: name(string) of the data file containing the labels
     Returns: label_names list, and np ndarray (size=numtrainingstars, nlabels)
@@ -120,8 +120,8 @@ def get_training_labels(filename):
     IDs = np.loadtxt(filename, usecols = (0,), dtype='string')
     print "Loaded stellar IDs, format: %s" %IDs[0]
     nlabels = len(label_names)
-    print "Loading %s labels:" %nlabels
-    print label_names
     cols = tuple(xrange(1,nlabels+1))
     label_values = np.loadtxt(filename, usecols=cols)
+    print "Loaded %s labels:" %nlabels
+    print label_names
     return label_names, label_values
