@@ -1,10 +1,13 @@
-*** Have you updated the Sphinx documentation???? ***
-
-GOAL: First draft done by the end of the day on Friday.
-
-logistical stuff:
-- put these things into "issues" on github so that everyone can comment
-- get the new code working for exclusively APOGEE spectra
+TIMELINE
+First draft done by the end of the day on Friday.
+Wed     - Confirm that all is working for exclusively APOGEE spectra
+        - Replace stars.py with Dataset.py
+        - Plot: coverage of label space in training set
+        - Plot: Histogram of S/N in training objects
+        - Plot: triangle.py for the N labels
+        - Warning if answer is > 2-sig away from training labels
+Thurs   - Continuum normalization
+Fri     - Documentation
 
 new features:
 - Plot the coverage of label space in the training set
