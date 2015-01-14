@@ -77,6 +77,13 @@ def training_set_diagnostics(dataset):
         print "Diagnostic for coverage of training label space"
         print "Saved fig %s" %figname
 
+def test_set_diagnostics(trainingset, testset):
+    # Calculate the mean and variance of the training labels
+    training_labels = trainingset.label_values
+    mean = avg(training_labels)
+    variance = var(training_labels)
+    # Two sigma away...
+
 def remove_stars(dataset, mask):
     """A method to remove a subset of stars from the Dataset. 
     

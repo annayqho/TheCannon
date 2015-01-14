@@ -57,6 +57,7 @@ training_set_diagnostics(training_set)
 
 # In this case, the training set and test set are the same
 test_set = Dataset(IDs=IDs, spectra=normalized_spectra, label_names=label_names)
+test_set_diagnostics(training_set, test_set)
 
 # STEP 1 OF THE CANNON: FIT FOR MODEL
  print "training model"
