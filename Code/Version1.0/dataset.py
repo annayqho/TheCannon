@@ -59,11 +59,12 @@ class Dataset(object):
         for i in range(0, len(self.label_names)):
             name = self.label_names[i]
             vals = self.label_values[:,i]
-            print name
-            print vals
             plt.hist(vals)
             plt.title("Distribution of Label: %s" %name)
-            plt.savefig("labeldist_%s.png" %name)
+            figname = "labeldist_%s.png" %name
+            plt.savefig(figname)
+            print "Diagnostic for coverage of training label space"
+            print "Saved fig %s" %figname
 
 def remove_stars(dataset, mask):
     """A method to remove a subset of stars from the Dataset. 
