@@ -1,8 +1,6 @@
 TIMELINE
 First draft done by the end of the day on Friday.
-Wed     - Confirm that all is working for exclusively APOGEE spectra
-        - Replace stars.py with Dataset.py
-        - Plot: coverage of label space in training set
+Wed     - Plot: coverage of label space in training set
         - Plot: Histogram of S/N in training objects
         - Plot: triangle.py for the N labels
         - Warning if answer is > 2-sig away from training labels

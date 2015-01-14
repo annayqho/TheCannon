@@ -16,6 +16,7 @@ get_training_labels (assumes a standard ASCII table)
 import pyfits
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 def get_spectra(files):
     """Extracts spectra (wavelengths, fluxes, fluxerrs) from aspcap fits files

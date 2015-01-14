@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 """Classes and methods for a Dataset of stars.
 
@@ -38,7 +39,9 @@ class Dataset(object):
         self.IDs = IDs
         self.spectra = spectra 
         self.label_names = label_names
-        self.label_values = label_values 
+        self.label_values = label_values
+        if label_values is not None:
+            self.plot_labelspace()
   
     def set_IDs(self, IDs):
         self.IDs = IDs
@@ -51,6 +54,16 @@ class Dataset(object):
 
     def set_label_values(self, label_values):
         self.label_values = label_values
+
+    def plot_labelspace(self):
+        for i in range(0, len(self.label_names)):
+            name = self.label_names[i]
+            vals = self.label_values[:,i]
+            print name
+            print vals
+            plt.hist(vals)
+            plt.title("Distribution of Label: %s" %name)
+            plt.savefig("labeldist_%s.png" %name)
 
 def remove_stars(dataset, mask):
     """A method to remove a subset of stars from the Dataset. 
