@@ -24,19 +24,21 @@ test_set, nothing = trial_run.set_star_set(False, training_label_names)
 #plot(pixels[0], fluxes[0])
 training_labels = training_set.get_label_values()
 #training_labels.shape # (523, 4)
-Teff, logg, FeH, age = training_labels[:,0], training_labels[:,1], training_labels[:,2], training_labels[:,3]
+#Teff, logg, FeH, age = training_labels[:,0], training_labels[:,1], training_labels[:,2], training_labels[:,3]
 #plt.hist(age) # plot the age distribution
 
 # Run The Cannon
+print "training model..."
 model = train_model(training_set)
-coeffs_all, covs, scatters, chis, chisqs, pivots = model
-coeffs_all.shape # (8575, 15)
-cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
+print "done training model"
+#coeffs_all, covs, scatters, chis, chisqs, pivots = model
+#coeffs_all.shape # (8575, 15)
+#cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
 
 # Plot the results
-cannon_labels.shape # (553, 4)
+#cannon_labels.shape # (553, 4)
 # Note that currently, there are more test stars than training stars because of the logg & Teff cuts. In order to compare the results, we need to perform the same filtering.
-filtered_cannon_labels = cannon_labels[to_discard]
-Cannon_Teff, Cannon_logg, Cannon_FeH, Cannon_age = filtered_cannon_labels[:,0], filtered_cannon_labels[:,1], filtered_cannon_labels[:,2], filtered_cannon_labels[:,3]
+#filtered_cannon_labels = cannon_labels[to_discard]
+#Cannon_Teff, Cannon_logg, Cannon_FeH, Cannon_age = filtered_cannon_labels[:,0], filtered_cannon_labels[:,1], filtered_cannon_labels[:,2], filtered_cannon_labels[:,3]
 plt.scatter(Teff, Cannon_Teff)
 # etc

@@ -24,21 +24,21 @@ spectra = get_spectra(filenames1)
 
 # Retrieve all training labels
 readin = "traininglabels.txt"
-label_names, label_values = get_training_labels(readin)
+all_label_names, all_label_values = get_training_labels(readin)
 
 # Optional: Set desired training labels
-cols = [1,2,3,4,5,6]
-colmask = np.zeros(len(label_names), dtype=bool)
+cols = [1, 3, 5]
+colmask = np.zeros(len(all_label_names), dtype=bool)
 colmask[cols] = 1
-label_names = [label_names[i] for i in cols]
-label_values = label_values[:,colmask]
+label_names = [all_label_names[i] for i in cols]
+label_values = all_label_values[:,colmask]
 
 # Optional: Set desired stars
 Teff = label_values[:,0]
-Teff_corr = label_values[:,1]
+Teff_corr = all_label_values[:,2]
 diff_t = np.abs(Teff-Teff_corr)
 diff_t_cut = 600.
-logg = label_values[:,2]
+logg = label_values[:,1]
 logg_cut = 100.
 bad = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
 IDs = IDs[bad]
@@ -49,22 +49,27 @@ label_values = label_values[bad]
 normalized_spectra, continua = continuum_normalize(spectra)
 
 # Initialize the training set
-training_set = Dataset(IDs=IDs, spectra=spectra, label_names=label_names, label_values=label_values)
+training_set = Dataset(IDs=IDs, spectra=normalized_spectra, label_names=label_names, label_values=label_values)
 
 # CONSTRUCT TEST SET
 
 # In this case, the training set and test set are the same
-test_set = Dataset(IDs=IDs, spectra=spectra, label_names=label_names)
+test_set = Dataset(IDs=IDs, spectra=normalized_spectra, label_names=label_names)
 
 # STEP 1 OF THE CANNON: FIT FOR MODEL
+print "training model"
 model = train_model(training_set)
+print "done training model"
 coeffs_all, covs, scatters, chis, chisqs, pivots = model
 coeffs_all.shape # (8575, 15)
+
+# STEP 2 OF THE CANNON: INFER LABELS
+nlabels = len(label_names)
 cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
 
 # Plot the results
 cannon_labels.shape # (553, 4)
-filtered_cannon_labels = cannon_labels[to_discard]
-Cannon_Teff, Cannon_logg, Cannon_FeH, Cannon_age = filtered_cannon_labels[:,0], filtered_cannon_labels[:,1], filtered_cannon_labels[:,2], filtered_cannon_labels[:,3]
+Teff, logg, FeH = label_values[:,0], label_values[:,1], label_values[:,2]
+Cannon_Teff, Cannon_logg, Cannon_FeH = cannon_labels[:,0], cannon_labels[:,1], cannon_labels[:,2]
 plt.scatter(Teff, Cannon_Teff)
 # etc

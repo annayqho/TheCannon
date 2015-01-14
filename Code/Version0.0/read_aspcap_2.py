@@ -153,7 +153,7 @@ class ReadASPCAP(ReadData):
         filenames1 = [] # for some reason if I try to replace the element, 
                         # it gets rid of the '.fits' at the end...very annoying
         for i in range(0, len(filenames)): # incorporate file location info
-            filename = '../Data/APOGEE_Data' + filenames[i][1:] 
+            filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + filenames[i][1:] 
             filenames1.append(filename)
         return np.array(filenames1)
 
@@ -167,7 +167,7 @@ class ReadASPCAP(ReadData):
         filenames1 = [] # for some reason if I try to replace the element, 
                         # it gets rid of the '.fits' at the end...very annoying
         for i in range(0, len(filenames)): # incorporate file location info
-            filename = '../Data/APOGEE_Data' + filenames[i][1:] 
+            filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + filenames[i][1:] 
             filenames1.append(filename)
         return np.array(filenames1)
 

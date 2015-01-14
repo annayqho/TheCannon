@@ -40,7 +40,7 @@ def infer_labels(num_labels, model, test_set):
     covs_all: covariance matrix of the fit
     """
     nlabels = num_labels
-    spectra = test_set.get_spectra() #(nstars, npixels, 3)
+    spectra = test_set.spectra #(nstars, npixels, 3)
     nstars = spectra.shape[0]
     npixels = spectra.shape[1]
     coeffs_all, covs, scatters, chis, chisqs, pivots = model
