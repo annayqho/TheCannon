@@ -116,10 +116,9 @@ def get_training_labels(filename):
     """
     with open(filename, 'r') as f:
         all_labels = f.readline().split() # ignore the hash
-    ID_type = all_labels[0]
     label_names = all_labels[1:]
-    print "Saving stellar IDs, %s" %ID_type
     IDs = np.loadtxt(filename, usecols = (0,), dtype='string')
+    print "Loaded stellar IDs, format: %s" %IDs[0]
     nlabels = len(label_names)
     print "Loading %s labels:" %nlabels
     print label_names
