@@ -8,6 +8,8 @@ from dataset import Dataset
 from aspcap import get_spectra
 from aspcap import continuum_normalize
 from aspcap import get_training_labels
+from cannon1_train_model import train_model
+from cannon2_infer_labels import infer_labels
 
 # CONSTRUCT TRAINING SET
 

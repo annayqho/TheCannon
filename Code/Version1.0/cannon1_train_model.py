@@ -3,7 +3,7 @@
 
 # Currently, this is a bit sketchy...there were sections of the original code that I didn't understand. have e-mailed MKN, will update. 
 
-from stars import Stars
+from dataset import Dataset
 import numpy as np
 import math
 import pylab
@@ -98,7 +98,7 @@ def train_model(training_set):
     """
     This determines the coefficients of the model using the training data
 
-    Input: the training_set, a Stars object (see stars.py)
+    Input: the training_set, a Dataset object (see dataset.py)
     Returns: the model, which consists of...
     -------
     coefficients: ndarray, (npixels, nstars, 15)
@@ -107,19 +107,14 @@ def train_model(training_set):
     chi squareds
     the pivot values
     """
-    label_names = training_set.get_label_names()
-    label_values = training_set.get_label_values() #(nstars, nlabels)
+    label_names = training_set.label_names
+    label_values = training_set.label_values #(nstars, nlabels)
     nlabels = len(label_names)
-    spectra = training_set.get_spectra() #(nstars, npixels, 3)
+    spectra = training_set.spectra #(nstars, npixels, 3)
     nstars = spectra.shape[0]
     npixels = spectra.shape[1]
 
-    # Each star has a LABEL VECTOR: x = [1, l1-L1, l2-L2, etc] 
-    # where Lk is the mean value of that label across all the stars. 
-    # Each element is called an offset, and these mean values are called pivots. 
-    # We assume in this version of the code that our model is quadratic in labels,
-    # but in the future we want to generalize this and even allow each pixel 
-    # to have its own functional form. 
+    # Establish label vector
     pivots = np.mean(label_values, axis=0)
     ones = np.ones((nstars, 1))
     linear_offsets = label_values - pivots
