@@ -115,7 +115,7 @@ def get_training_labels(filename):
     consisting of all of the label values
     """
     with open(filename, 'r') as f:
-        all_labels = f.readline().split()[1:] # ignore the hash
+        all_labels = f.readline().split() # ignore the hash
     ID_type = all_labels[0]
     label_names = all_labels[1:]
     print "Saving stellar IDs, %s" %ID_type
