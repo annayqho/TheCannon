@@ -1,8 +1,8 @@
 TIMELINE
 First draft done by the end of the day on Friday.
-Wed     - Plot: triangle.py for the N labels
-        - Warning if answer is > 2-sig away from training labels
-Thurs   - Continuum normalization
+Wed     - Warning if answer is > 2-sig away from training labels
+Thurs   - Plot: triangle.py for the N labels
+        - Continuum normalization
 Fri     - Documentation
 
 new features:

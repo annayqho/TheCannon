@@ -57,25 +57,25 @@ class Dataset(object):
     def set_label_values(self, label_values):
         self.label_values = label_values
 
-    def plot_SNRs(self):
-        plt.hist(self.SNRs)
-        plt.title("Distribution of SNR in the Training Set")
-        figname = "trainingset_SNRdist.png"
+def training_set_diagnostics(dataset):
+    # Plot SNR distribution
+    plt.hist(dataset.SNRs)
+    plt.title("Distribution of SNR in the Training Set")
+    figname = "trainingset_SNRdist.png"
+    plt.savefig(figname)
+    print "Diagnostic for SNR of training set"
+    print "Saved fig %s" %figname
+    # Plot training label distribution
+    for i in range(0, len(dataset.label_names)):
+        name = dataset.label_names[i]
+        vals = dataset.label_values[:,i]
+        plt.hist(vals)
+        # Note: label names cannot have slashes 
+        plt.title("Distribution of Label: %s" %name)
+        figname = "labeldist_%s.png" %name
         plt.savefig(figname)
-        print "Diagnostic for SNR of training set"
+        print "Diagnostic for coverage of training label space"
         print "Saved fig %s" %figname
-
-    def plot_labelspace(self):
-        for i in range(0, len(self.label_names)):
-            name = self.label_names[i]
-            vals = self.label_values[:,i]
-            plt.hist(vals)
-            # Note: label names cannot have slashes 
-            plt.title("Distribution of Label: %s" %name)
-            figname = "labeldist_%s.png" %name
-            plt.savefig(figname)
-            print "Diagnostic for coverage of training label space"
-            print "Saved fig %s" %figname
 
 def remove_stars(dataset, mask):
     """A method to remove a subset of stars from the Dataset. 
