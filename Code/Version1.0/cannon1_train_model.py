@@ -177,4 +177,13 @@ def model_diagnostics(training_set, model):
     fig.savefig(filename)
     plt.close(fig)
 
-
+    # Histogram of the chi squareds of the fits
+    plt.hist(chisqs)
+    plt.title("Distribution of Chi Squareds of the Model Fit")
+    plt.ylabel("Count")
+    plt.xlabel("Chi Squared")
+    filename = "modelfit_chisqs.png"
+    print "Diagnostic plot: histogram of the chi squareds of the fit"
+    print "Saved as %s" %filename
+    plt.savefig(filename)
+    plt.close()
