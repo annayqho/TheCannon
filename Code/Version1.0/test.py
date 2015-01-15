@@ -66,7 +66,7 @@ test_set = Dataset(IDs=IDs, SNRs = SNRs, spectra=normalized_spectra,
 print "training model"
 model = train_model(training_set)
 print "done training model"
-model_diagnostics(model)
+model_diagnostics(label_names, model)
 
 # coeffs_all, covs, scatters, chis, chisqs, pivots = model
 

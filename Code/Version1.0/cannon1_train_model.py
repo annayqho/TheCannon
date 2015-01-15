@@ -136,7 +136,7 @@ def train_model(training_set):
     model = coeffs, covs, scatters, chis, chisqs, pivots
     return model
 
-def model_diagnostics(model):
+def model_diagnostics(label_names, model):
     """Run a set of diagnostics on the model.
 
     Plot the 0th order coefficients as the baseline spectrum. 
@@ -158,6 +158,21 @@ def model_diagnostics(model):
     filename = "baseline_spec_with_cont_pix.png"
     print "Diagnostic plot: baseline spectrum from the model with continuum pixels overlaid. Saved as %s" %filename
     plt.savefig(filename)
+    plt.close(fig)
 
     # Leading coefficients for each label
-    
+    nlabels = len(pivots)
+    fig, axarr = plt.subplots(nlabels, sharex=True)
+    plt.xlabel(r"Wavelength $\lambda (\AA)$")
+    for i in range(nlabels):
+        ax = axarr[i]
+        ax.set_ylabel(r"$\theta_%s$" %i)
+        ax.set_title("%s" %label_names[i])
+        ax.plot(coeffs_all[:,i+1])
+    print "Diagnostic plot: leading coefficients as a function of wavelength."
+    filename = "leading_coeffs.png"
+    print "Saved as %s" %filename
+    fig.savefig(filename)
+    plt.close(fig)
+
+

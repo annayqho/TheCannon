@@ -1,7 +1,6 @@
 TIMELINE
 First draft done by the end of the day on Friday.
-Thurs   - Plot leading coefficients as a function of wavelength
-        - Histogram of the chi-sq of fits
+Thurs   - Histogram of the chi-sq of fits
         - In the above hist, a dashed line corresponding to DOF (npixels - nlabels)
         - Continuum normalization
         - Overplot each Cannon best-fit spec with original spec
