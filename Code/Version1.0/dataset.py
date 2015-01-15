@@ -41,9 +41,6 @@ class Dataset(object):
         self.spectra = spectra 
         self.label_names = label_names
         self.label_values = label_values
-        if label_values is not None:
-            self.plot_SNRs()
-            self.plot_labelspace()
   
     def set_IDs(self, IDs):
         self.IDs = IDs
