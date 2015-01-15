@@ -154,15 +154,16 @@ def model_diagnostics(training_set, model, label_vector):
     pixels = training_set.spectra[0,:,0]
     baseline_spec = coeffs_all[:,0]
     plt.plot(pixels, baseline_spec)
-    contpix = list(np.loadtxt("pixtest4_lambda.txt", 
+    contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
         usecols = (0,), unpack =1))
-    y = [1]*len(contpix)
-    plt.scatter(contpix, y)
+    y = [1]*len(contpix_lambda)
+    plt.scatter(contpix_lambda, y)
     plt.title("Baseline Spectrum with Continuum Pixels")
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
     plt.ylabel(r"$\theta_0$")
     filename = "baseline_spec_with_cont_pix.png"
-    print "Diagnostic plot: baseline spectrum from the model with continuum pixels overlaid. Saved as %s" %filename
+    print "Diagnostic plot: fitted 0th order spectrum, cont pix overlaid." 
+    print "Saved as %s" %filename
     plt.savefig(filename)
     plt.close()
 
@@ -202,13 +203,18 @@ def model_diagnostics(training_set, model, label_vector):
     # Perform this for each star and plot the spectrum
     nstars = label_vector.shape[1]
     os.system("mkdir SpectrumFits")
+    contpix = list(np.loadtxt("pixtest4.txt", dtype=int, usecols=(0,), unpack=1))
+    contmask = np.zeros(8575, dtype=bool)
+    contmask[contpix] = 1
     for i in range(nstars):
         print "star %s" %i
         x = label_vector[:,i,:]
         ID = training_set.IDs[i]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
         spec_orig = training_set.spectra[i,:,1]
-        keep = spec_orig > 0    
+        bad1 = spec_orig == 0
+        bad2 = contmask
+        keep = np.invert(bad1 | bad2)
         fig, axarr = plt.subplots(2)
         ax1 = axarr[0]
         ax1.plot(pixels, spec_fit, 
