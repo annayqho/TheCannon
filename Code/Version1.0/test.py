@@ -6,6 +6,7 @@ import numpy as np
 
 from dataset import Dataset
 from dataset import training_set_diagnostics
+from dataset import test_set_diagnostics
 from aspcap import get_spectra
 from aspcap import continuum_normalize
 from aspcap import get_training_labels
@@ -50,24 +51,27 @@ label_values = label_values[bad]
 normalized_spectra, continua = continuum_normalize(spectra)
 
 # Initialize the training set 
-training_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=normalized_spectra, label_names=label_names, label_values=label_values)
+training_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=normalized_spectra, 
+        label_names=label_names, label_values=label_values)
 training_set_diagnostics(training_set)
 
 # CONSTRUCT TEST SET
 
 # In this case, the training set and test set are the same
-#test_set = Dataset(IDs=IDs, spectra=normalized_spectra, label_names=label_names)
-#test_set_diagnostics(training_set, test_set)
+test_set = Dataset(IDs=IDs, SNRs = SNRs, spectra=normalized_spectra, 
+        label_names=label_names)
 
 # STEP 1 OF THE CANNON: FIT FOR MODEL
-# print "training model"
-# model = train_model(training_set)
-# print "done training model"
+print "training model"
+model = train_model(training_set)
+print "done training model"
 # coeffs_all, covs, scatters, chis, chisqs, pivots = model
 
 # STEP 2 OF THE CANNON: INFER LABELS
-# nlabels = len(label_names)
-# cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
+nlabels = len(label_names)
+cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
+test_set.set_label_values(cannon_labels)
+test_set_diagnostics(training_set, test_set)
 
 # Plot the results
 # cannon_labels.shape # (553, 4)
