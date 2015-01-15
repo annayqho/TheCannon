@@ -85,6 +85,7 @@ def training_set_diagnostics(dataset):
     print "Saved fig %s" %figname
 
 def test_set_diagnostics(training_set, test_set):
+    # 2-sigma check from training labels
     label_names = training_set.label_names
     nlabels = len(label_names)
     training_labels = training_set.label_values
@@ -106,6 +107,13 @@ def test_set_diagnostics(training_set, test_set):
         print "Training label %s" %label_name
         print "flagged %s stars beyond 2-sig of training labels" %sum(warning)
         print "Saved list %s" %filename
+    # Plot all output labels against each other
+    fig = triangle.corner(test_set.label_values, labels=test_set.label_names,
+            show_titles=True, title_args = {"fontsize": 12})
+    figname = "testset_labels_triangle.png"
+    fig.savefig(figname)
+    print "Diagnostic for plotting every Cannon label against every other"
+    print "Saved fig %s" %figname
 
 def remove_stars(dataset, mask):
     """A method to remove a subset of stars from the Dataset. 
