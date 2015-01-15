@@ -178,7 +178,7 @@ def model_diagnostics(training_set, model):
     plt.close(fig)
 
     # Histogram of the chi squareds of the fits
-    plt.hist(chisqs)
+    plt.hist(chis)
     plt.title("Distribution of Chi Squareds of the Model Fit")
     plt.ylabel("Count")
     plt.xlabel("Chi Squared")
