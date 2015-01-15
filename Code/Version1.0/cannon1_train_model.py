@@ -134,9 +134,9 @@ def train_model(training_set):
     chisqs = np.array([np.dot(b[2],b[2]) - b[3] for b in blob]) 
     scatters = np.array([b[4] for b in blob])
     model = coeffs, covs, scatters, chis, chisqs, pivots
-    return model
+    return model, x_full
 
-def model_diagnostics(training_set, model):
+def model_diagnostics(training_set, model, label_vector):
     """Run a set of diagnostics on the model.
 
     Plot the 0th order coefficients as the baseline spectrum. 
@@ -144,9 +144,13 @@ def model_diagnostics(training_set, model):
     
     Plot each label's leading coefficient as a function of wavelength.
     Color-code by label.
+
+    Histogram of the chi squareds of the fits.
+    Dotted line corresponding to DOF = npixels - nlabels
     """
-    # Baseline spectrum with continuum
     coeffs_all, covs, scatters, chis, chisqs, pivots = model
+    
+    # Baseline spectrum with continuum
     pixels = training_set.spectra[0,:,0]
     baseline_spec = coeffs_all[:,0]
     plt.plot(pixels, baseline_spec)
@@ -191,3 +195,36 @@ def model_diagnostics(training_set, model):
     print "Saved as %s" %filename
     plt.savefig(filename)
     plt.close()
+
+    # Overplot original spectra with the best-fit spectra
+    # We have: the label vector x, and the coefficient vector coeffs_all
+    # f_lambda = np.dot(x, coeff)
+    # Perform this for each star and plot the spectrum
+    nstars = label_vector.shape[1]
+    os.system("mkdir SpectrumFits")
+    for i in range(nstars):
+        print "star %s" %i
+        x = label_vector[:,i,:]
+        ID = training_set.IDs[i]
+        spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
+        spec_orig = training_set.spectra[i,:,1]
+        keep = spec_orig > 0    
+        fig, axarr = plt.subplots(2)
+        ax1 = axarr[0]
+        ax1.plot(pixels, spec_fit, 
+                label="Cannon Spectrum", linewidth=0.5)
+        ax1.plot(pixels[keep], spec_orig[keep], 
+                label="Orig Spectrum", linewidth=0.5, alpha=0.7)
+        ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
+        ax1.set_ylabel("Normalized flux")
+        ax1.set_title("Spectrum Fit: %s" %ID)
+        ax1.legend(loc='lower center', fancybox=True, shadow=True)
+        ax2 = axarr[1]
+        ax2.scatter(spec_orig[keep], spec_fit[keep])
+        ax2.set_xlabel("Orig Fluxes")
+        ax2.set_ylabel("Fitted Fluxes")
+        filename = "Star%s.png" %i
+        print "Diagnostic plot: fitted vs. original spec" 
+        print "Saved as %s" %filename
+        fig.savefig("SpectrumFits/"+filename)
+        plt.close(fig)

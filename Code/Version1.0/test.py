@@ -64,9 +64,9 @@ test_set = Dataset(IDs=IDs, SNRs = SNRs, spectra=normalized_spectra,
 
 # STEP 1 OF THE CANNON: FIT FOR MODEL
 print "training model"
-model = train_model(training_set)
+model, label_vector = train_model(training_set)
 print "done training model"
-model_diagnostics(training_set, model)
+model_diagnostics(training_set, model, label_vector)
 
 # coeffs_all, covs, scatters, chis, chisqs, pivots = model
 
