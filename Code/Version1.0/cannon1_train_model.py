@@ -7,6 +7,8 @@ from dataset import Dataset
 import numpy as np
 import math
 import pylab
+import matplotlib.pyplot as plt
+from matplotlib import rc
 
 def do_one_regression_at_fixed_scatter(spectra, x, scatter):
     """
@@ -133,3 +135,29 @@ def train_model(training_set):
     scatters = np.array([b[4] for b in blob])
     model = coeffs, covs, scatters, chis, chisqs, pivots
     return model
+
+def model_diagnostics(model):
+    """Run a set of diagnostics on the model.
+
+    Plot the 0th order coefficients as the baseline spectrum. 
+    Overplot the continuum pixels.
+    
+    Plot each label's leading coefficient as a function of wavelength.
+    Color-code by label.
+    """
+    # Baseline spectrum with continuum
+    coeffs_all, covs, scatters, chis, chisqs, pivots = model
+    baseline_spec = coeffs_all[:,0]
+    plt.plot(baseline_spec)
+    contpix = list(np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1))
+    y = [1]*len(contpix)
+    plt.scatter(contpix, y)
+    plt.title("Baseline Spectrum with Continuum Pixels")
+    plt.xlabel(r"Wavelength $\lambda (\AA)$")
+    plt.ylabel(r"$\theta_0$")
+    filename = "baseline_spec_with_cont_pix.png"
+    print "Diagnostic plot: baseline spectrum from the model with continuum pixels overlaid. Saved as %s" %filename
+    plt.savefig(filename)
+
+    # Leading coefficients for each label
+    

@@ -11,6 +11,7 @@ from aspcap import get_spectra
 from aspcap import continuum_normalize
 from aspcap import get_training_labels
 from cannon1_train_model import train_model
+from cannon1_train_model import model_diagnostics
 from cannon2_infer_labels import infer_labels
 
 # CONSTRUCT TRAINING SET
@@ -65,6 +66,8 @@ test_set = Dataset(IDs=IDs, SNRs = SNRs, spectra=normalized_spectra,
 print "training model"
 model = train_model(training_set)
 print "done training model"
+model_diagnostics(model)
+
 # coeffs_all, covs, scatters, chis, chisqs, pivots = model
 
 # STEP 2 OF THE CANNON: INFER LABELS

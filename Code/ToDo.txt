@@ -1,11 +1,13 @@
 TIMELINE
 First draft done by the end of the day on Friday.
-Thurs   - Overplot continuum pixels on 0th order spectrum
-        - Plot leading coefficients as a function of wavelength
-        - Histogram of the chi-sq of the fits, w/ a dashed line corresponding to DOF (npixels - nlabels)
+Thurs   - Plot leading coefficients as a function of wavelength
+        - Histogram of the chi-sq of fits
+        - In the above hist, a dashed line corresponding to DOF (npixels - nlabels)
         - Continuum normalization
         - Overplot each Cannon best-fit spec with original spec
         - Imagine that the residual of each best-fit spectrum is a 1D list, stack them and sort by each of the labels. Then we will see whether all stars have deviations at a particular wavelength from the best-fit model irrespective of the label -- if the quadratic model is general enough, then the 2D residual should show nothing but noise. (Jo Bovy has done something similar?) -- don't forget to normalize by the sources of variance and scatter, see HW's e-mail
+        - Incorporate David Hogg's workflow suggestions...or at least explain to him how mine are different
+
 Fri     - Documentation
 
 new features:

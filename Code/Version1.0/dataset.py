@@ -81,6 +81,7 @@ def training_set_diagnostics(dataset):
             show_titles=True, title_args = {"fontsize": 12})
     figname = "trainingset_labels_triangle.png"
     fig.savefig(figname)
+    plt.close(fig)
     print "Diagnostic for plotting every training label against every other"
     print "Saved fig %s" %figname
 
@@ -112,6 +113,7 @@ def test_set_diagnostics(training_set, test_set):
             show_titles=True, title_args = {"fontsize": 12})
     figname = "testset_labels_triangle.png"
     fig.savefig(figname)
+    plt.close(fig)
     print "Diagnostic for plotting every Cannon label against every other"
     print "Saved fig %s" %figname
 
