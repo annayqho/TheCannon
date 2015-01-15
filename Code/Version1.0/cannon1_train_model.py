@@ -179,6 +179,10 @@ def model_diagnostics(training_set, model):
 
     # Histogram of the chi squareds of the fits
     plt.hist(chis)
+    dof = len(pixels) - nlabels
+    dofline = plt.axvline(x=dof, color='b', linestyle='dotted',
+            label="DOF = npixels - nlabels")
+    plt.legend() 
     plt.title("Distribution of Chi Squareds of the Model Fit")
     plt.ylabel("Count")
     plt.xlabel("Chi Squared")

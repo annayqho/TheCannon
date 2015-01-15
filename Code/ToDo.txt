@@ -1,17 +1,19 @@
 TIMELINE
-First draft done by the end of the day on Friday.
-Thurs   - Histogram of the chi-sq of fits
-        - In the above hist, a dashed line corresponding to DOF (npixels - nlabels)
+Thurs   - Overplot each Cannon best-fit spec with original spec
         - Continuum normalization
-        - Overplot each Cannon best-fit spec with original spec
         - Imagine that the residual of each best-fit spectrum is a 1D list, stack them and sort by each of the labels. Then we will see whether all stars have deviations at a particular wavelength from the best-fit model irrespective of the label -- if the quadratic model is general enough, then the 2D residual should show nothing but noise. (Jo Bovy has done something similar?) -- don't forget to normalize by the sources of variance and scatter, see HW's e-mail
         - Incorporate David Hogg's workflow suggestions...or at least explain to him how mine are different
 
-Fri     - Documentation
+Fri     - Go through the process and outputs and make sure you understand
+        - Compile a list of questions, weird observations (ex. what is chi-sq)
+        - Documentation
+
+QUESTIONS
+- What is a S/N of training spectra that "isn't high enough"?
+- What is a set size that "isn't big enough"?
+- What is the actual chi squared? Why should that dotted line be there...? 
 
 new features:
-- Warning if the S/N of training spectra isn't high enough
-- Warning if the set size isn't big enough
 - Recognize if a spectrum has properties that are not covered by the spectral model. Auto-correlation of residual spectrum (if the residual is actually dominated by noise, should get a delta function)
 
 farther down the road:
