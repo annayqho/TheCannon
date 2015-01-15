@@ -6,8 +6,6 @@ Thurs   - Warning if answer is > 2-sig away from training labels
 Fri     - Documentation
 
 new features:
-- Plot the coverage of label space in the training set
-- Histogram of what the S/N is in the training objects
 - Warning if the S/N of training spectra isn't high enough
 - Warning if the set size isn't big enough
 - Recognize if a spectrum has properties that are not covered by the spectral model. Auto-correlation of residual spectrum (if the residual is actually dominated by noise, should get a delta function)

@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import triangle
 
 """Classes and methods for a Dataset of stars.
 
@@ -60,19 +61,28 @@ def training_set_diagnostics(dataset):
     plt.title("Distribution of SNR in the Training Set")
     figname = "trainingset_SNRdist.png"
     plt.savefig(figname)
+    plt.close()
     print "Diagnostic for SNR of training set"
     print "Saved fig %s" %figname
-    # Plot training label distribution
+    # Plot training label distributions
     for i in range(0, len(dataset.label_names)):
         name = dataset.label_names[i]
         vals = dataset.label_values[:,i]
         plt.hist(vals)
         # Note: label names cannot have slashes 
-        plt.title("Distribution of Label: %s" %name)
-        figname = "labeldist_%s.png" %name
+        plt.title("Training Set Distribution of Label: %s" %name)
+        figname = "trainingset_labeldist_%s.png" %name
         plt.savefig(figname)
         print "Diagnostic for coverage of training label space"
         print "Saved fig %s" %figname
+        plt.close()
+    # Plot all training labels against each other
+    fig = triangle.corner(dataset.label_values, labels=dataset.label_names, 
+            show_titles=True, title_args = {"fontsize": 12})
+    figname = "trainingset_labels_triangle"
+    fig.savefig(figname)
+    print "Diagnostic for plotting every training label against every other"
+    print "Saved fig %s" %figname
 
 def test_set_diagnostics(trainingset, testset):
     # Calculate the mean and variance of the training labels
