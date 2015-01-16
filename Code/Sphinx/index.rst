@@ -124,20 +124,24 @@ and label values.
     >>> from read_labels import get_training_labels
     >>> IDs, all_label_names, all_label_values = get_training_labels(readin)
 
+A ``Dataset`` object (``dataset.py``) is initialized. 
+
+    >>> from dataset import Dataset
+    >>> training_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=spectra, 
+    label_names=all_label_names, label_values=all_label_values)
+
 (Optional) The user can choose to select some subset of the training labels 
-by creating a mask corresponding to the desired column indices. 
-In this example, we select Teff, logg, and [Fe/H].  
+by creating a list of the desired column indices. 
+In this example, we select Teff, logg, and [Fe/H] which correspond to 
+columns 1, 3, and 5.   
     
+    >>> from dataset import choose_labels
     >>> cols = [1, 3, 5]
-    >>> colmask = np.zeros(len(all_label_names), dtype=bool)
-    >>> colmask[cols] = 1
+    >>> label_names, label_values = choose_labels(cols, all_label_names, all_label_values)
 
-
-    >>> label_names = [all_label_names[i] for i in cols]
-    >>> label_values = all_label_values[:,colmask]
-
-The user can also (if desired) select some subset of the training objects, by 
-imposing physical cutoffs. Here, we select data with physical 
+(Optional) The user can also select some subset of the training objects 
+(for example, by imposing physical cutoffs) by constructing a mask where 
+1 = keep this object, and 0 = remove it. Here, we select data using physical 
 Teff and logg cutoffs.
 
     >>> Teff = label_values[:,0]
@@ -146,9 +150,10 @@ Teff and logg cutoffs.
     >>> diff_t_cut = 600.
     >>> logg = label_values[:,1]
     >>> logg_cut = 100.
-    >>> bad = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
-    >>> IDs = IDs[bad]
-    >>>
+    >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
+    >>> IDs = IDs[mask]
+    >>> spectra = spectra[mask]
+    >>> label_values = label_values[mask]
 
     >>> dataset import Dataset
     >>> fts_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
