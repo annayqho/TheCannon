@@ -71,6 +71,14 @@ the model allow us to solve for - or infer - the labels of the survey
 objects.</li>
 </ol>
 </div>
+<div class="section" id="a-word-on-spectra">
+<h3>A Word on Spectra<a class="headerlink" href="#a-word-on-spectra" title="Permalink to this headline">¶</a></h3>
+<p><em>The Cannon</em> expects all spectra - for reference and survey objects -
+to be continuum-normalized in a consistent way, and sampled on a consistent
+rest-frame wavelength grid, with the same line-spread function. It also
+assumes that the flux variance, from photon noise and other sources, is
+known at each spectral pixel of each spectrum.</p>
+</div>
 <div class="section" id="overview-of-the-cannon-software">
 <h3>Overview of <em>The Cannon</em> Software<a class="headerlink" href="#overview-of-the-cannon-software" title="Permalink to this headline">¶</a></h3>
 <p>This software package breaks up <em>The Cannon</em> into the following steps and
@@ -103,32 +111,48 @@ features.</p>
 <div class="section" id="using-the-cannon">
 <h2>Using <em>The Cannon</em><a class="headerlink" href="#using-the-cannon" title="Permalink to this headline">¶</a></h2>
 <p>The details of using The Cannon package are provided in the following
-sections, along with an example.</p>
-<div class="section" id="step-1-prepare-data-prepdata-py">
-<h3>Step 1: Prepare Data (<tt class="docutils literal"><span class="pre">prepdata.py</span></tt>)<a class="headerlink" href="#step-1-prepare-data-prepdata-py" title="Permalink to this headline">¶</a></h3>
-<p><em>The Cannon</em> expects all spectra - for reference and survey objects -
-to be continuum-normalized in a consistent way, and sampled on a consistent
-rest-frame wavelength grid, with the same line-spread function. It also
-assumes that the flux variance, from photon noise and other sources, is
-known at each spectral pixel of each spectrum.</p>
-<p>Preparing data thus involves: putting spectra into a 3D array
-(nstars, npixels, 3), putting label names into an array (nlabels),
-and putting training label values into a 2D array (nstars, nlabels).
-The user is left to do this him or herself, but we include some basic
-methods and functionalities in <tt class="docutils literal"><span class="pre">prep_data.py</span></tt> that might be helpful.</p>
-</div>
-<div class="section" id="step-2-construct-training-set">
-<h3>Step 2: Construct Training Set<a class="headerlink" href="#step-2-construct-training-set" title="Permalink to this headline">¶</a></h3>
+sections, along with the following example: 553 open and globular cluster stars
+from APOGEE DR10 as the training set, and, for simplicity, the same set of stars
+as the test set.</p>
+<div class="section" id="step-1-construct-a-training-set-from-apogee-files-apogee-py">
+<h3>Step 1: Construct a training set from APOGEE files (<tt class="docutils literal"><span class="pre">apogee.py</span></tt>)<a class="headerlink" href="#step-1-construct-a-training-set-from-apogee-files-apogee-py" title="Permalink to this headline">¶</a></h3>
 <p>The training set is a set of stars from the survey under consideration
 for which the user has spectra and also high-fidelity labels (that is,
 stellar parameters and element abundances that are deemed both accurate
 and precise.) The set of reference objects is critical, as the label
 transfer to the survey objects can only be as good as the quality of the
 training set.</p>
-<p>Labels for a training set will not necessarily come from the same data,
-and therefore spectra will not necessarily be in the same data format.
-For flexibility, <em>The Cannon</em> software package allows the user to construct
-training subsets, one data type each, and then merge the subsets.</p>
+<p>Preparing data thus involves: putting spectra into a 3D array
+(nstars, npixels, 3), putting label names into an array (nlabels),
+and putting training label values into a 2D array (nstars, nlabels).</p>
+<p>The user must construct the following: a list of filenames corresponding to the
+training data (in this case, APOGEE .fits files) and a .txt file containing
+training labels in an ASCII table. The first row of this file must correspond
+to the names of the labels. The first column must be some kind of stellar ID
+in string format. The remaining entries must be floats.</p>
+<p>In our example, the label file is called <tt class="docutils literal"><span class="pre">traininglabels.txt</span></tt> and the ID
+column happens to correspond to the file names that we want to read spectra
+from.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">readin</span> <span class="o">=</span> <span class="s">&quot;traininglabels.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">readin</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;string&#39;</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filenames1</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">)):</span> <span class="c">#incorporate file location info</span>
+<span class="go">    ...filename = &#39;/home/annaho/AnnaCannon/Data/APOGEE_Data&#39; + IDs[i][1:]</span>
+<span class="go">    ...filenames1.append(filename)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectra</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we retrieve IDs, label names, and label values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_training_labels</span><span class="p">(</span><span class="n">readin</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once the file list is created, the <tt class="docutils literal"><span class="pre">get_spectra</span></tt> method can be
+used to put the spectrum information into the correct format.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">apogee</span> <span class="kn">import</span> <span class="n">get_spectra</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectra</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="kn">import</span> <span class="nn">Dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fts_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vesta_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
@@ -180,12 +204,12 @@ as follows:</p>
 <li><a class="reference internal" href="#"><em>The Cannon</em>: Data-Driven Stellar Labels</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a><ul>
 <li><a class="reference internal" href="#introduction-to-the-cannon">Introduction to <em>The Cannon</em></a></li>
+<li><a class="reference internal" href="#a-word-on-spectra">A Word on Spectra</a></li>
 <li><a class="reference internal" href="#overview-of-the-cannon-software">Overview of <em>The Cannon</em> Software</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#using-the-cannon">Using <em>The Cannon</em></a><ul>
-<li><a class="reference internal" href="#step-1-prepare-data-prepdata-py">Step 1: Prepare Data (<tt class="docutils literal"><span class="pre">prepdata.py</span></tt>)</a></li>
-<li><a class="reference internal" href="#step-2-construct-training-set">Step 2: Construct Training Set</a></li>
+<li><a class="reference internal" href="#step-1-construct-a-training-set-from-apogee-files-apogee-py">Step 1: Construct a training set from APOGEE files (<tt class="docutils literal"><span class="pre">apogee.py</span></tt>)</a></li>
 <li><a class="reference internal" href="#step-3-construct-test-set">Step 3: Construct Test Set</a></li>
 <li><a class="reference internal" href="#step-4-the-cannon-step-1-generate-model">Step 4: <em>The Cannon</em> Step 1 - Generate Model</a></li>
 <li><a class="reference internal" href="#step-5-the-cannon-step-2-infer-labels">Step 5: <em>The Cannon</em> Step 2 - Infer Labels</a></li>

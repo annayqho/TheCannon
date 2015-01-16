@@ -77,8 +77,8 @@ sections, along with the following example: 553 open and globular cluster stars
 from APOGEE DR10 as the training set, and, for simplicity, the same set of stars
 as the test set. 
 
-Step 1: Construct a training set from APOGEE files ``apogee.py`` 
-----------------------------------------------------------------
+Step 1: Construct a training set from APOGEE files (``apogee.py``) 
+------------------------------------------------------------------
 
 The training set is a set of stars from the survey under consideration
 for which the user has spectra and also high-fidelity labels (that is,
