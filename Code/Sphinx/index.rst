@@ -53,9 +53,11 @@ features.
    * ``read_apogee``: read spectra, continuum-normalize
    * ``dataset``: (optional) select a subset of spectra
 
-#. Step 1 of The Cannon: fit for a model
+#. The Cannon Step 1: Fit Model
 
-   * Run a set of diagnostics on the model
+   * ``train_model`` in ``cannon1_train_model``: solve for model
+   * ``model_diagnostics`` in ``cannon1_train_model``: run a set of 
+     diagnostics on the model
 
 #. Step 2 of The Cannon: infer labels for all test objects
 

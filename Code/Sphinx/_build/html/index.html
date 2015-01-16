@@ -89,8 +89,10 @@ features.</p>
 <li><tt class="docutils literal"><span class="pre">dataset</span></tt>: (optional) select a subset of spectra</li>
 </ul>
 </li>
-<li>Step 1 of The Cannon: fit for a model<ul>
-<li>Run a set of diagnostics on the model</li>
+<li>The Cannon Step 1: Fit Model<ul>
+<li><tt class="docutils literal"><span class="pre">train_model</span></tt> in <tt class="docutils literal"><span class="pre">cannon1_train_model</span></tt>: solve for model</li>
+<li><tt class="docutils literal"><span class="pre">model_diagnostics</span></tt> in <tt class="docutils literal"><span class="pre">cannon1_train_model</span></tt>: run a set of
+diagnostics on the model</li>
 </ul>
 </li>
 <li>Step 2 of The Cannon: infer labels for all test objects<ul>
@@ -218,11 +220,11 @@ simply show that <em>The Cannon</em> can return good labels for the set it train
 </pre></div>
 </div>
 </div>
-<div class="section" id="step-3-the-cannon-step-1-fit-model">
-<h3>Step 3: <em>The Cannon</em> Step 1 - Fit Model<a class="headerlink" href="#step-3-the-cannon-step-1-fit-model" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spectral_model</span> <span class="kn">import</span> <span class="n">SpectralModel</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpectralModel</span><span class="p">(</span><span class="n">label_names</span><span class="p">,</span> <span class="n">modeltype</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">trainingset</span><span class="p">)</span>
+<div class="section" id="step-3-the-cannon-step-1-fit-model-cannon1-train-model">
+<h3>Step 3: <em>The Cannon</em> Step 1 - Fit Model (<tt class="docutils literal"><span class="pre">cannon1_train_model</span></tt>)<a class="headerlink" href="#step-3-the-cannon-step-1-fit-model-cannon1-train-model" title="Permalink to this headline">¶</a></h3>
+<p>Now, we use our training set to fit for the model.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon1_train_model</span> <span class="kn">import</span> <span class="n">train_model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">,</span> <span class="n">label_vector</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">training_set</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -260,7 +262,7 @@ simply show that <em>The Cannon</em> can return good labels for the set it train
 </ul>
 </li>
 <li><a class="reference internal" href="#step-2-construct-a-test-set-from-apogee-files">Step 2: Construct a test set from APOGEE files</a></li>
-<li><a class="reference internal" href="#step-3-the-cannon-step-1-fit-model">Step 3: <em>The Cannon</em> Step 1 - Fit Model</a></li>
+<li><a class="reference internal" href="#step-3-the-cannon-step-1-fit-model-cannon1-train-model">Step 3: <em>The Cannon</em> Step 1 - Fit Model (<tt class="docutils literal"><span class="pre">cannon1_train_model</span></tt>)</a></li>
 <li><a class="reference internal" href="#step-5-the-cannon-step-2-infer-labels">Step 5: <em>The Cannon</em> Step 2 - Infer Labels</a></li>
 </ul>
 </li>
