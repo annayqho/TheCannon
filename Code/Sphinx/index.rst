@@ -173,6 +173,8 @@ The output of these diagnostics are:
 2. A histogram for each label showing its coverage in label space
 3. A "triangle plot" that shows every label plotted against every other
 
+.. image:: /home/annaho/AnnaCannon/Code/Version1.1/trainingset_SNRdist.png 
+
 Step 2: Construct a test set from APOGEE files
 ----------------------------------------------
 

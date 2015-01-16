@@ -138,6 +138,7 @@ def train_model(training_set):
 
 def calc_red_chi_sq(model):
     """Calculate one reduced chi sq value per star"""
+    print "running calc_red_chi_sq"
     coeffs_all, covs, scatters, chis, chisqs, pivots = model
     nlabels = len(pivots)
     npixels, nstars = chis.shape
@@ -145,6 +146,7 @@ def calc_red_chi_sq(model):
     chisqs = np.sum(all_chisqs, axis=0) # now we have one per star
     dof = npixels-nlabels
     red_chisqs = chisqs/dof
+    return red_chisqs
 
 def model_diagnostics(lambdas, label_names, model):
     """Run a set of diagnostics on the model.
