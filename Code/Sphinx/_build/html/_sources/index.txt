@@ -171,9 +171,18 @@ The output of these diagnostics are:
 
 1. A histogram showing the distribution of SNR in the training set
 2. A histogram for each label showing its coverage in label space
-3. A "triangle plot" that shows every label plotted against every other
+3. A "triangle plot" that shows every label plotted against every other 
 
-.. image:: /home/annaho/AnnaCannon/Code/Version1.1/trainingset_SNRdist.png 
+Sample output plots below.
+
+.. image:: trainingset_SNRdist.png
+    :width: 400pt
+
+.. image:: trainingset_labeldist_Teff.png
+    :width: 400pt
+
+.. image:: trainingset_labels_triangle.png
+    :width: 400pt
 
 Step 2: Construct a test set from APOGEE files
 ----------------------------------------------
@@ -208,6 +217,17 @@ The output of these diagnostics are:
    of wavelength
 3. Histogram of the reduced chi squareds of the fits (normalized by DOF, 
    where DOF = npixels-nlabels)
+
+Sample output plots below.
+
+.. image:: baseline_spec_with_cont_pix.png
+    :width: 400pt
+
+.. image:: leading_coeffs.png
+    :width: 400pt
+
+.. image:: modelfit_redchisqs.png
+    :width: 400pt
 
 Step 5: *The Cannon* Step 2 - Infer Labels
 -------------------------------------------
