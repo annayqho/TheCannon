@@ -50,8 +50,8 @@ features.
 
 #. Construct a test set from APOGEE files
 
-   * ``read_apogee``: retrieve continuum-normalized test spectra 
-     and (optional) select a subset of spectra.
+   * ``read_apogee``: read spectra, continuum-normalize
+   * ``dataset``: (optional) select a subset of spectra
 
 #. Step 1 of The Cannon: fit for a model
 
@@ -177,12 +177,15 @@ Step 2: Construct a test set from APOGEE files
 Ordinarily, the user would go through a process identical to that for the 
 training set, except without reading in the training labels file. In this case, 
 for simplicity, we use the training set as our test set, so that our results 
-simply show that The Cannon can return good labels for the set it trained on.
+simply show that *The Cannon* can return good labels for the set it trained on.
 
-    >>> test_set = training_set 
+    >>> test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs, 
+    spectra=training_set.spectra, label_names=training_set.label_names)
 
-Step 4: *The Cannon* Step 1 - Generate Model
----------------------------------------------
+Step 3: *The Cannon* Step 1 - Fit Model
+---------------------------------------
+
+
 
     >>> from spectral_model import SpectralModel
     >>> model = SpectralModel(label_names, modeltype) 

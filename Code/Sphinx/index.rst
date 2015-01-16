@@ -179,10 +179,13 @@ training set, except without reading in the training labels file. In this case,
 for simplicity, we use the training set as our test set, so that our results 
 simply show that *The Cannon* can return good labels for the set it trained on.
 
-    >>> test_set = training_set 
+    >>> test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs, 
+    spectra=training_set.spectra, label_names=training_set.label_names)
 
-Step 4: *The Cannon* Step 1 - Generate Model
----------------------------------------------
+Step 3: *The Cannon* Step 1 - Fit Model
+---------------------------------------
+
+
 
     >>> from spectral_model import SpectralModel
     >>> model = SpectralModel(label_names, modeltype) 
