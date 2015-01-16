@@ -16,23 +16,17 @@ def do_one_regression_at_fixed_scatter(spectra, x, scatter):
     Params
     ------
     spectra: ndarray, [nstars, 3]
-        "3" corresponds to wavelength, flux, flux_err
-
     x=coefficients of the model: ndarray, [nstars, nlabels]
-
     scatter: ndarray, [nstars]
 
     Returns
     ------
     coeff: ndarray
         coefficients of the fit
-
     xTCinvx: ndarray
         inverse covariance matrix for fit coefficients
-
     chi: float
         chi-squared at best fit
-
     logdet_Cinv: float
         inverse of the log determinant of the cov matrix
     """
@@ -133,11 +127,24 @@ def train_model(training_set):
     coeffs = np.array([b[0] for b in blob])
     covs = np.array([np.linalg.inv(b[1]) for b in blob])
     chis = np.array([b[2] for b in blob])
-    chisqs = np.array([np.dot(b[2],b[2]) - b[3] for b in blob]) 
-    scatters = np.array([b[4] for b in blob])
+    chisqs = np.array([np.dot(b[2],b[2]) - b[3] for b in blob])
+    # is the above actually supposed to be b[2]*b[2]? 
+    scatters = np.array([b[4] for b in blob]) # how could there be a b[4]?
+                        # there are only four outputs from do_one_regression_at_
+                        # fixed_scatter...confused
     model = coeffs, covs, scatters, chis, chisqs, pivots
     print "Done training model"
     return model, x_full
+
+def calc_red_chi_sq(model):
+    """Calculate one reduced chi sq value per star"""
+    coeffs_all, covs, scatters, chis, chisqs, pivots = model
+    nlabels = len(pivots)
+    npixels, nstars = chis.shape
+    all_chisqs = chis*chis
+    chisqs = sum(all_chisqs, axis=0) # now we have one per star
+    dof = npixels-nlabels
+    red_chisqs = chisqs/dof
 
 def model_diagnostics(lambdas, label_names, model):
     """Run a set of diagnostics on the model.
@@ -184,17 +191,14 @@ def model_diagnostics(lambdas, label_names, model):
     fig.savefig(filename)
     plt.close(fig)
 
-    # Histogram of the chi squareds of the fits
-    plt.hist(chis)
-    dof = len(pixels) - nlabels
-    dofline = plt.axvline(x=dof, color='b', linestyle='dotted',
-            label="DOF = npixels - nlabels")
-    plt.legend() 
-    plt.title("Distribution of Chi Squareds of the Model Fit")
+    # Histogram of the reduced chi squareds of the fits
+    red_chisqs = calc_red_chi_sq(model)
+    plt.hist(red_chisqs)
+    plt.title("Distribution of Reduced Chi Squareds of the Model Fit")
     plt.ylabel("Count")
-    plt.xlabel("Chi Squared")
-    filename = "modelfit_chisqs.png"
-    print "Diagnostic plot: histogram of the chi squareds of the fit"
+    plt.xlabel("Reduced Chi Sq") 
+    filename = "modelfit_redchisqs.png"
+    print "Diagnostic plot: histogram of the red chi squareds of the fit"
     print "Saved as %s" %filename
     plt.savefig(filename)
     plt.close()
