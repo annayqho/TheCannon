@@ -146,11 +146,11 @@ columns 1, 3, and 5.
 1 = keep this object, and 0 = remove it. Here, we select data using physical 
 Teff and logg cutoffs.
 
-    >>> Teff = label_values[:,0]
+    >>> Teff = training_set.label_values[:,0]
     >>> Teff_corr = all_label_values[:,2]
     >>> diff_t = np.abs(Teff-Teff_corr)
     >>> diff_t_cut = 600.
-    >>> logg = label_values[:,1]
+    >>> logg = training_set.label_values[:,1]
     >>> logg_cut = 100.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
     >>> training_set.choose_spectra(mask)

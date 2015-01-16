@@ -143,7 +143,7 @@ from.</p>
 </pre></div>
 </div>
 <p>Once the file list is created, the <tt class="docutils literal"><span class="pre">get_spectra</span></tt> method can be
-used to continuum normalization the spectrum information and put it
+used to continuum-normalize the spectrum information and put it
 into the correct format.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_apogee</span> <span class="kn">import</span> <span class="n">get_spectra</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">continua</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
@@ -179,11 +179,11 @@ columns 1, 3, and 5.</p>
 (for example, by imposing physical cutoffs) by constructing a mask where
 1 = keep this object, and 0 = remove it. Here, we select data using physical
 Teff and logg cutoffs.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">label_values</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_values</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Teff_corr</span> <span class="o">=</span> <span class="n">all_label_values</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Teff</span><span class="o">-</span><span class="n">Teff_corr</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t_cut</span> <span class="o">=</span> <span class="mf">600.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">label_values</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_values</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logg_cut</span> <span class="o">=</span> <span class="mf">100.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">((</span><span class="n">diff_t</span> <span class="o">&lt;</span> <span class="n">diff_t_cut</span><span class="p">),</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="n">logg_cut</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span><span class="o">.</span><span class="n">choose_spectra</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
