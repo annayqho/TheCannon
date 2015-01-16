@@ -1,12 +1,12 @@
 What remains for Version 1.0 
-- Imagine that the residual of each best-fit spectrum is a 1D list, stack them and sort by each of the labels. Then we will see whether all stars have deviations at a particular wavelength from the best-fit model irrespective of the label -- if the quadratic model is general enough, then the 2D residual should show nothing but noise. (Jo Bovy has done something similar?) -- don't forget to normalize by the sources of variance and scatter, see HW's e-mail
-- Go through & compile questions and observations from the diagnostic plots
-- Continuum normalization
+- Go through and carefully check all code and outputs
 - Documentation
+- Compile questions and observations to share with the others
 - E-mail HWR, MKN, DH introducing this version
 
 For Version 1.1
 - Restructure to incorporate David Hogg's workflow suggestions
+- Implement continuum normalization
 
 For way further down the road:
 - spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
