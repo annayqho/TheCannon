@@ -23,7 +23,7 @@ def func(coeffs, *labels):
     x = get_x(list(labels))
     return np.dot(coeffs, x)
 
-def infer_labels(num_labels, model, test_set):
+def infer_labels(model, test_set):
     """
     Uses the model to solve for labels of the test set.
 
@@ -39,11 +39,11 @@ def infer_labels(num_labels, model, test_set):
     MCM_rotate_all:
     covs_all: covariance matrix of the fit
     """
-    nlabels = num_labels
+    coeffs_all, covs, scatters, chis, chisqs, pivots = model
+    nlabels = len(pivots)
     spectra = test_set.spectra #(nstars, npixels, 3)
     nstars = spectra.shape[0]
     npixels = spectra.shape[1]
-    coeffs_all, covs, scatters, chis, chisqs, pivots = model
     labels_all = np.zeros((nstars, nlabels))
     # Don't understand what this MCM_rotate_all matrix is
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1]-1, 

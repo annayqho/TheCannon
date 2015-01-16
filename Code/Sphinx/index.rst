@@ -229,9 +229,10 @@ Sample output plots below.
 .. image:: modelfit_redchisqs.png
     :width: 400pt
 
-Step 5: *The Cannon* Step 2 - Infer Labels
--------------------------------------------
+Step 4: *The Cannon* Step 2 - Infer Labels (``cannon2_infer_labels``)
+---------------------------------------------------------------------
 
-    >>> from cannon_labels import CannonLabels
-    >>> labels = CannonLabels(label_names)
-    >>> labels.solve(model, testset)
+Now, we use the model to infer labels for the survey objects.
+
+    >>> from cannon2_infer_labels import infer_labels
+    >>> cannon_labels, MCM_rotate, covs = infer_labels(model, test_set)
