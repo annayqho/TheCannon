@@ -110,6 +110,7 @@ def train_model(training_set):
     chi squareds
     the pivot values
     """
+    print "Training model..."
     label_names = training_set.label_names
     label_values = training_set.label_values #(nstars, nlabels)
     nlabels = len(label_names)
@@ -135,6 +136,7 @@ def train_model(training_set):
     chisqs = np.array([np.dot(b[2],b[2]) - b[3] for b in blob]) 
     scatters = np.array([b[4] for b in blob])
     model = coeffs, covs, scatters, chis, chisqs, pivots
+    print "Done training model"
     return model, x_full
 
 def model_diagnostics(training_set, model, label_vector):

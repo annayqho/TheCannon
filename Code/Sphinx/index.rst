@@ -182,14 +182,13 @@ simply show that *The Cannon* can return good labels for the set it trained on.
     >>> test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs, 
     spectra=training_set.spectra, label_names=training_set.label_names)
 
-Step 3: *The Cannon* Step 1 - Fit Model
----------------------------------------
+Step 3: *The Cannon* Step 1 - Fit Model (``cannon1_train_model``)
+-----------------------------------------------------------------
 
+Now, we use our training set to fit for the model.
 
-
-    >>> from spectral_model import SpectralModel
-    >>> model = SpectralModel(label_names, modeltype) 
-    >>> model.train(trainingset)
+    >>> from cannon1_train_model import train_model
+    >>> model, label_vector = train_model(training_set)
 
 Step 5: *The Cannon* Step 2 - Infer Labels
 -------------------------------------------
