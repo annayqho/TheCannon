@@ -51,9 +51,9 @@ features.
 #. Construct a training set from APOGEE files
    
    * ``read_apogee``: retrieve continuum-normalized training spectra 
-   and (optional) select a subset of spectra.
+     and (optional) select a subset of spectra.
    * ``read_labels``: retrieve training label names and values
-   and (optional) select a subset of labels.
+     and (optional) select a subset of labels.
    * Run a set of diagnostics on the training set
 
 #. Construct a test set from APOGEE files

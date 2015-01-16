@@ -85,15 +85,16 @@ known at each spectral pixel of each spectrum.</p>
 features.</p>
 <ol class="arabic simple">
 <li>Construct a training set from APOGEE files<ul>
-<li>Retrieve continuum-normalized training spectra</li>
-<li>Retrieve training labels</li>
-<li>(Optional) Select a subset of labels and spectra</li>
+<li><tt class="docutils literal"><span class="pre">read_apogee</span></tt>: retrieve continuum-normalized training spectra
+and (optional) select a subset of spectra.</li>
+<li><tt class="docutils literal"><span class="pre">read_labels</span></tt>: retrieve training label names and values
+and (optional) select a subset of labels.</li>
 <li>Run a set of diagnostics on the training set</li>
 </ul>
 </li>
 <li>Construct a test set from APOGEE files<ul>
-<li>Retrieve continuum-normalized test spectra</li>
-<li>(Optional) Select a subset of spectra</li>
+<li><tt class="docutils literal"><span class="pre">read_apogee</span></tt>: retrieve continuum-normalized test spectra
+and (optional) select a subset of spectra.</li>
 </ul>
 </li>
 <li>Step 1 of The Cannon: fit for a model<ul>
@@ -122,14 +123,20 @@ stellar parameters and element abundances that are deemed both accurate
 and precise.) The set of reference objects is critical, as the label
 transfer to the survey objects can only be as good as the quality of the
 training set.</p>
-<p>Preparing data thus involves: putting spectra into a 3D array
-(nstars, npixels, 3), putting label names into an array (nlabels),
-and putting training label values into a 2D array (nstars, nlabels).</p>
-<p>The user must construct the following: a list of filenames corresponding to the
-training data (in this case, APOGEE .fits files) and a .txt file containing
-training labels in an ASCII table. The first row of this file must correspond
-to the names of the labels. The first column must be some kind of stellar ID
-in string format. The remaining entries must be floats.</p>
+<p>The user must construct the following inputs:</p>
+<ol class="arabic simple">
+<li>a list of filenames corresponding to the training data
+(in this case, APOGEE .fits files)</li>
+<li>a .txt file containing training labels in an ASCII table.</li>
+</ol>
+<p>The following requirements govern (2):
+1. The first row must be strings corresponding to the names of the labels</p>
+<blockquote>
+<div>and must not contain any &#8216;/&#8217;s</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>The first column must be string corresponding to the stellar IDs</li>
+<li>The remaining entries must be floats corresponding to the label values</li>
+</ol>
 <p>In our example, the label file is called <tt class="docutils literal"><span class="pre">traininglabels.txt</span></tt> and the ID
 column happens to correspond to the file names that we want to read spectra
 from.</p>
@@ -140,17 +147,44 @@ from.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">)):</span> <span class="c">#incorporate file location info</span>
 <span class="go">    ...filename = &#39;/home/annaho/AnnaCannon/Data/APOGEE_Data&#39; + IDs[i][1:]</span>
 <span class="go">    ...filenames1.append(filename)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">spectra</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Now we retrieve IDs, label names, and label values.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_training_labels</span><span class="p">(</span><span class="n">readin</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once the file list is created, the <tt class="docutils literal"><span class="pre">get_spectra</span></tt> method can be
 used to put the spectrum information into the correct format.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">apogee</span> <span class="kn">import</span> <span class="n">get_spectra</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_apogee</span> <span class="kn">import</span> <span class="n">get_spectra</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">spectra</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now the <tt class="docutils literal"><span class="pre">get_training_labels</span></tt> method is used to retrieve IDs, label names,
+and label values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_labels</span> <span class="kn">import</span> <span class="n">get_training_labels</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_training_labels</span><span class="p">(</span><span class="n">readin</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(Optional) The user can choose to select some subset of the training labels
+by creating a mask corresponding to the desired column indices.
+In this example, we select Teff, logg, and [Fe/H].</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">colmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_label_names</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">colmask</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">label_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_label_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">label_values</span> <span class="o">=</span> <span class="n">all_label_values</span><span class="p">[:,</span><span class="n">colmask</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The user can also (if desired) select some subset of the training objects, by
+imposing physical cutoffs. Here, we select data with physical
+Teff and logg cutoffs.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">label_values</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Teff_corr</span> <span class="o">=</span> <span class="n">all_label_values</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Teff</span><span class="o">-</span><span class="n">Teff_corr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t_cut</span> <span class="o">=</span> <span class="mf">600.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">label_values</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logg_cut</span> <span class="o">=</span> <span class="mf">100.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">((</span><span class="n">diff_t</span> <span class="o">&lt;</span> <span class="n">diff_t_cut</span><span class="p">),</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="n">logg_cut</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span> <span class="o">=</span> <span class="n">IDs</span><span class="p">[</span><span class="n">bad</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
 </pre></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="kn">import</span> <span class="nn">Dataset</span>
