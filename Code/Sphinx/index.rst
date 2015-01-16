@@ -50,15 +50,16 @@ features.
 
 #. Construct a training set from APOGEE files
    
-   * Retrieve continuum-normalized training spectra
-   * Retrieve training labels
-   * (Optional) Select a subset of labels and spectra
+   * ``read_apogee``: retrieve continuum-normalized training spectra 
+   and (optional) select a subset of spectra.
+   * ``read_labels``: retrieve training label names and values
+   and (optional) select a subset of labels.
    * Run a set of diagnostics on the training set
 
 #. Construct a test set from APOGEE files
 
-   * Retrieve continuum-normalized test spectra
-   * (Optional) Select a subset of spectra
+   * ``read_apogee``: retrieve continuum-normalized test spectra 
+     and (optional) select a subset of spectra.
 
 #. Step 1 of The Cannon: fit for a model
 
@@ -87,15 +88,17 @@ and precise.) The set of reference objects is critical, as the label
 transfer to the survey objects can only be as good as the quality of the
 training set. 
 
-Preparing data thus involves: putting spectra into a 3D array
-(nstars, npixels, 3), putting label names into an array (nlabels),
-and putting training label values into a 2D array (nstars, nlabels).
+The user must construct the following inputs: 
 
-The user must construct the following: a list of filenames corresponding to the 
-training data (in this case, APOGEE .fits files) and a .txt file containing 
-training labels in an ASCII table. The first row of this file must correspond 
-to the names of the labels. The first column must be some kind of stellar ID 
-in string format. The remaining entries must be floats.
+1. a list of filenames corresponding to the training data 
+   (in this case, APOGEE .fits files) 
+2. a .txt file containing training labels in an ASCII table. 
+
+The following requirements govern (2):
+1. The first row must be strings corresponding to the names of the labels 
+   and must not contain any '/'s 
+2. The first column must be string corresponding to the stellar IDs
+3. The remaining entries must be floats corresponding to the label values
 
 In our example, the label file is called ``traininglabels.txt`` and the ID 
 column happens to correspond to the file names that we want to read spectra 
@@ -108,17 +111,44 @@ from.
     >>> for i in range(0, len(IDs)): #incorporate file location info
         ...filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + IDs[i][1:]
         ...filenames1.append(filename)
-    >>> spectra, SNRs = get_spectra(filenames1) 
 
-Now we retrieve IDs, label names, and label values.
-
-    >>> IDs, all_label_names, all_label_values = get_training_labels(readin)
-
-Once the file list is created, the ``get_spectra`` method can be 
+Once the file list is created, the ``get_spectra`` method can be               
 used to put the spectrum information into the correct format.
 
-    >>> from apogee import get_spectra
-    >>> spectra, SNRs = get_spectra(filenames1)
+    >>> from read_apogee import get_spectra
+    >>> spectra, SNRs = get_spectra(filenames1) 
+
+Now the ``get_training_labels`` method is used to retrieve IDs, label names, 
+and label values.
+
+    >>> from read_labels import get_training_labels
+    >>> IDs, all_label_names, all_label_values = get_training_labels(readin)
+
+(Optional) The user can choose to select some subset of the training labels 
+by creating a mask corresponding to the desired column indices. 
+In this example, we select Teff, logg, and [Fe/H].  
+    
+    >>> cols = [1, 3, 5]
+    >>> colmask = np.zeros(len(all_label_names), dtype=bool)
+    >>> colmask[cols] = 1
+
+
+    >>> label_names = [all_label_names[i] for i in cols]
+    >>> label_values = all_label_values[:,colmask]
+
+The user can also (if desired) select some subset of the training objects, by 
+imposing physical cutoffs. Here, we select data with physical 
+Teff and logg cutoffs.
+
+    >>> Teff = label_values[:,0]
+    >>> Teff_corr = all_label_values[:,2]
+    >>> diff_t = np.abs(Teff-Teff_corr)
+    >>> diff_t_cut = 600.
+    >>> logg = label_values[:,1]
+    >>> logg_cut = 100.
+    >>> bad = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
+    >>> IDs = IDs[bad]
+    >>>
 
     >>> dataset import Dataset
     >>> fts_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
