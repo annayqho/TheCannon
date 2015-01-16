@@ -236,3 +236,24 @@ Now, we use the model to infer labels for the survey objects.
 
     >>> from cannon2_infer_labels import infer_labels
     >>> cannon_labels, MCM_rotate, covs = infer_labels(model, test_set)
+
+We update the test objects accordingly.
+    
+    >>> test_set.set_label_values(cannon_labels)
+
+To let the user examine whether things are going smoothly, *The Cannon* can 
+print out a set of test set diagnostics.
+
+    >>> from dataset import test_set_diagnostics
+    >>> test_set_diagnostics(training_set, test_set)
+
+The output of these diagnostics are:
+
+1. For each label, a list of flagged stars for which test labels are 
+   over 2-sigma away from training labels
+2. Triangle plot, each test label plotted against every other test label
+3. 1-1 plots, for each label, training values plotted against test values
+
+Sample output plots below.
+
+.. image:: 

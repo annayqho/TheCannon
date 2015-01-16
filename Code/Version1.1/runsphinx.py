@@ -43,3 +43,11 @@ coeffs_all, covs, scatters, chis, chisqs, pivots = model
 
 from cannon1_train_model import model_diagnostics
 model_diagnostics(lambdas, training_set.label_names, model)
+
+from cannon2_infer_labels import infer_labels
+cannon_labels, MCM_rotate, covs = infer_labels(model, test_set)
+
+test_set.set_label_values(cannon_labels)
+
+from dataset import test_set_diagnostics
+test_set_diagnostics(training_set, test_set)

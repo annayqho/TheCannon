@@ -136,9 +136,11 @@ def test_set_diagnostics(training_set, test_set):
         print "Training label %s" %label_name
         print "flagged %s stars beyond 2-sig of training labels" %sum(warning)
         print "Saved list %s" %filename
+    
     # Plot all output labels against each other
     figname = "testset_labels_triangle.png"
     test_set.label_triangle_plot(figname)
+    
     # 1-1 plots of all labels
     for i in range(nlabels):
         name = label_names[i]
