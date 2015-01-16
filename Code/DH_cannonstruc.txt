@@ -1,0 +1,40 @@
+1) Run APOGEE munging code
+Input: URL, or maybe nothing
+Output:
+- a length-L rest-frame wavelength vector
+- a block N x L of training-set pixel intensities
+- a parallel block of inverse variances
+- a block N x K of labels
+- a block M x L of test-set pixel intensities
+- a parallel block of inverse variances
+
+Comments: this code should get the data, shift it to rest frame, read the bad-pixel masks, and build the inverse variance vectors and package them all into rectangular blocks.
+
+2) Run Continuum Wavelengths Code
+Input: (the first three inputs to the Main Code)
+- a rectangular block that is N x L of pixel values of continuum-normalized spectra
+intensities (training set)
+- a parallel block of inverse variance values
+- a block of N x K labels
+Output: a length-L mask of continuum True/False values
+
+3) Run Continuum Normalization code
+Input: 
+- N x L or M x L block of pixel values
+- a parallel block of inverse variance values
+- the length-L continuum mask (from above)
+Output:
+- a N x L or M x L block of continuum-normalized intensities
+- a parallel block of rescaled inverse variance values
+
+4) Run Main Code
+Input: 
+- a rectangular block that is N x L of pixel values of continuum-normalized spectra intensities (training set)
+- a parallel block of inverse variance values
+- a block of N x K labels
+- a rectangular block that is M x L of pixel values of continuum-normalized spectral intensities (test set)
+- a parallel block of inverse variance values
+- a value for the "polynomial order" of the model
+Output:
+- a block of M x K labels
+- a block of Q x L parameters (coefficients and scatters and so on)
