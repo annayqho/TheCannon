@@ -142,7 +142,7 @@ def calc_red_chi_sq(model):
     nlabels = len(pivots)
     npixels, nstars = chis.shape
     all_chisqs = chis*chis
-    chisqs = sum(all_chisqs, axis=0) # now we have one per star
+    chisqs = np.sum(all_chisqs, axis=0) # now we have one per star
     dof = npixels-nlabels
     red_chisqs = chisqs/dof
 
