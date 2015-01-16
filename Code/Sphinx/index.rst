@@ -78,8 +78,8 @@ sections, along with the following example: 553 open and globular cluster stars
 from APOGEE DR10 as the training set, and, for simplicity, the same set of stars
 as the test set. 
 
-Step 1: Construct a training set from APOGEE files (``apogee.py``) 
-------------------------------------------------------------------
+Step 1: Construct a training set from APOGEE files 
+--------------------------------------------------
 
 The training set is a set of stars from the survey under consideration
 for which the user has spectra and also high-fidelity labels (that is,
@@ -100,6 +100,9 @@ The following requirements govern (2):
 2. The first column must be string corresponding to the stellar IDs
 3. The remaining entries must be floats corresponding to the label values
 
+Reading spectra (``read_apogee.py``)
+++++++++++++++++++++++++++++++++++++
+
 In our example, the label file is called ``traininglabels.txt`` and the ID 
 column happens to correspond to the file names that we want to read spectra 
 from.
@@ -118,11 +121,17 @@ used to put the spectrum information into the correct format.
     >>> from read_apogee import get_spectra
     >>> spectra, SNRs = get_spectra(filenames1) 
 
+Reading labels (``read_labels.py``)
++++++++++++++++++++++++++++++++++++
+
 Now the ``get_training_labels`` method is used to retrieve IDs, label names, 
 and label values.
 
     >>> from read_labels import get_training_labels
     >>> IDs, all_label_names, all_label_values = get_training_labels(readin)
+
+Creating & tailoring a Dataset object (``dataset.py``)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 A ``Dataset`` object (``dataset.py``) is initialized. 
 
@@ -150,9 +159,9 @@ Teff and logg cutoffs.
     >>> logg = label_values[:,1]
     >>> logg_cut = 100.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
-    >>> IDs = IDs[mask]
-    >>> spectra = spectra[mask]
-    >>> label_values = label_values[mask]
+    >>> training_set.choose_spectra(mask)
+
+
 
     >>> dataset import Dataset
     >>> fts_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])

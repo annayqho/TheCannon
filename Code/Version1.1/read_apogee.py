@@ -41,7 +41,10 @@ def get_spectra(files):
         spectra[jj, :, 1] = fluxes
         spectra[jj, :, 2] = flux_errs
     print "Loaded %s stellar spectra" %len(files)
-    return spectra, SNRs
+    
+    # Automatically continuum-normalize
+    normalized_spectra, continua = continuum_normalize(spectra)
+    return normalized_spectra, continua, SNRs
 
 def continuum_normalize(spectra):
     """Continuum-normalizes the spectra.

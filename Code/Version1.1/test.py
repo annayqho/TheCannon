@@ -7,9 +7,9 @@ import numpy as np
 from dataset import Dataset
 from dataset import training_set_diagnostics
 from dataset import test_set_diagnostics
-from apogee import get_spectra
-from apogee import continuum_normalize
-from apogee import get_training_labels
+from read_apogee import get_spectra
+from read_apogee import continuum_normalize
+from read_apogee import get_training_labels
 from cannon1_train_model import train_model
 from cannon1_train_model import model_diagnostics
 from cannon2_infer_labels import infer_labels
@@ -34,6 +34,8 @@ colmask = np.zeros(len(all_label_names), dtype=bool)
 colmask[cols] = 1
 label_names = [all_label_names[i] for i in cols]
 label_values = all_label_values[:,colmask]
+
+dataset.choose_spectra(mask)
 
 # Optional: Set desired stars
 Teff = label_values[:,0]

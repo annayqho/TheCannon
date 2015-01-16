@@ -67,6 +67,15 @@ class Dataset(object):
         self.set_label_names(new_label_names)
         self.set_label_values(new_label_values)
 
+    def choose_spectra(self, mask):
+        """Updates the ID, spectra, label_values properties 
+
+        Input: mask where 1 = keep, 0 = discard
+        """
+        self.set_IDs(self.IDs[mask])
+        self.set_spectra(self.spectra[mask])
+        self.set_label_values(self.label_values[mask])
+
 def training_set_diagnostics(dataset):
     # Plot SNR distribution
     plt.hist(dataset.SNRs)
