@@ -51,3 +51,8 @@ test_set.set_label_values(cannon_labels)
 
 from dataset import test_set_diagnostics
 test_set_diagnostics(training_set, test_set)
+
+from cannon_spectra import draw_spectra
+cannon_set = draw_spectra(label_vector, model, test_set)
+
+

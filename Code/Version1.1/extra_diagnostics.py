@@ -1,18 +1,3 @@
-    # Histogram of the chi squareds of the fits
-    plt.hist(chis)
-    dof = len(pixels) - nlabels
-    dofline = plt.axvline(x=dof, color='b', linestyle='dotted', 
-            label="DOF = npixels - nlabels")
-    plt.legend()
-    plt.title("Distribution of Chi Squareds of the Model Fit")
-    plt.ylabel("Count")
-    plt.xlabel("Chi Squared")
-    filename = "modelfit_chisqs.png"
-    print "Diagnostic plot: histogram of the chi squareds of the fit"
-    print "Saved as %s" %filename
-    plt.savefig(filename)
-    plt.close()
-
     # Overplot original spectra with the best-fit spectra
     # We have: the label vector x, and the coefficient vector coeffs_all
     # f_lambda = np.dot(x, coeff)

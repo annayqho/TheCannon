@@ -267,3 +267,18 @@ Sample output plots below.
 
 .. image:: 1to1_label[MH].png
     :width: 400pt
+
+Cannon Spectra (``draw_spectra``)
+---------------------------------
+
+Now that we have the model and labels for the test objects, we can in 
+principle "draw" spectra for each test object.
+
+    >>> from cannon_spectra import draw_spectra
+    >>> cannon_set = draw_spectra(label_vector, test_set)
+
+We can now perform a final set of diagnostic checks.
+
+    >>> from cannon_spectra import diagnostics
+    >>> diagnostics(cannon_set, model, test_set)
+
