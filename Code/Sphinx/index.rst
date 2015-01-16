@@ -33,14 +33,6 @@ process of *label transfer.*
    the model allow us to solve for - or infer - the labels of the survey 
    objects. 
 
-A Word on Spectra
------------------
-
-*The Cannon* expects all spectra - for reference and survey objects - 
-to be continuum-normalized in a consistent way, and sampled on a consistent
-rest-frame wavelength grid, with the same line-spread function. It also
-assumes that the flux variance, from photon noise and other sources, is 
-known at each spectral pixel of each spectrum.
 
 Overview of *The Cannon* Software
 ---------------------------------
@@ -116,10 +108,11 @@ from.
         ...filenames1.append(filename)
 
 Once the file list is created, the ``get_spectra`` method can be               
-used to put the spectrum information into the correct format.
+used to continuum normalization the spectrum information and put it 
+into the correct format.
 
     >>> from read_apogee import get_spectra
-    >>> spectra, SNRs = get_spectra(filenames1) 
+    >>> normalized_spectra, continua, SNRs = get_spectra(filenames1) 
 
 Reading labels (``read_labels.py``)
 +++++++++++++++++++++++++++++++++++
@@ -136,7 +129,7 @@ Creating & tailoring a Dataset object (``dataset.py``)
 A ``Dataset`` object (``dataset.py``) is initialized. 
 
     >>> from dataset import Dataset
-    >>> training_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=spectra, 
+    >>> training_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=normalized_spectra, 
     label_names=all_label_names, label_values=all_label_values)
 
 (Optional) The user can choose to select some subset of the training labels 
@@ -163,8 +156,7 @@ Teff and logg cutoffs.
 
 
 
-    >>> dataset import Dataset
-    >>> fts_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
+>>> fts_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
     >>> vesta_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
     >>> cluster_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
     >>> trainingset = mergesets(fts_trainingset, vesta_trainingset, cluster_trainingset)
