@@ -6,46 +6,65 @@ Introduction
 ============
 
 This is the software package used for *The Cannon*,
-a data-driven approach to determining stellar parameters
-and abundances (hereafter referred to as *labels*) corresponding to a 
-vast set of stellar spectra. 
+a data-driven approach to determining stellar labels (parameters
+and abundances) for a vast set of stellar spectra. This version is tailored 
+specifically for APOGEE spectra.
 
-A brief overview of *The Cannon* is below. For more details, see our 
-publication! :D
+A brief overview of *The Cannon* and the associated software package is below. 
+For more details on the method and its successful application to APOGEE DR10
+spectra, see Ness et al. 2015.
 
-For *The Cannon* to work, this vast set must have a subset of *reference 
-objects*: spectra that already have high-fidelity labels. Labels for the 
-remaining spectra are determined via a process called *label transfer.*
+Introduction to *The Cannon* 
+----------------------------
 
-There are two fundamental steps in label transfer.
+*The Cannon* has two fundamental steps that together constitutes a 
+process of *label transfer.* 
 
-1. The *training step*: the reference objects are assembled into a 
-   *training set* that is used to solve for a flexible generative model 
-   (with ~80,000 parameters). The model describes the flux in every pixel 
-   of the continuum-normalized spectrum as a function of stellar labels.
+1. The *Training Step*: *reference objects* are a subset of spectra in the 
+   survey for which corresponding stellar labels are known with high fidelity, 
+   for calib reasons or otherwise. Using both the spectra and labels for 
+   these objects, *The Cannon* solves for a flexible model that describes 
+   how the flux in every pixel of any given continuum-normalized spectrum 
+   depends on labels. 
    
-2. The *test step*: we assume that this generative model holds for all 
-   of the other objects in the survey (dubbed *survey objects*). 
-   Then, the spectra of the survey objects and the generative model from 
-   the reference objects allow us to solve for - or infer - the labels 
-   of the survey objects. 
+2. The *Test Step*: the model found in Step 1 is assumed to hold for all of 
+   the objects in the survey, including those outside the training set 
+   (dubbed *survey objects*). Thus, the spectra of the survey objects and 
+   the model allow us to solve for - or infer - the labels of the survey 
+   objects. 
 
-A few notable features of this package are:
+Overview of *The Cannon* Software
+---------------------------------
 
-* Helpful (optional) methods for preparing spectra and labels to be
-  fed into *The Cannon*
-* Generate a training set and a test set by supplying spectra and training 
-  labels
-* Merge multiple training sets into one
-* Generate a model by running the training set through Step 1 of *The Cannon*
-* Determine labels for the test set by running the model and training set 
-  through Step 2 of *The Cannon*.  
+This software package breaks up *The Cannon* into the following steps and 
+features.
 
-Getting Started
-===============
+#. Construct a training set
+   
+   * Retrieve continuum-normalized training spectra
+   * Retrieve training labels
+   * (Optional) Select a subset of labels and spectra
+   * Run a set of diagnostics on the training set
 
-The basic workflow for creating a training set and test set, solving for
-the model (Step 1) and finally determining labels (Step 2) is shown below.
+#. Construct a test set
+
+   * Retrieve continuum-normalized test spectra
+   * (Optional) Select a subset of spectra
+
+#. Step 1 of The Cannon: fit for a model
+
+   * Run a set of diagnostics on the model
+
+#. Step 2 of The Cannon: infer labels for all test objects
+
+   * Run a set of diagnostics on the inferred labels
+   * Run a set of diagnostics on the best-fit spectra
+
+Using *The Cannon*
+==================
+
+The details of using The Cannon package are provided in the following 
+sections, along with an example.
 
 Step 1: Prepare Data (``prepdata.py``) 
 ---------------------------------------
@@ -108,29 +127,3 @@ Step 5: *The Cannon* Step 2 - Infer Labels
     >>> from cannon_labels import CannonLabels
     >>> labels = CannonLabels(label_names)
     >>> labels.solve(model, testset)
-
-Using The Cannon
-===================
-
-The details of using The Cannon package are provided in the following sections:
-
-Prepare Data
--------------
-
-Construct Training Set
------------------------
-
-Construct Test Set
--------------------
-
-*The Cannon* Step 1: Generate Model
-------------------------------------
-
-*The Cannon* Step 2: Infer Labels
-----------------------------------
-
-Reference/API
-=============
-
-.. automodule:: prep_data
-    :members:

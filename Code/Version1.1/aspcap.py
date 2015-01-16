@@ -1,17 +1,4 @@
-"""Prepare spectra and training labels from ASPCAP files.
-
-This is *very* tailored to the particular kind of spectrum that we have
-been using. The more general user will probably have to write his or her
-own kind of file, similar to this.
-
-Methods
--------
-get_spectra
-continuum_normalize
-get_training_labels (assumes a standard ASCII table)
-    can choose all labels, can specify some labels with either name or column #
-
-"""
+"""Extract & continuum-normalize spectra from APOGEE .fits files."""
 
 import pyfits
 import numpy as np
@@ -19,14 +6,21 @@ import os
 import matplotlib.pyplot as plt
 
 def get_spectra(files):
-    """Extracts spectra (wavelengths, fluxes, fluxerrs) from aspcap fits files
+    """
+    Extracts spectra (wavelengths, fluxes, fluxerrs) from aspcap fits files
 
-    Input: a list of data file names of length nstars
-    Returns: a 3D float array of shape (nstars, npixels, 3)
+    Parameters
+    ----------
+    a list of data file names of length nstars
+    
+    Returns
+    -------
+    a 3D float array of shape (nstars, npixels, 3)
     with spectra[:,:,0] = pixel wavelengths
     spectra[:,:,1] = flux values
     spectra[:,:,2] = flux err values
     """
+    
     for jj,fits_file in enumerate(files):
         file_in = pyfits.open(fits_file)
         fluxes = np.array(file_in[1].data)
