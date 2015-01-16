@@ -75,3 +75,14 @@ nlabels = len(label_names)
 cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
 test_set.set_label_values(cannon_labels)
 test_set_diagnostics(training_set, test_set)
+
+# Finally, create our artificial "Cannon Set"
+nstars = len(test_set.IDs)
+cannon_spectra = np.zeros(test_set.spectra.shape)
+cannon_spectra[:,:,0] = test_set.spectra[:,:,0]
+for i in range(nstars):
+    x = label_vector[:,i,:]
+    spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
+    cannon_spectra[i,:,1]=spec_fit
+cannon_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=cannon_spectra, 
+        label_names = label_names, label_values = cannon_labels)

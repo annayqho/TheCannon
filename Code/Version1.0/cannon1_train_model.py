@@ -203,15 +203,18 @@ def model_diagnostics(training_set, model, label_vector):
     # f_lambda = np.dot(x, coeff)
     # Perform this for each star and plot the spectrum
     nstars = label_vector.shape[1]
+    npixels = training_set.spectra.shape[1]
     os.system("mkdir SpectrumFits")
     contpix = list(np.loadtxt("pixtest4.txt", dtype=int, usecols=(0,), unpack=1))
     contmask = np.zeros(8575, dtype=bool)
     contmask[contpix] = 1
+    fitted_spec = np.zeros((nstars,npixels))
     for i in range(nstars):
         print "star %s" %i
         x = label_vector[:,i,:]
         ID = training_set.IDs[i]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
+        fitted_spec[i,:] = spec_fit
         spec_orig = training_set.spectra[i,:,1]
         bad1 = spec_orig == 0
         bad2 = contmask
