@@ -109,7 +109,7 @@ from.
         ...filenames1.append(filename)
 
 Once the file list is created, the ``get_spectra`` method can be               
-used to continuum normalization the spectrum information and put it 
+used to continuum-normalize the spectrum information and put it 
 into the correct format.
 
     >>> from read_apogee import get_spectra
