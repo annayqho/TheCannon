@@ -61,8 +61,14 @@ features.
 
 #. Step 2 of The Cannon: infer labels for all test objects
 
-   * Run a set of diagnostics on the inferred labels
-   * Run a set of diagnostics on the best-fit spectra
+   * ``infer_labels`` in ``cannon2_infer_labels``: infer labels using model
+   * ``test_set_diagnostics`` in ``cannon2_infer_labels``: run a set of 
+     diagnostics on the inferred labels
+
+#. Cannon-generated spectra (``cannon_spectra``)
+
+   * ``draw_spectra`` in ``cannon_spectra``
+   * ``diagnostics`` in ``cannon_spectra``
 
 Using *The Cannon*
 ==================
@@ -268,7 +274,7 @@ Sample output plots below.
 .. image:: 1to1_label[MH].png
     :width: 400pt
 
-Cannon Spectra (``draw_spectra``)
+Cannon Spectra (``cannon_spectra``)
 ---------------------------------
 
 Now that we have the model and labels for the test objects, we can in 

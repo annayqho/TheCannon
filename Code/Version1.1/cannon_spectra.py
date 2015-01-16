@@ -12,7 +12,7 @@ def draw_spectra(label_vector, model, test_set):
         cannon_spectra[i,:,1]=spec_fit
     cannon_set = Dataset(IDs=test_set.IDs, SNRs=test_set.SNRs, 
             spectra=cannon_spectra, label_names = test_set.label_names, 
-            label_values = test_set.cannon_labels)
+            label_values = test_set.label_values)
     return cannon_set
 
 def diagnostics(cannon_set, test_set):
