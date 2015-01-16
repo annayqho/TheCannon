@@ -71,14 +71,6 @@ the model allow us to solve for - or infer - the labels of the survey
 objects.</li>
 </ol>
 </div>
-<div class="section" id="a-word-on-spectra">
-<h3>A Word on Spectra<a class="headerlink" href="#a-word-on-spectra" title="Permalink to this headline">¶</a></h3>
-<p><em>The Cannon</em> expects all spectra - for reference and survey objects -
-to be continuum-normalized in a consistent way, and sampled on a consistent
-rest-frame wavelength grid, with the same line-spread function. It also
-assumes that the flux variance, from photon noise and other sources, is
-known at each spectral pixel of each spectrum.</p>
-</div>
 <div class="section" id="overview-of-the-cannon-software">
 <h3>Overview of <em>The Cannon</em> Software<a class="headerlink" href="#overview-of-the-cannon-software" title="Permalink to this headline">¶</a></h3>
 <p>This software package breaks up <em>The Cannon</em> into the following steps and
@@ -115,8 +107,8 @@ and (optional) select a subset of spectra.</li>
 sections, along with the following example: 553 open and globular cluster stars
 from APOGEE DR10 as the training set, and, for simplicity, the same set of stars
 as the test set.</p>
-<div class="section" id="step-1-construct-a-training-set-from-apogee-files-apogee-py">
-<h3>Step 1: Construct a training set from APOGEE files (<tt class="docutils literal"><span class="pre">apogee.py</span></tt>)<a class="headerlink" href="#step-1-construct-a-training-set-from-apogee-files-apogee-py" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="step-1-construct-a-training-set-from-apogee-files">
+<h3>Step 1: Construct a training set from APOGEE files<a class="headerlink" href="#step-1-construct-a-training-set-from-apogee-files" title="Permalink to this headline">¶</a></h3>
 <p>The training set is a set of stars from the survey under consideration
 for which the user has spectra and also high-fidelity labels (that is,
 stellar parameters and element abundances that are deemed both accurate
@@ -129,14 +121,15 @@ training set.</p>
 (in this case, APOGEE .fits files)</li>
 <li>a .txt file containing training labels in an ASCII table.</li>
 </ol>
-<p>The following requirements govern (2):
-1. The first row must be strings corresponding to the names of the labels</p>
-<blockquote>
-<div>and must not contain any &#8216;/&#8217;s</div></blockquote>
-<ol class="arabic simple" start="2">
+<p>The following requirements govern (2):</p>
+<ol class="arabic simple">
+<li>The first row must be strings corresponding to the names of the labels
+and must not contain any &#8216;/&#8217;s</li>
 <li>The first column must be string corresponding to the stellar IDs</li>
 <li>The remaining entries must be floats corresponding to the label values</li>
 </ol>
+<div class="section" id="reading-spectra-read-apogee-py">
+<h4>Reading spectra (<tt class="docutils literal"><span class="pre">read_apogee.py</span></tt>)<a class="headerlink" href="#reading-spectra-read-apogee-py" title="Permalink to this headline">¶</a></h4>
 <p>In our example, the label file is called <tt class="docutils literal"><span class="pre">traininglabels.txt</span></tt> and the ID
 column happens to correspond to the file names that we want to read spectra
 from.</p>
@@ -150,31 +143,41 @@ from.</p>
 </pre></div>
 </div>
 <p>Once the file list is created, the <tt class="docutils literal"><span class="pre">get_spectra</span></tt> method can be
-used to put the spectrum information into the correct format.</p>
+used to continuum normalization the spectrum information and put it
+into the correct format.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_apogee</span> <span class="kn">import</span> <span class="n">get_spectra</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">spectra</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">continua</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="reading-labels-read-labels-py">
+<h4>Reading labels (<tt class="docutils literal"><span class="pre">read_labels.py</span></tt>)<a class="headerlink" href="#reading-labels-read-labels-py" title="Permalink to this headline">¶</a></h4>
 <p>Now the <tt class="docutils literal"><span class="pre">get_training_labels</span></tt> method is used to retrieve IDs, label names,
 and label values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_labels</span> <span class="kn">import</span> <span class="n">get_training_labels</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_training_labels</span><span class="p">(</span><span class="n">readin</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="creating-tailoring-a-dataset-object-dataset-py">
+<h4>Creating &amp; tailoring a Dataset object (<tt class="docutils literal"><span class="pre">dataset.py</span></tt>)<a class="headerlink" href="#creating-tailoring-a-dataset-object-dataset-py" title="Permalink to this headline">¶</a></h4>
+<p>A <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">dataset.py</span></tt>) is initialized.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">spectra</span><span class="o">=</span><span class="n">normalized_spectra</span><span class="p">,</span>
+<span class="go">label_names=all_label_names, label_values=all_label_values)</span>
+</pre></div>
+</div>
 <p>(Optional) The user can choose to select some subset of the training labels
-by creating a mask corresponding to the desired column indices.
-In this example, we select Teff, logg, and [Fe/H].</p>
+by creating a list of the desired column indices.
+In this example, we select Teff, logg, and [Fe/H] which correspond to
+columns 1, 3, and 5.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">colmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_label_names</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">colmask</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span><span class="o">.</span><span class="n">choose_labels</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">label_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_label_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">label_values</span> <span class="o">=</span> <span class="n">all_label_values</span><span class="p">[:,</span><span class="n">colmask</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>The user can also (if desired) select some subset of the training objects, by
-imposing physical cutoffs. Here, we select data with physical
+<p>(Optional) The user can also select some subset of the training objects
+(for example, by imposing physical cutoffs) by constructing a mask where
+1 = keep this object, and 0 = remove it. Here, we select data using physical
 Teff and logg cutoffs.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">label_values</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Teff_corr</span> <span class="o">=</span> <span class="n">all_label_values</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
@@ -182,24 +185,26 @@ Teff and logg cutoffs.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t_cut</span> <span class="o">=</span> <span class="mf">600.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">label_values</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logg_cut</span> <span class="o">=</span> <span class="mf">100.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">((</span><span class="n">diff_t</span> <span class="o">&lt;</span> <span class="n">diff_t_cut</span><span class="p">),</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="n">logg_cut</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span> <span class="o">=</span> <span class="n">IDs</span><span class="p">[</span><span class="n">bad</span><span class="p">]</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">((</span><span class="n">diff_t</span> <span class="o">&lt;</span> <span class="n">diff_t_cut</span><span class="p">),</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="n">logg_cut</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span><span class="o">.</span><span class="n">choose_spectra</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="kn">import</span> <span class="nn">Dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fts_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vesta_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster_trainingset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="p">[])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trainingset</span> <span class="o">=</span> <span class="n">mergesets</span><span class="p">(</span><span class="n">fts_trainingset</span><span class="p">,</span> <span class="n">vesta_trainingset</span><span class="p">,</span> <span class="n">cluster_trainingset</span><span class="p">)</span>
+</div>
+<div class="section" id="training-set-diagnostics">
+<h4>Training set diagnostics<a class="headerlink" href="#training-set-diagnostics" title="Permalink to this headline">¶</a></h4>
+<p>Now, the training set has been constructed. To let the user examine whether
+things are going smoothly, <em>The Cannon</em> can print out a set of training set
+diagnostics.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">training_set_diagnostics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">training_set_diagnostics</span><span class="p">(</span><span class="n">training_set</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>There are a few ways to examine the dataset. You can retrieve the spectra
-as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pixels</span> <span class="o">=</span> <span class="n">trainingset</span><span class="o">.</span><span class="n">spectra</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span> <span class="o">=</span> <span class="n">trainingset</span><span class="o">.</span><span class="n">spectra</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxerrs</span> <span class="o">=</span> <span class="n">trainingset</span><span class="o">.</span><span class="n">spectra</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
-</pre></div>
+<p>The output of these diagnostics are:</p>
+<ol class="arabic simple">
+<li>A histogram showing the distribution of SNR in the training set</li>
+<li>A histogram for each label showing its coverage in label space</li>
+<li>A &#8220;triangle plot&#8221; that shows every label plotted against every other</li>
+</ol>
 </div>
 </div>
 <div class="section" id="step-3-construct-test-set">
@@ -238,12 +243,17 @@ as follows:</p>
 <li><a class="reference internal" href="#"><em>The Cannon</em>: Data-Driven Stellar Labels</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a><ul>
 <li><a class="reference internal" href="#introduction-to-the-cannon">Introduction to <em>The Cannon</em></a></li>
-<li><a class="reference internal" href="#a-word-on-spectra">A Word on Spectra</a></li>
 <li><a class="reference internal" href="#overview-of-the-cannon-software">Overview of <em>The Cannon</em> Software</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#using-the-cannon">Using <em>The Cannon</em></a><ul>
-<li><a class="reference internal" href="#step-1-construct-a-training-set-from-apogee-files-apogee-py">Step 1: Construct a training set from APOGEE files (<tt class="docutils literal"><span class="pre">apogee.py</span></tt>)</a></li>
+<li><a class="reference internal" href="#step-1-construct-a-training-set-from-apogee-files">Step 1: Construct a training set from APOGEE files</a><ul>
+<li><a class="reference internal" href="#reading-spectra-read-apogee-py">Reading spectra (<tt class="docutils literal"><span class="pre">read_apogee.py</span></tt>)</a></li>
+<li><a class="reference internal" href="#reading-labels-read-labels-py">Reading labels (<tt class="docutils literal"><span class="pre">read_labels.py</span></tt>)</a></li>
+<li><a class="reference internal" href="#creating-tailoring-a-dataset-object-dataset-py">Creating &amp; tailoring a Dataset object (<tt class="docutils literal"><span class="pre">dataset.py</span></tt>)</a></li>
+<li><a class="reference internal" href="#training-set-diagnostics">Training set diagnostics</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#step-3-construct-test-set">Step 3: Construct Test Set</a></li>
 <li><a class="reference internal" href="#step-4-the-cannon-step-1-generate-model">Step 4: <em>The Cannon</em> Step 1 - Generate Model</a></li>
 <li><a class="reference internal" href="#step-5-the-cannon-step-2-infer-labels">Step 5: <em>The Cannon</em> Step 2 - Infer Labels</a></li>

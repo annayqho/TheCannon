@@ -87,6 +87,7 @@ The user must construct the following inputs:
 2. a .txt file containing training labels in an ASCII table. 
 
 The following requirements govern (2):
+
 1. The first row must be strings corresponding to the names of the labels 
    and must not contain any '/'s 
 2. The first column must be string corresponding to the stellar IDs
@@ -154,19 +155,21 @@ Teff and logg cutoffs.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
     >>> training_set.choose_spectra(mask)
 
+Training set diagnostics
+++++++++++++++++++++++++
 
+Now, the training set has been constructed. To let the user examine whether 
+things are going smoothly, *The Cannon* can print out a set of training set 
+diagnostics.
 
->>> fts_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
-    >>> vesta_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
-    >>> cluster_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])
-    >>> trainingset = mergesets(fts_trainingset, vesta_trainingset, cluster_trainingset)
+    >>> from dataset import training_set_diagnostics
+    >>> training_set_diagnostics(training_set)
 
-There are a few ways to examine the dataset. You can retrieve the spectra
-as follows:
+The output of these diagnostics are:
 
->>> pixels = trainingset.spectra[:,:,0]
->>> fluxes = trainingset.spectra[:,:,1]
->>> fluxerrs = trainingset.spectra[:,:,2]
+1. A histogram showing the distribution of SNR in the training set
+2. A histogram for each label showing its coverage in label space
+3. A "triangle plot" that shows every label plotted against every other
     
 Step 3: Construct Test Set
 ---------------------------
