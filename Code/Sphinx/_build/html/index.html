@@ -230,7 +230,7 @@ simply show that <em>The Cannon</em> can return good labels for the set it train
 <p>To let the user examine whether things are going smoothly, <em>The Cannon</em> can
 print out a set of model diagnostics.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon1_train_model</span> <span class="kn">import</span> <span class="n">model_diagnostics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model_diagnostics</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model_diagnostics</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_names</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The output of these diagnostics are:</p>
@@ -239,7 +239,8 @@ print out a set of model diagnostics.</p>
 function of wavelength.</li>
 <li>Plot of the leading coefficients of each label as a function
 of wavelength</li>
-<li>Histogram of the chi squareds of the fits</li>
+<li>Histogram of the reduced chi squareds of the fits (normalized by DOF,
+where DOF = npixels-nlabels)</li>
 </ol>
 </div>
 <div class="section" id="step-5-the-cannon-step-2-infer-labels">
