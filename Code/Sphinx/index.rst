@@ -204,7 +204,8 @@ The output of these diagnostics are:
    function of wavelength.
 2. Plot of the leading coefficients of each label as a function 
    of wavelength
-3. Histogram of the chi squareds of the fits
+3. Histogram of the reduced chi squareds of the fits (normalized by DOF, 
+   where DOF = npixels-nlabels)
 
 Step 5: *The Cannon* Step 2 - Infer Labels
 -------------------------------------------

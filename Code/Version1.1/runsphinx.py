@@ -39,6 +39,7 @@ test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs,
 from cannon1_train_model import train_model
 model, label_vector = train_model(training_set)
 
-from cannon1_train_model import model_diagnostics
-model_diagnostics(lambdas, model)
+coeffs_all, covs, scatters, chis, chisqs, pivots = model
 
+from cannon1_train_model import model_diagnostics
+model_diagnostics(lambdas, training_set.label_names, model)
