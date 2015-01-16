@@ -33,6 +33,15 @@ process of *label transfer.*
    the model allow us to solve for - or infer - the labels of the survey 
    objects. 
 
+A Word on Spectra
+-----------------
+
+*The Cannon* expects all spectra - for reference and survey objects - 
+to be continuum-normalized in a consistent way, and sampled on a consistent
+rest-frame wavelength grid, with the same line-spread function. It also
+assumes that the flux variance, from photon noise and other sources, is 
+known at each spectral pixel of each spectrum.
+
 Overview of *The Cannon* Software
 ---------------------------------
 
@@ -64,25 +73,12 @@ Using *The Cannon*
 ==================
 
 The details of using The Cannon package are provided in the following 
-sections, along with an example.
+sections, along with the following example: 553 open and globular cluster stars 
+from APOGEE DR10 as the training set, and, for simplicity, the same set of stars
+as the test set. 
 
-Step 1: Prepare Data (``prepdata.py``) 
----------------------------------------
-
-*The Cannon* expects all spectra - for reference and survey objects - 
-to be continuum-normalized in a consistent way, and sampled on a consistent
-rest-frame wavelength grid, with the same line-spread function. It also
-assumes that the flux variance, from photon noise and other sources, is 
-known at each spectral pixel of each spectrum.
-
-Preparing data thus involves: putting spectra into a 3D array
-(nstars, npixels, 3), putting label names into an array (nlabels),
-and putting training label values into a 2D array (nstars, nlabels).
-The user is left to do this him or herself, but we include some basic 
-methods and functionalities in ``prep_data.py`` that might be helpful.
-
-Step 2: Construct Training Set
--------------------------------
+Step 1: Construct a training set from APOGEE files ``apogee.py`` 
+----------------------------------------------------------------
 
 The training set is a set of stars from the survey under consideration
 for which the user has spectra and also high-fidelity labels (that is,
@@ -91,10 +87,38 @@ and precise.) The set of reference objects is critical, as the label
 transfer to the survey objects can only be as good as the quality of the
 training set. 
 
-Labels for a training set will not necessarily come from the same data,
-and therefore spectra will not necessarily be in the same data format.
-For flexibility, *The Cannon* software package allows the user to construct
-training subsets, one data type each, and then merge the subsets.
+Preparing data thus involves: putting spectra into a 3D array
+(nstars, npixels, 3), putting label names into an array (nlabels),
+and putting training label values into a 2D array (nstars, nlabels).
+
+The user must construct the following: a list of filenames corresponding to the 
+training data (in this case, APOGEE .fits files) and a .txt file containing 
+training labels in an ASCII table. The first row of this file must correspond 
+to the names of the labels. The first column must be some kind of stellar ID 
+in string format. The remaining entries must be floats.
+
+In our example, the label file is called ``traininglabels.txt`` and the ID 
+column happens to correspond to the file names that we want to read spectra 
+from.
+
+    >>> import numpy as np
+    >>> readin = "traininglabels.txt"
+    >>> IDs = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
+    >>> filenames1 = []
+    >>> for i in range(0, len(IDs)): #incorporate file location info
+        ...filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + IDs[i][1:]
+        ...filenames1.append(filename)
+    >>> spectra, SNRs = get_spectra(filenames1) 
+
+Now we retrieve IDs, label names, and label values.
+
+    >>> IDs, all_label_names, all_label_values = get_training_labels(readin)
+
+Once the file list is created, the ``get_spectra`` method can be 
+used to put the spectrum information into the correct format.
+
+    >>> from apogee import get_spectra
+    >>> spectra, SNRs = get_spectra(filenames1)
 
     >>> dataset import Dataset
     >>> fts_trainingset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = [])

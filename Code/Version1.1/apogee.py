@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def get_spectra(files):
     """
-    Extracts spectra (wavelengths, fluxes, fluxerrs) from aspcap fits files
+    Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
 
     Parameters
     ----------
@@ -121,4 +121,4 @@ def get_training_labels(filename):
     label_values = np.loadtxt(filename, usecols=cols)
     print "Loaded %s labels:" %nlabels
     print label_names
-    return label_names, label_values
+    return IDs, label_names, label_values

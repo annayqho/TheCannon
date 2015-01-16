@@ -7,17 +7,17 @@ import numpy as np
 from dataset import Dataset
 from dataset import training_set_diagnostics
 from dataset import test_set_diagnostics
-from aspcap import get_spectra
-from aspcap import continuum_normalize
-from aspcap import get_training_labels
+from apogee import get_spectra
+from apogee import continuum_normalize
+from apogee import get_training_labels
 from cannon1_train_model import train_model
 from cannon1_train_model import model_diagnostics
 from cannon2_infer_labels import infer_labels
 
 # CONSTRUCT TRAINING SET
+readin = "traininglabels.txt"
 
 # Retrieve all training IDs & spectra
-readin = "traininglabels.txt"
 IDs = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
 filenames1 = [] # if I just replace the element, I lose the '.fits'
 for i in range(0, len(IDs)): # incorporate file location info
@@ -26,7 +26,6 @@ for i in range(0, len(IDs)): # incorporate file location info
 spectra, SNRs = get_spectra(filenames1)
 
 # Retrieve all training labels
-readin = "traininglabels.txt"
 all_label_names, all_label_values = get_training_labels(readin)
 
 # Optional: Set desired training labels
