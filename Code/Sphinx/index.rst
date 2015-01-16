@@ -196,7 +196,7 @@ To let the user examine whether things are going smoothly, *The Cannon* can
 print out a set of model diagnostics.
 
     >>> from cannon1_train_model import model_diagnostics
-    >>> model_diagnostics(lambdas, model)
+    >>> model_diagnostics(lambdas, training_set.label_names, model)
 
 The output of these diagnostics are:
 

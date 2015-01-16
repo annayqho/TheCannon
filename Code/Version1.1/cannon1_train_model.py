@@ -139,7 +139,7 @@ def train_model(training_set):
     print "Done training model"
     return model, x_full
 
-def model_diagnostics(lambdas, model):
+def model_diagnostics(lambdas, label_names, model):
     """Run a set of diagnostics on the model.
 
     Plot the 0th order coefficients as the baseline spectrum. 
@@ -176,7 +176,7 @@ def model_diagnostics(lambdas, model):
     for i in range(nlabels):
         ax = axarr[i]
         ax.set_ylabel(r"$\theta_%s$" %i)
-        ax.set_title("%s" %training_set.label_names[i])
+        ax.set_title("%s" %label_names[i])
         ax.plot(lambdas, coeffs_all[:,i+1])
     print "Diagnostic plot: leading coefficients as a function of wavelength."
     filename = "leading_coeffs.png"

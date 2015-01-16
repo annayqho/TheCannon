@@ -148,7 +148,7 @@ from.</p>
 used to continuum-normalize the spectrum information and put it
 into the correct format.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_apogee</span> <span class="kn">import</span> <span class="n">get_spectra</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">continua</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lambdas</span><span class="p">,</span> <span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">continua</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -227,6 +227,20 @@ simply show that <em>The Cannon</em> can return good labels for the set it train
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">,</span> <span class="n">label_vector</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">training_set</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>To let the user examine whether things are going smoothly, <em>The Cannon</em> can
+print out a set of model diagnostics.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon1_train_model</span> <span class="kn">import</span> <span class="n">model_diagnostics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model_diagnostics</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The output of these diagnostics are:</p>
+<ol class="arabic simple">
+<li>Plot of the baseline spectrum (0th order coefficients) as a
+function of wavelength.</li>
+<li>Plot of the leading coefficients of each label as a function
+of wavelength</li>
+<li>Histogram of the chi squareds of the fits</li>
+</ol>
 </div>
 <div class="section" id="step-5-the-cannon-step-2-infer-labels">
 <h3>Step 5: <em>The Cannon</em> Step 2 - Infer Labels<a class="headerlink" href="#step-5-the-cannon-step-2-infer-labels" title="Permalink to this headline">¶</a></h3>

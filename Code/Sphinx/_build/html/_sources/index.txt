@@ -112,10 +112,10 @@ from.
 
 Once the file list is created, the ``get_spectra`` method can be               
 used to continuum-normalize the spectrum information and put it 
-into the correct format.
+into the correct format. 
 
     >>> from read_apogee import get_spectra
-    >>> normalized_spectra, continua, SNRs = get_spectra(filenames1) 
+    >>> lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1) 
 
 Reading labels (``read_labels.py``)
 +++++++++++++++++++++++++++++++++++
@@ -191,6 +191,20 @@ Now, we use our training set to fit for the model.
 
     >>> from cannon1_train_model import train_model
     >>> model, label_vector = train_model(training_set)
+
+To let the user examine whether things are going smoothly, *The Cannon* can 
+print out a set of model diagnostics.
+
+    >>> from cannon1_train_model import model_diagnostics
+    >>> model_diagnostics(lambdas, model)
+
+The output of these diagnostics are:
+
+1. Plot of the baseline spectrum (0th order coefficients) as a 
+   function of wavelength.
+2. Plot of the leading coefficients of each label as a function 
+   of wavelength
+3. Histogram of the chi squareds of the fits
 
 Step 5: *The Cannon* Step 2 - Infer Labels
 -------------------------------------------
