@@ -256,4 +256,14 @@ The output of these diagnostics are:
 
 Sample output plots below.
 
-.. image:: 
+.. image:: testset_labels_triangle.png
+    :width: 400pt
+
+.. image:: 1to1_labelTeff.png
+    :width: 400pt
+
+.. image:: 1to1_labellogg.png
+    :width: 400pt
+
+.. image:: 1to1_label[MH].png
+    :width: 400pt
