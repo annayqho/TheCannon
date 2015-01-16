@@ -39,14 +39,14 @@ Overview of *The Cannon* Software
 This software package breaks up *The Cannon* into the following steps and 
 features.
 
-#. Construct a training set
+#. Construct a training set from APOGEE files
    
    * Retrieve continuum-normalized training spectra
    * Retrieve training labels
    * (Optional) Select a subset of labels and spectra
    * Run a set of diagnostics on the training set
 
-#. Construct a test set
+#. Construct a test set from APOGEE files
 
    * Retrieve continuum-normalized test spectra
    * (Optional) Select a subset of spectra
