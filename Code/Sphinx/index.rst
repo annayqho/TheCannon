@@ -135,9 +135,8 @@ by creating a list of the desired column indices.
 In this example, we select Teff, logg, and [Fe/H] which correspond to 
 columns 1, 3, and 5.   
     
-    >>> from dataset import choose_labels
     >>> cols = [1, 3, 5]
-    >>> label_names, label_values = choose_labels(cols, all_label_names, all_label_values)
+    >>> training_set.choose_labels(cols)
 
 (Optional) The user can also select some subset of the training objects 
 (for example, by imposing physical cutoffs) by constructing a mask where 

@@ -55,6 +55,18 @@ class Dataset(object):
     def set_label_values(self, label_values):
         self.label_values = label_values
 
+    def choose_labels(self, cols):
+        """Updates the label_names and label_values properties
+
+        Input: list of column indices corresponding to which to keep
+        """
+        new_label_names = [self.label_names[i] for i in cols]
+        colmask = np.zeros(len(self.label_names), dtype=bool)
+        colmask[cols]=1
+        new_label_values = self.label_values[:,colmask]
+        self.set_label_names(new_label_names)
+        self.set_label_values(new_label_values)
+
 def training_set_diagnostics(dataset):
     # Plot SNR distribution
     plt.hist(dataset.SNRs)

@@ -23,15 +23,3 @@ def get_training_labels(filename):
     print "Loaded %s labels:" %nlabels
     print label_names
     return IDs, label_names, label_values
-
-def choose_labels(cols, label_names, label_values):
-    """Extracts a subset of the labels.
-
-    Input: list of column indices corresponding to which to keep
-    Returns: updated label arrays
-    """
-    new_label_names = [all_label_names[i] for i in cols]
-    colmask = np.zeros(len(all_label_names), dtype=bool)
-    colmask[cols]=1
-    new_label_values = all_label_values[:,colmask]
-    return new_label_names, new_label_values
