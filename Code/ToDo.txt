@@ -1,11 +1,9 @@
 TIMELINE
-Thurs   - Overplot each Cannon best-fit spec with original spec
-        - Continuum normalization
+Friday  - Incorporate David Hogg's workflow suggestions
         - Imagine that the residual of each best-fit spectrum is a 1D list, stack them and sort by each of the labels. Then we will see whether all stars have deviations at a particular wavelength from the best-fit model irrespective of the label -- if the quadratic model is general enough, then the 2D residual should show nothing but noise. (Jo Bovy has done something similar?) -- don't forget to normalize by the sources of variance and scatter, see HW's e-mail
-        - Incorporate David Hogg's workflow suggestions...or at least explain to him how mine are different
-
-Fri     - Go through the process and outputs and make sure you understand
-        - Compile a list of questions, weird observations (ex. what is chi-sq)
+        - Go through & compile questions and observations (ex. what is chi sq)      
+        - E-mail to HW, Melissa, and David Hogg, which will involve the above
+        - Continuum normalization
         - Documentation
 
 QUESTIONS
