@@ -76,16 +76,27 @@ class Dataset(object):
         self.set_spectra(self.spectra[mask])
         self.set_label_values(self.label_values[mask])
 
+    def label_triangle_plot(self, figname):
+        """Plots every label against every other label"""
+        fig = triangle.corner(self.label_values, labels=self.label_names,
+                show_titles=True, title_args = {"fontsize":12})
+        fig.savefig(figname)
+        print "Plotting every label against every other"
+        print "Saved fig %s" %figname
+        plt.close(fig)
+
 def training_set_diagnostics(dataset):
     # Plot SNR distribution
+    print "Diagnostic for SNR of training set"
     plt.hist(dataset.SNRs)
     plt.title("Distribution of SNR in the Training Set")
     figname = "trainingset_SNRdist.png"
     plt.savefig(figname)
     plt.close()
-    print "Diagnostic for SNR of training set"
     print "Saved fig %s" %figname
+    
     # Plot training label distributions
+    print "Diagnostic for coverage of training label space"
     for i in range(0, len(dataset.label_names)):
         name = dataset.label_names[i]
         vals = dataset.label_values[:,i]
@@ -94,17 +105,12 @@ def training_set_diagnostics(dataset):
         plt.title("Training Set Distribution of Label: %s" %name)
         figname = "trainingset_labeldist_%s.png" %name
         plt.savefig(figname)
-        print "Diagnostic for coverage of training label space"
         print "Saved fig %s" %figname
         plt.close()
+    
     # Plot all training labels against each other
-    fig = triangle.corner(dataset.label_values, labels=dataset.label_names, 
-            show_titles=True, title_args = {"fontsize": 12})
     figname = "trainingset_labels_triangle.png"
-    fig.savefig(figname)
-    plt.close(fig)
-    print "Diagnostic for plotting every training label against every other"
-    print "Saved fig %s" %figname
+    dataset.label_triangle_plot(figname)
 
 def test_set_diagnostics(training_set, test_set):
     # 2-sigma check from training labels
@@ -131,13 +137,8 @@ def test_set_diagnostics(training_set, test_set):
         print "flagged %s stars beyond 2-sig of training labels" %sum(warning)
         print "Saved list %s" %filename
     # Plot all output labels against each other
-    fig = triangle.corner(test_set.label_values, labels=test_set.label_names,
-            show_titles=True, title_args = {"fontsize": 12})
     figname = "testset_labels_triangle.png"
-    fig.savefig(figname)
-    plt.close(fig)
-    print "Diagnostic for plotting every Cannon label against every other"
-    print "Saved fig %s" %figname
+    test_set.label_triangle_plot(figname)
     # 1-1 plots of all labels
     for i in range(nlabels):
         name = label_names[i]
