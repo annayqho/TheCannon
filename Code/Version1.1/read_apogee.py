@@ -29,14 +29,14 @@ def get_spectra(files):
             npixels = len(fluxes)
             SNRs = np.zeros(nstars)
             spectra = np.zeros((nstars, npixels, 3))
+            start_wl = file_in[1].header['CRVAL1']
+            diff_wl = file_in[1].header['CDELT1']
+            val = diff_wl*(npixels) + start_wl
+            wl_full_log = np.arange(start_wl,val, diff_wl)
+            wl_full = [10**aval for aval in wl_full_log]
+            pixels = np.array(wl_full)
         flux_errs = np.array((file_in[2].data))
         SNRs[jj] = float(file_in[0].header['SNR'])
-        start_wl = file_in[1].header['CRVAL1']
-        diff_wl = file_in[1].header['CDELT1']
-        val = diff_wl*(npixels) + start_wl
-        wl_full_log = np.arange(start_wl,val, diff_wl)
-        wl_full = [10**aval for aval in wl_full_log]
-        pixels = np.array(wl_full) 
         spectra[jj, :, 0] = pixels
         spectra[jj, :, 1] = fluxes
         spectra[jj, :, 2] = flux_errs
@@ -44,7 +44,7 @@ def get_spectra(files):
     
     # Automatically continuum-normalize
     normalized_spectra, continua = continuum_normalize(spectra)
-    return normalized_spectra, continua, SNRs
+    return pixels, normalized_spectra, continua, SNRs
 
 def continuum_normalize(spectra):
     """Continuum-normalizes the spectra.

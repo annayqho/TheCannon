@@ -139,7 +139,7 @@ def train_model(training_set):
     print "Done training model"
     return model, x_full
 
-def model_diagnostics(training_set, model, label_vector):
+def model_diagnostics(lambdas, model):
     """Run a set of diagnostics on the model.
 
     Plot the 0th order coefficients as the baseline spectrum. 
@@ -154,9 +154,8 @@ def model_diagnostics(training_set, model, label_vector):
     coeffs_all, covs, scatters, chis, chisqs, pivots = model
     
     # Baseline spectrum with continuum
-    pixels = training_set.spectra[0,:,0]
     baseline_spec = coeffs_all[:,0]
-    plt.plot(pixels, baseline_spec)
+    plt.plot(lambdas, baseline_spec)
     contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
         usecols = (0,), unpack =1))
     y = [1]*len(contpix_lambda)
@@ -178,7 +177,7 @@ def model_diagnostics(training_set, model, label_vector):
         ax = axarr[i]
         ax.set_ylabel(r"$\theta_%s$" %i)
         ax.set_title("%s" %training_set.label_names[i])
-        ax.plot(pixels, coeffs_all[:,i+1])
+        ax.plot(lambdas, coeffs_all[:,i+1])
     print "Diagnostic plot: leading coefficients as a function of wavelength."
     filename = "leading_coeffs.png"
     print "Saved as %s" %filename
@@ -199,44 +198,3 @@ def model_diagnostics(training_set, model, label_vector):
     print "Saved as %s" %filename
     plt.savefig(filename)
     plt.close()
-
-    # Overplot original spectra with the best-fit spectra
-    # We have: the label vector x, and the coefficient vector coeffs_all
-    # f_lambda = np.dot(x, coeff)
-    # Perform this for each star and plot the spectrum
-    nstars = label_vector.shape[1]
-    npixels = training_set.spectra.shape[1]
-    os.system("mkdir SpectrumFits")
-    contpix = list(np.loadtxt("pixtest4.txt", dtype=int, usecols=(0,), unpack=1))
-    contmask = np.zeros(8575, dtype=bool)
-    contmask[contpix] = 1
-    fitted_spec = np.zeros((nstars,npixels))
-    for i in range(nstars):
-        print "star %s" %i
-        x = label_vector[:,i,:]
-        ID = training_set.IDs[i]
-        spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
-        fitted_spec[i,:] = spec_fit
-        spec_orig = training_set.spectra[i,:,1]
-        bad1 = spec_orig == 0
-        bad2 = contmask
-        keep = np.invert(bad1 | bad2)
-        fig, axarr = plt.subplots(2)
-        ax1 = axarr[0]
-        ax1.plot(pixels, spec_fit, 
-                label="Cannon Spectrum", linewidth=0.5)
-        ax1.plot(pixels[keep], spec_orig[keep], 
-                label="Orig Spectrum", linewidth=0.5, alpha=0.7)
-        ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
-        ax1.set_ylabel("Normalized flux")
-        ax1.set_title("Spectrum Fit: %s" %ID)
-        ax1.legend(loc='lower center', fancybox=True, shadow=True)
-        ax2 = axarr[1]
-        ax2.scatter(spec_orig[keep], spec_fit[keep])
-        ax2.set_xlabel("Orig Fluxes")
-        ax2.set_ylabel("Fitted Fluxes")
-        filename = "Star%s.png" %i
-        print "Diagnostic plot: fitted vs. original spec" 
-        print "Saved as %s" %filename
-        fig.savefig("SpectrumFits/"+filename)
-        plt.close(fig)
