@@ -77,11 +77,11 @@ objects.</li>
 features.</p>
 <ol class="arabic simple">
 <li>Construct a training set from APOGEE files<ul>
-<li><tt class="docutils literal"><span class="pre">read_apogee</span></tt>: retrieve continuum-normalized training spectra
-and (optional) select a subset of spectra.</li>
-<li><tt class="docutils literal"><span class="pre">read_labels</span></tt>: retrieve training label names and values
-and (optional) select a subset of labels.</li>
-<li>Run a set of diagnostics on the training set</li>
+<li><tt class="docutils literal"><span class="pre">read_apogee</span></tt>: read spectra, continuum-normalize</li>
+<li><tt class="docutils literal"><span class="pre">read_labels</span></tt>: retrieve stellar IDs, training label names and values</li>
+<li><tt class="docutils literal"><span class="pre">dataset</span></tt>: (optional) select a subset of labels</li>
+<li><tt class="docutils literal"><span class="pre">dataset</span></tt>: (optional) select a subset of spectra</li>
+<li><tt class="docutils literal"><span class="pre">dataset</span></tt>: (optional) run a set of diagnostics on the training set</li>
 </ul>
 </li>
 <li>Construct a test set from APOGEE files<ul>
@@ -207,9 +207,13 @@ diagnostics.</p>
 </ol>
 </div>
 </div>
-<div class="section" id="step-3-construct-test-set">
-<h3>Step 3: Construct Test Set<a class="headerlink" href="#step-3-construct-test-set" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">testset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">objectIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">spectra</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelnames</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">labelvals</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+<div class="section" id="step-2-construct-a-test-set-from-apogee-files">
+<h3>Step 2: Construct a test set from APOGEE files<a class="headerlink" href="#step-2-construct-a-test-set-from-apogee-files" title="Permalink to this headline">¶</a></h3>
+<p>Ordinarily, the user would go through a process identical to that for the
+training set, except without reading in the training labels file. In this case,
+for simplicity, we use the training set as our test set, so that our results
+simply show that The Cannon can return good labels for the set it trained on.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_set</span> <span class="o">=</span> <span class="n">training_set</span>
 </pre></div>
 </div>
 </div>
@@ -254,7 +258,7 @@ diagnostics.</p>
 <li><a class="reference internal" href="#training-set-diagnostics">Training set diagnostics</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#step-3-construct-test-set">Step 3: Construct Test Set</a></li>
+<li><a class="reference internal" href="#step-2-construct-a-test-set-from-apogee-files">Step 2: Construct a test set from APOGEE files</a></li>
 <li><a class="reference internal" href="#step-4-the-cannon-step-1-generate-model">Step 4: <em>The Cannon</em> Step 1 - Generate Model</a></li>
 <li><a class="reference internal" href="#step-5-the-cannon-step-2-infer-labels">Step 5: <em>The Cannon</em> Step 2 - Infer Labels</a></li>
 </ul>

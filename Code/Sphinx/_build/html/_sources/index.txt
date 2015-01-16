@@ -42,11 +42,11 @@ features.
 
 #. Construct a training set from APOGEE files
    
-   * ``read_apogee``: retrieve continuum-normalized training spectra 
-     and (optional) select a subset of spectra.
-   * ``read_labels``: retrieve training label names and values
-     and (optional) select a subset of labels.
-   * Run a set of diagnostics on the training set
+   * ``read_apogee``: read spectra, continuum-normalize
+   * ``read_labels``: retrieve stellar IDs, training label names and values
+   * ``dataset``: (optional) select a subset of labels
+   * ``dataset``: (optional) select a subset of spectra  
+   * ``dataset``: (optional) run a set of diagnostics on the training set
 
 #. Construct a test set from APOGEE files
 
@@ -170,11 +170,16 @@ The output of these diagnostics are:
 1. A histogram showing the distribution of SNR in the training set
 2. A histogram for each label showing its coverage in label space
 3. A "triangle plot" that shows every label plotted against every other
-    
-Step 3: Construct Test Set
----------------------------
 
-    >>> testset = Dataset(objectIDs = [], spectra = [], labelnames = [], labelvals = None)
+Step 2: Construct a test set from APOGEE files
+----------------------------------------------
+
+Ordinarily, the user would go through a process identical to that for the 
+training set, except without reading in the training labels file. In this case, 
+for simplicity, we use the training set as our test set, so that our results 
+simply show that The Cannon can return good labels for the set it trained on.
+
+    >>> test_set = training_set 
 
 Step 4: *The Cannon* Step 1 - Generate Model
 ---------------------------------------------
