@@ -75,10 +75,3 @@ nlabels = len(label_names)
 cannon_labels, MCM_rotate, covs = infer_labels(nlabels, model, test_set)
 test_set.set_label_values(cannon_labels)
 test_set_diagnostics(training_set, test_set)
-
-# Plot the results
-# cannon_labels.shape # (553, 4)
-# Teff, logg, FeH = label_values[:,0], label_values[:,1], label_values[:,2]
-# Cannon_Teff, Cannon_logg, Cannon_FeH = cannon_labels[:,0], cannon_labels[:,1], cannon_labels[:,2]
-# plt.scatter(Teff, Cannon_Teff)
-# etc

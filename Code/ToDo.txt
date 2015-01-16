@@ -1,24 +1,15 @@
-TIMELINE
-Friday  - Incorporate David Hogg's workflow suggestions
-        - Imagine that the residual of each best-fit spectrum is a 1D list, stack them and sort by each of the labels. Then we will see whether all stars have deviations at a particular wavelength from the best-fit model irrespective of the label -- if the quadratic model is general enough, then the 2D residual should show nothing but noise. (Jo Bovy has done something similar?) -- don't forget to normalize by the sources of variance and scatter, see HW's e-mail
-        - Go through & compile questions and observations (ex. what is chi sq)      
-        - E-mail to HW, Melissa, and David Hogg, which will involve the above
-        - Continuum normalization
-        - Documentation
+What remains for Version 1.0 
+- Imagine that the residual of each best-fit spectrum is a 1D list, stack them and sort by each of the labels. Then we will see whether all stars have deviations at a particular wavelength from the best-fit model irrespective of the label -- if the quadratic model is general enough, then the 2D residual should show nothing but noise. (Jo Bovy has done something similar?) -- don't forget to normalize by the sources of variance and scatter, see HW's e-mail
+- Go through & compile questions and observations from the diagnostic plots
+- Continuum normalization
+- Documentation
+- E-mail HWR, MKN, DH introducing this version
 
-QUESTIONS
-- What is a S/N of training spectra that "isn't high enough"?
-- What is a set size that "isn't big enough"?
-- What is the actual chi squared? Why should that dotted line be there...? 
+For Version 1.1
+- Restructure to incorporate David Hogg's workflow suggestions
 
-new features:
-- Recognize if a spectrum has properties that are not covered by the spectral model. Auto-correlation of residual spectrum (if the residual is actually dominated by noise, should get a delta function)
-
-farther down the road:
+For way further down the road:
 - spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
 - create non-identical subsets of the training set
 - shot noise in the creation of a training set
 - check the scatter at each pixel
-
-I don't understand:
-- MCM_rotate_all matrix...what is it? it's the coefficients multiplied by the inverse covariance (1/errors^2). Just has to be the right shape for matrix multiplication to work. MKN will send me the maths in the next couple of days. 

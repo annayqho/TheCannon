@@ -90,6 +90,7 @@ def test_set_diagnostics(training_set, test_set):
     label_names = training_set.label_names
     nlabels = len(label_names)
     training_labels = training_set.label_values
+    test_labels = test_set.label_values
     test_IDs = test_set.IDs
     mean = np.mean(training_labels, 0)
     stdev = np.std(training_labels, 0)
@@ -97,7 +98,7 @@ def test_set_diagnostics(training_set, test_set):
     upper = mean + 2 * stdev
     for i in range(nlabels):
         label_name = label_names[i]
-        test_vals = test_set.label_values[:,i]
+        test_vals = test_labels[:,i]
         warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
         flagged_stars = test_IDs[warning]
         filename = "flagged_stars_%s.txt" %label_name
@@ -116,6 +117,20 @@ def test_set_diagnostics(training_set, test_set):
     plt.close(fig)
     print "Diagnostic for plotting every Cannon label against every other"
     print "Saved fig %s" %figname
+    # 1-1 plots of all labels
+    for i in range(nlabels):
+        name = label_names[i]
+        orig = training_labels[:,i]
+        cannon = test_labels[:,i]
+        plt.scatter(orig, cannon)
+        plt.xlabel("Training Value")
+        plt.ylabel("Cannon Output Value")
+        plt.title("1-1 Plot of Label %s" %name)
+        figname = "1to1_label%s.png" %name
+        plt.savefig(figname)
+        print "Diagnostic for label output vs. input"
+        print "Saved fig %s" %figname
+        plt.close()
 
 def remove_stars(dataset, mask):
     """A method to remove a subset of stars from the Dataset. 
