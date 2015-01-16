@@ -9,6 +9,7 @@ import math
 import pylab
 import matplotlib.pyplot as plt
 from matplotlib import rc
+import os
 
 def do_one_regression_at_fixed_scatter(spectra, x, scatter):
     """
