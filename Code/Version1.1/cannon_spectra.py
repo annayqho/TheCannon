@@ -20,14 +20,12 @@ def draw_spectra(label_vector, model, test_set):
 def diagnostics(cannon_set, test_set, red_chi_sq, scatters):
     # Overplot original spectra with best-fit spectra
     os.system("mkdir SpectrumFits")
-    #contpix = list(np.loadtxt("pixtest4.txt", dtype=int, usecols=(0,), unpack=1))
-    #contmask = np.zeros(8575, dtype=bool)
-    #contmask[contpix] = 1
+    print "Overplotting spectra for ten random stars"
     nstars = cannon_set.spectra.shape[0]
-    random = []
-    #for i in range(10):
-    #    random.
-    for i in range(nstars):
+    pickstars = []
+    for i in range(10):
+        pickstars.append(random.randrange(0, nstars-1))
+    for i in pickstars:
         print "Star %s" %i
         ID = cannon_set.IDs[i]
         spec_orig = test_set.spectra[i,:,1]
@@ -74,7 +72,6 @@ def diagnostics(cannon_set, test_set, red_chi_sq, scatters):
         ax2.set_xlabel("Orig Fluxes")
         ax2.set_ylabel("Fitted Fluxes")
         filename = "Star%s.png" %i
-        print "Diagnostic plot: fitted vs. original spec"
         print "Saved as %s" %filename
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
