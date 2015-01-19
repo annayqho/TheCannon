@@ -55,4 +55,5 @@ test_set_diagnostics(training_set, test_set)
 from cannon_spectra import draw_spectra
 cannon_set = draw_spectra(label_vector, model, test_set)
 
-
+from cannon_spectra import diagnostics
+diagnostics(cannon_set, test_set)

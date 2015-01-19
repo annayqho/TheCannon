@@ -1,12 +1,10 @@
-What remains for Version 1.0 
-- Go through and carefully check all code and outputs
-- Documentation
-- Compile questions and observations to share with the others
-- E-mail HWR, MKN, DH introducing this version
-
-For Version 1.1
-- Restructure to incorporate David Hogg's workflow suggestions
+Remaining for Version 1.1 (before HW takes a look...)
+- Remaining diagnostic tests
 - Implement continuum normalization
+- Version Control?
+
+Then, after Tuesday:
+- Learn how to use gh-pages
 
 For way further down the road:
 - spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
