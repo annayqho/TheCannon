@@ -17,7 +17,7 @@ def draw_spectra(label_vector, model, test_set):
             label_values = test_set.label_values)
     return cannon_set
 
-def diagnostics(cannon_set, test_set, red_chi_sq, scatters):
+def overlay_spectra(cannon_set, test_set, red_chi_sq, scatters):
     # Overplot original spectra with best-fit spectra
     os.system("mkdir SpectrumFits")
     print "Overplotting spectra for ten random stars"
@@ -75,3 +75,4 @@ def diagnostics(cannon_set, test_set, red_chi_sq, scatters):
         print "Saved as %s" %filename
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
+
