@@ -1,7 +1,6 @@
 Remaining for Version 1.1 (before HW takes a look...)
-- Remaining diagnostic tests
 - Implement continuum normalization
-- Version Control?
+- Version Control
 
 Then, after Tuesday:
 - Learn how to use gh-pages
