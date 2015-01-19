@@ -2,6 +2,7 @@ import numpy as np
 import os
 import random
 from dataset import Dataset
+import matplotlib.pyplot as plt
 
 def draw_spectra(label_vector, model, test_set):
     coeffs_all, covs, scatters, chis, chisqs, pivots = model
@@ -76,4 +77,34 @@ def overlay_spectra(cannon_set, test_set, red_chi_sq, scatters):
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
 
-def residuals(cannon_set, test_set)
+def residuals(cannon_set, test_set, scatters):
+    # sort by each of the labels. Then we will see whether 
+    # all stars have deviations at a particular wavelength from the best-fit 
+    # model irrespective of the label -- if the quadratic model is general 
+    # enough, then the 2D residual should show nothing but noise. 
+    # (Jo Bovy has done something similar?)
+
+    print "Stacking spectrum fit residuals"
+    res = test_set.spectra[:,:,1]-cannon_set.spectra[:,:,1]
+    spec_fit = cannon_set.spectra[:,:,1]
+    err = np.sqrt(test_set.spectra[:,:,2]**2 + scatters**2)
+    res_norm = res/err
+    
+    for i in range(len(cannon_set.label_names)):
+        label_name = cannon_set.label_names[i]
+        print "Plotting residuals sorted by %s" %label_name
+        label_vals = cannon_set.label_values[:,i]
+        sorted_res = res[np.argsort(label_vals)]
+        lim = np.maximum(np.abs(sorted_res.max()), np.abs(sorted_res.min()))
+        plt.imshow(sorted_res, cmap=plt.cm.bwr_r,
+                interpolation="nearest", vmin=-1*lim, vmax=lim,
+                aspect='auto',origin='lower')
+        plt.title("Spectral Residuals Sorted by %s" %label_name)
+        plt.xlabel("Pixels")
+        plt.ylabel("Stars")
+        plt.colorbar()
+        filename = "residuals_sorted_by_%s.png" %label_name
+        plt.savefig(filename)
+        print "File saved as %s" %filename
+        plt.close()
+

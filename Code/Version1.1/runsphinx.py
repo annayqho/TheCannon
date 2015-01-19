@@ -60,3 +60,6 @@ red_chi_sq = calc_red_chi_sq(model)
 
 from cannon_spectra import overlay_spectra
 overlay_spectra(cannon_set, test_set, red_chi_sq, scatters)
+
+from cannon_spectra import residuals
+residuals(cannon_set, test_set, scatters)
