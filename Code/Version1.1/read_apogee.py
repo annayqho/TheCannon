@@ -49,6 +49,31 @@ def get_spectra(files):
 def continuum_normalize(spectra):
     """Continuum-normalizes the spectra.
 
+    Create two vectors that contain a) f_bar the ensemble median (or
+    slightly higher quantile) at each pixel, taken over the set of
+    reference objects; b) sigma_f: the variance (formal second moment,
+    interval enclosing the central X% of the distribution at each 
+    pixel; X=68 to 90). Good continuum pixels are those that have 
+    f_bar~1 and sigma_f<<1. Then an (initially by eye) cut on f_bar 
+    and sigma_f may identify (in a very simple fashion) good cont
+    pixels. Drawbacks: assuming label space is covered, but unevenly,
+    then what you do for sigma_f matters."""
+    
+    x = spectra[:,:,0]
+    f_bar = np.median(spectra[:,:,1], axis=0)
+    sigma_f = np.var(spectra[:,:,1], axis=0)
+    # f_bar ~ 1...
+    f_cut = 0.0001
+    cont1 = np.abs(f_bar-1)/1 < f_cut
+    # sigma_f << 1...
+    sigma_cut = 0.005
+    cont2 = sigma_f < sigma_cut
+    cont = np.logical_and(cont1, cont2)
+    errorbar(x[0][cont], f_bar[cont], yerr=sigma_f[cont], fmt='ko')
+
+def continuum_normalize_Chebyshev(spectra):
+    """Continuum-normalizes the spectra.
+
     Fit a 2nd order Chebyshev polynomial to each segment 
     and divide each segment by its corresponding polynomial 
 
