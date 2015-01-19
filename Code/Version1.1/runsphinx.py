@@ -55,5 +55,8 @@ test_set_diagnostics(training_set, test_set)
 from cannon_spectra import draw_spectra
 cannon_set = draw_spectra(label_vector, model, test_set)
 
+from cannon1_train_model import calc_red_chi_sq
+red_chi_sq = calc_red_chi_sq(model)
+
 from cannon_spectra import diagnostics
-diagnostics(cannon_set, test_set)
+diagnostics(cannon_set, test_set, red_chi_sq, scatters)
