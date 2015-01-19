@@ -156,31 +156,6 @@ def test_set_diagnostics(training_set, test_set):
         print "Saved fig %s" %figname
         plt.close()
 
-def cannon_set_diagnostics(cannon_set, test_set):
-    # Save residual of each best-fit spectrum as a 1D list, stack them
-    orig_spec = test_set.spectra
-    fitted_spec = cannon_set.spectra
-    residuals = orig_spec[:,:,1] - fitted_spec[:,:,1]
-    norm_residuals = residuals ** 1 # have to figure out what this is
-    all_label_vals = cannon_set.label_values
-    all_labels = cannon_set.label_names
-    for i in range(len(all_labels)):
-        label = all_labels[i]
-        label_vals = all_label_vals[:,i]
-        sorted_residuals = residuals[np.argsort(label_vals)]
-        plt.imshow(sorted_residuals, cmap=plt.cm.bwr_r, 
-                interpolation="nearest", vmin=-0.1, vmax=0.1, 
-                aspect='auto',origin='lower')
-        plt.title("Spectral Residuals Sorted by %s" %label)
-        plt.xlabel("Pixels")
-        plt.ylabel("Stars")
-        plt.colorbar()
-        filename = "residuals_sorted_by_%s.png" %label
-        plt.savefig(filename)
-        print "Plotting residuals sorted by %s" %label
-        print "File saved as %s" %filename
-        plt.close()
-
 def remove_stars(dataset, mask):
     """A method to remove a subset of stars from the Dataset. 
     

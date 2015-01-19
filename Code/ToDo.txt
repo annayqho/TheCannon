@@ -1,9 +1,9 @@
 Remaining for Version 1.1 (before HW takes a look...)
 - Implement continuum normalization
-- Version Control
 
-Then, after Tuesday:
+On Tuesday:
 - Learn how to use gh-pages
+- Update Sphinx and go through everything carefully to make sure HW will be able to run it
 
 For way further down the road:
 - spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
