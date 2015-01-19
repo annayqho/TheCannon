@@ -76,3 +76,4 @@ def overlay_spectra(cannon_set, test_set, red_chi_sq, scatters):
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
 
+def residuals(cannon_set, test_set)
