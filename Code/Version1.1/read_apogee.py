@@ -43,7 +43,7 @@ def get_spectra(files):
     print "Loaded %s stellar spectra" %len(files)
     
     # Automatically continuum-normalize
-    normalized_spectra, continua = continuum_normalize_Chebyshev(spectra)
+    normalized_spectra, continua = continuum_normalize_Chebyshev(lambdas, spectra)
     return lambdas, normalized_spectra, continua, SNRs
 
 def continuum_normalize(lambdas, spectra):
@@ -107,14 +107,15 @@ def continuum_normalize_Chebyshev(lambdas, spectra):
         for i in range(len(ranges)):
             start, stop = ranges[i][0], ranges[i][1]
             spectrum = spectra[jj,start:stop,:]
+            lambda_cut = lambdas[start:stop]
             ivar1 = ivar[start:stop]
-            fit = np.polynomial.chebyshev.Chebyshev.fit(x=lambdas, 
+            fit = np.polynomial.chebyshev.Chebyshev.fit(x=lambda_cut, 
                     y=spectrum[:,0], w=ivar1, deg=3)
-            continua[jj,start:stop] = fit(lambdas)
-            normalized_fluxes = spectrum[:,0]/fit(lambdas[start:stop])
+            continua[jj,start:stop] = fit(lambda_cut)
+            normalized_fluxes = spectrum[:,0]/fit(lambda_cut)
             bad = np.invert(np.isfinite(normalized_fluxes))
             normalized_fluxes[bad] = 1.
-            normalized_flux_errs = spectrum[:,1]/fit(lambdas[start:stop])
+            normalized_flux_errs = spectrum[:,1]/fit(lambda_cut)
             bad = np.logical_or(np.invert(np.isfinite(normalized_flux_errs)),
                     normalized_flux_errs <= 0)
             normalized_flux_errs[bad] = LARGE

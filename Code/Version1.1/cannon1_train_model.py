@@ -108,7 +108,7 @@ def train_model(training_set):
     """
     print "Training model..."
     label_names = training_set.label_names
-    label_values = training_set.label_values #(nstars, nlabels)
+    label_vals = training_set.label_vals #(nstars, nlabels)
     nlabels = len(label_names)
     lambdas = training_set.lambdas
     spectra = training_set.spectra #(nstars, npixels, 2)
@@ -116,11 +116,11 @@ def train_model(training_set):
     npixels = len(lambdas)
 
     # Establish label vector
-    pivots = np.mean(label_values, axis=0)
+    pivots = np.mean(label_vals, axis=0)
     ones = np.ones((nstars, 1))
-    linear_offsets = label_values - pivots
+    linear_offsets = label_vals - pivots
     quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)] 
-        for m in (label_values - pivots)])
+        for m in (label_vals - pivots)])
     x = np.hstack((ones, linear_offsets, quadratic_offsets))
     x_full = np.array([x,]*npixels) 
 
