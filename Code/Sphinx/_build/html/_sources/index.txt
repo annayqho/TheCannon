@@ -37,8 +37,7 @@ process of *label transfer.*
 Overview of *The Cannon* Software
 ---------------------------------
 
-This software package breaks up *The Cannon* into the following steps and 
-features.
+This software package breaks up *The Cannon* into the following steps and methods.
 
 #. Construct a training set from APOGEE files
    
