@@ -73,10 +73,10 @@ features.
 Using *The Cannon*
 ==================
 
-The details of using The Cannon package are provided in the following 
-sections, along with the following example: 553 open and globular cluster stars 
-from APOGEE DR10 as the training set, and, for simplicity, the same set of stars
-as the test set. 
+The details of using this package are provided in the following 
+sections, along with an example of usage. In the example, the training set
+consists of 553 open and globular cluster stars from APOGEE DR10 and, 
+for simplicity, the same set of stars as the test set. 
 
 Step 1: Construct a training set from APOGEE files 
 --------------------------------------------------
