@@ -303,4 +303,4 @@ The output of these diagnostics with sample plots are listed below.
    by that label. If the functional form of the model is comprehensive enough,
    then this should look like noise and there should be no systematic structure.
 
-.. image:: trainingset_labeldist_Teff.png
+.. image:: residuals_sorted_by_Teff.png
