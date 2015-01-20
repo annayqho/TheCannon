@@ -1,7 +1,4 @@
-Remaining for Version 1.1 (before HW takes a look...)
-- Update Sphinx and go through everything carefully to make sure HW will be able to run it
-
-After HW takes a look...
+More things to do...
 - Learn how to use gh-pages
 - Implement continuum normalization
 
