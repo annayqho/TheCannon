@@ -56,7 +56,7 @@ def do_one_regression(lambdas, spectra, x):
     Input
     -----
     lambdas: ndarray, [npixels]
-    spectra: ndarray, [nstars, 3] 
+    spectra: ndarray, [nstars, 2] 
     x = coefficients of the model: ndarray, [nstars, nlabels]
 
     Output
@@ -103,8 +103,9 @@ def train_model(training_set):
     coefficients: ndarray, (npixels, nstars, 15)
     the covariance matrix
     scatter values
-    chi squareds
+    red chi squareds
     the pivot values
+    the label vector
     """
     print "Training model..."
     label_names = training_set.label_names
@@ -136,23 +137,17 @@ def train_model(training_set):
     scatters = np.array([b[4] for b in blob]) # how could there be a b[4]?
                         # there are only four outputs from do_one_regression_at_
                         # fixed_scatter...confused
-    model = coeffs, covs, scatters, chis, chisqs, pivots
-    print "Done training model"
-    return model, x_full
-
-def calc_red_chi_sq(model):
-    """Calculate one reduced chi sq value per star"""
-    print "running calc_red_chi_sq"
-    coeffs_all, covs, scatters, chis, chisqs, pivots = model
-    nlabels = len(pivots)
-    npixels, nstars = chis.shape
+    
+    # Calc red chi sq
     all_chisqs = chis*chis
     chisqs = np.sum(all_chisqs, axis=0) # now we have one per star
     dof = npixels-nlabels
     red_chisqs = chisqs/dof
-    return red_chisqs
+    model = coeffs, covs, scatters, red_chisqs, pivots, x_full
+    print "Done training model"
+    return model
 
-def model_diagnostics(lambdas, label_names, model):
+def model_diagnostics(training_set, model):
     """Run a set of diagnostics on the model.
 
     Plot the 0th order coefficients as the baseline spectrum. 
@@ -164,8 +159,10 @@ def model_diagnostics(lambdas, label_names, model):
     Histogram of the chi squareds of the fits.
     Dotted line corresponding to DOF = npixels - nlabels
     """
-    coeffs_all, covs, scatters, chis, chisqs, pivots = model
-    
+    lambdas = training_set.lambdas
+    label_names = training_set.label_names
+    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
+   
     # Baseline spectrum with continuum
     baseline_spec = coeffs_all[:,0]
     plt.plot(lambdas, baseline_spec)
@@ -198,7 +195,6 @@ def model_diagnostics(lambdas, label_names, model):
     plt.close(fig)
 
     # Histogram of the reduced chi squareds of the fits
-    red_chisqs = calc_red_chi_sq(model)
     plt.hist(red_chisqs)
     plt.title("Distribution of Reduced Chi Squareds of the Model Fit")
     plt.ylabel("Count")

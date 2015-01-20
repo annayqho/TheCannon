@@ -39,7 +39,7 @@ def infer_labels(model, test_set):
     MCM_rotate_all:
     covs_all: covariance matrix of the fit
     """
-    coeffs_all, covs, scatters, chis, chisqs, pivots = model
+    coeffs_all, covs, scatters, red_chisqs, pivots, label_values = model
     nlabels = len(pivots)
     lambdas = test_set.lambdas
     spectra = test_set.spectra #(nstars, npixels, 2)
@@ -75,4 +75,6 @@ def infer_labels(model, test_set):
         labels_all[jj,:] = labels
         MCM_rotate_all[jj,:,:] = MCM_rotate
         covs_all[jj,:,:] = covs
-    return labels_all, MCM_rotate_all, covs_all
+    
+    test_set.set_label_vals(labels_all)
+    return test_set, covs_all

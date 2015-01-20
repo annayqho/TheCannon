@@ -114,8 +114,8 @@ happen to be the first column in the training labels text file,
     >>> IDs = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
     >>> filenames1 = []
     >>> for i in range(0, len(IDs)): #incorporate file location info
-        ...filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + IDs[i][1:]
-        ...filenames1.append(filename)
+    >>> ....filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + IDs[i][1:]
+    >>> ....filenames1.append(filename)
 
 Once the file list is created, the ``get_spectra`` method can be               
 used to continuum-normalize the spectrum information and put it 
@@ -124,7 +124,7 @@ continua (Chebyshev polynomial) and a list of SNR values for the
 spectra.
 
     >>> from read_apogee import get_spectra
-    >>> lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1) 
+    >>> lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1)
 
 Reading labels (``get_training_labels``)
 ++++++++++++++++++++++++++++++++++++++++
@@ -143,8 +143,9 @@ Creating & tailoring a ``Dataset`` object (``choose_labels``, ``choose_spectra``
 A ``Dataset`` object (``dataset.py``) is initialized. 
 
     >>> from dataset import Dataset
-    >>> training_set = Dataset(IDs=IDs, SNRs=SNRs, spectra=normalized_spectra, 
-    label_names=all_label_names, label_values=all_label_values)
+    >>> training_set = Dataset(IDs=IDs, SNRs=SNRs, lambdas=lambdas,
+    >>> ....spectra=normalized_spectra, label_names=all_label_names, 
+    >>> ....label_vals=all_label_values)
 
 (Optional) The user can choose to select some subset of the training labels 
 by creating a list of the desired column indices. 
@@ -159,11 +160,11 @@ columns 1, 3, and 5.
 1 = keep this object, and 0 = remove it. Here, we select data using physical 
 Teff and logg cutoffs.
 
-    >>> Teff = training_set.label_values[:,0]
+    >>> Teff = training_set.label_vals[:,0]
     >>> Teff_corr = all_label_values[:,2]
     >>> diff_t = np.abs(Teff-Teff_corr)
     >>> diff_t_cut = 600.
-    >>> logg = training_set.label_values[:,1]
+    >>> logg = training_set.label_vals[:,1]
     >>> logg_cut = 100.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
     >>> training_set.choose_spectra(mask)
@@ -203,8 +204,9 @@ identical to that for the training set, except without reading in the
 training labels file. 
 In this case, for simplicity, we use the training set as our test set. 
 
-    >>> test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs, 
-    spectra=training_set.spectra, label_names=training_set.label_names)
+    >>> test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs,
+    >>> ....lambdas=lambdas, spectra=training_set.spectra,
+    >>> ....label_names=training_set.label_names)
 
 Step 3: *The Cannon* Step 1 - Fit Model (``train_model``, ``model_diagnostics``)
 --------------------------------------------------------------------------------
@@ -212,30 +214,30 @@ Step 3: *The Cannon* Step 1 - Fit Model (``train_model``, ``model_diagnostics``)
 Now, we use our training set to fit for the model.
 
     >>> from cannon1_train_model import train_model
-    >>> model, label_vector = train_model(training_set)
+    >>> model = train_model(training_set)
 
 To let the user examine whether things are going smoothly, *The Cannon* can 
 print out a set of model diagnostics.
 
     >>> from cannon1_train_model import model_diagnostics
-    >>> model_diagnostics(lambdas, training_set.label_names, model)
+    >>> model_diagnostics(training_set, model)
 
-The output of these diagnostics are:
+The output of these diagnostics with sample plots are listed below.
 
 1. Plot of the baseline spectrum (0th order coefficients) as a 
    function of wavelength.
-2. Plot of the leading coefficients of each label as a function 
-   of wavelength
-3. Histogram of the reduced chi squareds of the fits (normalized by DOF, 
-   where DOF = npixels-nlabels)
-
-Sample output plots below.
 
 .. image:: baseline_spec_with_cont_pix.png
     :width: 400pt
 
+2. Plot of the leading coefficients of each label as a function 
+   of wavelength
+
 .. image:: leading_coeffs.png
     :width: 400pt
+
+3. Histogram of the reduced chi squareds of the fits (normalized by DOF, 
+   where DOF = npixels-nlabels)
 
 .. image:: modelfit_redchisqs.png
     :width: 400pt
@@ -243,14 +245,11 @@ Sample output plots below.
 Step 4: *The Cannon* Step 2 - Infer Labels (``cannon2_infer_labels``)
 ---------------------------------------------------------------------
 
-Now, we use the model to infer labels for the survey objects.
+Now, we use the model to infer labels for the survey objects and 
+update the test_set object.
 
     >>> from cannon2_infer_labels import infer_labels
-    >>> cannon_labels, MCM_rotate, covs = infer_labels(model, test_set)
-
-We update the test objects accordingly.
-    
-    >>> test_set.set_label_values(cannon_labels)
+    >>> test_set, covs = infer_labels(model, test_set)
 
 To let the user examine whether things are going smoothly, *The Cannon* can 
 print out a set of test set diagnostics.
@@ -258,38 +257,52 @@ print out a set of test set diagnostics.
     >>> from dataset import test_set_diagnostics
     >>> test_set_diagnostics(training_set, test_set)
 
-The output of these diagnostics are:
+The output of these diagnostics with sample plots are listed below.
 
 1. For each label, a list of flagged stars for which test labels are 
    over 2-sigma away from training labels
 2. Triangle plot, each test label plotted against every other test label
-3. 1-1 plots, for each label, training values plotted against test values
-
-Sample output plots below.
 
 .. image:: testset_labels_triangle.png
     :width: 400pt
 
+3. 1-1 plots, for each label, training values plotted against test values
+
 .. image:: 1to1_labelTeff.png
-    :width: 400pt
+    :width: 300pt
 
 .. image:: 1to1_labellogg.png
-    :width: 400pt
+    :width: 300pt
 
 .. image:: 1to1_label[MH].png
-    :width: 400pt
+    :width: 300pt
 
-Cannon Spectra (``cannon_spectra``)
----------------------------------
+Cannon Spectra (``draw_spectra``, ``diagnostics``)
+--------------------------------------------------
 
-Now that we have the model and labels for the test objects, we can in 
-principle "draw" spectra for each test object.
+Now that we have the model and labels for the test objects, ``The Cannon`` can
+"draw" spectra for each test object.
 
     >>> from cannon_spectra import draw_spectra
-    >>> cannon_set = draw_spectra(label_vector, test_set)
+    >>> cannon_set = draw_spectra(model, test_set)
 
 We can now perform a final set of diagnostic checks.
 
     >>> from cannon_spectra import diagnostics
-    >>> diagnostics(cannon_set, model, test_set)
+    >>> diagnostics(cannon_set, test_set, model)
 
+The output of these diagnostics with sample plots are listed below.
+
+1. A directory called SpectrumFits containing (for 10 randomly-selected stars)
+   the Cannon fitted spectra overlaid with the 'true' (data) spectra, 
+   as well as the two compared in a 1-to-1 plot.
+
+.. image:: Star500.png
+    :width:400pt
+
+2. For each label, the residuals of the spectra fits stacked and sorted 
+   by that label. If the functional form of the model is comprehensive enough,
+   then this should look like noise and there should be no systematic structure.
+
+.. image:: trainingset_labeldist_Teff.png
+    :width:400pt

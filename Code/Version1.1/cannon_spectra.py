@@ -4,8 +4,8 @@ import random
 from dataset import Dataset
 import matplotlib.pyplot as plt
 
-def draw_spectra(label_vector, model, test_set):
-    coeffs_all, covs, scatters, chis, chisqs, pivots = model
+def draw_spectra(model, test_set):
+    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nstars = len(test_set.IDs)
     cannon_spectra = np.zeros(test_set.spectra.shape)
     for i in range(nstars):
@@ -15,10 +15,15 @@ def draw_spectra(label_vector, model, test_set):
     cannon_set = Dataset(IDs=test_set.IDs, SNRs=test_set.SNRs, 
             lambdas = test_set.lambdas, spectra=cannon_spectra, 
             label_names = test_set.label_names, 
-            label_values = test_set.label_values)
+            label_vals = test_set.label_vals)
     return cannon_set
 
-def overlay_spectra(cannon_set, test_set, red_chi_sq, scatters):
+def diagnostics(cannon_set, test_set, model):
+    overlay_spectra(cannon_set, test_set, model)
+    residuals(cannon_set, test_set, model)
+
+def overlay_spectra(cannon_set, test_set, model):
+    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     # Overplot original spectra with best-fit spectra
     os.system("mkdir SpectrumFits")
     print "Overplotting spectra for ten random stars"
@@ -36,7 +41,7 @@ def overlay_spectra(cannon_set, test_set, red_chi_sq, scatters):
         sig_fit = cannon_set.spectra[i,:,1]
         err_orig = np.sqrt(sig_orig**2 + scatters**2)
         err_fit = np.sqrt(sig_fit**2 + scatters**2)
-        chisq = np.round(red_chi_sq[i], 2)
+        chisq = np.round(red_chisqs[i], 2)
         bad2 = np.logical_or(spec_orig == 0, spec_orig == 1)
         bad1 = np.logical_or(sig_fit == 200., sig_orig == 200.)
         bad = np.logical_or(bad1, bad2)
@@ -77,23 +82,17 @@ def overlay_spectra(cannon_set, test_set, red_chi_sq, scatters):
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
 
-def residuals(cannon_set, test_set, scatters):
-    # sort by each of the labels. Then we will see whether 
-    # all stars have deviations at a particular wavelength from the best-fit 
-    # model irrespective of the label -- if the quadratic model is general 
-    # enough, then the 2D residual should show nothing but noise. 
-    # (Jo Bovy has done something similar?)
-
+def residuals(cannon_set, test_set, model):
+    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     print "Stacking spectrum fit residuals"
     res = test_set.spectra[:,:,0]-cannon_set.spectra[:,:,0]
     spec_fit = cannon_set.spectra[:,:,0]
     err = np.sqrt(test_set.spectra[:,:,1]**2 + scatters**1)
     res_norm = res/err
-    
     for i in range(len(cannon_set.label_names)):
         label_name = cannon_set.label_names[i]
         print "Plotting residuals sorted by %s" %label_name
-        label_vals = cannon_set.label_values[:,i]
+        label_vals = cannon_set.label_vals[:,i]
         sorted_res = res[np.argsort(label_vals)]
         lim = np.maximum(np.abs(sorted_res.max()), np.abs(sorted_res.min()))
         plt.imshow(sorted_res, cmap=plt.cm.bwr_r,

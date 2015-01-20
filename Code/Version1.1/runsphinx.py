@@ -39,29 +39,19 @@ test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs,
         label_names=training_set.label_names)
 
 from cannon1_train_model import train_model
-model, label_vector = train_model(training_set)
-
-coeffs_all, covs, scatters, chis, chisqs, pivots = model
+model = train_model(training_set)
 
 from cannon1_train_model import model_diagnostics
-model_diagnostics(lambdas, training_set.label_names, model)
+model_diagnostics(training_set, model)
 
 from cannon2_infer_labels import infer_labels
-cannon_labels, MCM_rotate, covs = infer_labels(model, test_set)
-
-test_set.set_label_vals(cannon_labels)
+test_set, covs = infer_labels(model, test_set)
 
 from dataset import test_set_diagnostics
 test_set_diagnostics(training_set, test_set)
 
 from cannon_spectra import draw_spectra
-cannon_set = draw_spectra(label_vector, model, test_set)
+cannon_set = draw_spectra(model, test_set)
 
-from cannon1_train_model import calc_red_chi_sq
-red_chi_sq = calc_red_chi_sq(model)
-
-from cannon_spectra import overlay_spectra
-overlay_spectra(cannon_set, test_set, red_chi_sq, scatters)
-
-from cannon_spectra import residuals
-residuals(cannon_set, test_set, scatters)
+from cannon_spectra import diagnostics
+diagnostics(cannon_set, test_set, model)

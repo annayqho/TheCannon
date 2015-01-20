@@ -147,8 +147,8 @@ happen to be the first column in the training labels text file,
 <span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">readin</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;string&#39;</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filenames1</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">)):</span> <span class="c">#incorporate file location info</span>
-<span class="go">    ...filename = &#39;/home/annaho/AnnaCannon/Data/APOGEE_Data&#39; + IDs[i][1:]</span>
-<span class="go">    ...filenames1.append(filename)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">filename</span> <span class="o">=</span> <span class="s">&#39;/home/annaho/AnnaCannon/Data/APOGEE_Data&#39;</span> <span class="o">+</span> <span class="n">IDs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">filenames1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once the file list is created, the <tt class="docutils literal"><span class="pre">get_spectra</span></tt> method can be
@@ -176,8 +176,9 @@ to retrieve object IDs, label names, and label values.</p>
 <h4>Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)<a class="headerlink" href="#creating-tailoring-a-dataset-object-choose-labels-choose-spectra" title="Permalink to this headline">¶</a></h4>
 <p>A <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">dataset.py</span></tt>) is initialized.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">spectra</span><span class="o">=</span><span class="n">normalized_spectra</span><span class="p">,</span>
-<span class="go">label_names=all_label_names, label_values=all_label_values)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">spectra</span><span class="o">=</span><span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">label_names</span><span class="o">=</span><span class="n">all_label_names</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">label_vals</span><span class="o">=</span><span class="n">all_label_values</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>(Optional) The user can choose to select some subset of the training labels
@@ -192,11 +193,11 @@ columns 1, 3, and 5.</p>
 (for example, by imposing physical cutoffs) by constructing a mask where
 1 = keep this object, and 0 = remove it. Here, we select data using physical
 Teff and logg cutoffs.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_values</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_vals</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Teff_corr</span> <span class="o">=</span> <span class="n">all_label_values</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Teff</span><span class="o">-</span><span class="n">Teff_corr</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t_cut</span> <span class="o">=</span> <span class="mf">600.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_values</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_vals</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logg_cut</span> <span class="o">=</span> <span class="mf">100.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">((</span><span class="n">diff_t</span> <span class="o">&lt;</span> <span class="n">diff_t_cut</span><span class="p">),</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="n">logg_cut</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span><span class="o">.</span><span class="n">choose_spectra</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
@@ -219,61 +220,62 @@ diagnostics.</p>
 <a class="reference internal image-reference" href="_images/trainingset_SNRdist.png"><img alt="_images/trainingset_SNRdist.png" src="_images/trainingset_SNRdist.png" style="width: 400pt;" /></a>
 <ol class="arabic simple" start="2">
 <li>A histogram for each label showing its coverage in label space</li>
+</ol>
+<a class="reference internal image-reference" href="_images/trainingset_labeldist_Teff.png"><img alt="_images/trainingset_labeldist_Teff.png" src="_images/trainingset_labeldist_Teff.png" style="width: 400pt;" /></a>
+<ol class="arabic simple" start="3">
 <li>A &#8220;triangle plot&#8221; that shows every label plotted against every other</li>
 </ol>
-<p>Sample output plots below.</p>
-<a class="reference internal image-reference" href="_images/trainingset_SNRdist.png"><img alt="_images/trainingset_SNRdist.png" src="_images/trainingset_SNRdist.png" style="width: 400pt;" /></a>
-<a class="reference internal image-reference" href="_images/trainingset_labeldist_Teff.png"><img alt="_images/trainingset_labeldist_Teff.png" src="_images/trainingset_labeldist_Teff.png" style="width: 400pt;" /></a>
 <a class="reference internal image-reference" href="_images/trainingset_labels_triangle.png"><img alt="_images/trainingset_labels_triangle.png" src="_images/trainingset_labels_triangle.png" style="width: 400pt;" /></a>
 </div>
 </div>
 <div class="section" id="step-2-construct-a-test-set-from-apogee-files">
 <h3>Step 2: Construct a test set from APOGEE files<a class="headerlink" href="#step-2-construct-a-test-set-from-apogee-files" title="Permalink to this headline">¶</a></h3>
-<p>Ordinarily, the user would go through a process identical to that for the
-training set, except without reading in the training labels file. In this case,
-for simplicity, we use the training set as our test set, so that our results
-simply show that <em>The Cannon</em> can return good labels for the set it trained on.</p>
+<p>To construct the test set, the user would ordinarily go through a process
+identical to that for the training set, except without reading in the
+training labels file.
+In this case, for simplicity, we use the training set as our test set.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">training_set</span><span class="o">.</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">training_set</span><span class="o">.</span><span class="n">SNRs</span><span class="p">,</span>
-<span class="go">spectra=training_set.spectra, label_names=training_set.label_names)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">spectra</span><span class="o">=</span><span class="n">training_set</span><span class="o">.</span><span class="n">spectra</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">label_names</span><span class="o">=</span><span class="n">training_set</span><span class="o">.</span><span class="n">label_names</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="step-3-the-cannon-step-1-fit-model-cannon1-train-model">
-<h3>Step 3: <em>The Cannon</em> Step 1 - Fit Model (<tt class="docutils literal"><span class="pre">cannon1_train_model</span></tt>)<a class="headerlink" href="#step-3-the-cannon-step-1-fit-model-cannon1-train-model" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="step-3-the-cannon-step-1-fit-model-train-model-model-diagnostics">
+<h3>Step 3: <em>The Cannon</em> Step 1 - Fit Model (<tt class="docutils literal"><span class="pre">train_model</span></tt>, <tt class="docutils literal"><span class="pre">model_diagnostics</span></tt>)<a class="headerlink" href="#step-3-the-cannon-step-1-fit-model-train-model-model-diagnostics" title="Permalink to this headline">¶</a></h3>
 <p>Now, we use our training set to fit for the model.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon1_train_model</span> <span class="kn">import</span> <span class="n">train_model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="p">,</span> <span class="n">label_vector</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">training_set</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">training_set</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To let the user examine whether things are going smoothly, <em>The Cannon</em> can
 print out a set of model diagnostics.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon1_train_model</span> <span class="kn">import</span> <span class="n">model_diagnostics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model_diagnostics</span><span class="p">(</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">training_set</span><span class="o">.</span><span class="n">label_names</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model_diagnostics</span><span class="p">(</span><span class="n">training_set</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The output of these diagnostics are:</p>
+<p>The output of these diagnostics with sample plots are listed below.</p>
 <ol class="arabic simple">
 <li>Plot of the baseline spectrum (0th order coefficients) as a
 function of wavelength.</li>
+</ol>
+<a class="reference internal image-reference" href="_images/baseline_spec_with_cont_pix.png"><img alt="_images/baseline_spec_with_cont_pix.png" src="_images/baseline_spec_with_cont_pix.png" style="width: 400pt;" /></a>
+<ol class="arabic simple" start="2">
 <li>Plot of the leading coefficients of each label as a function
 of wavelength</li>
+</ol>
+<a class="reference internal image-reference" href="_images/leading_coeffs.png"><img alt="_images/leading_coeffs.png" src="_images/leading_coeffs.png" style="width: 400pt;" /></a>
+<ol class="arabic simple" start="3">
 <li>Histogram of the reduced chi squareds of the fits (normalized by DOF,
 where DOF = npixels-nlabels)</li>
 </ol>
-<p>Sample output plots below.</p>
-<a class="reference internal image-reference" href="_images/baseline_spec_with_cont_pix.png"><img alt="_images/baseline_spec_with_cont_pix.png" src="_images/baseline_spec_with_cont_pix.png" style="width: 400pt;" /></a>
-<a class="reference internal image-reference" href="_images/leading_coeffs.png"><img alt="_images/leading_coeffs.png" src="_images/leading_coeffs.png" style="width: 400pt;" /></a>
 <a class="reference internal image-reference" href="_images/modelfit_redchisqs.png"><img alt="_images/modelfit_redchisqs.png" src="_images/modelfit_redchisqs.png" style="width: 400pt;" /></a>
 </div>
 <div class="section" id="step-4-the-cannon-step-2-infer-labels-cannon2-infer-labels">
 <h3>Step 4: <em>The Cannon</em> Step 2 - Infer Labels (<tt class="docutils literal"><span class="pre">cannon2_infer_labels</span></tt>)<a class="headerlink" href="#step-4-the-cannon-step-2-infer-labels-cannon2-infer-labels" title="Permalink to this headline">¶</a></h3>
-<p>Now, we use the model to infer labels for the survey objects.</p>
+<p>Now, we use the model to infer labels for the survey objects and
+update the test_set object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon2_infer_labels</span> <span class="kn">import</span> <span class="n">infer_labels</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cannon_labels</span><span class="p">,</span> <span class="n">MCM_rotate</span><span class="p">,</span> <span class="n">covs</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>We update the test objects accordingly.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_set</span><span class="o">.</span><span class="n">set_label_values</span><span class="p">(</span><span class="n">cannon_labels</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_set</span><span class="p">,</span> <span class="n">covs</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To let the user examine whether things are going smoothly, <em>The Cannon</em> can
@@ -282,32 +284,46 @@ print out a set of test set diagnostics.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_set_diagnostics</span><span class="p">(</span><span class="n">training_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The output of these diagnostics are:</p>
+<p>The output of these diagnostics with sample plots are listed below.</p>
 <ol class="arabic simple">
 <li>For each label, a list of flagged stars for which test labels are
 over 2-sigma away from training labels</li>
 <li>Triangle plot, each test label plotted against every other test label</li>
+</ol>
+<a class="reference internal image-reference" href="_images/testset_labels_triangle.png"><img alt="_images/testset_labels_triangle.png" src="_images/testset_labels_triangle.png" style="width: 400pt;" /></a>
+<ol class="arabic simple" start="3">
 <li>1-1 plots, for each label, training values plotted against test values</li>
 </ol>
-<p>Sample output plots below.</p>
-<a class="reference internal image-reference" href="_images/testset_labels_triangle.png"><img alt="_images/testset_labels_triangle.png" src="_images/testset_labels_triangle.png" style="width: 400pt;" /></a>
-<a class="reference internal image-reference" href="_images/1to1_labelTeff.png"><img alt="_images/1to1_labelTeff.png" src="_images/1to1_labelTeff.png" style="width: 400pt;" /></a>
-<a class="reference internal image-reference" href="_images/1to1_labellogg.png"><img alt="_images/1to1_labellogg.png" src="_images/1to1_labellogg.png" style="width: 400pt;" /></a>
-<a class="reference internal image-reference" href="_images/1to1_label[MH].png"><img alt="_images/1to1_label[MH].png" src="_images/1to1_label[MH].png" style="width: 400pt;" /></a>
+<a class="reference internal image-reference" href="_images/1to1_labelTeff.png"><img alt="_images/1to1_labelTeff.png" src="_images/1to1_labelTeff.png" style="width: 300pt;" /></a>
+<a class="reference internal image-reference" href="_images/1to1_labellogg.png"><img alt="_images/1to1_labellogg.png" src="_images/1to1_labellogg.png" style="width: 300pt;" /></a>
+<a class="reference internal image-reference" href="_images/1to1_label[MH].png"><img alt="_images/1to1_label[MH].png" src="_images/1to1_label[MH].png" style="width: 300pt;" /></a>
 </div>
-<div class="section" id="cannon-spectra-cannon-spectra">
-<h3>Cannon Spectra (<tt class="docutils literal"><span class="pre">cannon_spectra</span></tt>)<a class="headerlink" href="#cannon-spectra-cannon-spectra" title="Permalink to this headline">¶</a></h3>
-<p>Now that we have the model and labels for the test objects, we can in
-principle &#8220;draw&#8221; spectra for each test object.</p>
+<div class="section" id="cannon-spectra-draw-spectra-diagnostics">
+<h3>Cannon Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)<a class="headerlink" href="#cannon-spectra-draw-spectra-diagnostics" title="Permalink to this headline">¶</a></h3>
+<p>Now that we have the model and labels for the test objects, <tt class="docutils literal"><span class="pre">The</span> <span class="pre">Cannon</span></tt> can
+&#8220;draw&#8221; spectra for each test object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon_spectra</span> <span class="kn">import</span> <span class="n">draw_spectra</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cannon_set</span> <span class="o">=</span> <span class="n">draw_spectra</span><span class="p">(</span><span class="n">label_vector</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cannon_set</span> <span class="o">=</span> <span class="n">draw_spectra</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We can now perform a final set of diagnostic checks.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon_spectra</span> <span class="kn">import</span> <span class="n">diagnostics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">diagnostics</span><span class="p">(</span><span class="n">cannon_set</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">diagnostics</span><span class="p">(</span><span class="n">cannon_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The output of these diagnostics with sample plots are listed below.</p>
+<ol class="arabic simple">
+<li>A directory called SpectrumFits containing (for 10 randomly-selected stars)
+the Cannon fitted spectra overlaid with the &#8216;true&#8217; (data) spectra,
+as well as the two compared in a 1-to-1 plot.</li>
+</ol>
+<img alt="Star500.png:width:400pt" src="Star500.png:width:400pt" />
+<ol class="arabic simple" start="2">
+<li>For each label, the residuals of the spectra fits stacked and sorted
+by that label. If the functional form of the model is comprehensive enough,
+then this should look like noise and there should be no systematic structure.</li>
+</ol>
+<img alt="trainingset_labeldist_Teff.png:width:400pt" src="trainingset_labeldist_Teff.png:width:400pt" />
 </div>
 </div>
 </div>
@@ -335,9 +351,9 @@ principle &#8220;draw&#8221; spectra for each test object.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#step-2-construct-a-test-set-from-apogee-files">Step 2: Construct a test set from APOGEE files</a></li>
-<li><a class="reference internal" href="#step-3-the-cannon-step-1-fit-model-cannon1-train-model">Step 3: <em>The Cannon</em> Step 1 - Fit Model (<tt class="docutils literal"><span class="pre">cannon1_train_model</span></tt>)</a></li>
+<li><a class="reference internal" href="#step-3-the-cannon-step-1-fit-model-train-model-model-diagnostics">Step 3: <em>The Cannon</em> Step 1 - Fit Model (<tt class="docutils literal"><span class="pre">train_model</span></tt>, <tt class="docutils literal"><span class="pre">model_diagnostics</span></tt>)</a></li>
 <li><a class="reference internal" href="#step-4-the-cannon-step-2-infer-labels-cannon2-infer-labels">Step 4: <em>The Cannon</em> Step 2 - Infer Labels (<tt class="docutils literal"><span class="pre">cannon2_infer_labels</span></tt>)</a></li>
-<li><a class="reference internal" href="#cannon-spectra-cannon-spectra">Cannon Spectra (<tt class="docutils literal"><span class="pre">cannon_spectra</span></tt>)</a></li>
+<li><a class="reference internal" href="#cannon-spectra-draw-spectra-diagnostics">Cannon Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)</a></li>
 </ul>
 </li>
 </ul>
