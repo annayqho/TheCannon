@@ -42,28 +42,27 @@ features.
 
 #. Construct a training set from APOGEE files
    
-   * ``read_apogee``: read spectra, continuum-normalize
-   * ``read_labels``: retrieve stellar IDs, training label names and values
-   * ``dataset``: (optional) select a subset of labels
-   * ``dataset``: (optional) select a subset of spectra  
-   * ``dataset``: (optional) run a set of diagnostics on the training set
+   * ``get_spectra``: read spectra, continuum-normalize
+   * ``get_training_labels``: retrieve stellar IDs, training label names and values
+   * ``choose_labels``: (optional) select a subset of labels
+   * ``choose_spectra``: (optional) select a subset of spectra  
+   * ``training_set_diagnostics``: (optional) run a set of diagnostics 
+     on the training set
 
 #. Construct a test set from APOGEE files
 
-   * ``read_apogee``: read spectra, continuum-normalize
-   * ``dataset``: (optional) select a subset of spectra
+   * ``get_spectra``: read spectra, continuum-normalize
+   * ``choose_spectra``: (optional) select a subset of spectra
 
 #. The Cannon Step 1: Fit Model
 
-   * ``train_model`` in ``cannon1_train_model``: solve for model
-   * ``model_diagnostics`` in ``cannon1_train_model``: run a set of 
-     diagnostics on the model
+   * ``train_model``: solve for model
+   * ``model_diagnostics``: run a set of diagnostics on the model
 
 #. Step 2 of The Cannon: infer labels for all test objects
 
-   * ``infer_labels`` in ``cannon2_infer_labels``: infer labels using model
-   * ``test_set_diagnostics`` in ``cannon2_infer_labels``: run a set of 
-     diagnostics on the inferred labels
+   * ``infer_labels``: infer labels using model
+   * ``test_set_diagnostics``: run a set of diagnostics on the inferred labels
 
 #. Cannon-generated spectra (``cannon_spectra``)
 
@@ -242,8 +241,8 @@ The output of these diagnostics with sample plots are listed below.
 .. image:: modelfit_redchisqs.png
     :width: 400pt
 
-Step 4: *The Cannon* Step 2 - Infer Labels (``cannon2_infer_labels``)
----------------------------------------------------------------------
+Step 4: *The Cannon* Step 2 - Infer Labels (``infer_labels``, ``test_set_diagnostics``)
+---------------------------------------------------------------------------------------
 
 Now, we use the model to infer labels for the survey objects and 
 update the test_set object.
