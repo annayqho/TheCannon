@@ -17,7 +17,7 @@ spectra, see Ness et al. 2015.
 Introduction to *The Cannon* 
 ----------------------------
 
-*The Cannon* has two fundamental steps that together constitutes a 
+*The Cannon* has two fundamental steps that together constitute a 
 process of *label transfer.* 
 
 1. The *Training Step*: *reference objects* are a subset of spectra in the 

@@ -43,7 +43,7 @@ def get_spectra(files):
     print "Loaded %s stellar spectra" %len(files)
     
     # Automatically continuum-normalize
-    normalized_spectra, continua = continuum_normalize(spectra)
+    normalized_spectra, continua = continuum_normalize_Chebyshev(spectra)
     return pixels, normalized_spectra, continua, SNRs
 
 def continuum_normalize(spectra):
