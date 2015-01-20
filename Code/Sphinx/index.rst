@@ -98,15 +98,16 @@ The following requirements govern (2):
 
 1. The first row must be strings corresponding to the names of the labels 
    and must not contain any '/'s 
-2. The first column must be string corresponding to the stellar IDs
+2. The first column must be strings corresponding to the stellar IDs
 3. The remaining entries must be floats corresponding to the label values
 
-Reading spectra (``read_apogee.py``)
-++++++++++++++++++++++++++++++++++++
+Reading spectra (``get_spectra``)
++++++++++++++++++++++++++++++++++
 
-In our example, the label file is called ``traininglabels.txt`` and the ID 
-column happens to correspond to the file names that we want to read spectra 
-from.
+We construct the first input: the list of filenames corresponding to the 
+training data (in this case, APOGEE .fits files). In our example, the filenames
+happen to be the first column in the training labels text file, 
+``traininglabels.txt``. So we simply read the first column of this file.
 
     >>> import numpy as np
     >>> readin = "traininglabels.txt"
@@ -118,22 +119,26 @@ from.
 
 Once the file list is created, the ``get_spectra`` method can be               
 used to continuum-normalize the spectrum information and put it 
-into the correct format. 
+into the correct format. ``get_spectra`` also returns the fitted
+continua (Chebyshev polynomial) and a list of SNR values for the 
+spectra.
 
     >>> from read_apogee import get_spectra
     >>> lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1) 
 
-Reading labels (``read_labels.py``)
-+++++++++++++++++++++++++++++++++++
+Reading labels (``get_training_labels``)
+++++++++++++++++++++++++++++++++++++++++
 
-Now the ``get_training_labels`` method is used to retrieve IDs, label names, 
-and label values.
+We construct the second input: the .txt file containing training labels in an 
+ASCII table, with requirements described above. In this example, the .txt file
+is called ``traininglabels.txt``. The method ``get_training_labels`` is used 
+to retrieve object IDs, label names, and label values.
 
     >>> from read_labels import get_training_labels
     >>> IDs, all_label_names, all_label_values = get_training_labels(readin)
 
-Creating & tailoring a Dataset object (``dataset.py``)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Creating & tailoring a ``Dataset`` object (``choose_labels``, ``choose_spectra``)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 A ``Dataset`` object (``dataset.py``) is initialized. 
 
@@ -163,8 +168,8 @@ Teff and logg cutoffs.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
     >>> training_set.choose_spectra(mask)
 
-Training set diagnostics
-++++++++++++++++++++++++
+Training set diagnostics (training_set_diagnostics)
++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Now, the training set has been constructed. To let the user examine whether 
 things are going smoothly, *The Cannon* can print out a set of training set 
@@ -173,9 +178,13 @@ diagnostics.
     >>> from dataset import training_set_diagnostics
     >>> training_set_diagnostics(training_set)
 
-The output of these diagnostics are:
+The output of these diagnostics, with examples, are listed below.
 
 1. A histogram showing the distribution of SNR in the training set
+
+.. image:: trainingset_SNRdist.png
+    :width: 400pt
+
 2. A histogram for each label showing its coverage in label space
 3. A "triangle plot" that shows every label plotted against every other 
 
