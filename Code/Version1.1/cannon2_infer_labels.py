@@ -41,9 +41,10 @@ def infer_labels(model, test_set):
     """
     coeffs_all, covs, scatters, chis, chisqs, pivots = model
     nlabels = len(pivots)
-    spectra = test_set.spectra #(nstars, npixels, 3)
+    lambdas = test_set.lambdas
+    spectra = test_set.spectra #(nstars, npixels, 2)
     nstars = spectra.shape[0]
-    npixels = spectra.shape[1]
+    npixels = len(lambdas)
     labels_all = np.zeros((nstars, nlabels))
     # Don't understand what this MCM_rotate_all matrix is
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1]-1, 
@@ -51,9 +52,8 @@ def infer_labels(model, test_set):
     covs_all = np.zeros((nstars, nlabels, nlabels))
 
     for jj in range(nstars):
-        pixels = spectra[jj,:,0]
-        fluxes = spectra[jj,:,1]
-        fluxerrs = spectra[jj,:,2]
+        fluxes = spectra[jj,:,0]
+        fluxerrs = spectra[jj,:,1]
         fluxes_norm = fluxes - coeffs_all[:,0]*1 # pivot around the leading term
         Cinv = 1. / (fluxerrs* 2 + scatters**2)
         weights = 1 / Cinv**0.5

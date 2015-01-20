@@ -186,32 +186,28 @@ The output of these diagnostics, with examples, are listed below.
     :width: 400pt
 
 2. A histogram for each label showing its coverage in label space
-3. A "triangle plot" that shows every label plotted against every other 
-
-Sample output plots below.
-
-.. image:: trainingset_SNRdist.png
-    :width: 400pt
 
 .. image:: trainingset_labeldist_Teff.png
     :width: 400pt
+   
+3. A "triangle plot" that shows every label plotted against every other 
 
 .. image:: trainingset_labels_triangle.png
     :width: 400pt
-
+   
 Step 2: Construct a test set from APOGEE files
 ----------------------------------------------
 
-Ordinarily, the user would go through a process identical to that for the 
-training set, except without reading in the training labels file. In this case, 
-for simplicity, we use the training set as our test set, so that our results 
-simply show that *The Cannon* can return good labels for the set it trained on.
+To construct the test set, the user would ordinarily go through a process 
+identical to that for the training set, except without reading in the 
+training labels file. 
+In this case, for simplicity, we use the training set as our test set. 
 
     >>> test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs, 
     spectra=training_set.spectra, label_names=training_set.label_names)
 
-Step 3: *The Cannon* Step 1 - Fit Model (``cannon1_train_model``)
------------------------------------------------------------------
+Step 3: *The Cannon* Step 1 - Fit Model (``train_model``, ``model_diagnostics``)
+--------------------------------------------------------------------------------
 
 Now, we use our training set to fit for the model.
 

@@ -11,10 +11,11 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 import os
 
-def do_one_regression_at_fixed_scatter(spectra, x, scatter):
+def do_one_regression_at_fixed_scatter(lambdas, spectra, x, scatter):
     """
     Params
     ------
+    lambdas: ndarray, [npixels]
     spectra: ndarray, [nstars, 3]
     x=coefficients of the model: ndarray, [nstars, nlabels]
     scatter: ndarray, [nstars]
@@ -30,22 +31,22 @@ def do_one_regression_at_fixed_scatter(spectra, x, scatter):
     logdet_Cinv: float
         inverse of the log determinant of the cov matrix
     """
-    Cinv = 1. / (spectra[:, 2] ** 2 + scatter ** 2)  
+    Cinv = 1. / (spectra[:, 1] ** 2 + scatter ** 2)  
     xTCinvx = np.dot(x.T, Cinv[:, None] * x) 
-    fluxes = spectra[:, 1] 
+    fluxes = spectra[:, 0] 
     xTCinvf = np.dot(x.T, Cinv * fluxes)
     try:
         coeff = np.linalg.solve(xTCinvx, xTCinvf) # this is the model!
     except np.linalg.linalg.LinAlgError:
         print "np.linalg.linalg.LinAlgError, do_one_regression_at_fixed_scatter"
-        print MTCinvM, MTCinvx, spectra[:,0], spectra[:,1], spectra[:,2]
+        print MTCinvM, MTCinvx, lambdas, spectra[:,0], spectra[:,1]
         print fluxes
     assert np.all(np.isfinite(coeff))
     chi = np.sqrt(Cinv) * (fluxes - np.dot(x, coeff))
     logdet_Cinv = np.sum(np.log(Cinv))
     return (coeff, xTCinvx, chi, logdet_Cinv)
 
-def do_one_regression(spectra, x):
+def do_one_regression(lambdas, spectra, x):
     """
     Optimizes to find the scatter associated with the best-fit model.
 
@@ -54,6 +55,7 @@ def do_one_regression(spectra, x):
 
     Input
     -----
+    lambdas: ndarray, [npixels]
     spectra: ndarray, [nstars, 3] 
     x = coefficients of the model: ndarray, [nstars, nlabels]
 
@@ -67,18 +69,18 @@ def do_one_regression(spectra, x):
     chis_eval = np.zeros_like(ln_scatter_vals)
     for jj, ln_scatter_val in enumerate(ln_scatter_vals):
         coeff, xTCinvx, chi, logdet_Cinv = do_one_regression_at_fixed_scatter(
-                spectra, x, scatter = np.exp(ln_scatter_val))
+                lambdas, spectra, x, scatter = np.exp(ln_scatter_val))
         chis_eval[jj] = np.sum(chi * chi) - logdet_Cinv
     # What do the below two cases *mean*?
     if np.any(np.isnan(chis_eval)):
         best_scatter = np.exp(ln_scatter_vals[-1]) 
         return do_one_regression_at_fixed_scatter(
-                spectra, x, scatter = best_scatter) + (best_scatter, )
+                lambdas, spectra, x, scatter = best_scatter) + (best_scatter, )
     lowest = np.argmin(chis_eval) # the best-fit scatter value?
     # If it was unsuccessful at finding it...
     if lowest == 0 or lowest == len(ln_scatter_vals) + 1: 
         best_scatter = np.exp(ln_scatter_vals[lowest])
-        return do_one_regression_at_fixed_scatter(spectra, x, 
+        return do_one_regression_at_fixed_scatter(lambdas, spectra, x, 
                 scatter = best_scatter) + (best_scatter, )
     ln_scatter_vals_short = ln_scatter_vals[np.array(
         [lowest-1, lowest, lowest+1])]
@@ -89,7 +91,7 @@ def do_one_regression(spectra, x):
     fit_pder2 = pylab.polyder(fit_pder)
     best_scatter = np.exp(np.roots(fit_pder)[0])
     return do_one_regression_at_fixed_scatter(
-            spectra, x, scatter = best_scatter) + (best_scatter, )
+            lambdas, spectra, x, scatter = best_scatter) + (best_scatter, )
 
 def train_model(training_set):
     """
@@ -108,9 +110,10 @@ def train_model(training_set):
     label_names = training_set.label_names
     label_values = training_set.label_values #(nstars, nlabels)
     nlabels = len(label_names)
-    spectra = training_set.spectra #(nstars, npixels, 3)
+    lambdas = training_set.lambdas
+    spectra = training_set.spectra #(nstars, npixels, 2)
     nstars = spectra.shape[0]
-    npixels = spectra.shape[1]
+    npixels = len(lambdas)
 
     # Establish label vector
     pivots = np.mean(label_values, axis=0)
@@ -123,7 +126,8 @@ def train_model(training_set):
 
     # Perform REGRESSIONS
     spectra = spectra.swapaxes(0,1) # for consistency with x_full
-    blob = map(do_one_regression, spectra, x_full) # one regression per pixel
+    blob = map(do_one_regression, lambdas, 
+            spectra, x_full) # one regression per pixel
     coeffs = np.array([b[0] for b in blob])
     covs = np.array([np.linalg.inv(b[1]) for b in blob])
     chis = np.array([b[2] for b in blob])

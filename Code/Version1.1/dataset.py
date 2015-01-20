@@ -20,10 +20,11 @@ class Dataset(object):
     ----------
     IDs: numpy ndarray, list
         Specify the names (or IDs, in whatever format) of the stars.
+    lambdas: numpy ndarray
+        Wavelength array corresponding to the pixels in the spectrum
     spectra: numpy ndarray
-        spectra[:,:,0] = wavelengths, pixel values
-        spectra[:,:,1] = flux (spectrum)
-        spectra[:,:,2] = flux error array
+        spectra[:,:,0] = flux (spectrum)
+        spectra[:,:,1] = flux error array
     labels: numpy ndarray, list, optional
         Training labels for training set, but None for test set
     
@@ -32,19 +33,26 @@ class Dataset(object):
     set_IDs
     set_spectra
     set_label_names
-    set_label_values
+    set_label_vals
+    choose_labels
+    choose_spectra
+    label_triangle_plot
 
     """
 
-    def __init__(self, IDs, SNRs, spectra, label_names, label_values=None):
+    def __init__(self, IDs, SNRs, lambdas, spectra, label_names, label_vals=None):
         self.IDs = IDs
         self.SNRs = SNRs
+        self.lambdas = lambdas
         self.spectra = spectra 
         self.label_names = label_names
-        self.label_values = label_values
+        self.label_vals = label_vals
   
     def set_IDs(self, IDs):
         self.IDs = IDs
+
+    def set_lambdas(self, lambdas):
+        self.lambdas = lambdas
 
     def set_spectra(self, spectra):
         self.spectra = spectra
@@ -52,33 +60,34 @@ class Dataset(object):
     def set_label_names(self, label_names):
         self.label_names = label_names
 
-    def set_label_values(self, label_values):
-        self.label_values = label_values
+    def set_label_vals(self, label_vals):
+        self.label_vals = label_vals
 
     def choose_labels(self, cols):
-        """Updates the label_names and label_values properties
+        """Updates the label_names and label_vals properties
 
         Input: list of column indices corresponding to which to keep
         """
         new_label_names = [self.label_names[i] for i in cols]
         colmask = np.zeros(len(self.label_names), dtype=bool)
         colmask[cols]=1
-        new_label_values = self.label_values[:,colmask]
+        new_label_vals = self.label_vals[:,colmask]
         self.set_label_names(new_label_names)
-        self.set_label_values(new_label_values)
+        self.set_label_vals(new_label_vals)
 
     def choose_spectra(self, mask):
-        """Updates the ID, spectra, label_values properties 
+        """Updates the ID, spectra, label_vals properties 
 
         Input: mask where 1 = keep, 0 = discard
         """
         self.set_IDs(self.IDs[mask])
+        self.set_lambdas(self.lambdas[mask])
         self.set_spectra(self.spectra[mask])
-        self.set_label_values(self.label_values[mask])
+        self.set_label_vals(self.label_vals[mask])
 
     def label_triangle_plot(self, figname):
         """Plots every label against every other label"""
-        fig = triangle.corner(self.label_values, labels=self.label_names,
+        fig = triangle.corner(self.label_vals, labels=self.label_names,
                 show_titles=True, title_args = {"fontsize":12})
         fig.savefig(figname)
         print "Plotting every label against every other"
@@ -99,7 +108,7 @@ def training_set_diagnostics(dataset):
     print "Diagnostic for coverage of training label space"
     for i in range(0, len(dataset.label_names)):
         name = dataset.label_names[i]
-        vals = dataset.label_values[:,i]
+        vals = dataset.label_vals[:,i]
         plt.hist(vals)
         # Note: label names cannot have slashes 
         plt.title("Training Set Distribution of Label: %s" %name)
@@ -116,8 +125,8 @@ def test_set_diagnostics(training_set, test_set):
     # 2-sigma check from training labels
     label_names = training_set.label_names
     nlabels = len(label_names)
-    training_labels = training_set.label_values
-    test_labels = test_set.label_values
+    training_labels = training_set.label_vals
+    test_labels = test_set.label_vals
     test_IDs = test_set.IDs
     mean = np.mean(training_labels, 0)
     stdev = np.std(training_labels, 0)
@@ -164,6 +173,6 @@ def remove_stars(dataset, mask):
     mask: numpy ndarray of booleans. True means "remove"
     """
     ntokeep = 1-np.sum(mask)
-    return Dataset(dataset.IDs[mask], dataset.spectra[mask],
-            dataset.label_names, dataset.label_values[mask])
+    return Dataset(dataset.IDs[mask], dataset.lambdas[mask], 
+            dataset.spectra[mask], dataset.label_names, dataset.label_vals[mask])
     print "New dataset constructed with %s stars included" %ntokeep
