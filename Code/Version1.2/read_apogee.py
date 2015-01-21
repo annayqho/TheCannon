@@ -43,11 +43,12 @@ def get_spectra(files):
     print "Loaded %s stellar spectra" %nstars
    
     # Deal with bad pixels
-    for jj in range(nstars):
-        bad1 = np.logical_or(np.isinf(spectra[jj,:,0]), 
-                np.isinf(spectra[jj,:,1]))
-        bad = np.logical_or(bad1, spectra[jj,:,1] <= 0)
-        print sum(bad)
+ indx= (((data['APOGEE_TARGET1'] & 2**11) != 0)+((data['APOGEE_TARGET1'] & 2**12) != 0)+((data['APOGEE_TARGET1'] & 2**13) != 0))\
+         *((data['APOGEE_TARGET1'] & 2**7) == 0)\
+         *((data['APOGEE_TARGET1'] & 2**8) == 0)\
+         *((data['APOGEE_TARGET2'] & 2**9) == 0)
+         #*((data['APOGEE_TARGET1'] & 2**17) == 0)\
+                 return indx
 
     # Continuum normalize
     contpix = identify_continuum(lambdas, spectra)
