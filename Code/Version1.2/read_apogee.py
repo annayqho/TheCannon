@@ -21,11 +21,11 @@ def get_spectra(files):
     spectra[:,:,1] = flux err values
     """
     
+    nstars = len(files)
     for jj,fits_file in enumerate(files):
         file_in = pyfits.open(fits_file)
         fluxes = np.array(file_in[1].data)
         if jj == 0: 
-            nstars = len(files) 
             npixels = len(fluxes)
             SNRs = np.zeros(nstars)
             lambdas = np.zeros(npixels)
@@ -40,43 +40,47 @@ def get_spectra(files):
         SNRs[jj] = float(file_in[0].header['SNR'])
         spectra[jj, :, 0] = fluxes
         spectra[jj, :, 1] = flux_errs
-    print "Loaded %s stellar spectra" %len(files)
-    
-    # Automatically continuum-normalize
-    normalized_spectra, continua = continuum_normalize_Chebyshev(lambdas, spectra)
+    print "Loaded %s stellar spectra" %nstars
+   
+    # Deal with bad pixels
+    for jj in range(nstars):
+        bad1 = np.logical_or(np.isinf(spectra[jj,:,0]), 
+                np.isinf(spectra[jj,:,1]))
+        bad = np.logical_or(bad1, spectra[jj,:,1] <= 0)
+        print sum(bad)
+
+    # Continuum normalize
+    contpix = identify_continuum(lambdas, spectra)
+    normalized_spectra, continua = continuum_normalize(lambdas, spectra, contpix)
     return lambdas, normalized_spectra, continua, SNRs
 
-def continuum_normalize(lambdas, spectra):
-    """Continuum-normalizes the spectra.
-
-    Create two vectors that contain a) f_bar the ensemble median (or
-    slightly higher quantile) at each pixel, taken over the set of
-    reference objects; b) sigma_f: the variance (formal second moment,
-    interval enclosing the central X% of the distribution at each 
-    pixel; X=68 to 90). Good continuum pixels are those that have 
-    f_bar~1 and sigma_f<<1. Then an (initially by eye) cut on f_bar 
-    and sigma_f may identify (in a very simple fashion) good cont
-    pixels. Drawbacks: assuming label space is covered, but unevenly,
-    then what you do for sigma_f matters."""
+def identify_continuum(lambdas, spectra):
+    """Identifies continuum pixels."""
     
     f_bar = np.median(spectra[:,:,0], axis=0)
     sigma_f = np.var(spectra[:,:,0], axis=0)
+    # f_bar == 0
+    cont1 = f_bar == 0
     # f_bar ~ 1...
-    f_cut = 0.0001
-    cont1 = np.abs(f_bar-1)/1 < f_cut
+    f_cut = 0.001
+    cont2 = np.abs(f_bar-1)/1 < f_cut
     # sigma_f << 1...
     sigma_cut = 0.005
-    cont2 = sigma_f < sigma_cut
-    cont = np.logical_and(cont1, cont2)
-    errorbar(lambdas[0][cont], f_bar[cont], yerr=sigma_f[cont], fmt='ko')
+    cont3 = sigma_f < sigma_cut
+    cont = np.logical_or(cont1, np.logical_and(cont2, cont3))
+    #plot(lambdas, f_bar)
+    #errorbar(lambdas[cont], f_bar[cont], yerr=sigma_f[cont], fmt='ko')
+    return lambdas[cont] 
 
-def continuum_normalize_Chebyshev(lambdas, spectra):
+def continuum_normalize_Chebyshev(lambdas, spectra, contpix):
     """Continuum-normalizes the spectra.
 
     Fit a 2nd order Chebyshev polynomial to each segment 
     and divide each segment by its corresponding polynomial 
 
-    Input: spectra array, 2D float shape nstars,npixels,3
+    Input: lambdas, numpy ndarray floats
+        spectra array, 2D float shape nstars,npixels,3
+        contpix, identified continuum pixels
     Returns: 3D continuum-normalized spectra (nstars, npixels,3)
             2D continuum array (nstars, npixels)
     """
@@ -84,25 +88,12 @@ def continuum_normalize_Chebyshev(lambdas, spectra):
     npixels = len(lambdas)
     continua = np.zeros((nstars, npixels))
     normalized_spectra = np.ones((nstars, npixels, 2))
-    # list of "true" continuum pix, det. here by the Cannon
-    pixlist = list(np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1))
     # We discard the edges of the fluxes: 10 Angstroms, which is ~50 pixels
-    ## I found the regions with flux to be: 
-    ## [321, 3242] [3647, 6047], [6411, 8305]
-    ## With edge cuts: [371, 3192], [3697, 5997], [6461, 8255]
-    ## Corresponding to: [15218, 15743] [15931, 16367] [16549, 16887] 
     ranges = [[371,3192], [3697,5997], [6461,8255]]
-    LARGE = 200.
     for jj in range(nstars):
-        # Mask unphysical pixels
-        bad1 = np.invert(np.logical_and(np.isfinite(spectra[jj,:,0]),  
-            np.isfinite(spectra[jj,:,1])))
-        bad = bad1 | (spectra[jj,:,1] <= 0)
-        spectra[jj,:,0][bad] = 0.
-        spectra[jj,:,1][bad] = np.Inf
         var_array = 100**2*np.ones(npixels)
-        var_array[pixlist] = 0.000
-        ivar = 1. / ((spectra[jj, :, 1] ** 2) + var_array)
+        var_array[contpix] = 0.000
+        ivar = 1. / ((spectra[jj,:,1]**2) + var_array)
         ivar = (np.ma.masked_invalid(ivar)).filled(0)
         for i in range(len(ranges)):
             start, stop = ranges[i][0], ranges[i][1]
@@ -112,17 +103,6 @@ def continuum_normalize_Chebyshev(lambdas, spectra):
             fit = np.polynomial.chebyshev.Chebyshev.fit(x=lambda_cut, 
                     y=spectrum[:,0], w=ivar1, deg=3)
             continua[jj,start:stop] = fit(lambda_cut)
-            normalized_fluxes = spectrum[:,0]/fit(lambda_cut)
-            bad = np.invert(np.isfinite(normalized_fluxes))
-            normalized_fluxes[bad] = 1.
-            normalized_flux_errs = spectrum[:,1]/fit(lambda_cut)
-            bad = np.logical_or(np.invert(np.isfinite(normalized_flux_errs)),
-                    normalized_flux_errs <= 0)
-            normalized_flux_errs[bad] = LARGE
-            normalized_spectra[jj,start:stop,0] = normalized_fluxes 
-            normalized_spectra[jj,start:stop,1] = normalized_flux_errs
-        # One last check for unphysical pixels
-        bad = spectra[jj,:,1] > LARGE
-        normalized_spectra[jj,np.logical_or(bad, bad1),0] = 1.
-        normalized_spectra[jj,np.logical_or(bad, bad1),1] = LARGE
-    return normalized_spectra, continua
+            normalized_spectra[jj,start:stop,0] = spectrum[:,0]/fit(lambda_cut)
+            normalized_spectra[jj,start:stop,1] = spectrum[:,1]/fit(lambda_cut)
+
