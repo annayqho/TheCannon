@@ -302,3 +302,9 @@ The output of these diagnostics with sample plots are listed below.
    then this should look like noise and there should be no systematic structure.
 
 .. image:: residuals_sorted_by_logg.png
+
+3. The autocorrelation of the mean spectral residual. If the functional
+   form of the model is comprehensive enough, then this should be a delta
+   function. 
+
+.. image:: residuals_autocorr.png
