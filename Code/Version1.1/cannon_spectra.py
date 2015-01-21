@@ -94,8 +94,8 @@ def residuals(cannon_set, test_set, model):
         print "Plotting residuals sorted by %s" %label_name
         label_vals = cannon_set.label_vals[:,i]
         sorted_res = res_norm[np.argsort(label_vals)]
-        mu = np.mean(sorted_res)
-        sigma = np.std(sorted_res)
+        mu = np.mean(sorted_res.flatten())
+        sigma = np.std(sorted_res.flatten())
         #lim = np.maximum(np.abs(sorted_res.max()), np.abs(sorted_res.min()))
         plt.imshow(sorted_res, cmap=plt.cm.bwr_r,
                 interpolation="nearest", vmin=mu-3*sigma, vmax=mu+3*sigma,
@@ -108,5 +108,14 @@ def residuals(cannon_set, test_set, model):
         plt.savefig(filename)
         print "File saved as %s" %filename
         plt.close()
-    #for i in range(res.shape(0)):
-    #    res_spec = res[i,:]
+    print "Plotting Auto-Correlation of Mean Residuals"
+    mean_res = res_norm.mean(axis=0)
+    autocorr = np.correlate(mean_res, mean_res, mode="full")
+    plt.plot(autocorr)
+    plt.title("Autocorrelation of Mean Spectral Residual")
+    plt.xlabel("k")
+    plt.ylabel("r_k")
+    filename = "residuals_autocorr.png" 
+    plt.savefig(filename)
+    print "saved %s" %filename
+    plt.close()
