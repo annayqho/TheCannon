@@ -99,9 +99,9 @@ on the training set</li>
 <li><tt class="docutils literal"><span class="pre">test_set_diagnostics</span></tt>: run a set of diagnostics on the inferred labels</li>
 </ul>
 </li>
-<li>Cannon-generated spectra (<tt class="docutils literal"><span class="pre">cannon_spectra</span></tt>)<ul>
-<li><tt class="docutils literal"><span class="pre">draw_spectra</span></tt> in <tt class="docutils literal"><span class="pre">cannon_spectra</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">diagnostics</span></tt> in <tt class="docutils literal"><span class="pre">cannon_spectra</span></tt></li>
+<li>Cannon-generated spectra (<tt class="docutils literal"><span class="pre">spectral_model</span></tt>)<ul>
+<li><tt class="docutils literal"><span class="pre">draw_spectra</span></tt> in <tt class="docutils literal"><span class="pre">spectral_model</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">diagnostics</span></tt> in <tt class="docutils literal"><span class="pre">spectral_model</span></tt></li>
 </ul>
 </li>
 </ol>
@@ -300,12 +300,12 @@ over 2-sigma away from training labels</li>
 <h3>Cannon Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)<a class="headerlink" href="#cannon-spectra-draw-spectra-diagnostics" title="Permalink to this headline">¶</a></h3>
 <p>Now that we have the model and labels for the test objects, <tt class="docutils literal"><span class="pre">The</span> <span class="pre">Cannon</span></tt> can
 &#8220;draw&#8221; spectra for each test object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon_spectra</span> <span class="kn">import</span> <span class="n">draw_spectra</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spectral_model</span> <span class="kn">import</span> <span class="n">draw_spectra</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cannon_set</span> <span class="o">=</span> <span class="n">draw_spectra</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We can now perform a final set of diagnostic checks.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cannon_spectra</span> <span class="kn">import</span> <span class="n">diagnostics</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spectral_model</span> <span class="kn">import</span> <span class="n">diagnostics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diagnostics</span><span class="p">(</span><span class="n">cannon_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
