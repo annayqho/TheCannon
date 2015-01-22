@@ -1,6 +1,3 @@
-Before the meeting...
-- Do the auto-correlation on the residual spectrum and see if we get a delta function...plot it (one last diagnostic! you can do it!)
-
 More things to do...
 - Learn how to use gh-pages
 - Implement continuum normalization

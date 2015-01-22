@@ -42,14 +42,6 @@ def get_spectra(files):
         spectra[jj, :, 1] = flux_errs
     print "Loaded %s stellar spectra" %nstars
    
-    # Deal with bad pixels
- indx= (((data['APOGEE_TARGET1'] & 2**11) != 0)+((data['APOGEE_TARGET1'] & 2**12) != 0)+((data['APOGEE_TARGET1'] & 2**13) != 0))\
-         *((data['APOGEE_TARGET1'] & 2**7) == 0)\
-         *((data['APOGEE_TARGET1'] & 2**8) == 0)\
-         *((data['APOGEE_TARGET2'] & 2**9) == 0)
-         #*((data['APOGEE_TARGET1'] & 2**17) == 0)\
-                 return indx
-
     # Continuum normalize
     contpix = identify_continuum(lambdas, spectra)
     normalized_spectra, continua = continuum_normalize(lambdas, spectra, contpix)
