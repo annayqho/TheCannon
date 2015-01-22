@@ -93,11 +93,11 @@ def do_one_regression(lambdas, spectra, x):
     return do_one_regression_at_fixed_scatter(
             lambdas, spectra, x, scatter = best_scatter) + (best_scatter, )
 
-def train_model(training_set):
+def train_model(reference_set):
     """
     This determines the coefficients of the model using the training data
 
-    Input: the training_set, a Dataset object (see dataset.py)
+    Input: the reference_set, a Dataset object (see dataset.py)
     Returns: the model, which consists of...
     -------
     coefficients: ndarray, (npixels, nstars, 15)
@@ -108,11 +108,11 @@ def train_model(training_set):
     the label vector
     """
     print "Training model..."
-    label_names = training_set.label_names
-    label_vals = training_set.label_vals #(nstars, nlabels)
+    label_names = reference_set.label_names
+    label_vals = reference_set.label_vals #(nstars, nlabels)
     nlabels = len(label_names)
-    lambdas = training_set.lambdas
-    spectra = training_set.spectra #(nstars, npixels, 2)
+    lambdas = reference_set.lambdas
+    spectra = reference_set.spectra #(nstars, npixels, 2)
     nstars = spectra.shape[0]
     npixels = len(lambdas)
 
@@ -147,7 +147,7 @@ def train_model(training_set):
     print "Done training model"
     return model
 
-def model_diagnostics(training_set, model):
+def model_diagnostics(reference_set, model):
     """Run a set of diagnostics on the model.
 
     Plot the 0th order coefficients as the baseline spectrum. 
@@ -159,20 +159,32 @@ def model_diagnostics(training_set, model):
     Histogram of the chi squareds of the fits.
     Dotted line corresponding to DOF = npixels - nlabels
     """
-    lambdas = training_set.lambdas
-    label_names = training_set.label_names
+    lambdas = reference_set.lambdas
+    label_names = reference_set.label_names
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
    
     # Baseline spectrum with continuum
     baseline_spec = coeffs_all[:,0]
-    plt.plot(lambdas, baseline_spec)
+    fig, axarr = plt.subplots(2, sharex=True)
+    plt.xlabel(r"Wavelength $\lambda (\AA)$")
+    plt.xlim(min(contpix_lambda), max(contpix_lambda))
+    ax = axarr[0]
+    ax.plot(lambdas, baseline_spec)
     contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
         usecols = (0,), unpack =1))
     y = [1]*len(contpix_lambda)
-    plt.scatter(contpix_lambda, y)
-    plt.title("Baseline Spectrum with Continuum Pixels")
-    plt.xlabel(r"Wavelength $\lambda (\AA)$")
-    plt.ylabel(r"$\theta_0$")
+    ax.scatter(contpix_lambda, y, s=1)
+    ax.set_title("Baseline Spectrum with Continuum Pixels")
+    ax.set_ylabel(r'$\theta_0$' + ", the leading fit coefficient")
+    ax = axarr[1]
+    ax.plot(lambdas, baseline_spec)
+    contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
+        usecols = (0,), unpack =1))
+    ax.scatter(contpix_lambda, y, s=1)
+    ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
+    ax.set_ylabel(r'$\theta_0$' + ", the leading fit coefficient")
+    ax.set_ylim(0.95, 1.05)
+
     filename = "baseline_spec_with_cont_pix.png"
     print "Diagnostic plot: fitted 0th order spectrum, cont pix overlaid." 
     print "Saved as %s" %filename
@@ -185,8 +197,8 @@ def model_diagnostics(training_set, model):
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
     for i in range(nlabels):
         ax = axarr[i]
-        ax.set_ylabel(r"$\theta_%s$" %i)
-        ax.set_title(r"$%s$" %label_names[i])
+        ax.set_ylabel(r"$\theta_%s$" %(i+1) + ", first-order fit coefficient")
+        ax.set_title("First-Order Fit Coefficient for "+r"$%s$"%label_names[i])
         ax.plot(lambdas, coeffs_all[:,i+1])
     print "Diagnostic plot: leading coefficients as a function of wavelength."
     filename = "leading_coeffs.png"
