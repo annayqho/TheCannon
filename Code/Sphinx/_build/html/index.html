@@ -134,8 +134,8 @@ and must not contain any &#8216;/&#8217;s</li>
 <li>The first column must be strings corresponding to the stellar IDs</li>
 <li>The remaining entries must be floats corresponding to the label values</li>
 </ol>
-<div class="section" id="reading-spectra-get-spectra">
-<h4>Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)<a class="headerlink" href="#reading-spectra-get-spectra" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="a-reading-spectra-get-spectra">
+<h4>1a. Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)<a class="headerlink" href="#a-reading-spectra-get-spectra" title="Permalink to this headline">¶</a></h4>
 <p>We construct the first input: the list of filenames corresponding to the
 reference stars (in this case, APOGEE .fits files). In our example, the filenames
 happen to be the first column in the reference labels text file,
@@ -159,8 +159,8 @@ spectra.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="reading-labels-get-reference-labels">
-<h4>Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)<a class="headerlink" href="#reading-labels-get-reference-labels" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="b-reading-labels-get-reference-labels">
+<h4>1b. Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)<a class="headerlink" href="#b-reading-labels-get-reference-labels" title="Permalink to this headline">¶</a></h4>
 <p>We construct the second input: the .txt file containing reference labels in an
 ASCII table, with requirements described above. In this example, the .txt file
 is called <tt class="docutils literal"><span class="pre">reference_labels.txt</span></tt>. The method <tt class="docutils literal"><span class="pre">get_reference_labels</span></tt> is used
@@ -170,8 +170,8 @@ to retrieve object IDs, label names, and label values.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="creating-tailoring-a-dataset-object-choose-labels-choose-spectra">
-<h4>Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)<a class="headerlink" href="#creating-tailoring-a-dataset-object-choose-labels-choose-spectra" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="c-creating-tailoring-a-dataset-object-choose-labels-choose-spectra">
+<h4>1c. Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)<a class="headerlink" href="#c-creating-tailoring-a-dataset-object-choose-labels-choose-spectra" title="Permalink to this headline">¶</a></h4>
 <p>A <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">dataset.py</span></tt>) is initialized.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span>
@@ -202,8 +202,8 @@ Teff and logg cutoffs.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="reference-set-diagnostics-reference-set-diagnostics">
-<h4>reference set diagnostics (reference_set_diagnostics)<a class="headerlink" href="#reference-set-diagnostics-reference-set-diagnostics" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="d-reference-set-diagnostics-reference-set-diagnostics">
+<h4>1d. Reference set diagnostics (reference_set_diagnostics)<a class="headerlink" href="#d-reference-set-diagnostics-reference-set-diagnostics" title="Permalink to this headline">¶</a></h4>
 <p>Now, the reference set has been constructed. To let the user examine whether
 things are going smoothly, <em>The Cannon</em> can print out a set of reference set
 diagnostics.</p>
@@ -212,17 +212,11 @@ diagnostics.</p>
 </pre></div>
 </div>
 <p>The output of these diagnostics, with examples, are listed below.</p>
-<ol class="arabic simple">
-<li>A histogram showing the distribution of SNR in the reference set</li>
-</ol>
+<p>1.1) A histogram showing the distribution of SNR in the reference set</p>
 <a class="reference internal image-reference" href="_images/referenceset_SNRdist.png"><img alt="_images/referenceset_SNRdist.png" src="_images/referenceset_SNRdist.png" style="width: 400pt;" /></a>
-<ol class="arabic simple" start="2">
-<li>A histogram for each label showing its coverage in label space</li>
-</ol>
+<p>1.2) A histogram for each label showing its coverage in label space</p>
 <a class="reference internal image-reference" href="_images/referenceset_labeldist_Teff.png"><img alt="_images/referenceset_labeldist_Teff.png" src="_images/referenceset_labeldist_Teff.png" style="width: 400pt;" /></a>
-<ol class="arabic simple" start="3">
-<li>A &#8220;triangle plot&#8221; that shows every label plotted against every other</li>
-</ol>
+<p>1.3) A &#8220;triangle plot&#8221; that shows every label plotted against every other</p>
 <a class="reference internal image-reference" href="_images/referenceset_labels_triangle.png"><img alt="_images/referenceset_labels_triangle.png" src="_images/referenceset_labels_triangle.png" style="width: 400pt;" /></a>
 </div>
 </div>
@@ -252,20 +246,20 @@ print out a set of model diagnostics.</p>
 </pre></div>
 </div>
 <p>The output of these diagnostics with sample plots are listed below.</p>
-<ol class="arabic simple">
-<li>Plot of the baseline spectrum (0th order coefficients) as a
-function of wavelength.</li>
-</ol>
+<dl class="docutils">
+<dt>3.1) Plot of the baseline spectrum (0th order coefficients) as a</dt>
+<dd>function of wavelength.</dd>
+</dl>
 <a class="reference internal image-reference" href="_images/baseline_spec_with_cont_pix.png"><img alt="_images/baseline_spec_with_cont_pix.png" src="_images/baseline_spec_with_cont_pix.png" style="width: 400pt;" /></a>
-<ol class="arabic simple" start="2">
-<li>Plot of the leading coefficients of each label as a function
-of wavelength</li>
-</ol>
+<dl class="docutils">
+<dt>3.2) Plot of the leading coefficients of each label as a function</dt>
+<dd>of wavelength</dd>
+</dl>
 <a class="reference internal image-reference" href="_images/leading_coeffs.png"><img alt="_images/leading_coeffs.png" src="_images/leading_coeffs.png" style="width: 400pt;" /></a>
-<ol class="arabic simple" start="3">
-<li>Histogram of the reduced chi squareds of the fits (normalized by DOF,
-where DOF = npixels-nlabels)</li>
-</ol>
+<dl class="docutils">
+<dt>3.3) Histogram of the reduced chi squareds of the fits (normalized by DOF,</dt>
+<dd>where DOF = npixels-nlabels)</dd>
+</dl>
 <a class="reference internal image-reference" href="_images/modelfit_redchisqs.png"><img alt="_images/modelfit_redchisqs.png" src="_images/modelfit_redchisqs.png" style="width: 400pt;" /></a>
 </div>
 <div class="section" id="step-4-the-cannon-s-test-step-infer-labels-test-set-diagnostics">
@@ -283,21 +277,17 @@ print out a set of test set diagnostics.</p>
 </pre></div>
 </div>
 <p>The output of these diagnostics with sample plots are listed below.</p>
-<ol class="arabic simple">
-<li>For each label, a list of flagged stars for which test labels are
-over 2-sigma away from reference labels</li>
-<li>Triangle plot, each test label plotted against every other test label</li>
-</ol>
+<p>4.1) For each label, a list of flagged stars for which test labels are
+over 2-sigma away from reference labels</p>
+<p>4.2) Triangle plot, each test label plotted against every other test label</p>
 <a class="reference internal image-reference" href="_images/testset_labels_triangle.png"><img alt="_images/testset_labels_triangle.png" src="_images/testset_labels_triangle.png" style="width: 400pt;" /></a>
-<ol class="arabic simple" start="3">
-<li>1-1 plots, for each label, reference values plotted against test values</li>
-</ol>
+<p>4.3) 1-1 plots, for each label, reference values plotted against test values</p>
 <a class="reference internal image-reference" href="_images/1to1_labelTeff.png"><img alt="_images/1to1_labelTeff.png" src="_images/1to1_labelTeff.png" style="width: 300pt;" /></a>
 <a class="reference internal image-reference" href="_images/1to1_labellogg.png"><img alt="_images/1to1_labellogg.png" src="_images/1to1_labellogg.png" style="width: 300pt;" /></a>
 <a class="reference internal image-reference" href="_images/1to1_label[MH].png"><img alt="_images/1to1_label[MH].png" src="_images/1to1_label[MH].png" style="width: 300pt;" /></a>
 </div>
-<div class="section" id="cannon-spectra-draw-spectra-diagnostics">
-<h3>Cannon Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)<a class="headerlink" href="#cannon-spectra-draw-spectra-diagnostics" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="step-5-model-spectra-draw-spectra-diagnostics">
+<h3>Step 5: Model Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)<a class="headerlink" href="#step-5-model-spectra-draw-spectra-diagnostics" title="Permalink to this headline">¶</a></h3>
 <p>Now that we have the model and labels for the test objects, <tt class="docutils literal"><span class="pre">The</span> <span class="pre">Cannon</span></tt> can
 &#8220;draw&#8221; spectra for each test object.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spectral_model</span> <span class="kn">import</span> <span class="n">draw_spectra</span>
@@ -310,23 +300,23 @@ over 2-sigma away from reference labels</li>
 </pre></div>
 </div>
 <p>The output of these diagnostics with sample plots are listed below.</p>
-<ol class="arabic simple">
-<li>A directory called SpectrumFits containing (for 10 randomly-selected stars)
-the Cannon fitted spectra overlaid with the &#8216;true&#8217; (data) spectra,
-as well as the two compared in a 1-to-1 plot.</li>
-</ol>
+<dl class="docutils">
+<dt>5.1) A directory called SpectrumFits containing (for 10 randomly-selected stars)</dt>
+<dd>the Cannon fitted spectra overlaid with the &#8216;true&#8217; (data) spectra,
+as well as the two compared in a 1-to-1 plot.</dd>
+</dl>
 <img alt="_images/Star500.png" src="_images/Star500.png" />
-<ol class="arabic simple" start="2">
-<li>For each label, the residuals of the spectra fits stacked and sorted
-by that label. If the functional form of the model is comprehensive enough,
-then this should look like noise and there should be no systematic structure.</li>
-</ol>
+<dl class="docutils">
+<dt>5.2) For each label, the residuals of the spectra fits stacked and sorted</dt>
+<dd>by that label. If the functional form of the model is comprehensive enough,
+then this should look like noise and there should be no systematic structure.</dd>
+</dl>
 <img alt="_images/residuals_sorted_by_logg.png" src="_images/residuals_sorted_by_logg.png" />
-<ol class="arabic simple" start="3">
-<li>The autocorrelation of the mean spectral residual. If the functional
-form of the model is comprehensive enough, then this should be a delta
-function.</li>
-</ol>
+<dl class="docutils">
+<dt>5.3) The autocorrelation of the mean spectral residual. If the functional</dt>
+<dd>form of the model is comprehensive enough, then this should be a delta
+function.</dd>
+</dl>
 <img alt="_images/residuals_autocorr.png" src="_images/residuals_autocorr.png" />
 </div>
 </div>
@@ -348,16 +338,16 @@ function.</li>
 </li>
 <li><a class="reference internal" href="#using-the-cannon">Using <em>The Cannon</em></a><ul>
 <li><a class="reference internal" href="#step-1-construct-a-set-of-reference-object-from-apogee-files">Step 1: Construct a set of reference object from APOGEE files</a><ul>
-<li><a class="reference internal" href="#reading-spectra-get-spectra">Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)</a></li>
-<li><a class="reference internal" href="#reading-labels-get-reference-labels">Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)</a></li>
-<li><a class="reference internal" href="#creating-tailoring-a-dataset-object-choose-labels-choose-spectra">Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)</a></li>
-<li><a class="reference internal" href="#reference-set-diagnostics-reference-set-diagnostics">reference set diagnostics (reference_set_diagnostics)</a></li>
+<li><a class="reference internal" href="#a-reading-spectra-get-spectra">1a. Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)</a></li>
+<li><a class="reference internal" href="#b-reading-labels-get-reference-labels">1b. Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)</a></li>
+<li><a class="reference internal" href="#c-creating-tailoring-a-dataset-object-choose-labels-choose-spectra">1c. Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)</a></li>
+<li><a class="reference internal" href="#d-reference-set-diagnostics-reference-set-diagnostics">1d. Reference set diagnostics (reference_set_diagnostics)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#step-2-construct-a-set-of-test-objects-from-apogee-files">Step 2: Construct a set of test objects from APOGEE files</a></li>
 <li><a class="reference internal" href="#step-3-the-cannon-s-training-step-train-model-model-diagnostics">Step 3: <em>The Cannon</em>&#8216;s Training Step (<tt class="docutils literal"><span class="pre">train_model</span></tt>, <tt class="docutils literal"><span class="pre">model_diagnostics</span></tt>)</a></li>
 <li><a class="reference internal" href="#step-4-the-cannon-s-test-step-infer-labels-test-set-diagnostics">Step 4: <em>The Cannon</em>&#8216;s Test Step (<tt class="docutils literal"><span class="pre">infer_labels</span></tt>, <tt class="docutils literal"><span class="pre">test_set_diagnostics</span></tt>)</a></li>
-<li><a class="reference internal" href="#cannon-spectra-draw-spectra-diagnostics">Cannon Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)</a></li>
+<li><a class="reference internal" href="#step-5-model-spectra-draw-spectra-diagnostics">Step 5: Model Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)</a></li>
 </ul>
 </li>
 </ul>

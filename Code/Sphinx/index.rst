@@ -99,8 +99,8 @@ The following requirements govern (2):
 2. The first column must be strings corresponding to the stellar IDs
 3. The remaining entries must be floats corresponding to the label values
 
-Reading spectra (``get_spectra``)
-+++++++++++++++++++++++++++++++++
+1a. Reading spectra (``get_spectra``)
++++++++++++++++++++++++++++++++++++++
 
 We construct the first input: the list of filenames corresponding to the 
 reference stars (in this case, APOGEE .fits files). In our example, the filenames
@@ -124,8 +124,8 @@ spectra.
     >>> from read_apogee import get_spectra
     >>> lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1)
 
-Reading labels (``get_reference_labels``)
-+++++++++++++++++++++++++++++++++++++++++
+1b. Reading labels (``get_reference_labels``)
++++++++++++++++++++++++++++++++++++++++++++++
 
 We construct the second input: the .txt file containing reference labels in an 
 ASCII table, with requirements described above. In this example, the .txt file
@@ -135,8 +135,8 @@ to retrieve object IDs, label names, and label values.
     >>> from read_labels import get_reference_labels
     >>> IDs, all_label_names, all_label_values = get_reference_labels(readin)
 
-Creating & tailoring a ``Dataset`` object (``choose_labels``, ``choose_spectra``)
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1c. Creating & tailoring a ``Dataset`` object (``choose_labels``, ``choose_spectra``)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 A ``Dataset`` object (``dataset.py``) is initialized. 
 
@@ -167,8 +167,8 @@ Teff and logg cutoffs.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
     >>> reference_set.choose_spectra(mask)
 
-reference set diagnostics (reference_set_diagnostics)
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
+1d. Reference set diagnostics (reference_set_diagnostics)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Now, the reference set has been constructed. To let the user examine whether 
 things are going smoothly, *The Cannon* can print out a set of reference set 
@@ -179,17 +179,17 @@ diagnostics.
 
 The output of these diagnostics, with examples, are listed below.
 
-1. A histogram showing the distribution of SNR in the reference set
+1.1) A histogram showing the distribution of SNR in the reference set
 
 .. image:: referenceset_SNRdist.png
     :width: 400pt
 
-2. A histogram for each label showing its coverage in label space
+1.2) A histogram for each label showing its coverage in label space
 
 .. image:: referenceset_labeldist_Teff.png
     :width: 400pt
    
-3. A "triangle plot" that shows every label plotted against every other 
+1.3) A "triangle plot" that shows every label plotted against every other 
 
 .. image:: referenceset_labels_triangle.png
     :width: 400pt
@@ -222,19 +222,19 @@ print out a set of model diagnostics.
 
 The output of these diagnostics with sample plots are listed below.
 
-1. Plot of the baseline spectrum (0th order coefficients) as a 
+3.1) Plot of the baseline spectrum (0th order coefficients) as a 
    function of wavelength.
 
 .. image:: baseline_spec_with_cont_pix.png
     :width: 400pt
 
-2. Plot of the leading coefficients of each label as a function 
+3.2) Plot of the leading coefficients of each label as a function 
    of wavelength
 
 .. image:: leading_coeffs.png
     :width: 400pt
 
-3. Histogram of the reduced chi squareds of the fits (normalized by DOF, 
+3.3) Histogram of the reduced chi squareds of the fits (normalized by DOF, 
    where DOF = npixels-nlabels)
 
 .. image:: modelfit_redchisqs.png
@@ -257,14 +257,15 @@ print out a set of test set diagnostics.
 
 The output of these diagnostics with sample plots are listed below.
 
-1. For each label, a list of flagged stars for which test labels are 
-   over 2-sigma away from reference labels
-2. Triangle plot, each test label plotted against every other test label
+4.1) For each label, a list of flagged stars for which test labels are 
+over 2-sigma away from reference labels
+
+4.2) Triangle plot, each test label plotted against every other test label
 
 .. image:: testset_labels_triangle.png
     :width: 400pt
 
-3. 1-1 plots, for each label, reference values plotted against test values
+4.3) 1-1 plots, for each label, reference values plotted against test values
 
 .. image:: 1to1_labelTeff.png
     :width: 300pt
@@ -275,8 +276,8 @@ The output of these diagnostics with sample plots are listed below.
 .. image:: 1to1_label[MH].png
     :width: 300pt
 
-Cannon Spectra (``draw_spectra``, ``diagnostics``)
---------------------------------------------------
+Step 5: Model Spectra (``draw_spectra``, ``diagnostics``)
+---------------------------------------------------------
 
 Now that we have the model and labels for the test objects, ``The Cannon`` can
 "draw" spectra for each test object.
@@ -291,19 +292,19 @@ We can now perform a final set of diagnostic checks.
 
 The output of these diagnostics with sample plots are listed below.
 
-1. A directory called SpectrumFits containing (for 10 randomly-selected stars)
+5.1) A directory called SpectrumFits containing (for 10 randomly-selected stars)
    the Cannon fitted spectra overlaid with the 'true' (data) spectra, 
    as well as the two compared in a 1-to-1 plot.
 
 .. image:: Star500.png
 
-2. For each label, the residuals of the spectra fits stacked and sorted 
+5.2) For each label, the residuals of the spectra fits stacked and sorted 
    by that label. If the functional form of the model is comprehensive enough,
    then this should look like noise and there should be no systematic structure.
 
 .. image:: residuals_sorted_by_logg.png
 
-3. The autocorrelation of the mean spectral residual. If the functional
+5.3) The autocorrelation of the mean spectral residual. If the functional
    form of the model is comprehensive enough, then this should be a delta
    function. 
 

@@ -186,7 +186,7 @@ def model_diagnostics(training_set, model):
     for i in range(nlabels):
         ax = axarr[i]
         ax.set_ylabel(r"$\theta_%s$" %i)
-        ax.set_title("%s" %label_names[i])
+        ax.set_title(r"$%s$" %label_names[i])
         ax.plot(lambdas, coeffs_all[:,i+1])
     print "Diagnostic plot: leading coefficients as a function of wavelength."
     filename = "leading_coeffs.png"

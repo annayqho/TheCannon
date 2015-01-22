@@ -26,7 +26,7 @@ class Dataset(object):
         spectra[:,:,0] = flux (spectrum)
         spectra[:,:,1] = flux error array
     labels: numpy ndarray, list, optional
-        Training labels for reference set, but None for test set
+        Reference labels for reference set, but None for test set
     
     Methods
     -------
@@ -86,46 +86,37 @@ class Dataset(object):
 
     def label_triangle_plot(self, figname):
         """Plots every label against every other label"""
-        fig = triangle.corner(self.label_vals, labels=self.label_names,
+        texlabels = []
+        for label in self.label_names:
+            texlabels.append(r"$%s$" %label)
+        fig = triangle.corner(self.label_vals, labels=texlabels,
                 show_titles=True, title_args = {"fontsize":12})
+        #fig.gca().annotate("Label Triangle Plot")
         fig.savefig(figname)
         print "Plotting every label against every other"
         print "Saved fig %s" %figname
         plt.close(fig)
 
-def reference_set_diagnostics(dataset):
-    # Plot SNR distribution
-    print "Diagnostic for SNR of reference set"
-    plt.hist(dataset.SNRs)
+def dataset_prediagnostics(reference_set, test_set):
+    # Plot SNR distributions
+    print "Diagnostic for SNRs of reference and survey stars"
+    plt.hist(reference_set.SNRs, alpha=0.5, label="Ref Stars")
+    plt.hist(test_set.SNRs, alpha=0.5, label="Survey Stars")
+    plt.legend(loc='upper right')
     plt.xscale('log')
-    plt.title("Logspace Distribution of Formal SNR in the Training Set")
+    plt.title("SNR Comparison Between Reference & Test Stars")
     plt.xlabel("log(Formal SNR)")
     plt.ylabel("Number of Objects")
-    figname = "referenceset_SNRdist.png"
+    figname = "SNRdist.png"
     plt.savefig(figname)
     plt.close()
     print "Saved fig %s" %figname
-    
-    # Plot reference label distributions
-    print "Diagnostic for coverage of reference label space"
-    for i in range(0, len(dataset.label_names)):
-        name = dataset.label_names[i]
-        vals = dataset.label_vals[:,i]
-        plt.hist(vals)
-        # Note: label names cannot have slashes 
-        plt.title("Training Set Distribution of Label: %s" %name)
-        plt.xlabel(name)
-        plt.ylabel("Number of Objects")
-        figname = "referenceset_labeldist_%s.png" %name
-        plt.savefig(figname)
-        print "Saved fig %s" %figname
-        plt.close()
-    
-    # Plot all reference labels against each other
-    figname = "referenceset_labels_triangle.png"
-    dataset.label_triangle_plot(figname)
 
-def test_set_diagnostics(reference_set, test_set):
+    # Plot all reference labels against each other
+    figname = "reference_labels_triangle.png"
+    reference_set.label_triangle_plot(figname)
+
+def dataset_postdiagnostics(reference_set, test_set):
     # 2-sigma check from reference labels
     label_names = reference_set.label_names
     nlabels = len(label_names)
@@ -141,29 +132,29 @@ def test_set_diagnostics(reference_set, test_set):
         test_vals = test_labels[:,i]
         warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
         flagged_stars = test_IDs[warning]
-        filename = "flagged_stars_%s.txt" %label_name
+        filename = "flagged_stars_%s.txt" %i
         output = open(filename, 'w')
         for star in test_IDs[warning]:
             output.write(star + '\n')
         output.close()
-        print "Training label %s" %label_name
+        print "Reference label %s" %label_name
         print "flagged %s stars beyond 2-sig of reference labels" %sum(warning)
         print "Saved list %s" %filename
-    
-    # Plot all output labels against each other
-    figname = "testset_labels_triangle.png"
+
+    # Plot all survey labels against each other
+    figname = "survey_labels_triangle.png"
     test_set.label_triangle_plot(figname)
-    
+
     # 1-1 plots of all labels
     for i in range(nlabels):
         name = label_names[i]
         orig = reference_labels[:,i]
         cannon = test_labels[:,i]
         plt.scatter(orig, cannon)
-        plt.xlabel("Training Value")
+        plt.xlabel("Reference Value")
         plt.ylabel("Cannon Output Value")
-        plt.title("1-1 Plot of Label %s" %name)
-        figname = "1to1_label%s.png" %name
+        plt.title("1-1 Plot of Label r'$%s$'" %name)
+        figname = "1to1_label_%s.png" %i
         plt.savefig(figname)
         print "Diagnostic for label output vs. input"
         print "Saved fig %s" %figname

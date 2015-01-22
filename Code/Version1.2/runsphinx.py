@@ -31,12 +31,12 @@ logg_cut = 100.
 mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
 reference_set.choose_spectra(mask)
 
-from dataset import reference_set_diagnostics
-reference_set_diagnostics(reference_set)
-
 test_set = Dataset(IDs=reference_set.IDs, SNRs=reference_set.SNRs,
         lambdas=lambdas, spectra=reference_set.spectra, 
         label_names=reference_set.label_names)
+
+from dataset import dataset_prediagnostics
+dataset_prediagnostics(reference_set, test_set)
 
 from cannon1_train_model import train_model
 model = train_model(reference_set)
@@ -47,8 +47,8 @@ model_diagnostics(reference_set, model)
 from cannon2_infer_labels import infer_labels
 test_set, covs = infer_labels(model, test_set)
 
-from dataset import test_set_diagnostics
-test_set_diagnostics(reference_set, test_set)
+from dataset import dataset_postdiagnostics
+dataset_postdiagnostics(reference_set, test_set)
 
 from spectral_model import draw_spectra
 cannon_set = draw_spectra(model, test_set)

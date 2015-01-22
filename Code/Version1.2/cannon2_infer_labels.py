@@ -75,6 +75,7 @@ def infer_labels(model, test_set):
         labels_all[jj,:] = labels
         MCM_rotate_all[jj,:,:] = MCM_rotate
         covs_all[jj,:,:] = covs
-    
+
     test_set.set_label_vals(labels_all)
     return test_set, covs_all
+

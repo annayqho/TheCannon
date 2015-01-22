@@ -13,8 +13,9 @@ def get_reference_labels(filename):
     """
 
     with open(filename, 'r') as f:
-        all_labels = f.readline().split() # ignore the hash
-    label_names = all_labels[1:]
+        all_labels = f.readline().split('  ')
+    all_labels = filter(None, all_labels)
+    label_names = all_labels[1:] # ignore the hash
     IDs = np.loadtxt(filename, usecols = (0,), dtype='string')
     print "Loaded stellar IDs, format: %s" %IDs[0]
     nlabels = len(label_names)
