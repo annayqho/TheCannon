@@ -58,33 +58,33 @@ spectra, see Ness et al. 2015.</p>
 <p><em>The Cannon</em> has two fundamental steps that together constitute a
 process of <em>label transfer.</em></p>
 <ol class="arabic simple">
-<li>The <em>Training Step</em>: <em>reference objects</em> are a subset of spectra in the
-survey for which corresponding stellar labels are known with high fidelity,
+<li>The <em>Training Step</em>: <em>reference stars</em> are a subset of the
+survey for which labels are known with high fidelity,
 for calib reasons or otherwise. Using both the spectra and labels for
 these objects, <em>The Cannon</em> solves for a flexible model that describes
 how the flux in every pixel of any given continuum-normalized spectrum
 depends on labels.</li>
 <li>The <em>Test Step</em>: the model found in Step 1 is assumed to hold for all of
-the objects in the survey, including those outside the training set
-(dubbed <em>survey objects</em>). Thus, the spectra of the survey objects and
+the objects in the survey, including those outside the reference stars
+(dubbed <em>survey stars</em>). Thus, the spectra of the survey stars and
 the model allow us to solve for - or infer - the labels of the survey
-objects.</li>
+stars.</li>
 </ol>
 </div>
 <div class="section" id="overview-of-the-cannon-software">
 <h3>Overview of <em>The Cannon</em> Software<a class="headerlink" href="#overview-of-the-cannon-software" title="Permalink to this headline">¶</a></h3>
 <p>This software package breaks up <em>The Cannon</em> into the following steps and methods.</p>
 <ol class="arabic simple">
-<li>Construct a training set from APOGEE files<ul>
+<li>Construct reference stars from APOGEE files<ul>
 <li><tt class="docutils literal"><span class="pre">get_spectra</span></tt>: read spectra, continuum-normalize</li>
 <li><tt class="docutils literal"><span class="pre">get_training_labels</span></tt>: retrieve stellar IDs, training label names and values</li>
 <li><tt class="docutils literal"><span class="pre">choose_labels</span></tt>: (optional) select a subset of labels</li>
 <li><tt class="docutils literal"><span class="pre">choose_spectra</span></tt>: (optional) select a subset of spectra</li>
 <li><tt class="docutils literal"><span class="pre">training_set_diagnostics</span></tt>: (optional) run a set of diagnostics
-on the training set</li>
+on the reference stars</li>
 </ul>
 </li>
-<li>Construct a test set from APOGEE files<ul>
+<li>Construct test stars from APOGEE files<ul>
 <li><tt class="docutils literal"><span class="pre">get_spectra</span></tt>: read spectra, continuum-normalize</li>
 <li><tt class="docutils literal"><span class="pre">choose_spectra</span></tt>: (optional) select a subset of spectra</li>
 </ul>
@@ -94,7 +94,7 @@ on the training set</li>
 <li><tt class="docutils literal"><span class="pre">model_diagnostics</span></tt>: run a set of diagnostics on the model</li>
 </ul>
 </li>
-<li>Step 2 of The Cannon: infer labels for all test objects<ul>
+<li>Step 2 of The Cannon: infer labels for all survey stars<ul>
 <li><tt class="docutils literal"><span class="pre">infer_labels</span></tt>: infer labels using model</li>
 <li><tt class="docutils literal"><span class="pre">test_set_diagnostics</span></tt>: run a set of diagnostics on the inferred labels</li>
 </ul>
@@ -110,22 +110,22 @@ on the training set</li>
 <div class="section" id="using-the-cannon">
 <h2>Using <em>The Cannon</em><a class="headerlink" href="#using-the-cannon" title="Permalink to this headline">¶</a></h2>
 <p>The details of using this package are provided in the following
-sections, along with an example of usage. In the example, the training set
+sections, along with an example of usage. In the example, the reference stars
 consists of 553 open and globular cluster stars from APOGEE DR10 and,
-for simplicity, the same set of stars as the test set.</p>
+for simplicity, the same set of stars as the survey stars.</p>
 <div class="section" id="step-1-construct-a-training-set-from-apogee-files">
 <h3>Step 1: Construct a training set from APOGEE files<a class="headerlink" href="#step-1-construct-a-training-set-from-apogee-files" title="Permalink to this headline">¶</a></h3>
-<p>The training set is a set of stars from the survey under consideration
-for which the user has spectra and also high-fidelity labels (that is,
+<p>The reference stars in the survey under consideration
+are those which the user has spectra and also high-fidelity labels (that is,
 stellar parameters and element abundances that are deemed both accurate
-and precise.) The set of reference objects is critical, as the label
-transfer to the survey objects can only be as good as the quality of the
-training set.</p>
+and precise.) The set of reference stars is critical, as the label
+transfer to the survey stars can only be as good as the quality of the
+reference stars.</p>
 <p>The user must construct the following inputs:</p>
 <ol class="arabic simple">
-<li>a list of filenames corresponding to the training data
+<li>a list of filenames corresponding to the reference data
 (in this case, APOGEE .fits files)</li>
-<li>a .txt file containing training labels in an ASCII table.</li>
+<li>a .txt file containing reference labels in an ASCII table.</li>
 </ol>
 <p>The following requirements govern (2):</p>
 <ol class="arabic simple">
@@ -137,11 +137,11 @@ and must not contain any &#8216;/&#8217;s</li>
 <div class="section" id="reading-spectra-get-spectra">
 <h4>Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)<a class="headerlink" href="#reading-spectra-get-spectra" title="Permalink to this headline">¶</a></h4>
 <p>We construct the first input: the list of filenames corresponding to the
-training data (in this case, APOGEE .fits files). In our example, the filenames
+reference stars (in this case, APOGEE .fits files). In our example, the filenames
 happen to be the first column in the training labels text file,
-<tt class="docutils literal"><span class="pre">traininglabels.txt</span></tt>. So we simply read the first column of this file.</p>
+<tt class="docutils literal"><span class="pre">reference_labels.txt</span></tt>. So we simply read the first column of this file.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">readin</span> <span class="o">=</span> <span class="s">&quot;traininglabels.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">readin</span> <span class="o">=</span> <span class="s">&quot;reference_labels.txt&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">readin</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;string&#39;</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filenames1</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">)):</span> <span class="c">#incorporate file location info</span>
@@ -159,14 +159,14 @@ spectra.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="reading-labels-get-training-labels">
-<h4>Reading labels (<tt class="docutils literal"><span class="pre">get_training_labels</span></tt>)<a class="headerlink" href="#reading-labels-get-training-labels" title="Permalink to this headline">¶</a></h4>
-<p>We construct the second input: the .txt file containing training labels in an
+<div class="section" id="reading-labels-get-reference-labels">
+<h4>Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)<a class="headerlink" href="#reading-labels-get-reference-labels" title="Permalink to this headline">¶</a></h4>
+<p>We construct the second input: the .txt file containing reference labels in an
 ASCII table, with requirements described above. In this example, the .txt file
-is called <tt class="docutils literal"><span class="pre">traininglabels.txt</span></tt>. The method <tt class="docutils literal"><span class="pre">get_training_labels</span></tt> is used
+is called <tt class="docutils literal"><span class="pre">reference_labels.txt</span></tt>. The method <tt class="docutils literal"><span class="pre">get_reference_labels</span></tt> is used
 to retrieve object IDs, label names, and label values.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_labels</span> <span class="kn">import</span> <span class="n">get_training_labels</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_training_labels</span><span class="p">(</span><span class="n">readin</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_labels</span> <span class="kn">import</span> <span class="n">get_reference_labels</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_reference_labels</span><span class="p">(</span><span class="n">readin</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -174,7 +174,7 @@ to retrieve object IDs, label names, and label values.</p>
 <h4>Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)<a class="headerlink" href="#creating-tailoring-a-dataset-object-choose-labels-choose-spectra" title="Permalink to this headline">¶</a></h4>
 <p>A <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">dataset.py</span></tt>) is initialized.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">training_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">spectra</span><span class="o">=</span><span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">label_names</span><span class="o">=</span><span class="n">all_label_names</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">label_vals</span><span class="o">=</span><span class="n">all_label_values</span><span class="p">)</span>
 </pre></div>
@@ -349,7 +349,7 @@ function.</li>
 <li><a class="reference internal" href="#using-the-cannon">Using <em>The Cannon</em></a><ul>
 <li><a class="reference internal" href="#step-1-construct-a-training-set-from-apogee-files">Step 1: Construct a training set from APOGEE files</a><ul>
 <li><a class="reference internal" href="#reading-spectra-get-spectra">Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)</a></li>
-<li><a class="reference internal" href="#reading-labels-get-training-labels">Reading labels (<tt class="docutils literal"><span class="pre">get_training_labels</span></tt>)</a></li>
+<li><a class="reference internal" href="#reading-labels-get-reference-labels">Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)</a></li>
 <li><a class="reference internal" href="#creating-tailoring-a-dataset-object-choose-labels-choose-spectra">Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)</a></li>
 <li><a class="reference internal" href="#training-set-diagnostics-training-set-diagnostics">Training set diagnostics (training_set_diagnostics)</a></li>
 </ul>

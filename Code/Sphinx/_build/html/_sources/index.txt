@@ -20,18 +20,18 @@ Introduction to *The Cannon*
 *The Cannon* has two fundamental steps that together constitute a 
 process of *label transfer.* 
 
-1. The *Training Step*: *reference objects* are a subset of spectra in the 
-   survey for which corresponding stellar labels are known with high fidelity, 
+1. The *Training Step*: *reference stars* are a subset of the 
+   survey for which labels are known with high fidelity, 
    for calib reasons or otherwise. Using both the spectra and labels for 
    these objects, *The Cannon* solves for a flexible model that describes 
    how the flux in every pixel of any given continuum-normalized spectrum 
    depends on labels. 
    
 2. The *Test Step*: the model found in Step 1 is assumed to hold for all of 
-   the objects in the survey, including those outside the training set 
-   (dubbed *survey objects*). Thus, the spectra of the survey objects and 
+   the objects in the survey, including those outside the reference stars 
+   (dubbed *survey stars*). Thus, the spectra of the survey stars and 
    the model allow us to solve for - or infer - the labels of the survey 
-   objects. 
+   stars. 
 
 
 Overview of *The Cannon* Software
@@ -39,16 +39,16 @@ Overview of *The Cannon* Software
 
 This software package breaks up *The Cannon* into the following steps and methods.
 
-#. Construct a training set from APOGEE files
+#. Construct reference stars from APOGEE files
    
    * ``get_spectra``: read spectra, continuum-normalize
    * ``get_training_labels``: retrieve stellar IDs, training label names and values
    * ``choose_labels``: (optional) select a subset of labels
    * ``choose_spectra``: (optional) select a subset of spectra  
    * ``training_set_diagnostics``: (optional) run a set of diagnostics 
-     on the training set
+     on the reference stars
 
-#. Construct a test set from APOGEE files
+#. Construct test stars from APOGEE files
 
    * ``get_spectra``: read spectra, continuum-normalize
    * ``choose_spectra``: (optional) select a subset of spectra
@@ -58,7 +58,7 @@ This software package breaks up *The Cannon* into the following steps and method
    * ``train_model``: solve for model
    * ``model_diagnostics``: run a set of diagnostics on the model
 
-#. Step 2 of The Cannon: infer labels for all test objects
+#. Step 2 of The Cannon: infer labels for all survey stars
 
    * ``infer_labels``: infer labels using model
    * ``test_set_diagnostics``: run a set of diagnostics on the inferred labels
@@ -72,25 +72,25 @@ Using *The Cannon*
 ==================
 
 The details of using this package are provided in the following 
-sections, along with an example of usage. In the example, the training set
+sections, along with an example of usage. In the example, the reference stars
 consists of 553 open and globular cluster stars from APOGEE DR10 and, 
-for simplicity, the same set of stars as the test set. 
+for simplicity, the same set of stars as the survey stars. 
 
 Step 1: Construct a training set from APOGEE files 
 --------------------------------------------------
 
-The training set is a set of stars from the survey under consideration
-for which the user has spectra and also high-fidelity labels (that is,
+The reference stars in the survey under consideration
+are those which the user has spectra and also high-fidelity labels (that is,
 stellar parameters and element abundances that are deemed both accurate
-and precise.) The set of reference objects is critical, as the label 
-transfer to the survey objects can only be as good as the quality of the
-training set. 
+and precise.) The set of reference stars is critical, as the label 
+transfer to the survey stars can only be as good as the quality of the
+reference stars. 
 
 The user must construct the following inputs: 
 
-1. a list of filenames corresponding to the training data 
+1. a list of filenames corresponding to the reference data 
    (in this case, APOGEE .fits files) 
-2. a .txt file containing training labels in an ASCII table. 
+2. a .txt file containing reference labels in an ASCII table. 
 
 The following requirements govern (2):
 
@@ -103,12 +103,12 @@ Reading spectra (``get_spectra``)
 +++++++++++++++++++++++++++++++++
 
 We construct the first input: the list of filenames corresponding to the 
-training data (in this case, APOGEE .fits files). In our example, the filenames
+reference stars (in this case, APOGEE .fits files). In our example, the filenames
 happen to be the first column in the training labels text file, 
-``traininglabels.txt``. So we simply read the first column of this file.
+``reference_labels.txt``. So we simply read the first column of this file.
 
     >>> import numpy as np
-    >>> readin = "traininglabels.txt"
+    >>> readin = "reference_labels.txt"
     >>> IDs = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
     >>> filenames1 = []
     >>> for i in range(0, len(IDs)): #incorporate file location info
@@ -124,16 +124,16 @@ spectra.
     >>> from read_apogee import get_spectra
     >>> lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1)
 
-Reading labels (``get_training_labels``)
-++++++++++++++++++++++++++++++++++++++++
+Reading labels (``get_reference_labels``)
++++++++++++++++++++++++++++++++++++++++++
 
-We construct the second input: the .txt file containing training labels in an 
+We construct the second input: the .txt file containing reference labels in an 
 ASCII table, with requirements described above. In this example, the .txt file
-is called ``traininglabels.txt``. The method ``get_training_labels`` is used 
+is called ``reference_labels.txt``. The method ``get_reference_labels`` is used 
 to retrieve object IDs, label names, and label values.
 
-    >>> from read_labels import get_training_labels
-    >>> IDs, all_label_names, all_label_values = get_training_labels(readin)
+    >>> from read_labels import get_reference_labels
+    >>> IDs, all_label_names, all_label_values = get_reference_labels(readin)
 
 Creating & tailoring a ``Dataset`` object (``choose_labels``, ``choose_spectra``)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -141,7 +141,7 @@ Creating & tailoring a ``Dataset`` object (``choose_labels``, ``choose_spectra``
 A ``Dataset`` object (``dataset.py``) is initialized. 
 
     >>> from dataset import Dataset
-    >>> training_set = Dataset(IDs=IDs, SNRs=SNRs, lambdas=lambdas,
+    >>> reference_set = Dataset(IDs=IDs, SNRs=SNRs, lambdas=lambdas,
     >>> ....spectra=normalized_spectra, label_names=all_label_names, 
     >>> ....label_vals=all_label_values)
 

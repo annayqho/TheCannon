@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_training_labels(filename):
+def get_reference_labels(filename):
     """Extracts training labels from file.
 
     Assumes that the file has # then label names in first row, that first
