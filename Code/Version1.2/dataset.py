@@ -26,7 +26,7 @@ class Dataset(object):
         spectra[:,:,0] = flux (spectrum)
         spectra[:,:,1] = flux error array
     labels: numpy ndarray, list, optional
-        Training labels for training set, but None for test set
+        Training labels for reference set, but None for test set
     
     Methods
     -------
@@ -93,21 +93,21 @@ class Dataset(object):
         print "Saved fig %s" %figname
         plt.close(fig)
 
-def training_set_diagnostics(dataset):
+def reference_set_diagnostics(dataset):
     # Plot SNR distribution
-    print "Diagnostic for SNR of training set"
+    print "Diagnostic for SNR of reference set"
     plt.hist(dataset.SNRs)
     plt.xscale('log')
     plt.title("Logspace Distribution of Formal SNR in the Training Set")
     plt.xlabel("log(Formal SNR)")
     plt.ylabel("Number of Objects")
-    figname = "trainingset_SNRdist.png"
+    figname = "referenceset_SNRdist.png"
     plt.savefig(figname)
     plt.close()
     print "Saved fig %s" %figname
     
-    # Plot training label distributions
-    print "Diagnostic for coverage of training label space"
+    # Plot reference label distributions
+    print "Diagnostic for coverage of reference label space"
     for i in range(0, len(dataset.label_names)):
         name = dataset.label_names[i]
         vals = dataset.label_vals[:,i]
@@ -116,24 +116,24 @@ def training_set_diagnostics(dataset):
         plt.title("Training Set Distribution of Label: %s" %name)
         plt.xlabel(name)
         plt.ylabel("Number of Objects")
-        figname = "trainingset_labeldist_%s.png" %name
+        figname = "referenceset_labeldist_%s.png" %name
         plt.savefig(figname)
         print "Saved fig %s" %figname
         plt.close()
     
-    # Plot all training labels against each other
-    figname = "trainingset_labels_triangle.png"
+    # Plot all reference labels against each other
+    figname = "referenceset_labels_triangle.png"
     dataset.label_triangle_plot(figname)
 
-def test_set_diagnostics(training_set, test_set):
-    # 2-sigma check from training labels
-    label_names = training_set.label_names
+def test_set_diagnostics(reference_set, test_set):
+    # 2-sigma check from reference labels
+    label_names = reference_set.label_names
     nlabels = len(label_names)
-    training_labels = training_set.label_vals
+    reference_labels = reference_set.label_vals
     test_labels = test_set.label_vals
     test_IDs = test_set.IDs
-    mean = np.mean(training_labels, 0)
-    stdev = np.std(training_labels, 0)
+    mean = np.mean(reference_labels, 0)
+    stdev = np.std(reference_labels, 0)
     lower = mean - 2 * stdev
     upper = mean + 2 * stdev
     for i in range(nlabels):
@@ -147,7 +147,7 @@ def test_set_diagnostics(training_set, test_set):
             output.write(star + '\n')
         output.close()
         print "Training label %s" %label_name
-        print "flagged %s stars beyond 2-sig of training labels" %sum(warning)
+        print "flagged %s stars beyond 2-sig of reference labels" %sum(warning)
         print "Saved list %s" %filename
     
     # Plot all output labels against each other
@@ -157,7 +157,7 @@ def test_set_diagnostics(training_set, test_set):
     # 1-1 plots of all labels
     for i in range(nlabels):
         name = label_names[i]
-        orig = training_labels[:,i]
+        orig = reference_labels[:,i]
         cannon = test_labels[:,i]
         plt.scatter(orig, cannon)
         plt.xlabel("Training Value")

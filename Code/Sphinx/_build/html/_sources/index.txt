@@ -42,10 +42,10 @@ This software package breaks up *The Cannon* into the following steps and method
 #. Construct reference stars from APOGEE files
    
    * ``get_spectra``: read spectra, continuum-normalize
-   * ``get_training_labels``: retrieve stellar IDs, training label names and values
+   * ``get_reference_labels``: retrieve stellar IDs, reference label names and values
    * ``choose_labels``: (optional) select a subset of labels
    * ``choose_spectra``: (optional) select a subset of spectra  
-   * ``training_set_diagnostics``: (optional) run a set of diagnostics 
+   * ``reference_set_diagnostics``: (optional) run a set of diagnostics 
      on the reference stars
 
 #. Construct test stars from APOGEE files
@@ -53,12 +53,12 @@ This software package breaks up *The Cannon* into the following steps and method
    * ``get_spectra``: read spectra, continuum-normalize
    * ``choose_spectra``: (optional) select a subset of spectra
 
-#. The Cannon Step 1: Fit Model
+#. *The Cannon*'s Training Step: Fit Model
 
    * ``train_model``: solve for model
    * ``model_diagnostics``: run a set of diagnostics on the model
 
-#. Step 2 of The Cannon: infer labels for all survey stars
+#. *The Cannon*'s Test Step: Infer Labels
 
    * ``infer_labels``: infer labels using model
    * ``test_set_diagnostics``: run a set of diagnostics on the inferred labels
@@ -76,8 +76,8 @@ sections, along with an example of usage. In the example, the reference stars
 consists of 553 open and globular cluster stars from APOGEE DR10 and, 
 for simplicity, the same set of stars as the survey stars. 
 
-Step 1: Construct a training set from APOGEE files 
---------------------------------------------------
+Step 1: Construct a set of reference object from APOGEE files 
+-------------------------------------------------------------
 
 The reference stars in the survey under consideration
 are those which the user has spectra and also high-fidelity labels (that is,
@@ -104,7 +104,7 @@ Reading spectra (``get_spectra``)
 
 We construct the first input: the list of filenames corresponding to the 
 reference stars (in this case, APOGEE .fits files). In our example, the filenames
-happen to be the first column in the training labels text file, 
+happen to be the first column in the reference labels text file, 
 ``reference_labels.txt``. So we simply read the first column of this file.
 
     >>> import numpy as np
@@ -145,80 +145,80 @@ A ``Dataset`` object (``dataset.py``) is initialized.
     >>> ....spectra=normalized_spectra, label_names=all_label_names, 
     >>> ....label_vals=all_label_values)
 
-(Optional) The user can choose to select some subset of the training labels 
+(Optional) The user can choose to select some subset of the reference labels 
 by creating a list of the desired column indices. 
 In this example, we select Teff, logg, and [Fe/H] which correspond to 
 columns 1, 3, and 5.   
     
     >>> cols = [1, 3, 5]
-    >>> training_set.choose_labels(cols)
+    >>> reference_set.choose_labels(cols)
 
-(Optional) The user can also select some subset of the training objects 
+(Optional) The user can also select some subset of the reference objects 
 (for example, by imposing physical cutoffs) by constructing a mask where 
 1 = keep this object, and 0 = remove it. Here, we select data using physical 
 Teff and logg cutoffs.
 
-    >>> Teff = training_set.label_vals[:,0]
+    >>> Teff = reference_set.label_vals[:,0]
     >>> Teff_corr = all_label_values[:,2]
     >>> diff_t = np.abs(Teff-Teff_corr)
     >>> diff_t_cut = 600.
-    >>> logg = training_set.label_vals[:,1]
+    >>> logg = reference_set.label_vals[:,1]
     >>> logg_cut = 100.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
-    >>> training_set.choose_spectra(mask)
+    >>> reference_set.choose_spectra(mask)
 
-Training set diagnostics (training_set_diagnostics)
-+++++++++++++++++++++++++++++++++++++++++++++++++++
+reference set diagnostics (reference_set_diagnostics)
++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Now, the training set has been constructed. To let the user examine whether 
-things are going smoothly, *The Cannon* can print out a set of training set 
+Now, the reference set has been constructed. To let the user examine whether 
+things are going smoothly, *The Cannon* can print out a set of reference set 
 diagnostics.
 
-    >>> from dataset import training_set_diagnostics
-    >>> training_set_diagnostics(training_set)
+    >>> from dataset import reference_set_diagnostics
+    >>> reference_set_diagnostics(reference_set)
 
 The output of these diagnostics, with examples, are listed below.
 
-1. A histogram showing the distribution of SNR in the training set
+1. A histogram showing the distribution of SNR in the reference set
 
-.. image:: trainingset_SNRdist.png
+.. image:: referenceset_SNRdist.png
     :width: 400pt
 
 2. A histogram for each label showing its coverage in label space
 
-.. image:: trainingset_labeldist_Teff.png
+.. image:: referenceset_labeldist_Teff.png
     :width: 400pt
    
 3. A "triangle plot" that shows every label plotted against every other 
 
-.. image:: trainingset_labels_triangle.png
+.. image:: referenceset_labels_triangle.png
     :width: 400pt
    
-Step 2: Construct a test set from APOGEE files
-----------------------------------------------
+Step 2: Construct a set of test objects from APOGEE files
+----------------------------------------------------------
 
 To construct the test set, the user would ordinarily go through a process 
-identical to that for the training set, except without reading in the 
-training labels file. 
-In this case, for simplicity, we use the training set as our test set. 
+identical to that for the reference set, except without reading in the 
+reference labels file. 
+In this case, for simplicity, we use the reference set as our test set. 
 
-    >>> test_set = Dataset(IDs=training_set.IDs, SNRs=training_set.SNRs,
-    >>> ....lambdas=lambdas, spectra=training_set.spectra,
-    >>> ....label_names=training_set.label_names)
+    >>> test_set = Dataset(IDs=reference_set.IDs, SNRs=reference_set.SNRs,
+    >>> ....lambdas=lambdas, spectra=reference_set.spectra,
+    >>> ....label_names=reference_set.label_names)
 
-Step 3: *The Cannon* Step 1 - Fit Model (``train_model``, ``model_diagnostics``)
---------------------------------------------------------------------------------
+Step 3: *The Cannon*'s Training Step (``train_model``, ``model_diagnostics``)
+-----------------------------------------------------------------------------
 
-Now, we use our training set to fit for the model.
+Now, we use our reference set to fit for the model.
 
     >>> from cannon1_train_model import train_model
-    >>> model = train_model(training_set)
+    >>> model = train_model(reference_set)
 
 To let the user examine whether things are going smoothly, *The Cannon* can 
 print out a set of model diagnostics.
 
     >>> from cannon1_train_model import model_diagnostics
-    >>> model_diagnostics(training_set, model)
+    >>> model_diagnostics(reference_set, model)
 
 The output of these diagnostics with sample plots are listed below.
 
@@ -240,8 +240,8 @@ The output of these diagnostics with sample plots are listed below.
 .. image:: modelfit_redchisqs.png
     :width: 400pt
 
-Step 4: *The Cannon* Step 2 - Infer Labels (``infer_labels``, ``test_set_diagnostics``)
----------------------------------------------------------------------------------------
+Step 4: *The Cannon*'s Test Step (``infer_labels``, ``test_set_diagnostics``)
+-----------------------------------------------------------------------------
 
 Now, we use the model to infer labels for the survey objects and 
 update the test_set object.
@@ -253,18 +253,18 @@ To let the user examine whether things are going smoothly, *The Cannon* can
 print out a set of test set diagnostics.
 
     >>> from dataset import test_set_diagnostics
-    >>> test_set_diagnostics(training_set, test_set)
+    >>> test_set_diagnostics(reference_set, test_set)
 
 The output of these diagnostics with sample plots are listed below.
 
 1. For each label, a list of flagged stars for which test labels are 
-   over 2-sigma away from training labels
+   over 2-sigma away from reference labels
 2. Triangle plot, each test label plotted against every other test label
 
 .. image:: testset_labels_triangle.png
     :width: 400pt
 
-3. 1-1 plots, for each label, training values plotted against test values
+3. 1-1 plots, for each label, reference values plotted against test values
 
 .. image:: 1to1_labelTeff.png
     :width: 300pt

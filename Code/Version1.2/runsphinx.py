@@ -1,7 +1,7 @@
 # Compile the Sphinx documentation all at once
 
 import numpy as np
-readin = "referencelabels.txt"
+readin = "reference_labels.txt"
 IDs = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
 filenames1 = []
 for i in range(0, len(IDs)): #incorporate file location info
