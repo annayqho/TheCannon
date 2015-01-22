@@ -58,13 +58,12 @@ def infer_labels(model, test_set):
         Cinv = 1. / (fluxerrs* 2 + scatters**2)
         weights = 1 / Cinv**0.5
         coeffs = np.delete(coeffs_all, 0, axis=1) # take pivot into account
-        p0 = np.repeat(1, nlabels)
         try: 
-            labels, covs = opt.curve_fit(func, coeffs, fluxes_norm, p0=p0, 
-                    sigma=weights, absolute_sigma = True)
+            labels, covs = opt.curve_fit(func, coeffs, fluxes_norm, 
+                p0=np.repeat(1,nlabels), sigma=weights, absolute_sigma = True)
         except TypeError: #old scipy version
-            labels, covs = opt.curve_fit(func, coeffs, fluxes_norm, p0=p0, 
-                    sigma=weights)
+            labels, covs = opt.curve_fit(func, coeffs, fluxes_norm,
+                    p0=np.repeat(1,nlabels), sigma=weights)
            # rescale covariance matrix
             chi = (fluxes_norm-func(coeffs, *labels)) / weights
             chi2 = (chi**2).sum()
