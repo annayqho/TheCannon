@@ -97,7 +97,10 @@ def training_set_diagnostics(dataset):
     # Plot SNR distribution
     print "Diagnostic for SNR of training set"
     plt.hist(dataset.SNRs)
-    plt.title("Distribution of SNR in the Training Set")
+    plt.xscale('log')
+    plt.title("Logspace Distribution of Formal SNR in the Training Set")
+    plt.xlabel("log(Formal SNR)")
+    plt.ylabel("Number of Objects")
     figname = "trainingset_SNRdist.png"
     plt.savefig(figname)
     plt.close()
@@ -111,6 +114,8 @@ def training_set_diagnostics(dataset):
         plt.hist(vals)
         # Note: label names cannot have slashes 
         plt.title("Training Set Distribution of Label: %s" %name)
+        plt.xlabel(name)
+        plt.ylabel("Number of Objects")
         figname = "trainingset_labeldist_%s.png" %name
         plt.savefig(figname)
         print "Saved fig %s" %figname
