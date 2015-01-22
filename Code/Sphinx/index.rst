@@ -63,10 +63,10 @@ This software package breaks up *The Cannon* into the following steps and method
    * ``infer_labels``: infer labels using model
    * ``test_set_diagnostics``: run a set of diagnostics on the inferred labels
 
-#. Cannon-generated spectra (``cannon_spectra``)
+#. Cannon-generated spectra (``spectral_model``)
 
-   * ``draw_spectra`` in ``cannon_spectra``
-   * ``diagnostics`` in ``cannon_spectra``
+   * ``draw_spectra`` in ``spectral_model``
+   * ``diagnostics`` in ``spectral_model``
 
 Using *The Cannon*
 ==================
@@ -281,12 +281,12 @@ Cannon Spectra (``draw_spectra``, ``diagnostics``)
 Now that we have the model and labels for the test objects, ``The Cannon`` can
 "draw" spectra for each test object.
 
-    >>> from cannon_spectra import draw_spectra
+    >>> from spectral_model import draw_spectra
     >>> cannon_set = draw_spectra(model, test_set)
 
 We can now perform a final set of diagnostic checks.
 
-    >>> from cannon_spectra import diagnostics
+    >>> from spectral_model import diagnostics
     >>> diagnostics(cannon_set, test_set, model)
 
 The output of these diagnostics with sample plots are listed below.

@@ -50,8 +50,8 @@ test_set, covs = infer_labels(model, test_set)
 from dataset import test_set_diagnostics
 test_set_diagnostics(training_set, test_set)
 
-from cannon_spectra import draw_spectra
+from spectral_model import draw_spectra
 cannon_set = draw_spectra(model, test_set)
 
-from cannon_spectra import diagnostics
+from spectral_model import diagnostics
 diagnostics(cannon_set, test_set, model)
