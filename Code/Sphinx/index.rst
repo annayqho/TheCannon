@@ -228,8 +228,7 @@ function of wavelength.
 .. image:: baseline_spec_with_cont_pix.png
     :width: 400pt
 
-3.2) Plot of the leading coefficients of each label as a function 
-of wavelength
+3.2) Plot the leading coefficients of each label as a function of wavelength
 
 .. image:: leading_coeffs.png
     :width: 400pt
