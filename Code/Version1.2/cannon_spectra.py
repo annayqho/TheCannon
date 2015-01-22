@@ -60,7 +60,7 @@ def overlay_spectra(cannon_set, test_set, model):
         ax2 = axarr[1]
         ax2.scatter(spec_orig[keep], spec_fit[keep], c=err_orig[keep])
         ax2.errorbar(spec_orig[keep], spec_fit[keep], yerr=err_fit[keep], 
-                ecolor='k', fmt="none")
+                ecolor='k', fmt=None)
         fig.subplots_adjust(right=0.8)
         cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
         fig.colorbar(im, cax=cbar_ax, 
