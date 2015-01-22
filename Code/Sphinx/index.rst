@@ -223,19 +223,19 @@ print out a set of model diagnostics.
 The output of these diagnostics with sample plots are listed below.
 
 3.1) Plot of the baseline spectrum (0th order coefficients) as a 
-   function of wavelength.
+function of wavelength.
 
 .. image:: baseline_spec_with_cont_pix.png
     :width: 400pt
 
 3.2) Plot of the leading coefficients of each label as a function 
-   of wavelength
+of wavelength
 
 .. image:: leading_coeffs.png
     :width: 400pt
 
 3.3) Histogram of the reduced chi squareds of the fits (normalized by DOF, 
-   where DOF = npixels-nlabels)
+where DOF = npixels-nlabels)
 
 .. image:: modelfit_redchisqs.png
     :width: 400pt
@@ -292,20 +292,19 @@ We can now perform a final set of diagnostic checks.
 
 The output of these diagnostics with sample plots are listed below.
 
-5.1) A directory called SpectrumFits containing (for 10 randomly-selected stars)
-   the Cannon fitted spectra overlaid with the 'true' (data) spectra, 
-   as well as the two compared in a 1-to-1 plot.
+5.1) A directory called SpectrumFits containing (for 10 randomly-selected stars) 
+the Cannon fitted spectra overlaid with the 'true' (data) spectra, as well as 
+the two compared in a 1-to-1 plot.
 
 .. image:: Star500.png
 
-5.2) For each label, the residuals of the spectra fits stacked and sorted 
-   by that label. If the functional form of the model is comprehensive enough,
-   then this should look like noise and there should be no systematic structure.
+5.2) For each label, the residuals of the spectra fits stacked and sorted by 
+that label. If the functional form of the model is comprehensive enough, then 
+this should look like noise and there should be no systematic structure.
 
 .. image:: residuals_sorted_by_logg.png
 
-5.3) The autocorrelation of the mean spectral residual. If the functional
-   form of the model is comprehensive enough, then this should be a delta
-   function. 
+5.3) The autocorrelation of the mean spectral residual. If the functional form 
+of the model is comprehensive enough, then this should be a delta function. 
 
 .. image:: residuals_autocorr.png
