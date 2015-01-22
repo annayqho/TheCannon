@@ -167,7 +167,7 @@ def model_diagnostics(reference_set, model):
     baseline_spec = coeffs_all[:,0]
     fig, axarr = plt.subplots(2, sharex=True)
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
-    plt.xlim(min(contpix_lambda), max(contpix_lambda))
+    plt.xlim(min(lambdas), max(lambdas))
     ax = axarr[0]
     ax.plot(lambdas, baseline_spec)
     contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
@@ -195,9 +195,11 @@ def model_diagnostics(reference_set, model):
     nlabels = len(pivots)
     fig, axarr = plt.subplots(nlabels, sharex=True)
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
     for i in range(nlabels):
         ax = axarr[i]
         ax.set_ylabel(r"$\theta_%s$" %(i+1) + ", first-order fit coefficient")
+        ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         ax.set_title("First-Order Fit Coefficient for "+r"$%s$"%label_names[i])
         ax.plot(lambdas, coeffs_all[:,i+1])
     print "Diagnostic plot: leading coefficients as a function of wavelength."

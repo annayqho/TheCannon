@@ -150,10 +150,14 @@ def dataset_postdiagnostics(reference_set, test_set):
         name = label_names[i]
         orig = reference_labels[:,i]
         cannon = test_labels[:,i]
+        low = np.minimum(min(orig), min(cannon))
+        high = np.maximum(max(orig), max(cannon))
+        plt.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
         plt.scatter(orig, cannon)
+        plt.legend()
         plt.xlabel("Reference Value")
         plt.ylabel("Cannon Output Value")
-        plt.title("1-1 Plot of Label r'$%s$'" %name)
+        plt.title("1-1 Plot of Label " + r"$%s$" %name)
         figname = "1to1_label_%s.png" %i
         plt.savefig(figname)
         print "Diagnostic for label output vs. input"
