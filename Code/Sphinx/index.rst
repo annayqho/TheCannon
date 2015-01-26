@@ -187,7 +187,7 @@ with the distribution of SNR in the test set.
 1.2) A "triangle plot" that shows the distribution of every label as well as 
 every label plotted against every other 
 
-.. image:: reference_labels_triangle.png
+.. image:: survey_labels_triangle.png
    
 Step 2: Construct a set of test objects from APOGEE files
 ----------------------------------------------------------
