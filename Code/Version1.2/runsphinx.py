@@ -9,7 +9,7 @@ for i in range(0, len(IDs)): #incorporate file location info
     filenames1.append(filename)
 
 from read_apogee import get_spectra
-lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1)
+lambdas, normalized_spectra, ivar, continua, SNRs = get_spectra(filenames1)
 
 from read_labels import get_reference_labels
 IDs, all_label_names, all_label_values = get_reference_labels(readin)
