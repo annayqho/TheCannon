@@ -292,7 +292,11 @@ the two compared in a 1-to-1 plot.
 that label. If the functional form of the model is comprehensive enough, then 
 this should look like noise and there should be no systematic structure.
 
-.. image:: residuals_sorted_by_logg.png
+.. image:: residuals_sorted_by_label_0.png
+
+.. image:: residuals_sorted_by_label_1.png
+
+.. image:: residuals_sorted_by_label_2.png
 
 5.3) The autocorrelation of the mean spectral residual. If the functional form 
 of the model is comprehensive enough, then this should be a delta function. 

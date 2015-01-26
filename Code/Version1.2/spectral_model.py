@@ -100,7 +100,7 @@ def residuals(cannon_set, test_set, model):
         plt.imshow(sorted_res, cmap=plt.cm.bwr_r,
                 interpolation="nearest", vmin=mu-3*sigma, vmax=mu+3*sigma,
                 aspect='auto',origin='lower')
-        plt.title("Spectral Residuals Sorted by r'$%s$'" %label_name)
+        plt.title("Spectral Residuals Sorted by " + r"$%s$" %label_name)
         plt.xlabel("Pixels")
         plt.ylabel("Stars")
         plt.colorbar()
