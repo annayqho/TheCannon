@@ -169,20 +169,26 @@ def model_diagnostics(reference_set, model):
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
     plt.xlim(min(lambdas), max(lambdas))
     ax = axarr[0]
-    ax.plot(lambdas, baseline_spec)
+    ax.plot(lambdas, baseline_spec,
+            label=r'$\theta_0$' + "= the leading fit coefficient")
     contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
         usecols = (0,), unpack =1))
     y = [1]*len(contpix_lambda)
-    ax.scatter(contpix_lambda, y, s=1)
+    ax.scatter(contpix_lambda, y, s=1,
+            label="continuum pixels")
+    ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
     ax.set_title("Baseline Spectrum with Continuum Pixels")
-    ax.set_ylabel(r'$\theta_0$' + ", the leading fit coefficient")
+    ax.set_ylabel(r'$\theta_0$')
     ax = axarr[1]
-    ax.plot(lambdas, baseline_spec)
+    ax.plot(lambdas, baseline_spec, 
+            label=r'$\theta_0$' + "= the leading fit coefficient")
     contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
         usecols = (0,), unpack =1))
-    ax.scatter(contpix_lambda, y, s=1)
+    ax.scatter(contpix_lambda, y, s=1,
+            label="continuum pixels")
     ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
-    ax.set_ylabel(r'$\theta_0$' + ", the leading fit coefficient")
+    ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
+    ax.set_ylabel(r'$\theta_0$')
     ax.set_ylim(0.95, 1.05)
 
     filename = "baseline_spec_with_cont_pix.png"
@@ -198,10 +204,12 @@ def model_diagnostics(reference_set, model):
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
     for i in range(nlabels):
         ax = axarr[i]
-        ax.set_ylabel(r"$\theta_%s$" %(i+1) + ", first-order fit coefficient")
+        ax.set_ylabel(r"$\theta_%s$" %(i+1))
         ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         ax.set_title("First-Order Fit Coefficient for "+r"$%s$"%label_names[i])
-        ax.plot(lambdas, coeffs_all[:,i+1])
+        ax.plot(lambdas, coeffs_all[:,i+1], 
+                label=r'$\theta_%s$' %(i+1)+"= the first-order fit coefficient")
+        ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
     print "Diagnostic plot: leading coefficients as a function of wavelength."
     filename = "leading_coeffs.png"
     print "Saved as %s" %filename

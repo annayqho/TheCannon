@@ -179,20 +179,15 @@ diagnostics.
 
 The output of these diagnostics, with examples, are listed below.
 
-1.1) A histogram showing the distribution of SNR in the reference set
+1.1) A histogram showing the distribution of SNR in the reference set overplotted
+with the distribution of SNR in the test set.
 
-.. image:: referenceset_SNRdist.png
-    :width: 400pt
+.. image:: SNRdist.png
 
-1.2) A histogram for each label showing its coverage in label space
+1.2) A "triangle plot" that shows the distribution of every label as well as 
+every label plotted against every other 
 
-.. image:: referenceset_labeldist_Teff.png
-    :width: 400pt
-   
-1.3) A "triangle plot" that shows every label plotted against every other 
-
-.. image:: referenceset_labels_triangle.png
-    :width: 400pt
+.. image:: reference_labels_triangle.png
    
 Step 2: Construct a set of test objects from APOGEE files
 ----------------------------------------------------------
@@ -226,18 +221,15 @@ The output of these diagnostics with sample plots are listed below.
 function of wavelength.
 
 .. image:: baseline_spec_with_cont_pix.png
-    :width: 400pt
 
 3.2) Plot the leading coefficients of each label as a function of wavelength
 
 .. image:: leading_coeffs.png
-    :width: 400pt
 
 3.3) Histogram of the reduced chi squareds of the fits (normalized by DOF, 
 where DOF = npixels-nlabels)
 
 .. image:: modelfit_redchisqs.png
-    :width: 400pt
 
 Step 4: *The Cannon*'s Test Step (``infer_labels``, ``test_set_diagnostics``)
 -----------------------------------------------------------------------------
@@ -261,18 +253,17 @@ over 2-sigma away from reference labels
 
 4.2) Triangle plot, each test label plotted against every other test label
 
-.. image:: testset_labels_triangle.png
-    :width: 400pt
+.. image:: survey_labels_triangle.png
 
 4.3) 1-1 plots, for each label, reference values plotted against test values
 
-.. image:: 1to1_labelTeff.png
+.. image:: 1to1_label_0.png
     :width: 300pt
 
-.. image:: 1to1_labellogg.png
+.. image:: 1to1_label_1.png
     :width: 300pt
 
-.. image:: 1to1_label[MH].png
+.. image:: 1to1_label_2.png
     :width: 300pt
 
 Step 5: Model Spectra (``draw_spectra``, ``diagnostics``)
