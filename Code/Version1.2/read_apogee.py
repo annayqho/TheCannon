@@ -20,7 +20,7 @@ def get_spectra(files):
     with spectra[:,:,0] = flux values
     spectra[:,:,1] = flux err values
     """
-    
+    LARGE = 200.
     for jj,fits_file in enumerate(files):
         file_in = pyfits.open(fits_file)
         fluxes = np.array(file_in[1].data)
@@ -28,9 +28,8 @@ def get_spectra(files):
             nstars = len(files) 
             npixels = len(fluxes)
             SNRs = np.zeros(nstars)
-            lambdas = np.zeros(npixels)
-            spectra = np.zeros((nstars, npixels, 2))
-            ivars = np.zeros((nstars, npixels))
+            norm_fluxes = np.zeros((nstars, npixels))
+            norm_ivars = np.zeros(norm_fluxes.shape)
             start_wl = file_in[1].header['CRVAL1']
             diff_wl = file_in[1].header['CDELT1']
             val = diff_wl*(npixels) + start_wl
@@ -39,17 +38,17 @@ def get_spectra(files):
             lambdas = np.array(wl_full)
         flux_errs = np.array((file_in[2].data))
         SNRs[jj] = float(file_in[0].header['SNR'])
-        ivar = find_bad_pix(lambdas, fluxes, flux_errs)
-        norm_flux, norm_flux_err, continua = continuum_normalize_Chebyshev(lambdas,
-                fluxes, flux_errs, ivar)
-        ivar = find_bad_pix(lambdas, norm_flux, norm_flux_err)
-        spectra[jj,:,0] = norm_flux
-        spectra[jj,:,1] = norm_flux_err
-        ivars[jj,:] = ivar
+        ivar = construct_ivar(lambdas, fluxes, flux_errs)
+        norm_flux, norm_ivar, continua = continuum_normalize_Chebyshev(
+                lambdas, fluxes, flux_errs, ivar)
+        mask = norm_ivar == 0
+        norm_flux[mask] = 1.0
+        norm_fluxes[jj] = norm_flux
+        norm_ivars[jj] = norm_ivar
     print "Loaded %s stellar spectra" %len(files)
-    return lambdas, spectra, ivar, continua, SNRs
+    return lambdas, norm_fluxes, norm_ivars, SNRs
 
-def find_bad_pix(lambdas, fluxes, flux_errs):
+def construct_ivar(lambdas, fluxes, flux_errs):
     """Find bad pixels in a spectrum and return ivar
 
     Definition of a bad pixel
@@ -82,7 +81,7 @@ def find_continuum_pix(lambdas, spectra):
     cont = np.logical_and(cont1, cont2)
     errorbar(lambdas[0][cont], f_bar[cont], yerr=sigma_f[cont], fmt='ko')
 
-def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivar):
+def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars):
     """Continuum-normalizes the spectra.
 
     Fit a 2nd order Chebyshev polynomial to each segment 
@@ -92,11 +91,16 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivar):
     Returns: 3D continuum-normalized spectra (nstars, npixels,3)
             2D continuum array (nstars, npixels)
     """
-    continua = np.zeros(ivar.shape)
+    continua = np.zeros(lambdas.shape)
     norm_flux = np.zeros(fluxes.shape)
     norm_flux_err = np.zeros(flux_errs.shape)
+    norm_ivar = np.zeros(ivars.shape)
     # list of "true" continuum pix, det. here by the Cannon
-    pixlist = list(np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1))
+    pixlist = list(np.loadtxt("pixtest4.txt", dtype=int, usecols=(0,), unpack=1))
+    ivars_orig = ivars
+    contmask = np.ones(len(lambdas), dtype=bool)
+    contmask[pixlist] = 0
+    ivars[contmask] = 0. # ignore non-cont pixels 
     # We discard the edges of the fluxes: 10 Angstroms, which is ~50 pixels
     ranges = [[371,3192], [3697,5997], [6461,8255]]
     for i in range(len(ranges)):
@@ -104,10 +108,13 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivar):
         flux = fluxes[start:stop]
         flux_err = flux_errs[start:stop]
         lambda_cut = lambdas[start:stop]
-        weights = ivar[start:stop]
+        ivar = ivars[start:stop]
         fit = np.polynomial.chebyshev.Chebyshev.fit(x=lambda_cut, 
-                y=flux, w=weights, deg=3)
+                y=flux, w=ivar, deg=3)
         continua[start:stop] = fit(lambda_cut)
         norm_flux[start:stop] = flux/fit(lambda_cut)
         norm_flux_err[start:stop] = flux_err/fit(lambda_cut)
-    return norm_flux, norm_flux_err, continua
+        norm_ivar[start:stop] = construct_ivar(lambda_cut,
+                norm_flux[start:stop], norm_flux_err[start:stop])
+        #ivars_orig[start:stop]*(fit(lambda_cut))**2
+    return norm_flux, norm_ivar, continua

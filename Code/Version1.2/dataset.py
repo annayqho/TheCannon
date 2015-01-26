@@ -40,22 +40,26 @@ class Dataset(object):
 
     """
 
-    def __init__(self, IDs, SNRs, lambdas, spectra, label_names, label_vals=None):
+    def __init__(self, IDs, SNRs, lams, fluxes, ivars, label_names, label_vals=None):
         self.IDs = IDs
         self.SNRs = SNRs
-        self.lambdas = lambdas
-        self.spectra = spectra 
+        self.lams = lams
+        self.fluxes = fluxes
+        self.ivars = ivars
         self.label_names = label_names
         self.label_vals = label_vals
   
     def set_IDs(self, IDs):
         self.IDs = IDs
 
-    def set_lambdas(self, lambdas):
-        self.lambdas = lambdas
+    def set_lambdas(self, lams):
+        self.lams = lams
 
-    def set_spectra(self, spectra):
-        self.spectra = spectra
+    def set_fluxes(self, fluxes):
+        self.fluxes = fluxes
+
+    def set_ivars(self, ivars):
+        self.ivars = ivars
 
     def set_label_names(self, label_names):
         self.label_names = label_names
@@ -75,13 +79,14 @@ class Dataset(object):
         self.set_label_names(new_label_names)
         self.set_label_vals(new_label_vals)
 
-    def choose_spectra(self, mask):
+    def choose_objects(self, mask):
         """Updates the ID, spectra, label_vals properties 
 
         Input: mask where 1 = keep, 0 = discard
         """
         self.set_IDs(self.IDs[mask])
-        self.set_spectra(self.spectra[mask])
+        self.set_fluxes(self.fluxes[mask])
+        self.set_ivars(self.ivars[mask])
         self.set_label_vals(self.label_vals[mask])
 
     def label_triangle_plot(self, figname):
@@ -140,11 +145,9 @@ def dataset_postdiagnostics(reference_set, test_set):
         print "Reference label %s" %label_name
         print "flagged %s stars beyond 2-sig of reference labels" %sum(warning)
         print "Saved list %s" %filename
-
     # Plot all survey labels against each other
     figname = "survey_labels_triangle.png"
     test_set.label_triangle_plot(figname)
-
     # 1-1 plots of all labels
     for i in range(nlabels):
         name = label_names[i]
@@ -163,15 +166,3 @@ def dataset_postdiagnostics(reference_set, test_set):
         print "Diagnostic for label output vs. input"
         print "Saved fig %s" %figname
         plt.close()
-
-def remove_stars(dataset, mask):
-    """A method to remove a subset of stars from the Dataset. 
-    
-    Parameters
-    ---------
-    mask: numpy ndarray of booleans. True means "remove"
-    """
-    ntokeep = 1-np.sum(mask)
-    return Dataset(dataset.IDs[mask], dataset.lambdas[mask], 
-            dataset.spectra[mask], dataset.label_names, dataset.label_vals[mask])
-    print "New dataset constructed with %s stars included" %ntokeep

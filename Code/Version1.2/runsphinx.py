@@ -9,14 +9,14 @@ for i in range(0, len(IDs)): #incorporate file location info
     filenames1.append(filename)
 
 from read_apogee import get_spectra
-lambdas, normalized_spectra, ivar, continua, SNRs = get_spectra(filenames1)
+lambdas, norm_fluxes, norm_ivars, SNRs = get_spectra(filenames1)
 
 from read_labels import get_reference_labels
 IDs, all_label_names, all_label_values = get_reference_labels(readin)
 
 from dataset import Dataset
-reference_set = Dataset(IDs=IDs, SNRs=SNRs, lambdas=lambdas,
-        spectra=normalized_spectra, label_names=all_label_names, 
+reference_set = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, fluxes = norm_fluxes, 
+        ivars = norm_ivars, label_names=all_label_names, 
         label_vals=all_label_values)
 
 cols = [1, 3, 5]
@@ -29,10 +29,10 @@ diff_t_cut = 600.
 logg = reference_set.label_vals[:,1]
 logg_cut = 100.
 mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
-reference_set.choose_spectra(mask)
+reference_set.choose_objects(mask)
 
 test_set = Dataset(IDs=reference_set.IDs, SNRs=reference_set.SNRs,
-        lambdas=lambdas, spectra=reference_set.spectra, 
+        lams=lambdas, fluxes=reference_set.fluxes, ivars = reference_set.ivars, 
         label_names=reference_set.label_names)
 
 from dataset import dataset_prediagnostics

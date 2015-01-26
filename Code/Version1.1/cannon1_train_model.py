@@ -137,7 +137,6 @@ def train_model(training_set):
     scatters = np.array([b[4] for b in blob]) # how could there be a b[4]?
                         # there are only four outputs from do_one_regression_at_
                         # fixed_scatter...confused
-    
     # Calc red chi sq
     all_chisqs = chis*chis
     chisqs = np.sum(all_chisqs, axis=0) # now we have one per star

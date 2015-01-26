@@ -41,9 +41,10 @@ def infer_labels(model, test_set):
     """
     coeffs_all, covs, scatters, red_chisqs, pivots, label_values = model
     nlabels = len(pivots)
-    lambdas = test_set.lambdas
-    spectra = test_set.spectra #(nstars, npixels, 2)
-    nstars = spectra.shape[0]
+    lambdas = test_set.lams
+    fluxes = test_set.fluxes
+    ivars = test_set.ivars
+    nstars = fluxes.shape[0]
     npixels = len(lambdas)
     labels_all = np.zeros((nstars, nlabels))
     # Don't understand what this MCM_rotate_all matrix is
@@ -52,22 +53,22 @@ def infer_labels(model, test_set):
     covs_all = np.zeros((nstars, nlabels, nlabels))
 
     for jj in range(nstars):
-        fluxes = spectra[jj,:,0]
-        fluxerrs = spectra[jj,:,1]
-        fluxes_norm = fluxes - coeffs_all[:,0]*1 # pivot around the leading term
-        Cinv = 1. / (fluxerrs* 2 + scatters**2)
+        flux = fluxes[jj,:]
+        ivar = ivars[jj,:]
+        flux_norm = flux - coeffs_all[:,0]*1 # pivot around the leading term
+        Cinv = 1. / ((1./ivar) + scatters**2)
         weights = 1 / Cinv**0.5
         coeffs = np.delete(coeffs_all, 0, axis=1) # take pivot into account
         try: 
-            labels, covs = opt.curve_fit(func, coeffs, fluxes_norm, 
+            labels, covs = opt.curve_fit(func, coeffs, flux_norm, 
                 p0=np.repeat(1,nlabels), sigma=weights, absolute_sigma = True)
         except TypeError: #old scipy version
-            labels, covs = opt.curve_fit(func, coeffs, fluxes_norm,
+            labels, covs = opt.curve_fit(func, coeffs, flux_norm,
                     p0=np.repeat(1,nlabels), sigma=weights)
            # rescale covariance matrix
-            chi = (fluxes_norm-func(coeffs, *labels)) / weights
+            chi = (flux_norm-func(coeffs, *labels)) / weights
             chi2 = (chi**2).sum()
-            dof = len(fluxes_norm)-len(p0)
+            dof = len(flux_norm)-len(p0)
             factor = (chi2/dof)
             covs /= factor
         labels = labels + pivots

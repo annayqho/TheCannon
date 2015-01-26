@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 def draw_spectra(model, test_set):
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nstars = len(test_set.IDs)
-    cannon_spectra = np.zeros(test_set.spectra.shape)
+    cannon_fluxes = np.zeros(test_set.fluxes.shape)
     for i in range(nstars):
         x = label_vector[:,i,:]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
-        cannon_spectra[i,:,0]=spec_fit
+        cannon_fluxes[i,:]=spec_fit
     cannon_set = Dataset(IDs=test_set.IDs, SNRs=test_set.SNRs, 
-            lambdas = test_set.lambdas, spectra=cannon_spectra, 
+            lams = test_set.lams, fluxes=cannon_fluxes, ivars = test_set.ivars,
             label_names = test_set.label_names, 
             label_vals = test_set.label_vals)
     return cannon_set
@@ -27,40 +27,40 @@ def overlay_spectra(cannon_set, test_set, model):
     # Overplot original spectra with best-fit spectra
     os.system("mkdir SpectrumFits")
     print "Overplotting spectra for ten random stars"
-    nstars = cannon_set.spectra.shape[0]
-    lambdas = test_set.lambdas
+    nstars = cannon_set.fluxes.shape[0]
+    lambdas = test_set.lams
     pickstars = []
     for i in range(10):
         pickstars.append(random.randrange(0, nstars-1))
     for i in pickstars:
         print "Star %s" %i
         ID = cannon_set.IDs[i]
-        spec_orig = test_set.spectra[i,:,0]
-        spec_fit = cannon_set.spectra[i,:,0]
-        sig_orig = test_set.spectra[i,:,1]
-        sig_fit = cannon_set.spectra[i,:,1]
-        err_orig = np.sqrt(sig_orig**2 + scatters**2)
-        err_fit = np.sqrt(sig_fit**2 + scatters**2)
-        chisq = np.round(red_chisqs[i], 2)
-        bad2 = np.logical_or(spec_orig == 0, spec_orig == 1)
-        bad1 = np.logical_or(sig_fit == 200., sig_orig == 200.)
-        bad = np.logical_or(bad1, bad2)
+        spec_orig = test_set.fluxes[i,:]
+        spec_fit = cannon_set.fluxes[i,:]
+        ivars = test_set.ivars[i,:]
+        bad_flux = np.logical_or(spec_orig == 0, spec_orig == 1)
+        bad_ivar = ivars == 0.
+        bad = np.logical_or(bad_flux, bad_ivar)
         keep = np.invert(bad)
+        lambdas = lambdas[keep]
+        spec_orig = spec_orig[keep]
+        spec_fit = spec_fit[keep]
+        sigma2 = 1. / ivars[keep]
+        err_orig = np.sqrt(sigma2)
+        err_fit = np.sqrt(sigma2 + scatters[keep]**2)
+        chisq = np.round(red_chisqs[i], 2)
         fig,axarr = plt.subplots(2)
         ax1 = axarr[0]
-        im = ax1.scatter(lambdas[keep], spec_orig[keep], label="Orig Spec", 
-                c=err_orig[keep])
-        ax1.scatter(lambdas[keep], spec_fit[keep], label="Cannon Spec", c='r')
-        ax1.errorbar(lambdas[keep], spec_fit[keep], yerr=err_fit[keep], 
-                fmt='ro')
+        im = ax1.scatter(lambdas, spec_orig, label="Orig Spec", c=err_orig)
+        ax1.scatter(lambdas, spec_fit, label="Cannon Spec", c='r')
+        ax1.errorbar(lambdas, spec_fit, yerr=err_fit, fmt='ro')
         ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
         ax1.set_ylabel("Normalized flux")
         ax1.set_title("Spectrum Fit: %s" %ID)
         ax1.legend(loc='lower center', fancybox=True, shadow=True)
         ax2 = axarr[1]
-        ax2.scatter(spec_orig[keep], spec_fit[keep], c=err_orig[keep])
-        ax2.errorbar(spec_orig[keep], spec_fit[keep], yerr=err_fit[keep], 
-                ecolor='k', fmt="none")
+        ax2.scatter(spec_orig, spec_fit, c=err_orig)
+        ax2.errorbar(spec_orig, spec_fit, yerr=err_fit, ecolor='k', fmt="none")
         fig.subplots_adjust(right=0.8)
         cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
         fig.colorbar(im, cax=cbar_ax)
@@ -85,9 +85,9 @@ def overlay_spectra(cannon_set, test_set, model):
 def residuals(cannon_set, test_set, model):
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     print "Stacking spectrum fit residuals"
-    res = test_set.spectra[:,:,0]-cannon_set.spectra[:,:,0]
-    spec_fit = cannon_set.spectra[:,:,0]
-    err = np.sqrt(test_set.spectra[:,:,1]**2 + scatters**1)
+    res = test_set.fluxes-cannon_set.fluxes
+    spec_fit = cannon_set.fluxes
+    err = np.sqrt(1./test_set.ivars + scatters**2)
     res_norm = res/err
     for i in range(len(cannon_set.label_names)):
         label_name = cannon_set.label_names[i]
