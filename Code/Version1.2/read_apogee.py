@@ -20,7 +20,7 @@ def get_spectra(files):
     with spectra[:,:,0] = flux values
     spectra[:,:,1] = flux err values
     """
-    LARGE = 200.
+    LARGE = 1000000.
     for jj,fits_file in enumerate(files):
         file_in = pyfits.open(fits_file)
         fluxes = np.array(file_in[1].data)
@@ -38,17 +38,17 @@ def get_spectra(files):
             wl_full = [10**aval for aval in wl_full_log]
             lambdas = np.array(wl_full)
         flux_errs = np.array((file_in[2].data))
-        goodpix, badpix = get_pixmask(fluxes, flux_errs)
-        SNRs[jj] = np.mean(fluxes[goodpix]/flux_errs[goodpix])
-        ivar = np.zeros(npixels, dtype=float)
-        ivar[goodpix] = 1. / (flux_errs[goodpix]**2)
+        badpix = get_pixmask(fluxes, flux_errs)
+        lambdas = np.ma.array(lambdas, mask=badpix)
+        fluxes = np.ma.array(fluxes, mask=badpix, fill_value=1.)
+        flux_errs = np.ma.array(flux_errs, mask=badpix, fill_value=LARGE)
+        SNRs[jj] = np.ma.median(fluxes/flux_errs)
+        ivar = 1. / (flux_errs**2)
         norm_flux, norm_ivar, continua = continuum_normalize_Chebyshev(
                 lambdas, fluxes, flux_errs, ivar)
-        mask = norm_ivar == 0
-        norm_flux[mask] = 1.0
-        #pixmasks[jj] = pixmask
-        norm_fluxes[jj] = norm_flux
-        norm_ivars[jj] = norm_ivar
+        badpix = get_pixmask(norm_flux, 1./np.sqrt(norm_ivar)) 
+        norm_fluxes[jj] = np.ma.array(norm_flux, mask=badpix, fill_value = 1.0)
+        norm_ivars[jj] = np.ma.array(norm_ivar, mask=badpix, fill_value = 0.)
     print "Loaded %s stellar spectra" %len(files)
     return lambdas, norm_fluxes, norm_ivars, SNRs
 
@@ -56,8 +56,7 @@ def get_pixmask(fluxes, flux_errs):
     bad_flux = np.isinf(fluxes)
     bad_err = np.logical_or(np.isinf(flux_errs), flux_errs <= 0)
     bad_pix = np.logical_or(bad_err, bad_flux)
-    good_pix = np.invert(bad_pix)
-    return good_pix, bad_pix
+    return bad_pix
 
 def find_continuum_pix(lambdas, spectra):
     """ Identify continuum pixels for use in normalization.
@@ -109,5 +108,4 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars):
         norm_flux[start:stop] = flux/fit(lambda_cut)
         norm_flux_err[start:stop] = flux_err/fit(lambda_cut)
         norm_ivar[start:stop] = 1. / norm_flux_err[start:stop]**2
-        #ivars_orig[start:stop]*(fit(lambda_cut))**2
     return norm_flux, norm_ivar, continua
