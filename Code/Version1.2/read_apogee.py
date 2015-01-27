@@ -30,6 +30,7 @@ def get_spectra(files):
             SNRs = np.zeros(nstars)
             norm_fluxes = np.zeros((nstars, npixels))
             norm_ivars = np.zeros(norm_fluxes.shape)
+            #pixmasks = np.zeros(norm_fluxes.shape)
             start_wl = file_in[1].header['CRVAL1']
             diff_wl = file_in[1].header['CDELT1']
             val = diff_wl*(npixels) + start_wl
@@ -37,34 +38,26 @@ def get_spectra(files):
             wl_full = [10**aval for aval in wl_full_log]
             lambdas = np.array(wl_full)
         flux_errs = np.array((file_in[2].data))
-        SNRs[jj] = flux_errs**2 / fluxes
-        #SNRs[jj] = float(file_in[0].header['SNR'])
-        ivar = construct_ivar(lambdas, fluxes, flux_errs)
+        goodpix, badpix = get_pixmask(fluxes, flux_errs)
+        SNRs[jj] = np.mean(fluxes[goodpix]/flux_errs[goodpix])
+        ivar = np.zeros(npixels, dtype=float)
+        ivar[goodpix] = 1. / (flux_errs[goodpix]**2)
         norm_flux, norm_ivar, continua = continuum_normalize_Chebyshev(
                 lambdas, fluxes, flux_errs, ivar)
         mask = norm_ivar == 0
         norm_flux[mask] = 1.0
+        #pixmasks[jj] = pixmask
         norm_fluxes[jj] = norm_flux
         norm_ivars[jj] = norm_ivar
     print "Loaded %s stellar spectra" %len(files)
     return lambdas, norm_fluxes, norm_ivars, SNRs
 
-def construct_ivar(lambdas, fluxes, flux_errs):
-    """Find bad pixels in a spectrum and return ivar
-
-    Definition of a bad pixel
-    -------------------------
-    Flux is infinite
-    Error is infinite
-    Error is negative
-    """
-    npixels = len(fluxes)
+def get_pixmask(fluxes, flux_errs):
     bad_flux = np.isinf(fluxes)
     bad_err = np.logical_or(np.isinf(flux_errs), flux_errs <= 0)
-    good_pix = np.logical_not(np.logical_or(bad_flux, bad_err))
-    ivar = np.zeros(npixels, dtype=float)
-    ivar[good_pix] = 1. / (flux_errs[good_pix]**2)
-    return ivar
+    bad_pix = np.logical_or(bad_err, bad_flux)
+    good_pix = np.invert(bad_pix)
+    return good_pix, bad_pix
 
 def find_continuum_pix(lambdas, spectra):
     """ Identify continuum pixels for use in normalization.
@@ -115,7 +108,6 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars):
         continua[start:stop] = fit(lambda_cut)
         norm_flux[start:stop] = flux/fit(lambda_cut)
         norm_flux_err[start:stop] = flux_err/fit(lambda_cut)
-        norm_ivar[start:stop] = construct_ivar(lambda_cut,
-                norm_flux[start:stop], norm_flux_err[start:stop])
+        norm_ivar[start:stop] = 1. / norm_flux_err[start:stop]**2
         #ivars_orig[start:stop]*(fit(lambda_cut))**2
     return norm_flux, norm_ivar, continua
