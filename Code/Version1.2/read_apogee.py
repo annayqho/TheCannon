@@ -37,7 +37,8 @@ def get_spectra(files):
             wl_full = [10**aval for aval in wl_full_log]
             lambdas = np.array(wl_full)
         flux_errs = np.array((file_in[2].data))
-        SNRs[jj] = float(file_in[0].header['SNR'])
+        SNRs[jj] = flux_errs**2 / fluxes
+        #SNRs[jj] = float(file_in[0].header['SNR'])
         ivar = construct_ivar(lambdas, fluxes, flux_errs)
         norm_flux, norm_ivar, continua = continuum_normalize_Chebyshev(
                 lambdas, fluxes, flux_errs, ivar)
