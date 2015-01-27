@@ -43,10 +43,11 @@ def get_spectra(files):
         fluxes = np.ma.array(fluxes, mask=badpix, fill_value=1.)
         flux_errs = np.ma.array(flux_errs, mask=badpix, fill_value=LARGE)
         SNRs[jj] = np.ma.median(fluxes/flux_errs)
-        ivar = 1. / (flux_errs**2)
+        ones = np.ma.array(np.ones(npixels), mask=badpix)
+        ivar = ones / (flux_errs**2)
         norm_flux, norm_ivar, continua = continuum_normalize_Chebyshev(
                 lambdas, fluxes, flux_errs, ivar)
-        badpix = get_pixmask(norm_flux, 1./np.sqrt(norm_ivar)) 
+        badpix = get_pixmask(norm_flux, ones/np.sqrt(norm_ivar)) 
         norm_fluxes[jj] = np.ma.array(norm_flux, mask=badpix, fill_value = 1.0)
         norm_ivars[jj] = np.ma.array(norm_ivar, mask=badpix, fill_value = 0.)
     print "Loaded %s stellar spectra" %len(files)
