@@ -167,17 +167,19 @@ def model_diagnostics(reference_set, model):
    
     # Baseline spectrum with continuum
     baseline_spec = coeffs_all[:,0]
+    cont = np.round(baseline_spec,5) == 1
+    baseline_spec = np.ma.array(baseline_spec, mask=cont)
+    lams = np.ma.array(lams, mask=cont)
     fig, axarr = plt.subplots(2, sharex=True)
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
-    plt.xlim(min(lams), max(lams))
+    plt.xlim(np.ma.min(lams), np.ma.max(lams))
     ax = axarr[0]
     ax.plot(lams, baseline_spec,
             label=r'$\theta_0$' + "= the leading fit coefficient")
     contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
         usecols = (0,), unpack =1))
     y = [1]*len(contpix_lambda)
-    ax.scatter(contpix_lambda, y, s=1,
-            label="continuum pixels")
+    ax.scatter(contpix_lambda, y, s=1, label="continuum pixels")
     ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
     ax.set_title("Baseline Spectrum with Continuum Pixels")
     ax.set_ylabel(r'$\theta_0$')

@@ -8,12 +8,14 @@ def draw_spectra(model, test_set):
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nstars = len(test_set.IDs)
     cannon_fluxes = np.zeros(test_set.fluxes.shape)
+    cannon_ivars = np.zeros(test_set.ivars.shape)
     for i in range(nstars):
         x = label_vector[:,i,:]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
-        cannon_fluxes[i,:]=spec_fit
+        cannon_fluxes[i,:] = spec_fit
+        cannon_ivars[i,:] = 1. / scatters**2
     cannon_set = Dataset(IDs=test_set.IDs, SNRs=test_set.SNRs, 
-            lams = test_set.lams, fluxes=cannon_fluxes, ivars = test_set.ivars,
+            lams = test_set.lams, fluxes=cannon_fluxes, ivars = cannon_ivars,
             label_names = test_set.label_names, 
             label_vals = test_set.label_vals)
     return cannon_set
