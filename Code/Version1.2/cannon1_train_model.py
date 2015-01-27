@@ -176,7 +176,8 @@ def model_diagnostics(reference_set, model):
     ax = axarr[0]
     ax.plot(lams, baseline_spec,
             label=r'$\theta_0$' + "= the leading fit coefficient")
-    contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
+    #contpix = list(np.loadtxt("contpix.txt"))
+    contpix_lambda = list(np.loadtxt("contpix_lambda.txt", 
         usecols = (0,), unpack =1))
     y = [1]*len(contpix_lambda)
     ax.scatter(contpix_lambda, y, s=1, label="continuum pixels")
@@ -186,10 +187,9 @@ def model_diagnostics(reference_set, model):
     ax = axarr[1]
     ax.plot(lams, baseline_spec, 
             label=r'$\theta_0$' + "= the leading fit coefficient")
-    contpix_lambda = list(np.loadtxt("pixtest4_lambda.txt", 
-        usecols = (0,), unpack =1))
-    ax.scatter(contpix_lambda, y, s=1,
-            label="continuum pixels")
+    #contpix_lambda = list(np.loadtxt("contpix_lambda.txt", 
+    #    usecols = (0,), unpack =1))
+    ax.scatter(contpix_lambda, y, s=1, label="continuum pixels")
     ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
     ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
     ax.set_ylabel(r'$\theta_0$')
