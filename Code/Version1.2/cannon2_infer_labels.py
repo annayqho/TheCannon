@@ -17,7 +17,7 @@ def get_lvec(labels):
             element = labels[i]*labels[j]
             lvec.append(element)
     lvec = np.array(lvec)
-    return x
+    return lvec
 
 def func(coeffs, *labels):
     lvec = get_lvec(list(labels))

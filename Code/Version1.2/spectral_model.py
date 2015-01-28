@@ -101,10 +101,11 @@ def residuals(cannon_set, test_set, model):
         #lim = np.maximum(np.abs(sorted_res.max()), np.abs(sorted_res.min()))
         plt.imshow(sorted_res, cmap=plt.cm.bwr_r,
                 interpolation="nearest", vmin=mu-3*sigma, vmax=mu+3*sigma,
-                aspect='auto',origin='lower')
+                aspect='auto',origin='lower', 
+                extent=[0, len(scatters), min(label_vals), max(label_vals)])
         plt.title("Spectral Residuals Sorted by " + r"$%s$" %label_name)
         plt.xlabel("Pixels")
-        plt.ylabel("Stars")
+        plt.ylabel(r"$%s$" %label_name)
         plt.colorbar()
         filename = "residuals_sorted_by_label_%s.png" %i
         plt.savefig(filename)
