@@ -140,12 +140,10 @@ def train_model(reference_set):
                         # there are only four outputs from do_one_regression_at_
                         # fixed_scatter...confused
     
-    # Calc red chi sq
+    # Calc chi sq
     all_chisqs = chis*chis
     chisqs = np.sum(all_chisqs, axis=0) # now we have one per star
-    dof = npixels-nlabels
-    red_chisqs = chisqs/dof
-    model = coeffs, covs, scatters, red_chisqs, pivots, x_full
+    model = coeffs, covs, scatters, chisqs, pivots, x_full
     print "Done training model"
     return model
 
