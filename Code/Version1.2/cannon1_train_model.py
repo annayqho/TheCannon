@@ -155,6 +155,7 @@ def model_diagnostics(reference_set, model):
     lams = reference_set.lams
     label_names = reference_set.label_names
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
+    nlabels = len(pivots)
 
     # Baseline spectrum with continuum
     baseline_spec = coeffs_all[:,0]
@@ -185,27 +186,38 @@ def model_diagnostics(reference_set, model):
     ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
     ax.set_ylabel(r'$\theta_0$')
     ax.set_ylim(0.95, 1.05)
-
     filename = "baseline_spec_with_cont_pix.png"
     print "Diagnostic plot: fitted 0th order spectrum, cont pix overlaid." 
     print "Saved as %s" %filename
     plt.savefig(filename)
     plt.close()
 
-    # Leading coefficients for each label
-    nlabels = len(pivots)
-    fig, axarr = plt.subplots(nlabels, sharex=True)
+    # Leading coefficients for each label & scatter
+    ## Scale coefficients so that they can be overlaid on the same plot
+    stds = np.array([np.std(coeffs_all[:,i+1]) for i in range(nlabels)])
+    pivot_std = max(stds)
+    ratios = np.round(pivot_std / stds, -1) # round to the nearest 10
+    ratios[ratios==0] = 1
+    fig, axarr = plt.subplots(2, sharex=True)
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
-    plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+    plt.xlim(np.ma.min(lams), np.ma.max(lams))
+    ax = axarr[0]
+    ax.set_ylabel("Leading coefficient " + r"$\theta_i$")
+    ax.set_title("First-Order Fit Coefficients for Labels")
     for i in range(nlabels):
-        ax = axarr[i]
-        ax.set_ylabel(r"$\theta_%s$" %(i+1))
-        ax.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-        ax.set_title("First-Order Fit Coefficient for "+r"$%s$"%label_names[i])
-        ax.plot(lams, coeffs_all[:,i+1], 
-                label=r'$\theta_%s$' %(i+1)+"= the first-order fit coefficient")
-        ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
-    print "Diagnostic plot: leading coefficients as a function of wavelength."
+        coeffs = coeffs_all[:,i+1] * ratios[i]
+        ax.plot(lams, coeffs, label=r'$\theta_%s$'%(i+1)+'=coeff for ' + 
+                r" $%s$*%s"%(label_names[i], ratios[i]))
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height*0.1, box.width, box.height*0.9])
+    ax.legend(bbox_to_anchor=(0., -.2, 1., .102), loc=3, ncol=3, mode="expand", 
+            prop={'family':'serif', 'size':'small'})
+    ax = axarr[1]
+    ax.set_ylabel("scatter")
+    ax.set_title("Scatter of Fit")
+    ax.plot(lams, scatters)
+    fig.tight_layout(pad=2.0, h_pad=4.0)
+    print "Diagnostic plot: leading coeffs and scatters across wavelength."
     filename = "leading_coeffs.png"
     print "Saved as %s" %filename
     fig.savefig(filename)
