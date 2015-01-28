@@ -229,7 +229,7 @@ function of wavelength.
 3.3) Histogram of the reduced chi squareds of the fits (normalized by DOF, 
 where DOF = npixels-nlabels)
 
-.. image:: modelfit_redchisqs.png
+.. image:: modelfit_chisqs.png
 
 Step 4: *The Cannon*'s Test Step (``infer_labels``, ``test_set_diagnostics``)
 -----------------------------------------------------------------------------
