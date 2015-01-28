@@ -166,22 +166,22 @@ def model_diagnostics(reference_set, model):
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
     plt.xlim(np.ma.min(lams), np.ma.max(lams))
     ax = axarr[0]
-    ax.plot(lams, baseline_spec,
+    ax.plot(lams, baseline_spec, c='k', linewidth=0.3,
             label=r'$\theta_0$' + "= the leading fit coefficient")
     #contpix = list(np.loadtxt("contpix.txt"))
     contpix_lambda = list(np.loadtxt("contpix_lambda.txt", 
         usecols = (0,), unpack =1))
     y = [1]*len(contpix_lambda)
-    ax.scatter(contpix_lambda, y, s=1, label="continuum pixels")
+    ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
     ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
     ax.set_title("Baseline Spectrum with Continuum Pixels")
     ax.set_ylabel(r'$\theta_0$')
     ax = axarr[1]
-    ax.plot(lams, baseline_spec, 
+    ax.plot(lams, baseline_spec, c='k', linewidth=0.3,
             label=r'$\theta_0$' + "= the leading fit coefficient")
     #contpix_lambda = list(np.loadtxt("contpix_lambda.txt", 
     #    usecols = (0,), unpack =1))
-    ax.scatter(contpix_lambda, y, s=1, label="continuum pixels")
+    ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
     ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
     ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
     ax.set_ylabel(r'$\theta_0$')
@@ -206,8 +206,8 @@ def model_diagnostics(reference_set, model):
     ax.set_title("First-Order Fit Coefficients for Labels")
     for i in range(nlabels):
         coeffs = coeffs_all[:,i+1] * ratios[i]
-        ax.plot(lams, coeffs, label=r'$\theta_%s$'%(i+1)+'=coeff for ' + 
-                r" $%s$*%s"%(label_names[i], ratios[i]))
+        ax.plot(lams, coeffs, linewidth=0.3, label=r'$\theta_%s$'%(i+1)
+                +'=coeff for ' + r" $%s$*%s"%(label_names[i], ratios[i]))
     box = ax.get_position()
     ax.set_position([box.x0, box.y0 + box.height*0.1, box.width, box.height*0.9])
     ax.legend(bbox_to_anchor=(0., -.2, 1., .102), loc=3, ncol=3, mode="expand", 
@@ -215,7 +215,7 @@ def model_diagnostics(reference_set, model):
     ax = axarr[1]
     ax.set_ylabel("scatter")
     ax.set_title("Scatter of Fit")
-    ax.plot(lams, scatters)
+    ax.plot(lams, scatters, c='k', linewidth=0.3)
     fig.tight_layout(pad=2.0, h_pad=4.0)
     print "Diagnostic plot: leading coeffs and scatters across wavelength."
     filename = "leading_coeffs.png"
