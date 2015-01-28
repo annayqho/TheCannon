@@ -4,24 +4,24 @@
 from scipy import optimize as opt
 import numpy as np
 
-def get_x(labels):
+def get_lvec(labels):
     """
     Constructs a label vector for an arbitrary number of labels
     Assumes that our model is quadratic in the labels
     """
     nlabels = len(labels)
-    x = labels # linear terms 
+    lvec = labels # linear terms 
     # Quadratic terms: 
     for i in range(nlabels):
         for j in range(i, nlabels):
             element = labels[i]*labels[j]
-            x.append(element)
-    x = np.array(x)
+            lvec.append(element)
+    lvec = np.array(lvec)
     return x
 
 def func(coeffs, *labels):
-    x = get_x(list(labels))
-    return np.dot(coeffs, x)
+    lvec = get_lvec(list(labels))
+    return np.dot(coeffs, lvec)
 
 def infer_labels(model, test_set):
     """
@@ -39,7 +39,7 @@ def infer_labels(model, test_set):
     MCM_rotate_all:
     covs_all: covariance matrix of the fit
     """
-    coeffs_all, covs, scatters, red_chisqs, pivots, label_values = model
+    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nlabels = len(pivots)
     lambdas = test_set.lams
     fluxes = test_set.fluxes

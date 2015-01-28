@@ -11,43 +11,43 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 import os
 
-def do_one_regression_at_fixed_scatter(lams, fluxes, ivars, x, scatter):
+def do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
     Params
     ------
     lams: ndarray, [npixels]
     spectra: ndarray, [nstars, 3]
-    x=coefficients of the model: ndarray, [nstars, nlabels]
+    lvec=label vector: ndarray, [nstars, 10]
     scatter: ndarray, [nstars]
 
     Returns
     ------
     coeff: ndarray
         coefficients of the fit
-    xTCinvx: ndarray
+    lTCinvl: ndarray
         inverse covariance matrix for fit coefficients
     chi: float
         chi-squared at best fit
     logdet_Cinv: float
         inverse of the log determinant of the cov matrix
     """
-    err2 = 100**2*np.ones(len(ivars))
+    sig2 = 100**2*np.ones(len(ivars))
     mask = ivars != 0
-    err2[mask] = 1. / ivars[mask]
-    Cinv = 1. / (err2 + scatter**2)
-    xTCinvx = np.dot(x.T, Cinv[:, None] * x) 
-    xTCinvf = np.dot(x.T, Cinv * fluxes)
+    sig2[mask] = 1. / ivars[mask]
+    Cinv = 1. / (sig2 + scatter**2)
+    lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec) 
+    lTCinvf = np.dot(lvec.T, Cinv * fluxes)
     try:
-        coeff = np.linalg.solve(xTCinvx, xTCinvf) # this is the model!
+        coeff = np.linalg.solve(lTCinvl, lTCinvf) 
     except np.linalg.linalg.LinAlgError:
         print "np.linalg.linalg.LinAlgError, do_one_regression_at_fixed_scatter"
-        print xTCinvx, xTCinvf, lams, fluxes
+        print lTCinvx, lTCinvf, lams, fluxes
     assert np.all(np.isfinite(coeff))
-    chi = np.sqrt(Cinv) * (fluxes - np.dot(x, coeff))
+    chi = np.sqrt(Cinv) * (fluxes - np.dot(lvec, coeff))
     logdet_Cinv = np.sum(np.log(Cinv))
-    return (coeff, xTCinvx, chi, logdet_Cinv)
+    return (coeff, lTCinvl, chi, logdet_Cinv)
 
-def do_one_regression(lams, fluxes, ivars, x):
+def do_one_regression(lams, fluxes, ivars, lvec):
     """
     Optimizes to find the scatter associated with the best-fit model.
 
@@ -58,30 +58,27 @@ def do_one_regression(lams, fluxes, ivars, x):
     -----
     lams: ndarray, [npixels]
     spectra: ndarray, [nstars, 2] 
-    x = coefficients of the model: ndarray, [nstars, nlabels]
+    x = the label vector, ndarray, [nstars, 10]
 
     Output
     -----
     output of do_one_regression_at_fixed_scatter
     """
-    # cover the full order of the scatter term, scatter << max term
     ln_scatter_vals = np.arange(np.log(0.0001), 0., 0.5) 
-    # will minimize over the range of scatter possibilities
+    # minimize over the range of scatter possibilities
     chis_eval = np.zeros_like(ln_scatter_vals)
     for jj, ln_scatter_val in enumerate(ln_scatter_vals):
-        coeff, xTCinvx, chi, logdet_Cinv = do_one_regression_at_fixed_scatter(
-                lams, fluxes, ivars, x, scatter = np.exp(ln_scatter_val))
-        chis_eval[jj] = np.sum(chi * chi) - logdet_Cinv
-    # What do the below two cases *mean*?
+        coeff, lTCinvl, chi, logdet_Cinv = do_one_regression_at_fixed_scatter(
+                lams, fluxes, ivars, lvec, scatter = np.exp(ln_scatter_val))
+        chis_eval[jj] = np.sum(chi*chi) - logdet_Cinv
     if np.any(np.isnan(chis_eval)):
         best_scatter = np.exp(ln_scatter_vals[-1]) 
-        return do_one_regression_at_fixed_scatter(
-                lams, fluxes, ivars, x, scatter = best_scatter) + (best_scatter, )
-    lowest = np.argmin(chis_eval) # the best-fit scatter value?
-    # If it was unsuccessful at finding it...
+        return do_one_regression_at_fixed_scatter(lams, fluxes, ivars, 
+                lvec, scatter = best_scatter) + (best_scatter, )
+    lowest = np.argmin(chis_eval) 
     if lowest == 0 or lowest == len(ln_scatter_vals) + 1: 
         best_scatter = np.exp(ln_scatter_vals[lowest])
-        return do_one_regression_at_fixed_scatter(lams, fluxes, ivars, x, 
+        return do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, 
                 scatter = best_scatter) + (best_scatter, )
     ln_scatter_vals_short = ln_scatter_vals[np.array(
         [lowest-1, lowest, lowest+1])]
@@ -92,7 +89,7 @@ def do_one_regression(lams, fluxes, ivars, x):
     fit_pder2 = pylab.polyder(fit_pder)
     best_scatter = np.exp(np.roots(fit_pder)[0])
     return do_one_regression_at_fixed_scatter(
-            lams, fluxes, ivars, x, scatter = best_scatter) + (best_scatter, )
+            lams, fluxes, ivars, lvec, scatter = best_scatter) + (best_scatter, )
 
 def train_model(reference_set):
     """
@@ -124,26 +121,22 @@ def train_model(reference_set):
     linear_offsets = label_vals - pivots
     quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)] 
         for m in (label_vals - pivots)])
-    x = np.hstack((ones, linear_offsets, quadratic_offsets))
-    x_full = np.array([x,]*npixels) 
+    lvec = np.hstack((ones, linear_offsets, quadratic_offsets))
+    lvec_full = np.array([lvec,]*npixels) 
 
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1) # for consistency with x_full
     ivars = ivars.swapaxes(0,1)
-    blob = map(do_one_regression, lams, fluxes, ivars, x_full) #one per pix
+    blob = map(do_one_regression, lams, fluxes, ivars, lvec_full) #one per pix
     coeffs = np.array([b[0] for b in blob])
     covs = np.array([np.linalg.inv(b[1]) for b in blob])
     chis = np.array([b[2] for b in blob])
-    chisqs = np.array([np.dot(b[2],b[2]) - b[3] for b in blob])
-    # is the above actually supposed to be b[2]*b[2]? 
-    scatters = np.array([b[4] for b in blob]) # how could there be a b[4]?
-                        # there are only four outputs from do_one_regression_at_
-                        # fixed_scatter...confused
+    scatters = np.array([b[4] for b in blob]) 
     
     # Calc chi sq
     all_chisqs = chis*chis
-    chisqs = np.sum(all_chisqs, axis=0) # now we have one per star
-    model = coeffs, covs, scatters, chisqs, pivots, x_full
+    #chisqs = np.sum(all_chisqs, axis=0) # now we have one per star
+    model = coeffs, covs, scatters, all_chisqs, pivots, lvec_full
     print "Done training model"
     return model
 
@@ -218,17 +211,14 @@ def model_diagnostics(reference_set, model):
     fig.savefig(filename)
     plt.close(fig)
 
-    # Histogram of the reduced chi squareds of the fits
-    plt.hist(chisqs)
-    # Calculate the number of degrees of freedom...
-    # npixels*nstars - npixels*(ncoeffs-1 + 1 for scatter)
-    # dof = len(lams)*label_vector.shape[1] - len(lams)*coeffs_all.shape[1]
-    dof = len(lams)-coeffs_all.shape[1]
+    # Histogram of the chi squareds of ind. stars 
+    plt.hist(np.sum(chisqs, axis=0))
+    dof = len(lams) - coeffs_all.shape[1] # for one star
     plt.axvline(x=dof, c='k', linewidth=2, label="DOF")
     plt.legend()
-    plt.title("Distribution of Chi Squareds of the Model Fit")
+    plt.title("Distribution of "+ r"$\chi^2$" + " of the Model Fit")
     plt.ylabel("Count")
-    plt.xlabel("Chi Sq") 
+    plt.xlabel(r"$\chi^2$" + " of Individual Star") 
     filename = "modelfit_chisqs.png"
     print "Diagnostic plot: histogram of the red chi squareds of the fit"
     print "Saved as %s" %filename
