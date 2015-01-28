@@ -161,8 +161,8 @@ def model_diagnostics(reference_set, model):
     """
     lams = reference_set.lams
     label_names = reference_set.label_names
-    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
-   
+    coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
+
     # Baseline spectrum with continuum
     baseline_spec = coeffs_all[:,0]
     cont = np.round(baseline_spec,5) == 1
@@ -219,11 +219,17 @@ def model_diagnostics(reference_set, model):
     plt.close(fig)
 
     # Histogram of the reduced chi squareds of the fits
-    plt.hist(red_chisqs)
-    plt.title("Distribution of Reduced Chi Squareds of the Model Fit")
+    plt.hist(chisqs)
+    # Calculate the number of degrees of freedom...
+    # npixels*nstars - npixels*(ncoeffs-1 + 1 for scatter)
+    # dof = len(lams)*label_vector.shape[1] - len(lams)*coeffs_all.shape[1]
+    dof = len(lams)-coeffs_all.shape[1]
+    plt.axvline(x=dof, c='k', linewidth=2, label="DOF")
+    plt.legend()
+    plt.title("Distribution of Chi Squareds of the Model Fit")
     plt.ylabel("Count")
-    plt.xlabel("Reduced Chi Sq") 
-    filename = "modelfit_redchisqs.png"
+    plt.xlabel("Chi Sq") 
+    filename = "modelfit_chisqs.png"
     print "Diagnostic plot: histogram of the red chi squareds of the fit"
     print "Saved as %s" %filename
     plt.savefig(filename)
