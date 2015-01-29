@@ -1,8 +1,11 @@
 import numpy as np
 import os
 import random
+import math
 from dataset import Dataset
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
+from matplotlib import make_axes
 
 def draw_spectra(model, test_set):
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
@@ -84,13 +87,17 @@ def overlay_spectra(cannon_set, test_set, model):
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
 
-def residuals(cannon_set, test_set, model):
-    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
+def residuals(cannon_set, test_set):
+    """ Stack spectrum fit residuals, sort by each label. Include histogram of
+    the RMS at each pixel. 
+    """
     print "Stacking spectrum fit residuals"
     res = test_set.fluxes-cannon_set.fluxes
-    spec_fit = cannon_set.fluxes
-    err = np.sqrt(1./test_set.ivars + scatters**2)
+    err = np.sqrt(1./test_set.ivars + 1./cannon_set.ivars)
     res_norm = res/err
+    res_norm = np.ma.array(res_norm, 
+            mask=(np.ones_like(res_norm)*(std(res_norm,axis=0)==0)))
+    res_norm = np.ma.compress_cols(res_norm)
     for i in range(len(cannon_set.label_names)):
         label_name = cannon_set.label_names[i]
         print "Plotting residuals sorted by %s" %label_name
@@ -98,15 +105,45 @@ def residuals(cannon_set, test_set, model):
         sorted_res = res_norm[np.argsort(label_vals)]
         mu = np.mean(sorted_res.flatten())
         sigma = np.std(sorted_res.flatten())
-        #lim = np.maximum(np.abs(sorted_res.max()), np.abs(sorted_res.min()))
-        plt.imshow(sorted_res, cmap=plt.cm.bwr_r,
+        left, width = 0.1, 0.65
+        bottom, height = 0.1, 0.65
+        bottom_h = left_h = left+width+0.1
+        rect_scatter = [left, bottom, width, height]
+        rect_histx = [left, bottom_h, width, 0.1]
+        rect_histy = [left_h, bottom, 0.1, height]
+        rect_cbar = [left, bottom-0.2, 0.6, 0.06]
+        plt.figure(1, figsize(10,10))
+        axScatter = plt.axes(rect_scatter)
+        axHistx = plt.axes(rect_histx)
+        axHisty = plt.axes(rect_histy)
+        im = axScatter.imshow(sorted_res, cmap=plt.cm.bwr_r,
                 interpolation="nearest", vmin=mu-3*sigma, vmax=mu+3*sigma,
-                aspect='auto',origin='lower', 
-                extent=[0, len(scatters), min(label_vals), max(label_vals)])
-        plt.title("Spectral Residuals Sorted by " + r"$%s$" %label_name)
-        plt.xlabel("Pixels")
-        plt.ylabel(r"$%s$" %label_name)
-        plt.colorbar()
+                aspect='auto', origin='lower', extent=[0,
+                    len(test_set.lams), min(label_vals), max(label_vals)])
+        cax, kw = make_axes(axScatter.axes, location='bottom')
+        colorbar(im, cax=cax, orientation='horizontal')
+        axScatter.set_title("Spectral Residuals Sorted by " + r"$%s$" %label_name)
+        axScatter.set_xlabel("Pixels")
+        axScatter.set_ylabel(r"$%s$" %label_name)
+        axHisty.hist(std(res_norm,axis=1), orientation='horizontal')
+        axHisty.axhline(y=1, c='k', linewidth=3, label="y=1")
+        axHisty.legend(bbox_to_anchor=(0.,0.8,1.,.102), 
+                prop={'family':'serif', 'size':'small'})
+        axHisty.text(1.0, 0.5, "Distribution of Stdev of Star Residuals", 
+                verticalalignment='center', transform=axHisty.transAxes, rotation=270)
+        axHisty.set_ylabel("Standard Deviation")
+        start, end = axHisty.get_xlim()
+        axHisty.xaxis.set_ticks(np.linspace(start, end, 3))
+        axHisty.set_xlabel("Number of Stars")
+        axHisty.xaxis.set_label_position("top")
+        axHistx.hist(std(res_norm, axis=0))
+        axHistx.axvline(x=1, c='k', linewidth=3, label="x=1")
+        axHistx.set_title("Distribution of Stdev of Pixel Residuals")
+        axHistx.set_xlabel("Standard Deviation")
+        axHistx.set_ylabel("Number of Pixels")
+        start, end = axHistx.get_ylim()
+        axHistx.yaxis.set_ticks(np.linspace(start, end, 3))
+        axHistx.legend()
         filename = "residuals_sorted_by_label_%s.png" %i
         plt.savefig(filename)
         print "File saved as %s" %filename

@@ -32,7 +32,7 @@ mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
 reference_set.choose_objects(mask)
 
 test_set = Dataset(IDs=reference_set.IDs, SNRs=reference_set.SNRs,
-        lams=lambdas, fluxes=reference_set.fluxes, ivars = reference_set.ivars, 
+        lams=lambdas, fluxes=reference_set.fluxes, ivars = reference_set.ivars,
         label_names=reference_set.label_names)
 
 from dataset import dataset_prediagnostics
