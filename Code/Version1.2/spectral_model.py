@@ -152,10 +152,19 @@ def residuals(cannon_set, test_set):
     print "Plotting Auto-Correlation of Mean Residuals"
     mean_res = res_norm.mean(axis=0)
     autocorr = np.correlate(mean_res, mean_res, mode="full")
-    plt.plot(autocorr)
-    plt.title("Autocorrelation of Mean Spectral Residual")
-    plt.xlabel("Lag (# Pixels)")
-    plt.ylabel("Autocorrelation")
+    pkwidth = int(len(autocorr)/2-np.argmin(autocorr))
+    xmin = int(len(autocorr)/2)-pkwidth
+    xmax = int(len(autocorr)/2)+pkwidth
+    zoom_x = np.linspace(xmin, xmax, len(autocorr[xmin:xmax]))
+    fig, axarr = subplots(2)
+    axarr[0].plot(autocorr)
+    axarr[0].set_title("Autocorrelation of Mean Spectral Residual")
+    axarr[0].set_xlabel("Lag (# Pixels)")
+    axarr[0].set_ylabel("Autocorrelation")
+    axarr[1].plot(zoom_x, autocorr[xmin:xmax]) 
+    axarr[1].set_title("Central Peak, Zoomed")
+    axarr[1].set_xlabel("Lag (# Pixels)")
+    axarr[1].set_ylabel("Autocorrelation")
     filename = "residuals_autocorr.png" 
     plt.savefig(filename)
     print "saved %s" %filename
