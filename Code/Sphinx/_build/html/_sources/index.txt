@@ -242,7 +242,8 @@ outside of the reference label space.
 
 .. image:: survey_labels_triangle.png
 
-4.3) 1-1 plots, for each label, reference values plotted against test values
+4.3) 1-1 plots, for each label, reference values plotted against test values. 
+Accompanied by a histogram of the difference in values.
 
 .. image:: 1to1_label_0.png
     :width: 300pt
