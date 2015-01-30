@@ -1,3 +1,5 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+
 """Extract & continuum-normalize spectra from APOGEE .fits files."""
 
 import pyfits
@@ -57,7 +59,7 @@ def get_spectra(dir_name):
         norm_fluxes[jj] = np.ma.filled(temp)
         temp = np.ma.array(norm_ivar, mask=badpix2, fill_value = 0.)
         norm_ivars[jj] = np.ma.filled(temp)
-    print "Loaded %s stellar spectra" %len(files)
+    print("Loaded %s stellar spectra" %len(files))
     return lambdas, norm_fluxes, norm_ivars, SNRs
 
 def get_pixmask(fluxes, flux_errs):

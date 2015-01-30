@@ -1,3 +1,5 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+
 """This runs Step 1 of The Cannon: 
     uses the training set to solve for the best-fit model."""
 
@@ -40,8 +42,8 @@ def do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     try:
         coeff = np.linalg.solve(lTCinvl, lTCinvf) 
     except np.linalg.linalg.LinAlgError:
-        print "np.linalg.linalg.LinAlgError, do_one_regression_at_fixed_scatter"
-        print lTCinvx, lTCinvf, lams, fluxes
+        print("np.linalg.linalg.LinAlgError, do_one_regression_at_fixed_scatter")
+        print(lTCinvx, lTCinvf, lams, fluxes)
     assert np.all(np.isfinite(coeff))
     chi = np.sqrt(Cinv) * (fluxes - np.dot(lvec, coeff))
     logdet_Cinv = np.sum(np.log(Cinv))
@@ -105,7 +107,7 @@ def train_model(reference_set):
     the pivot values
     the label vector
     """
-    print "Training model..."
+    print("Training model...")
     label_names = reference_set.label_names
     label_vals = reference_set.label_vals 
     nlabels = len(label_names)
@@ -137,7 +139,7 @@ def train_model(reference_set):
     all_chisqs = chis*chis
     #chisqs = np.sum(all_chisqs, axis=0) # now we have one per star
     model = coeffs, covs, scatters, all_chisqs, pivots, lvec_full
-    print "Done training model"
+    print("Done training model")
     return model
 
 def model_diagnostics(reference_set, model):
@@ -187,8 +189,8 @@ def model_diagnostics(reference_set, model):
     ax.set_ylabel(r'$\theta_0$')
     ax.set_ylim(0.95, 1.05)
     filename = "baseline_spec_with_cont_pix.png"
-    print "Diagnostic plot: fitted 0th order spectrum, cont pix overlaid." 
-    print "Saved as %s" %filename
+    print("Diagnostic plot: fitted 0th order spectrum, cont pix overlaid.") 
+    print("Saved as %s" %filename)
     plt.savefig(filename)
     plt.close()
 
@@ -217,9 +219,9 @@ def model_diagnostics(reference_set, model):
     ax.set_title("Scatter of Fit")
     ax.plot(lams, scatters, c='k', linewidth=0.3)
     fig.tight_layout(pad=2.0, h_pad=4.0)
-    print "Diagnostic plot: leading coeffs and scatters across wavelength."
+    print("Diagnostic plot: leading coeffs and scatters across wavelength.")
     filename = "leading_coeffs.png"
-    print "Saved as %s" %filename
+    print("Saved as %s" %filename)
     fig.savefig(filename)
     plt.close(fig)
 
@@ -232,7 +234,7 @@ def model_diagnostics(reference_set, model):
     plt.ylabel("Count")
     plt.xlabel(r"$\chi^2$" + " of Individual Star") 
     filename = "modelfit_chisqs.png"
-    print "Diagnostic plot: histogram of the red chi squareds of the fit"
-    print "Saved as %s" %filename
+    print("Diagnostic plot: histogram of the red chi squareds of the fit")
+    print("Saved as %s" %filename)
     plt.savefig(filename)
     plt.close()

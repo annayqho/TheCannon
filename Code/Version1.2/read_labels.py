@@ -1,3 +1,5 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+
 import numpy as np
 
 def get_reference_labels(filename):
@@ -23,7 +25,7 @@ def get_reference_labels(filename):
     sorted_vals = [val for (ID, val) in sorted(zip(IDs,label_values))]
     sorted_vals = np.array(sorted_vals)
     IDs = np.sort(IDs) 
-    print "Loaded stellar IDs, format: %s" %IDs[0]
-    print "Loaded %s labels:" %nlabels
-    print label_names
+    print("Loaded stellar IDs, format: %s" %IDs[0])
+    print("Loaded %s labels:" %nlabels)
+    print(label_names)
     return IDs, label_names, sorted_vals

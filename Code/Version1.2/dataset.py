@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
 import numpy as np
 import matplotlib.pyplot as plt
 import triangle
@@ -98,13 +99,13 @@ class Dataset(object):
                 show_titles=True, title_args = {"fontsize":12})
         #fig.gca().annotate("Label Triangle Plot")
         fig.savefig(figname)
-        print "Plotting every label against every other"
-        print "Saved fig %s" %figname
+        print("Plotting every label against every other")
+        print("Saved fig %s" %figname)
         plt.close(fig)
 
 def dataset_prediagnostics(reference_set, test_set):
     # Plot SNR distributions
-    print "Diagnostic for SNRs of reference and survey stars"
+    print("Diagnostic for SNRs of reference and survey stars")
     plt.hist(reference_set.SNRs, alpha=0.5, label="Ref Stars")
     plt.hist(test_set.SNRs, alpha=0.5, label="Survey Stars")
     plt.legend(loc='upper right')
@@ -115,7 +116,7 @@ def dataset_prediagnostics(reference_set, test_set):
     figname = "SNRdist.png"
     plt.savefig(figname)
     plt.close()
-    print "Saved fig %s" %figname
+    print("Saved fig %s" %figname)
 
     # Plot all reference labels against each other
     figname = "reference_labels_triangle.png"
@@ -142,9 +143,9 @@ def dataset_postdiagnostics(reference_set, test_set):
         for star in test_IDs[warning]:
             output.write(star + '\n')
         output.close()
-        print "Reference label %s" %label_name
-        print "flagged %s stars beyond 2-sig of reference labels" %sum(warning)
-        print "Saved list %s" %filename
+        print("Reference label %s" %label_name)
+        print("flagged %s stars beyond 2-sig of reference labels" %sum(warning))
+        print("Saved list %s" %filename)
     # Plot all survey labels against each other
     figname = "survey_labels_triangle.png"
     test_set.label_triangle_plot(figname)
@@ -170,6 +171,6 @@ def dataset_postdiagnostics(reference_set, test_set):
         ax2.set_title("Histogram of Output Minus Ref Labels")
         figname = "1to1_label_%s.png" %i
         plt.savefig(figname)
-        print "Diagnostic for label output vs. input"
-        print "Saved fig %s" %figname
+        print("Diagnostic for label output vs. input")
+        print("Saved fig %s" %figname)
         plt.close()

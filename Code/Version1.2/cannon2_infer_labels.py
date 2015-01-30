@@ -1,3 +1,5 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
+
 """This runs Step 2 of The Cannon:
     uses the model to solve for the labels of the test set."""
 
@@ -39,6 +41,7 @@ def infer_labels(model, test_set):
     MCM_rotate_all:
     covs_all: covariance matrix of the fit
     """
+    print("Inferring Labels...")
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nlabels = len(pivots)
     lambdas = test_set.lams

@@ -1,3 +1,4 @@
+from __future__ import (absolute_import, division, print_function, unicode_literals)
 import numpy as np
 import os
 import random
@@ -40,7 +41,7 @@ def overlay_spectra(cannon_set, test_set, model):
     res = test_set.fluxes-cannon_set.fluxes
     bad_ivar = np.std(res, axis=0) <= 1e-5
     os.system("mkdir SpectrumFits")
-    print "Overplotting spectra for ten random stars"
+    print("Overplotting spectra for ten random stars")
     lambdas = test_set.lams
     npix = len(lambdas)
     nstars = cannon_set.fluxes.shape[0]
@@ -48,7 +49,7 @@ def overlay_spectra(cannon_set, test_set, model):
     for i in range(10):
         pickstars.append(random.randrange(0, nstars-1))
     for i in pickstars:
-        print "Star %s" %i
+        print("Star %s" %i)
         ID = cannon_set.IDs[i]
         spec_orig = test_set.fluxes[i,:]
         bad_flux = np.logical_or(spec_orig == 0, spec_orig == 1) # unique to star
@@ -95,7 +96,7 @@ def overlay_spectra(cannon_set, test_set, model):
         ax2.set_xlabel("Orig Fluxes")
         ax2.set_ylabel("Fitted Fluxes")
         filename = "Star%s.png" %i
-        print "Saved as %s" %filename
+        print("Saved as %s" %filename)
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
 
@@ -103,7 +104,7 @@ def residuals(cannon_set, test_set):
     """ Stack spectrum fit residuals, sort by each label. Include histogram of
     the RMS at each pixel. 
     """
-    print "Stacking spectrum fit residuals"
+    print("Stacking spectrum fit residuals")
     res = test_set.fluxes-cannon_set.fluxes
     err = np.sqrt(1./test_set.ivars + 1./cannon_set.ivars)
     res_norm = res/err
@@ -112,7 +113,7 @@ def residuals(cannon_set, test_set):
     res_norm = np.ma.compress_cols(res_norm)
     for i in range(len(cannon_set.label_names)):
         label_name = cannon_set.label_names[i]
-        print "Plotting residuals sorted by %s" %label_name
+        print("Plotting residuals sorted by %s" %label_name)
         label_vals = cannon_set.label_vals[:,i]
         sorted_res = res_norm[np.argsort(label_vals)]
         mu = np.mean(sorted_res.flatten())
@@ -158,10 +159,10 @@ def residuals(cannon_set, test_set):
         axHistx.legend()
         filename = "residuals_sorted_by_label_%s.png" %i
         plt.savefig(filename)
-        print "File saved as %s" %filename
+        print("File saved as %s" %filename)
         plt.close()
     # Auto-correlation of mean residuals
-    print "Plotting Auto-Correlation of Mean Residuals"
+    print("Plotting Auto-Correlation of Mean Residuals")
     mean_res = res_norm.mean(axis=0)
     autocorr = np.correlate(mean_res, mean_res, mode="full")
     pkwidth = int(len(autocorr)/2-np.argmin(autocorr))
@@ -179,5 +180,5 @@ def residuals(cannon_set, test_set):
     axarr[1].set_ylabel("Autocorrelation")
     filename = "residuals_autocorr.png" 
     plt.savefig(filename)
-    print "saved %s" %filename
+    print("saved %s" %filename)
     plt.close()
