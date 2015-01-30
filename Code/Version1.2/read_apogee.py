@@ -5,7 +5,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
-def get_spectra(files):
+def get_spectra(dir_name):
     """
     Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
 
@@ -20,6 +20,8 @@ def get_spectra(files):
     with spectra[:,:,0] = flux values
     spectra[:,:,1] = flux err values
     """
+    files = [dir_name + "/" + filename for filename in os.listdir(dir_name)]
+    files = np.sort(files)
     LARGE = 1000000.
     for jj,fits_file in enumerate(files):
         file_in = pyfits.open(fits_file)

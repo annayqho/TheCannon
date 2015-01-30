@@ -155,12 +155,19 @@ def dataset_postdiagnostics(reference_set, test_set):
         cannon = test_labels[:,i]
         low = np.minimum(min(orig), min(cannon))
         high = np.maximum(max(orig), max(cannon))
-        plt.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
-        plt.scatter(orig, cannon)
-        plt.legend()
-        plt.xlabel("Reference Value")
-        plt.ylabel("Cannon Output Value")
-        plt.title("1-1 Plot of Label " + r"$%s$" %name)
+        fig, axarr = plt.subplots(2)
+        ax1 = axarr[0]
+        ax1.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
+        ax1.scatter(orig, cannon)
+        ax1.legend()
+        ax1.set_xlabel("Reference Value")
+        ax1.set_ylabel("Cannon Output Value")
+        ax1.set_title("1-1 Plot of Label " + r"$%s$" %name)
+        ax2 = axarr[1]
+        ax2.hist(cannon-orig)
+        ax2.set_xlabel("Difference")
+        ax2.set_ylabel("Count")
+        ax2.set_title("Histogram of Output Minus Ref Labels")
         figname = "1to1_label_%s.png" %i
         plt.savefig(figname)
         print "Diagnostic for label output vs. input"

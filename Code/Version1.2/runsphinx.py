@@ -1,18 +1,10 @@
 # Compile the Sphinx documentation all at once
 
-import numpy as np
-readin = "reference_labels.txt"
-IDs = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
-filenames1 = []
-for i in range(0, len(IDs)): #incorporate file location info
-    filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + IDs[i][1:]
-    filenames1.append(filename)
-
 from read_apogee import get_spectra
-lambdas, norm_fluxes, norm_ivars, SNRs = get_spectra(filenames1)
+lambdas, norm_fluxes, norm_ivars, SNRs = get_spectra("Data")
 
 from read_labels import get_reference_labels
-IDs, all_label_names, all_label_values = get_reference_labels(readin)
+IDs, all_label_names, all_label_values = get_reference_labels("reference_labels_update.txt")
 
 from dataset import Dataset
 reference_set = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, fluxes = norm_fluxes, 
@@ -22,6 +14,7 @@ reference_set = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, fluxes = norm_fluxes,
 cols = [1, 3, 5]
 reference_set.choose_labels(cols)
 
+import numpy as np
 Teff = reference_set.label_vals[:,0]
 Teff_corr = all_label_values[:,2]
 diff_t = np.abs(Teff-Teff_corr)
