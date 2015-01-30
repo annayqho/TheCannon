@@ -121,52 +121,35 @@ stellar parameters and element abundances that are deemed both accurate
 and precise.) The set of reference stars is critical, as the label
 transfer to the survey stars can only be as good as the quality of the
 reference stars.</p>
-<p>The user must construct the following inputs:</p>
-<ol class="arabic simple">
-<li>a list of filenames corresponding to the reference data
-(in this case, APOGEE .fits files)</li>
-<li>a .txt file containing reference labels in an ASCII table.</li>
-</ol>
-<p>The following requirements govern (2):</p>
+<p>The user must construct a .txt file containing reference labels in an ASCII table,
+according to the following requirements:</p>
 <ol class="arabic simple">
 <li>The first row must be strings corresponding to the names of the labels
-and must not contain any &#8216;/&#8217;s</li>
-<li>The first column must be strings corresponding to the stellar IDs</li>
+in a LaTeX compilable format (ex. T_{eff} for effective temperature)</li>
+<li>The first column must be strings corresponding to the filenames with the raw data</li>
 <li>The remaining entries must be floats corresponding to the label values</li>
 </ol>
 <div class="section" id="a-reading-spectra-get-spectra">
 <h4>1a. Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)<a class="headerlink" href="#a-reading-spectra-get-spectra" title="Permalink to this headline">¶</a></h4>
-<p>We construct the first input: the list of filenames corresponding to the
-reference stars (in this case, APOGEE .fits files). In our example, the filenames
-happen to be the first column in the reference labels text file,
-<tt class="docutils literal"><span class="pre">reference_labels.txt</span></tt>. So we simply read the first column of this file.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">readin</span> <span class="o">=</span> <span class="s">&quot;reference_labels.txt&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">readin</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;string&#39;</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filenames1</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">)):</span> <span class="c">#incorporate file location info</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">filename</span> <span class="o">=</span> <span class="s">&#39;/home/annaho/AnnaCannon/Data/APOGEE_Data&#39;</span> <span class="o">+</span> <span class="n">IDs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">filenames1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Once the file list is created, the <tt class="docutils literal"><span class="pre">get_spectra</span></tt> method can be
-used to continuum-normalize the spectrum information and put it
-into the correct format. <tt class="docutils literal"><span class="pre">get_spectra</span></tt> also returns the fitted
-continua (Chebyshev polynomial) and a list of SNR values for the
-spectra.</p>
+<p>The <tt class="docutils literal"><span class="pre">get_spectra</span></tt> method extracts the spectrum information from the
+raw data files (SNR, fluxes, uncertainties) and applies a continuum
+normalization by fitting a Chebyshev polynomial. The user specifies the
+directory in which all of the data files are stored. In this example, the
+directory is called <tt class="docutils literal"><span class="pre">Data</span></tt>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_apogee</span> <span class="kn">import</span> <span class="n">get_spectra</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lambdas</span><span class="p">,</span> <span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">continua</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="n">filenames1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lambdas</span><span class="p">,</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span><span class="p">,</span> <span class="n">SNRs</span> <span class="o">=</span> <span class="n">get_spectra</span><span class="p">(</span><span class="s">&quot;Data&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="b-reading-labels-get-reference-labels">
 <h4>1b. Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)<a class="headerlink" href="#b-reading-labels-get-reference-labels" title="Permalink to this headline">¶</a></h4>
-<p>We construct the second input: the .txt file containing reference labels in an
-ASCII table, with requirements described above. In this example, the .txt file
-is called <tt class="docutils literal"><span class="pre">reference_labels.txt</span></tt>. The method <tt class="docutils literal"><span class="pre">get_reference_labels</span></tt> is used
-to retrieve object IDs, label names, and label values.</p>
+<p>This step assumes that a .txt file containing reference labels has been prepared
+in the correct format (as described above). In this example, the .txt file
+is called <tt class="docutils literal"><span class="pre">reference_labels_update.txt</span></tt>. The method <tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>
+is used to retrieve object IDs, label names, and label values.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">read_labels</span> <span class="kn">import</span> <span class="n">get_reference_labels</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_reference_labels</span><span class="p">(</span><span class="n">readin</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">IDs</span><span class="p">,</span> <span class="n">all_label_names</span><span class="p">,</span> <span class="n">all_label_values</span> <span class="o">=</span> <span class="n">get_reference_labels</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="s">&quot;reference_labels_update.txt&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -174,9 +157,9 @@ to retrieve object IDs, label names, and label values.</p>
 <h4>1c. Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)<a class="headerlink" href="#c-creating-tailoring-a-dataset-object-choose-labels-choose-spectra" title="Permalink to this headline">¶</a></h4>
 <p>A <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">dataset.py</span></tt>) is initialized.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">spectra</span><span class="o">=</span><span class="n">normalized_spectra</span><span class="p">,</span> <span class="n">label_names</span><span class="o">=</span><span class="n">all_label_names</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">label_vals</span><span class="o">=</span><span class="n">all_label_values</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">SNRs</span><span class="p">,</span> <span class="n">lams</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">fluxes</span> <span class="o">=</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">ivars</span> <span class="o">=</span> <span class="n">norm_ivars</span><span class="p">,</span> <span class="n">label_names</span><span class="o">=</span><span class="n">all_label_names</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">label_vals</span><span class="o">=</span><span class="n">all_label_values</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>(Optional) The user can choose to select some subset of the reference labels
@@ -191,33 +174,17 @@ columns 1, 3, and 5.</p>
 (for example, by imposing physical cutoffs) by constructing a mask where
 1 = keep this object, and 0 = remove it. Here, we select data using physical
 Teff and logg cutoffs.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">reference_set</span><span class="o">.</span><span class="n">label_vals</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Teff</span> <span class="o">=</span> <span class="n">reference_set</span><span class="o">.</span><span class="n">label_vals</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Teff_corr</span> <span class="o">=</span> <span class="n">all_label_values</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Teff</span><span class="o">-</span><span class="n">Teff_corr</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">diff_t_cut</span> <span class="o">=</span> <span class="mf">600.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">reference_set</span><span class="o">.</span><span class="n">label_vals</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">logg_cut</span> <span class="o">=</span> <span class="mf">100.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">((</span><span class="n">diff_t</span> <span class="o">&lt;</span> <span class="n">diff_t_cut</span><span class="p">),</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="n">logg_cut</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reference_set</span><span class="o">.</span><span class="n">choose_spectra</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reference_set</span><span class="o">.</span><span class="n">choose_objects</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="d-reference-set-diagnostics-reference-set-diagnostics">
-<h4>1d. Reference set diagnostics (reference_set_diagnostics)<a class="headerlink" href="#d-reference-set-diagnostics-reference-set-diagnostics" title="Permalink to this headline">¶</a></h4>
-<p>Now, the reference set has been constructed. To let the user examine whether
-things are going smoothly, <em>The Cannon</em> can print out a set of reference set
-diagnostics.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">reference_set_diagnostics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reference_set_diagnostics</span><span class="p">(</span><span class="n">reference_set</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The output of these diagnostics, with examples, are listed below.</p>
-<p>1.1) A histogram showing the distribution of SNR in the reference set overplotted
-with the distribution of SNR in the test set.</p>
-<img alt="_images/SNRdist.png" src="_images/SNRdist.png" />
-<p>1.2) A &#8220;triangle plot&#8221; that shows the distribution of every label as well as
-every label plotted against every other</p>
-<img alt="_images/survey_labels_triangle.png" src="_images/survey_labels_triangle.png" />
 </div>
 </div>
 <div class="section" id="step-2-construct-a-set-of-test-objects-from-apogee-files">
@@ -227,10 +194,26 @@ identical to that for the reference set, except without reading in the
 reference labels file.
 In this case, for simplicity, we use the reference set as our test set.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_set</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">IDs</span><span class="o">=</span><span class="n">reference_set</span><span class="o">.</span><span class="n">IDs</span><span class="p">,</span> <span class="n">SNRs</span><span class="o">=</span><span class="n">reference_set</span><span class="o">.</span><span class="n">SNRs</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">lambdas</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">spectra</span><span class="o">=</span><span class="n">reference_set</span><span class="o">.</span><span class="n">spectra</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">....</span><span class="n">label_names</span><span class="o">=</span><span class="n">reference_set</span><span class="o">.</span><span class="n">label_names</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">lams</span><span class="o">=</span><span class="n">lambdas</span><span class="p">,</span> <span class="n">fluxes</span><span class="o">=</span><span class="n">reference_set</span><span class="o">.</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span> <span class="o">=</span> <span class="n">reference_set</span><span class="o">.</span><span class="n">ivars</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">label_names</span><span class="o">=</span><span class="n">reference_set</span><span class="o">.</span><span class="n">label_names</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="dataset-prediagnostics-dataset-prediagnostics">
+<h3>Dataset Prediagnostics (dataset_prediagnostics)<a class="headerlink" href="#dataset-prediagnostics-dataset-prediagnostics" title="Permalink to this headline">¶</a></h3>
+<p>Now that the reference and test sets have been constructed, we can examine
+whether things are going smoothly through a set of diagnostic plots.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">dataset_prediagnostics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset_diagnostics</span><span class="p">(</span><span class="n">reference_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The output of these diagnostics, with examples, are listed below.</p>
+<p>1.1) A histogram showing the distribution of SNR in the reference set overplotted
+with the distribution of SNR in the test set.</p>
+<img alt="_images/SNRdist.png" src="_images/SNRdist.png" />
+<p>1.2) A &#8220;triangle plot&#8221; that shows the distribution of every label as well as
+every label plotted against every other</p>
+<img alt="_images/survey_labels_triangle.png" src="_images/survey_labels_triangle.png" />
 </div>
 <div class="section" id="step-3-the-cannon-s-training-step-train-model-model-diagnostics">
 <h3>Step 3: <em>The Cannon</em>&#8216;s Training Step (<tt class="docutils literal"><span class="pre">train_model</span></tt>, <tt class="docutils literal"><span class="pre">model_diagnostics</span></tt>)<a class="headerlink" href="#step-3-the-cannon-s-training-step-train-model-model-diagnostics" title="Permalink to this headline">¶</a></h3>
@@ -247,12 +230,13 @@ print out a set of model diagnostics.</p>
 </div>
 <p>The output of these diagnostics with sample plots are listed below.</p>
 <p>3.1) Plot of the baseline spectrum (0th order coefficients) as a
-function of wavelength.</p>
+function of wavelength, with continuum pixels overlaid.</p>
 <img alt="_images/baseline_spec_with_cont_pix.png" src="_images/baseline_spec_with_cont_pix.png" />
-<p>3.2) Plot the leading coefficients of each label as a function of wavelength</p>
+<p>3.2) Plot the leading coefficients of each label and scatter
+as a function of wavelength</p>
 <img alt="_images/leading_coeffs.png" src="_images/leading_coeffs.png" />
-<p>3.3) Histogram of the reduced chi squareds of the fits (normalized by DOF,
-where DOF = npixels-nlabels)</p>
+<p>3.3) Histogram of the chi squareds of the fits, with a dotted line corresponding
+to the number of degrees of freedom.</p>
 <img alt="_images/modelfit_chisqs.png" src="_images/modelfit_chisqs.png" />
 </div>
 <div class="section" id="step-4-the-cannon-s-test-step-infer-labels-test-set-diagnostics">
@@ -263,15 +247,17 @@ update the test_set object.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_set</span><span class="p">,</span> <span class="n">covs</span> <span class="o">=</span> <span class="n">infer_labels</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>To let the user examine whether things are going smoothly, <em>The Cannon</em> can
-print out a set of test set diagnostics.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">test_set_diagnostics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">test_set_diagnostics</span><span class="p">(</span><span class="n">reference_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
+<p>Now that the labels have been inferred, <em>The Cannon</em> can run another set of
+diagnostics.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">dataset_postdiagnostics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset_diagnostics</span><span class="p">(</span><span class="n">reference_set</span><span class="p">,</span> <span class="n">test_set</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The output of these diagnostics with sample plots are listed below.</p>
-<p>4.1) For each label, a list of flagged stars for which test labels are
-over 2-sigma away from reference labels</p>
+<p>4.1) One text file for each label, with a list of flagged stars. Flagged stars
+are those whose output labels lie over 2-sigma away from the original reference
+label. In other words, this is a warning that <em>The Cannon</em> has extrapolated
+outside of the reference label space.</p>
 <p>4.2) Triangle plot, each test label plotted against every other test label</p>
 <img alt="_images/survey_labels_triangle.png" src="_images/survey_labels_triangle.png" />
 <p>4.3) 1-1 plots, for each label, reference values plotted against test values</p>
@@ -329,10 +315,10 @@ of the model is comprehensive enough, then this should be a delta function.</p>
 <li><a class="reference internal" href="#a-reading-spectra-get-spectra">1a. Reading spectra (<tt class="docutils literal"><span class="pre">get_spectra</span></tt>)</a></li>
 <li><a class="reference internal" href="#b-reading-labels-get-reference-labels">1b. Reading labels (<tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>)</a></li>
 <li><a class="reference internal" href="#c-creating-tailoring-a-dataset-object-choose-labels-choose-spectra">1c. Creating &amp; tailoring a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object (<tt class="docutils literal"><span class="pre">choose_labels</span></tt>, <tt class="docutils literal"><span class="pre">choose_spectra</span></tt>)</a></li>
-<li><a class="reference internal" href="#d-reference-set-diagnostics-reference-set-diagnostics">1d. Reference set diagnostics (reference_set_diagnostics)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#step-2-construct-a-set-of-test-objects-from-apogee-files">Step 2: Construct a set of test objects from APOGEE files</a></li>
+<li><a class="reference internal" href="#dataset-prediagnostics-dataset-prediagnostics">Dataset Prediagnostics (dataset_prediagnostics)</a></li>
 <li><a class="reference internal" href="#step-3-the-cannon-s-training-step-train-model-model-diagnostics">Step 3: <em>The Cannon</em>&#8216;s Training Step (<tt class="docutils literal"><span class="pre">train_model</span></tt>, <tt class="docutils literal"><span class="pre">model_diagnostics</span></tt>)</a></li>
 <li><a class="reference internal" href="#step-4-the-cannon-s-test-step-infer-labels-test-set-diagnostics">Step 4: <em>The Cannon</em>&#8216;s Test Step (<tt class="docutils literal"><span class="pre">infer_labels</span></tt>, <tt class="docutils literal"><span class="pre">test_set_diagnostics</span></tt>)</a></li>
 <li><a class="reference internal" href="#step-5-model-spectra-draw-spectra-diagnostics">Step 5: Model Spectra (<tt class="docutils literal"><span class="pre">draw_spectra</span></tt>, <tt class="docutils literal"><span class="pre">diagnostics</span></tt>)</a></li>

@@ -86,54 +86,37 @@ and precise.) The set of reference stars is critical, as the label
 transfer to the survey stars can only be as good as the quality of the
 reference stars. 
 
-The user must construct the following inputs: 
-
-1. a list of filenames corresponding to the reference data 
-   (in this case, APOGEE .fits files) 
-2. a .txt file containing reference labels in an ASCII table. 
-
-The following requirements govern (2):
+The user must construct a .txt file containing reference labels in an ASCII table,
+according to the following requirements:
 
 1. The first row must be strings corresponding to the names of the labels 
-   and must not contain any '/'s 
-2. The first column must be strings corresponding to the stellar IDs
+   in a LaTeX compilable format (ex. T_{eff} for effective temperature)
+2. The first column must be strings corresponding to the filenames with the raw data
 3. The remaining entries must be floats corresponding to the label values
 
 1a. Reading spectra (``get_spectra``)
 +++++++++++++++++++++++++++++++++++++
 
-We construct the first input: the list of filenames corresponding to the 
-reference stars (in this case, APOGEE .fits files). In our example, the filenames
-happen to be the first column in the reference labels text file, 
-``reference_labels.txt``. So we simply read the first column of this file.
-
-    >>> import numpy as np
-    >>> readin = "reference_labels.txt"
-    >>> IDs = np.loadtxt(readin, usecols=(0,), dtype='string', unpack=1)
-    >>> filenames1 = []
-    >>> for i in range(0, len(IDs)): #incorporate file location info
-    >>> ....filename = '/home/annaho/AnnaCannon/Data/APOGEE_Data' + IDs[i][1:]
-    >>> ....filenames1.append(filename)
-
-Once the file list is created, the ``get_spectra`` method can be               
-used to continuum-normalize the spectrum information and put it 
-into the correct format. ``get_spectra`` also returns the fitted
-continua (Chebyshev polynomial) and a list of SNR values for the 
-spectra.
+The ``get_spectra`` method extracts the spectrum information from the 
+raw data files (SNR, fluxes, uncertainties) and applies a continuum 
+normalization by fitting a Chebyshev polynomial. The user specifies the
+directory in which all of the data files are stored. In this example, the
+directory is called ``Data``. 
 
     >>> from read_apogee import get_spectra
-    >>> lambdas, normalized_spectra, continua, SNRs = get_spectra(filenames1)
+    >>> lambdas, norm_fluxes, norm_ivars, SNRs = get_spectra("Data")
 
 1b. Reading labels (``get_reference_labels``)
 +++++++++++++++++++++++++++++++++++++++++++++
 
-We construct the second input: the .txt file containing reference labels in an 
-ASCII table, with requirements described above. In this example, the .txt file
-is called ``reference_labels.txt``. The method ``get_reference_labels`` is used 
-to retrieve object IDs, label names, and label values.
+This step assumes that a .txt file containing reference labels has been prepared
+in the correct format (as described above). In this example, the .txt file
+is called ``reference_labels_update.txt``. The method ``get_reference_labels`` 
+is used to retrieve object IDs, label names, and label values.
 
     >>> from read_labels import get_reference_labels
-    >>> IDs, all_label_names, all_label_values = get_reference_labels(readin)
+    >>> IDs, all_label_names, all_label_values = get_reference_labels(
+    >>> ..."reference_labels_update.txt")
 
 1c. Creating & tailoring a ``Dataset`` object (``choose_labels``, ``choose_spectra``)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -141,9 +124,9 @@ to retrieve object IDs, label names, and label values.
 A ``Dataset`` object (``dataset.py``) is initialized. 
 
     >>> from dataset import Dataset
-    >>> reference_set = Dataset(IDs=IDs, SNRs=SNRs, lambdas=lambdas,
-    >>> ....spectra=normalized_spectra, label_names=all_label_names, 
-    >>> ....label_vals=all_label_values)
+    >>> reference_set = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, 
+    >>> ...fluxes = norm_fluxes, ivars = norm_ivars, label_names=all_label_names,
+    >>> ...label_vals=all_label_values)
 
 (Optional) The user can choose to select some subset of the reference labels 
 by creating a list of the desired column indices. 
@@ -158,6 +141,7 @@ columns 1, 3, and 5.
 1 = keep this object, and 0 = remove it. Here, we select data using physical 
 Teff and logg cutoffs.
 
+    >>> import numpy as np
     >>> Teff = reference_set.label_vals[:,0]
     >>> Teff_corr = all_label_values[:,2]
     >>> diff_t = np.abs(Teff-Teff_corr)
@@ -165,17 +149,28 @@ Teff and logg cutoffs.
     >>> logg = reference_set.label_vals[:,1]
     >>> logg_cut = 100.
     >>> mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
-    >>> reference_set.choose_spectra(mask)
+    >>> reference_set.choose_objects(mask)
 
-1d. Reference set diagnostics (reference_set_diagnostics)
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Step 2: Construct a set of test objects from APOGEE files
+----------------------------------------------------------
 
-Now, the reference set has been constructed. To let the user examine whether 
-things are going smoothly, *The Cannon* can print out a set of reference set 
-diagnostics.
+To construct the test set, the user would ordinarily go through a process 
+identical to that for the reference set, except without reading in the 
+reference labels file. 
+In this case, for simplicity, we use the reference set as our test set. 
 
-    >>> from dataset import reference_set_diagnostics
-    >>> reference_set_diagnostics(reference_set)
+    >>> test_set = Dataset(IDs=reference_set.IDs, SNRs=reference_set.SNRs,
+    >>> ...lams=lambdas, fluxes=reference_set.fluxes, ivars = reference_set.ivars,
+    >>> ...label_names=reference_set.label_names)
+
+Dataset Prediagnostics (dataset_prediagnostics)
+-----------------------------------------------
+
+Now that the reference and test sets have been constructed, we can examine 
+whether things are going smoothly through a set of diagnostic plots. 
+
+    >>> from dataset import dataset_prediagnostics
+    >>> dataset_diagnostics(reference_set, test_set)
 
 The output of these diagnostics, with examples, are listed below.
 
@@ -188,18 +183,6 @@ with the distribution of SNR in the test set.
 every label plotted against every other 
 
 .. image:: survey_labels_triangle.png
-   
-Step 2: Construct a set of test objects from APOGEE files
-----------------------------------------------------------
-
-To construct the test set, the user would ordinarily go through a process 
-identical to that for the reference set, except without reading in the 
-reference labels file. 
-In this case, for simplicity, we use the reference set as our test set. 
-
-    >>> test_set = Dataset(IDs=reference_set.IDs, SNRs=reference_set.SNRs,
-    >>> ....lambdas=lambdas, spectra=reference_set.spectra,
-    >>> ....label_names=reference_set.label_names)
 
 Step 3: *The Cannon*'s Training Step (``train_model``, ``model_diagnostics``)
 -----------------------------------------------------------------------------
@@ -218,18 +201,20 @@ print out a set of model diagnostics.
 The output of these diagnostics with sample plots are listed below.
 
 3.1) Plot of the baseline spectrum (0th order coefficients) as a 
-function of wavelength.
+function of wavelength, with continuum pixels overlaid.
 
 .. image:: baseline_spec_with_cont_pix.png
 
-3.2) Plot the leading coefficients of each label as a function of wavelength
+3.2) Plot the leading coefficients of each label and scatter
+as a function of wavelength
 
 .. image:: leading_coeffs.png
 
-3.3) Histogram of the reduced chi squareds of the fits (normalized by DOF, 
-where DOF = npixels-nlabels)
+3.3) Histogram of the chi squareds of the fits, with a dotted line corresponding
+to the number of degrees of freedom. 
 
 .. image:: modelfit_chisqs.png
+
 
 Step 4: *The Cannon*'s Test Step (``infer_labels``, ``test_set_diagnostics``)
 -----------------------------------------------------------------------------
@@ -240,16 +225,18 @@ update the test_set object.
     >>> from cannon2_infer_labels import infer_labels
     >>> test_set, covs = infer_labels(model, test_set)
 
-To let the user examine whether things are going smoothly, *The Cannon* can 
-print out a set of test set diagnostics.
+Now that the labels have been inferred, *The Cannon* can run another set of 
+diagnostics.
 
-    >>> from dataset import test_set_diagnostics
-    >>> test_set_diagnostics(reference_set, test_set)
+    >>> from dataset import dataset_postdiagnostics
+    >>> dataset_diagnostics(reference_set, test_set)
 
 The output of these diagnostics with sample plots are listed below.
 
-4.1) For each label, a list of flagged stars for which test labels are 
-over 2-sigma away from reference labels
+4.1) One text file for each label, with a list of flagged stars. Flagged stars
+are those whose output labels lie over 2-sigma away from the original reference
+label. In other words, this is a warning that *The Cannon* has extrapolated
+outside of the reference label space. 
 
 4.2) Triangle plot, each test label plotted against every other test label
 
