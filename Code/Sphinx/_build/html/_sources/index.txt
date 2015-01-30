@@ -44,14 +44,14 @@ This software package breaks up *The Cannon* into the following steps and method
    * ``get_spectra``: read spectra, continuum-normalize
    * ``get_reference_labels``: retrieve stellar IDs, reference label names and values
    * ``choose_labels``: (optional) select a subset of labels
-   * ``choose_spectra``: (optional) select a subset of spectra  
-   * ``reference_set_diagnostics``: (optional) run a set of diagnostics 
+   * ``choose_objects``: (optional) select a subset of objects  
+   * ``dataset_prediagnostics``: (optional) run a set of diagnostics 
      on the reference stars
 
 #. Construct test stars from APOGEE files
 
    * ``get_spectra``: read spectra, continuum-normalize
-   * ``choose_spectra``: (optional) select a subset of spectra
+   * ``choose_objects``: (optional) select a subset of spectra
 
 #. *The Cannon*'s Training Step: Fit Model
 
@@ -61,7 +61,7 @@ This software package breaks up *The Cannon* into the following steps and method
 #. *The Cannon*'s Test Step: Infer Labels
 
    * ``infer_labels``: infer labels using model
-   * ``test_set_diagnostics``: run a set of diagnostics on the inferred labels
+   * ``dataset_postdiagnostics``: run a set of diagnostics on the inferred labels
 
 #. Cannon-generated spectra (``spectral_model``)
 

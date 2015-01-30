@@ -79,14 +79,14 @@ stars.</li>
 <li><tt class="docutils literal"><span class="pre">get_spectra</span></tt>: read spectra, continuum-normalize</li>
 <li><tt class="docutils literal"><span class="pre">get_reference_labels</span></tt>: retrieve stellar IDs, reference label names and values</li>
 <li><tt class="docutils literal"><span class="pre">choose_labels</span></tt>: (optional) select a subset of labels</li>
-<li><tt class="docutils literal"><span class="pre">choose_spectra</span></tt>: (optional) select a subset of spectra</li>
-<li><tt class="docutils literal"><span class="pre">reference_set_diagnostics</span></tt>: (optional) run a set of diagnostics
+<li><tt class="docutils literal"><span class="pre">choose_objects</span></tt>: (optional) select a subset of objects</li>
+<li><tt class="docutils literal"><span class="pre">dataset_prediagnostics</span></tt>: (optional) run a set of diagnostics
 on the reference stars</li>
 </ul>
 </li>
 <li>Construct test stars from APOGEE files<ul>
 <li><tt class="docutils literal"><span class="pre">get_spectra</span></tt>: read spectra, continuum-normalize</li>
-<li><tt class="docutils literal"><span class="pre">choose_spectra</span></tt>: (optional) select a subset of spectra</li>
+<li><tt class="docutils literal"><span class="pre">choose_objects</span></tt>: (optional) select a subset of spectra</li>
 </ul>
 </li>
 <li><em>The Cannon</em>&#8216;s Training Step: Fit Model<ul>
@@ -96,7 +96,7 @@ on the reference stars</li>
 </li>
 <li><em>The Cannon</em>&#8216;s Test Step: Infer Labels<ul>
 <li><tt class="docutils literal"><span class="pre">infer_labels</span></tt>: infer labels using model</li>
-<li><tt class="docutils literal"><span class="pre">test_set_diagnostics</span></tt>: run a set of diagnostics on the inferred labels</li>
+<li><tt class="docutils literal"><span class="pre">dataset_postdiagnostics</span></tt>: run a set of diagnostics on the inferred labels</li>
 </ul>
 </li>
 <li>Cannon-generated spectra (<tt class="docutils literal"><span class="pre">spectral_model</span></tt>)<ul>
