@@ -6,7 +6,7 @@ define ANNOUNCE_HELP
 Pypegase makefile 
 
 Not much to say for now
-Will provide common task to clean and install pyPegase
+Will provide common task to clean and install or build
 
 targets:
 
