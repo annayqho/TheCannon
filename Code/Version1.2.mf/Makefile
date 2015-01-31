@@ -3,7 +3,7 @@
 .SILENT: help
 
 define ANNOUNCE_HELP
-Pypegase makefile 
+The Cannon makefile 
 
 Not much to say for now
 Will provide common task to clean and install or build
