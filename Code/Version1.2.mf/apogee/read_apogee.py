@@ -104,8 +104,8 @@ def get_pixmask(fluxes, flux_errs):
     # bad_err = np.isinf(flux_errs) or (flux_errs <= 0)
     # bad_err = np.logical_or(np.isinf(flux_errs), flux_errs <= 0)
     bad_flux = ~np.isfinite(fluxes)   # you probably want to clean nans as well
-    bad_err = ~np.isfinite(flux_errs) or (flux_errs <= 0)
-    bad_pix = bad_err or bad_flux
+    bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
+    bad_pix = bad_err | bad_flux
 
     return bad_pix
 
