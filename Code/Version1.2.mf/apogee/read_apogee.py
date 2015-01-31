@@ -1,7 +1,5 @@
-from __future__ import (absolute_import, division, print_function, unicode_literals)
-
 """Extract & continuum-normalize spectra from APOGEE .fits files."""
-
+from __future__ import (absolute_import, division, print_function, unicode_literals)
 import numpy as np
 import os
 
@@ -12,6 +10,10 @@ except ImportError:
 
 # imported but not used
 # import matplotlib.pyplot as plt
+
+import inspect
+# Where is this file
+localpath = '/'.join(os.path.abspath( inspect.getfile(inspect.currentframe())).split('/')[:-1])
 
 
 def get_spectra(dir_name):
@@ -172,7 +174,8 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars):
     norm_ivar = np.zeros(ivars.shape)
     # list of "true" continuum pix, det. here by the Cannon
     # FIXME: HARD CODED filename
-    pixlist = list(np.loadtxt("pixtest4.txt", dtype=int, usecols=(0,), unpack=1))
+    source = localpath + '/pixtest4.txt'
+    pixlist = list(np.loadtxt(source, dtype=int, usecols=(0,), unpack=1))
 
     # assigned and never used
     # ivars_orig = ivars
