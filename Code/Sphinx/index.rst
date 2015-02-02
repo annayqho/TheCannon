@@ -210,6 +210,8 @@ as a function of wavelength
 
 .. image:: leading_coeffs.png
 
+.. image:: leading_coeffs_triangle.png
+
 3.3) Histogram of the chi squareds of the fits, with a dotted line corresponding
 to the number of degrees of freedom. 
 
