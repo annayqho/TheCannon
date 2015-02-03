@@ -3,9 +3,9 @@ import numpy as np
 import os
 import random
 from .helpers.triangle import corner
-from .dataset import Dataset
 import matplotlib.pyplot as plt
 from matplotlib import colorbar
+from copy import deepcopy
 
 # imported but not used
 # from matplotlib import gridspec
@@ -22,10 +22,10 @@ def draw_spectra(model, test_set):
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
         cannon_fluxes[i,:] = spec_fit
         cannon_ivars[i,:] = 1. / scatters**2
-    cannon_set = Dataset(IDs=test_set.IDs, SNRs=test_set.SNRs,
-                         lams=test_set.lams, fluxes=cannon_fluxes,
-                         ivars=cannon_ivars, label_names=test_set.label_names,
-                         label_vals=test_set.label_vals)
+    cannon_set = deepcopy(test_set)
+    cannon_set.fluxes = cannon_fluxes
+    cannon_set.ivars = cannon_ivars
+
     return cannon_set
 
 

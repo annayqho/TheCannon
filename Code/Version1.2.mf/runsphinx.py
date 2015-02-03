@@ -18,7 +18,7 @@ from cannon.spectral_model import (draw_spectra, diagnostics)
 lambdas, norm_fluxes, norm_ivars, SNRs = get_spectra("example_DR10/Data")
 
 IDs, all_label_names, all_label_values = \
-    get_reference_labels("example_DR10/reference_labels_update.txt")
+    get_reference_labels("example_DR10/reference_labels.txt")
 
 reference_set = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, fluxes=norm_fluxes,
                         ivars=norm_ivars, label_names=all_label_names,
@@ -44,7 +44,7 @@ dataset_prediagnostics(reference_set, test_set)
 
 model = train_model(reference_set)
 
-model_diagnostics(reference_set, model)
+model_diagnostics(reference_set, model, 'example_DR10/contpix_lambda.txt')
 
 test_set, covs = infer_labels(model, test_set)
 

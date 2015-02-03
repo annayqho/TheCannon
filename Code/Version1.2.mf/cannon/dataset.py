@@ -40,7 +40,7 @@ class Dataset(object):
         Reference labels for reference set, but None for test set
     """
 
-    def __init__(self, label_vals, IDs, SNRs, lams, fluxes, ivars,
+    def __init__(self, label_vals, SNRs, lams, fluxes, ivars,
                  label_names=None):
         self.data = label_vals
         self.label_names = label_names
@@ -48,6 +48,14 @@ class Dataset(object):
         self.lams = lams
         self.fluxes = fluxes
         self.ivars = ivars
+        self.reset_label_vals()
+
+    def reset_label_vals(self):
+        self._label_vals = None
+
+    def set_label_vals(self, vals):
+        """ Set label vals from an array """
+        self._label_vals = vals
 
     @property
     def IDs(self):
@@ -81,8 +89,7 @@ class Dataset(object):
             or str giving the condition on the label data table.
         """
         if type(mask) in basestring:
-            # _m = self.data.where(mask)  # should work as well
-            _m = self.data.evalexpr(mask).astype(bool)
+            _m = self.data.where(mask)  # should work as well
         else:
             _m = mask
         self.data = self.data.select('*', indices=_m)
@@ -115,11 +122,23 @@ class Dataset(object):
     @property
     def label_vals(self):
         """ return the array of labels [Nsamples x Ndim] """
-        return np.array([self.data[k] for k in self.label_names]).T
+        if self._label_vals is None:
+            return np.array([self.data[k] for k in self.label_names]).T
+        else:
+            return self._label_vals
 
 
 def dataset_prediagnostics(reference_set, test_set):
-    # Plot SNR distributions
+    """ Plot SNR distributions and triangle plot of reference labels
+
+    Parameters
+    ----------
+    reference_set: Dataset
+        set used as training sample
+
+    test_set: Dataset
+        set from which we'll infer labels
+    """
     print("Diagnostic for SNRs of reference and survey stars")
     plt.hist(reference_set.SNRs, alpha=0.5, label="Ref Stars")
     plt.hist(test_set.SNRs, alpha=0.5, label="Survey Stars")
@@ -134,6 +153,7 @@ def dataset_prediagnostics(reference_set, test_set):
     print("Saved fig %s" % figname)
 
     # Plot all reference labels against each other
+    # FIXME: hard coded fname
     figname = "reference_labels_triangle.png"
     reference_set.label_triangle_plot(figname)
 
@@ -156,10 +176,9 @@ def dataset_postdiagnostics(reference_set, test_set):
         # assigned but never used
         # flagged_stars = test_IDs[warning]
         filename = "flagged_stars_%s.txt" % i
-        output = open(filename, 'w')
-        for star in test_IDs[warning]:
-            output.write(star + '\n')
-        output.close()
+        with open(filename, 'w') as output:
+            for star in test_IDs[warning]:
+                output.write('{0:s}\n'.format(star))
         print("Reference label %s" % label_name)
         print("flagged %s stars beyond 2-sig of reference labels" % sum(warning))
         print("Saved list %s" % filename)
@@ -216,8 +235,7 @@ class DataFrame(object):
         lambdas, norm_fluxes, norm_ivars, SNRs = self.get_spectra(*args, **kwargs)
         IDs, all_label_names, all_label_values = self.get_reference_labels()
 
-        dataset = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, fluxes=norm_fluxes,
-                          ivars=norm_ivars, label_names=all_label_names,
-                          label_vals=all_label_values)
+        dataset = Dataset(all_label_values, SNRs, lambdas, norm_fluxes,
+                          norm_ivars, all_label_names)
 
         self._dataset = dataset
