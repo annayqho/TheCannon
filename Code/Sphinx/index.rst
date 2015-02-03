@@ -201,9 +201,12 @@ print out a set of model diagnostics.
 The output of these diagnostics with sample plots are listed below.
 
 3.1) Plot of the baseline spectrum (0th order coefficients) as a 
-function of wavelength, with continuum pixels overlaid.
+function of wavelength, with continuum pixels overlaid. Ten plots are
+produced, each showing 10% of the spectrum. Two examples below:
 
-.. image:: baseline_spec_with_cont_pix.png
+.. image:: baseline_spec_with_cont_pix_0.png
+
+.. image:: baseline_spec_with_cont_pix_7.png
 
 3.2) Plot the leading coefficients of each label and scatter
 as a function of wavelength
