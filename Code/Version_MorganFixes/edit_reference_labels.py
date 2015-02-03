@@ -1,8 +1,13 @@
-inputf = open("reference_labels_update.txt", "r")
-outputf = open("reference_labels.txt", "w")
+inputf = open("reference_labels.txt", "r")
+outputf = open("reference_labels_2.txt", "w")
 
 lines = inputf.readlines()
-outputf.write(lines[0])
+header = filter(None, lines[0].split(' '))
+
+for item in header[0:len(header)-1]:
+    outputf.write(item + '\t')
+outputf.write(header[-1])
+
 lines = lines[1:]
 
 for line in lines:
