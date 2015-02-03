@@ -204,6 +204,8 @@ The output of these diagnostics with sample plots are listed below.
 function of wavelength, with continuum pixels overlaid. Ten plots are
 produced, each showing 10% of the spectrum. Two examples below:
 
+.. image:: baseline_spec_with_cont_pix.gif
+
 .. image:: baseline_spec_with_cont_pix_0.png
 
 .. image:: baseline_spec_with_cont_pix_7.png
