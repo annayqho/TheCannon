@@ -36,7 +36,7 @@ dataset_prediagnostics(reference_set, test_set)
 
 # learn the model from the reference_set
 model = CannonModel(reference_set)
-model.fit()   # model.train would work equivalently.
+model.fit() # model.train would work equivalently.
 
 # check the model
 model.diagnostics(df.contpix_file)
