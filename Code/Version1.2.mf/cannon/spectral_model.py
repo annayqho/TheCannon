@@ -21,7 +21,7 @@ def draw_spectra(model, test_set):
         x = label_vector[:,i,:]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
         cannon_fluxes[i,:] = spec_fit
-        cannon_ivars[i,:] = 1. / scatters**2
+        cannon_ivars[i,:] = 1. / scatters ** 2
     cannon_set = deepcopy(test_set)
     cannon_set.fluxes = cannon_fluxes
     cannon_set.ivars = cannon_ivars

@@ -1349,8 +1349,8 @@ class SimpleTable(object):
         if (type(fname) == dict) or (dtype in [dict, 'dict']):
             self.header = fname.pop('header', {})
             self.data = _convert_dict_to_structured_ndarray(fname)
-        elif (type(fname) in (str,)) or (dtype is not None):
-            if (type(fname) in (str,)):
+        elif (type(fname) in basestring) or (dtype is not None):
+            if (type(fname) in basestring):
                 extension = fname.split('.')[-1]
             else:
                 extension = None
