@@ -5,7 +5,7 @@ from read_apogee import get_spectra
 lambdas, norm_fluxes, norm_ivars, SNRs = get_spectra("Data")
 
 from read_labels import get_reference_labels
-IDs, all_label_names, all_label_values = get_reference_labels("reference_labels_update.txt")
+IDs, all_label_names, all_label_values = get_reference_labels("reference_labels.txt")
 
 from dataset import Dataset
 reference_set = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, fluxes = norm_fluxes, 

@@ -29,6 +29,15 @@ def diagnostics(cannon_set, test_set, model):
     overlay_spectra(cannon_set, test_set, model)
     residuals(cannon_set, test_set)
 
+def split_array(array, num):
+    avg = len(array) / float(num)
+    out = []
+    last = 0.0
+    while last < len(array):
+        out.append(array[int(last):int(last+avg)])
+        last += avg
+    return out
+
 def overlay_spectra(cannon_set, test_set, model):
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
     # Overplot original spectra with best-fit spectra
@@ -54,45 +63,79 @@ def overlay_spectra(cannon_set, test_set, model):
         spec_fit = np.ma.array(cannon_set.fluxes[i,:], mask=bad)
         ivars_orig = np.ma.array(test_set.ivars[i,:], mask=bad)
         ivars_fit = np.ma.array(cannon_set.ivars[i,:], mask=bad)
-        fig, axarr = plt.subplots(2)
-        ax1 = axarr[0]
-        ax1.scatter(lambdas, spec_orig, label="Orig Spec", c=1/np.sqrt(ivars_orig))
         red_chisq = np.sum(chisqs[:,i], axis=0)/(npix-coeffs_all.shape[1])
         red_chisq = np.round(red_chisq, 2)
-        fig,axarr = plt.subplots(2)
-        ax1 = axarr[0]
-        im = ax1.scatter(lambdas, spec_orig, 
-                label="Orig Spec", c=1/np.sqrt(ivars_orig))
-        ax1.scatter(lambdas, spec_fit, label="Cannon Spec", c='r')
-        ax1.errorbar(lambdas, spec_fit, yerr=1/np.sqrt(ivars_fit), fmt='ro')
-        ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
-        ax1.set_ylabel("Normalized flux")
-        ax1.set_title("Spectrum Fit: %s" %ID)
-        ax1.legend(loc='lower center', fancybox=True, shadow=True)
-        ax2 = axarr[1]
-        ax2.scatter(spec_orig, spec_fit, c=1/np.sqrt(ivars_orig))
-        ax2.errorbar(spec_orig, spec_fit, yerr=1/np.sqrt(ivars_fit), 
-                ecolor='k', fmt="none")
-        fig.subplots_adjust(right=0.8)
-        cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-        fig.colorbar(im, cax=cbar_ax)
-        im.set_label("Uncertainties on the Fluxes from the Original Spectrum")
-        xlims = ax2.get_xlim()
-        ylims = ax2.get_ylim()
+
+        # 1-to-1 plot
+        fig = plt.figure()
+        im = plt.scatter(spec_orig, spec_fit, c=1/np.sqrt(ivars_orig), zorder=100)
+        plt.errorbar(spec_orig, spec_fit, yerr=1/np.sqrt(ivars_fit), 
+                     ecolor='k', fmt="none", alpha=0.3, zorder=0)
+        textstr = "Red Chi Sq: %s" %red_chisq 
+        cbar = plt.colorbar(im)
+        cbar.set_label("Uncertainties on the Fluxes from the Original Spectrum")
+        xlims = (np.ma.min(spec_orig), np.ma.max(spec_orig))
+        ylims = (np.ma.min(spec_fit), np.ma.max(spec_fit))
+        xlims = plt.xlim()
+        ylims = plt.ylim()
         lims = [np.min([xlims, ylims]), np.max([xlims, ylims])]
-        ax2.plot(lims, lims, 'k-', alpha=0.75)
-        textstr = "Red Chi Sq: %s" %red_chisq
+        plt.plot(lims, lims, 'k-', alpha=0.75)
         props = dict(boxstyle='round', facecolor='palevioletred', alpha=0.5)
-        ax2.text(0.05, 0.95, textstr, transform=ax2.transAxes, fontsize=14,
-                verticalalignment='top', bbox=props)
-        ax2.set_xlim(xlims)
-        ax2.set_ylim(ylims)
-        ax2.set_xlabel("Orig Fluxes")
-        ax2.set_ylabel("Fitted Fluxes")
-        filename = "Star%s.png" %i
+        plt.annotate(textstr, fontsize=14, xy=(0.05, 0.90), 
+                     xycoords='axes fraction')
+        plt.xlim(xlims)
+        plt.ylim(ylims)
+        plt.xlabel("Orig Fluxes")
+        plt.ylabel("Fitted Fluxes")
+        plt.title("1-to-1 Plot of Test vs. Best-Fit Spectrum")
+        filename = "Star%s_1to1.png" %(i)
         print("Saved as %s" %filename)
         fig.savefig("SpectrumFits/"+filename)
         plt.close(fig)
+
+        # Plot zoomed segments
+        nseg = 100
+        xmins = []
+        xmaxs = []
+        lams_seg = split_array(lams.data, nseg)
+        for seg in lams_seg:
+            xmins.append(seg[0])
+            xmaxs.append(seg[-1])
+        for j in range(10, 20):
+            fig, axarr = plt.subplots(2, sharex=True, figsize=(15,10))
+            plt.xlim(xmins[j], xmaxs[j])
+            ax1 = axarr[0]
+            ax1.scatter(lambdas, spec_orig, label="Orig Spec", zorder=100)
+            ax1.errorbar(lambdas, spec_orig, yerr=1/np.sqrt(ivars_orig), 
+                        alpha=0.7, fmt='ko', zorder=0)
+            ax1.set_ylim(0.6, 1.2)
+            ax1.scatter(lambdas, spec_fit, label="Cannon Spec", c='r', zorder=100)
+            ax1.errorbar(lambdas, spec_fit, yerr=1/np.sqrt(ivars_fit), fmt='ro',
+                         alpha=0.7, zorder=0)
+            ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
+            ax1.set_ylabel("Normalized flux")
+            ax1.set_title("Spectrum Fit: %s" %ID)
+            ax1.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
+            fig.subplots_adjust(right=0.8)
+            
+            ax2 = axarr[1]
+            ax2.set_xlim(xmins[j], xmaxs[j])
+            ax2.scatter(lambdas, spec_orig, label="Orig Spec", zorder=100)
+            ax2.errorbar(lambdas, spec_orig, yerr=1/np.sqrt(ivars_orig), 
+                        alpha=0.7, fmt='ko', zorder=0)
+            ax2.set_xlabel(r"Wavelength $\lambda (\AA)$")
+            ax2.set_ylabel("Normalized flux")
+            ax2.set_title("Spectrum Fit, Zoomed")
+            ax2.set_ylim(0.95, 1.05)
+            ax2.scatter(lambdas, spec_fit, label="Cannon Spec", c='r', zorder=100)
+            ax2.errorbar(lambdas, spec_fit, yerr=1/np.sqrt(ivars_fit), fmt='ro',
+                         alpha=0.7, zorder=0)
+            ax2.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
+
+            filename = "Star%s_section%s.png" %(i,j)
+            print("Saved as %s" %filename)
+            fig.savefig("SpectrumFits/"+filename)
+            plt.close(fig)
 
 def residuals(cannon_set, test_set):
     """ Stack spectrum fit residuals, sort by each label. Include histogram of
