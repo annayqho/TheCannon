@@ -88,15 +88,10 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
     norm_ivar = np.zeros(ivars.shape)
     # list of "true" continuum pix, det. here by the Cannon
     pixlist = list(np.loadtxt(pixtest_fname, dtype=int, usecols=(0,), unpack=1))
-
-    # assigned and never used
-    # ivars_orig = ivars
-
     contmask = np.ones(len(lambdas), dtype=bool)
     contmask[pixlist] = 0
     ivars[contmask] = 0.   # ignore non-cont pixels
-    # We discard the edges of the fluxes: 10 Angstroms, which is ~50 pixels
-
+    
     for i in range(len(ranges)):
         start, stop = ranges[i][0], ranges[i][1]
         flux = fluxes[start:stop]
@@ -113,10 +108,12 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
 
 
 class ApogeeDF(DataFrame):
+    """ DataFrame for keeping an Apogee data organized. """
+    
     def __init__(self, spec_dir, label_file, contpix_file, pixtest_file):
-
         super(self.__class__, self).__init__(spec_dir, label_file, contpix_file)
         self.pixtest_file = pixtest_file
+        # we discard the edges of the fluxes: 10 A, corresponding to ~50 pix
         self.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
     def get_spectra(self, *args, **kwargs):
@@ -128,27 +125,29 @@ class ApogeeDF(DataFrame):
         lambdas: numpy ndarray of shape (npixels)
             common wavelength of the spectra
 
-        spectra: 3D numpy ndarray of shape (nstars, npixels, 2)
-            array of spectra expected with the following format:
-                spectra[:,:,0] = flux values
-                spectra[:,:,1] = flux err values
+        norm_fluxes: numpy ndarray of shape (nstars, npixels)
+            normalized fluxes for all the objects
+
+        norm_ivars: numpy ndarray of shape (nstars, npixels)
+            normalized inverse variances for all the objects
+
+        SNRs: numpy ndarray of shape (nstars)
 
         large: float
             default dispersion value for bad data
         """
         files = [self.spec_dir + "/" + filename
                  for filename in os.listdir(self.spec_dir)]
-
-        files = list(sorted(files))  # replaced by builtin
-
+        files = list(sorted(files))  
         LARGE = kwargs.get('large', 1000000.)
-        nstars = len(files)   # moved outside the loop
+        nstars = len(files)  
+        
         for jj, fits_file in enumerate(files):
             file_in = pyfits.open(fits_file)
             fluxes = np.array(file_in[1].data)
             if jj == 0:
                 npixels = len(fluxes)
-                SNRs = np.zeros(nstars, dtype=float)   # imposing the type is faster
+                SNRs = np.zeros(nstars, dtype=float)   
                 norm_fluxes = np.zeros((nstars, npixels), dtype=float)
                 norm_ivars = np.zeros(norm_fluxes.shape, dtype=float)
                 start_wl = file_in[1].header['CRVAL1']
@@ -179,9 +178,6 @@ class ApogeeDF(DataFrame):
             temp = np.ma.array(norm_ivar, mask=badpix2, fill_value=0.)
             norm_ivars[jj] = np.ma.filled(temp)
 
-        # len gives an int and you print a string
-        # print("Loaded %s stellar spectra" %len(files))
-        # new formatting is more flexible
         print("Loaded {0:d} stellar spectra".format(len(files)))
         return lambdas, norm_fluxes, norm_ivars, SNRs
 
