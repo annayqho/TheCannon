@@ -19,26 +19,25 @@ except ImportError:
 
 
 def get_pixmask(fluxes, flux_errs):
-    """ return a mask array of bad pixels
+    """ Return a mask array of bad pixels
 
-    bad pixels are either when fluxes or errors are not finite or when reported
-    errors are negative.
+    Bad pixels are defined as follows: fluxes or errors are not finite, or 
+    reported errors are negative.
 
     Parameters
     ----------
-
     fluxes: ndarray
         flux array
 
     flux_errs: ndarray
-        uncertainties on fluxes
+        measurement uncertainties on fluxes
 
-    returns
+    Returns
     -------
     mask: ndarray, dtype=bool
         array giving bad pixels as True values
     """
-    bad_flux = ~np.isfinite(fluxes)   # you probably want to clean nans as well
+    bad_flux = ~np.isfinite(fluxes)   
     bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
     bad_pix = bad_err | bad_flux
 
@@ -46,13 +45,11 @@ def get_pixmask(fluxes, flux_errs):
 
 
 def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
-                                  pixtest_fname, ranges):
+                                  pixtest_fname, ranges, deg=3):
     """Continuum-normalizes the spectra.
 
     Fit a 2nd order Chebyshev polynomial to each segment
     and divide each segment by its corresponding polynomial
-
-    FIXME: code uses deg=3
 
     Parameters
     ----------
@@ -63,7 +60,7 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
         array of fluxes
 
     flux_errs: ndarray
-        uncertainties on fluxes
+        measurement uncertainties on fluxes
 
     ivars: ndarray
         inverse variance matrix
@@ -72,7 +69,7 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
         filename against which testing continuum subtraction
 
     ranges: sequence
-        sequence of wavelength range defining the regions of interests
+        sequence of wavelength ranges defining the regions of interest
 
     Returns
     -------
@@ -107,7 +104,7 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
         lambda_cut = lambdas[start:stop]
         ivar = ivars[start:stop]
         fit = np.polynomial.chebyshev.Chebyshev.fit(x=lambda_cut, y=flux,
-                                                    w=ivar, deg=3)
+                                                    w=ivar, deg)
         continua[start:stop] = fit(lambda_cut)
         norm_flux[start:stop] = flux/fit(lambda_cut)
         norm_flux_err[start:stop] = flux_err/fit(lambda_cut)
