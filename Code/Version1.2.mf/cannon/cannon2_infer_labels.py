@@ -32,17 +32,22 @@ def infer_labels(model, test_set):
     """
     Uses the model to solve for labels of the test set.
 
-    Input:
-    -----
-    num_labels: number of labels being solved for
-    model: coeffs_all, covs, scatters, chis, chisqs, pivots
-    test_set: Stars object (see stars.py) corresponding to the test set.
+    Parameters
+    ----------
+    model: tuple
+        coeffs_all, covs, scatters, chis, chisqs, pivots
+        result from :func:`train_model`
+
+    test_set: Dataset
+        dataset that needs label inference
 
     Returns
     -------
-    labels_all:
-    MCM_rotate_all:
-    covs_all: covariance matrix of the fit
+    test_set: Dataset
+        same dataset as the input value with updated label_vals attribute
+
+    covs_all:
+        covariance matrix of the fit
     """
     print("Inferring Labels...")
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
@@ -76,8 +81,6 @@ def infer_labels(model, test_set):
             # rescale covariance matrix
             chi = (flux_norm-func(coeffs, *labels)) / weights
             chi2 = (chi**2).sum()
-            # FIXME: p0 is not defined!
-            # dof = len(flux_norm) - len(p0)
             # FIXME: dof does not seem to be right to me (MF)
             dof = len(flux_norm) - nlabels
             factor = (chi2 / dof)

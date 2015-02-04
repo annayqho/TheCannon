@@ -112,15 +112,32 @@ def train_model(reference_set):
     """
     This determines the coefficients of the model using the training data
 
-    Input: the reference_set, a Dataset object (see dataset.py)
-    Returns: the model, which consists of...
+    Parameters
+    ----------
+    reference_set: Dataset
+        reference data set (see dataset.py)
+
+    Returns
     -------
     coefficients: ndarray, (npixels, nstars, 15)
-    the covariance matrix
-    scatter values
-    red chi squareds
-    the pivot values
-    the label vector
+        the model coefficients
+
+    model = coeffs, covs, scatters, all_chisqs, pivots, lvec_full
+
+    covs: ndarray
+        the covariance matrix
+
+    scatter:
+        scatter values
+
+    all_chisqs:
+        red chi squareds
+
+    pivots:
+        the pivot values
+
+    lvec_full:
+        the label vector
     """
     print("Training model...")
     label_names = reference_set.label_names
@@ -139,7 +156,7 @@ def train_model(reference_set):
     quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)]
                                   for m in (label_vals - pivots)])
     lvec = np.hstack((ones, linear_offsets, quadratic_offsets))
-    lvec_full = np.array([lvec,]*npixels)
+    lvec_full = np.array([lvec,] * npixels)
 
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1)  # for consistency with x_full
@@ -159,7 +176,7 @@ def train_model(reference_set):
     return model
 
 
-def model_diagnostics(reference_set, model):
+def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt"):
     """Run a set of diagnostics on the model.
 
     Plot the 0th order coefficients as the baseline spectrum.
@@ -187,9 +204,7 @@ def model_diagnostics(reference_set, model):
     ax = axarr[0]
     ax.plot(lams, baseline_spec, c='k', linewidth=0.3,
             label=r'$\theta_0$' + "= the leading fit coefficient")
-    # contpix = list(np.loadtxt("contpix.txt"))
-    contpix_lambda = list(np.loadtxt("contpix_lambda.txt", usecols=(0,),
-                                     unpack=1))
+    contpix_lambda = list(np.loadtxt(contpix, usecols=(0,), unpack=1))
     y = [1]*len(contpix_lambda)
     ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
     ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
@@ -213,7 +228,7 @@ def model_diagnostics(reference_set, model):
 
     # Leading coefficients for each label & scatter
     # Scale coefficients so that they can be overlaid on the same plot
-    stds = np.array([np.std(coeffs_all[:,i+1]) for i in range(nlabels)])
+    stds = np.array([np.std(coeffs_all[:, i + 1]) for i in range(nlabels)])
     pivot_std = max(stds)
     ratios = np.round(pivot_std / stds, -1)  # round to the nearest 10
     ratios[ratios == 0] = 1

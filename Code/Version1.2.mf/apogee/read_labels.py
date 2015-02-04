@@ -2,6 +2,12 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import numpy as np
+import sys
+
+PY3 = sys.version_info[0] > 2
+
+if not PY3:
+    range = xrange
 
 
 def get_reference_labels(filename):
@@ -17,12 +23,12 @@ def get_reference_labels(filename):
     """
 
     with open(filename, 'r') as f:
-        all_labels = f.readline().split('  ')
-    all_labels = filter(None, all_labels)
-    label_names = all_labels[1:]  # ignore the hash
-    IDs = np.loadtxt(filename, usecols=(0,), dtype='string')
+        # first char is #
+        label_names = f.readline()[1:].split('    ')
+
+    IDs = np.loadtxt(filename, usecols=(0,), dtype='str')
     nlabels = len(label_names)
-    cols = tuple(xrange(1,nlabels+1))
+    cols = tuple(range(1,nlabels+1))
     label_values = np.loadtxt(filename, usecols=cols)
     sorted_vals = [val for (ID, val) in sorted(zip(IDs,label_values))]
     sorted_vals = np.array(sorted_vals)
