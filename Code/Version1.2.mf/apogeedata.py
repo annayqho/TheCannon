@@ -99,7 +99,7 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
         lambda_cut = lambdas[start:stop]
         ivar = ivars[start:stop]
         fit = np.polynomial.chebyshev.Chebyshev.fit(x=lambda_cut, y=flux,
-                                                    w=ivar, deg)
+                                                    w=ivar, deg=deg)
         continua[start:stop] = fit(lambda_cut)
         norm_flux[start:stop] = flux/fit(lambda_cut)
         norm_flux_err[start:stop] = flux_err/fit(lambda_cut)
@@ -109,7 +109,7 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
 
 class ApogeeDF(DataFrame):
     """ DataFrame for keeping an Apogee data organized. """
-    
+   
     def __init__(self, spec_dir, label_file, contpix_file, pixtest_file):
         super(self.__class__, self).__init__(spec_dir, label_file, contpix_file)
         self.pixtest_file = pixtest_file

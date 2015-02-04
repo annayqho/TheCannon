@@ -1,51 +1,52 @@
-from __future__ import (absolute_import, division, print_function, unicode_literals)
-# Compile the Sphinx documentation all at once
+"""
+Compile the Sphinx documentation all at once
+"""
+from __future__ import (absolute_import, division, print_function)
 
-from read_apogee import get_spectra
-lambdas, norm_fluxes, norm_ivars, SNRs, continua = get_spectra("Data")
+from copy import deepcopy
 
-from read_labels import get_reference_labels
-IDs, all_label_names, all_label_values = get_reference_labels("reference_labels.txt")
+from apogeedata import ApogeeDF
 
-from dataset import Dataset
-reference_set = Dataset(IDs=IDs, SNRs=SNRs, lams=lambdas, fluxes = norm_fluxes, 
-        ivars = norm_ivars, label_names=all_label_names, 
-        label_vals=all_label_values)
+from cannon.dataset import (dataset_prediagnostics, dataset_postdiagnostics)
+from cannon.model import CannonModel
 
-cols = [1, 3, 5]
+
+df = ApogeeDF("example_DR10/Data",
+              "example_DR10/reference_labels.csv",
+              'example_DR10/contpix_lambda.txt',
+              'example_DR10/pixtest4.txt')
+
+# generate the dataset necessary to run the code
+# DataFrame object will take care of book keeping necessary information
+reference_set = df.dataset
+
+# cols = [1, 3, 5]
+cols = 'teff logg mh'.split()
 reference_set.choose_labels(cols)
 
-import numpy as np
-Teff = reference_set.label_vals[:,0]
-Teff_corr = all_label_values[:,2]
-diff_t = np.abs(Teff-Teff_corr)
-diff_t_cut = 600.
-logg = reference_set.label_vals[:,1]
-logg_cut = 100.
-mask = np.logical_and((diff_t < diff_t_cut), logg < logg_cut)
+# discard object with large corrections
+mask = '(abs(teff - teff_corr) < 600) & (logg < 100)'
 reference_set.choose_objects(mask)
 
-test_set = Dataset(IDs=reference_set.IDs, SNRs=reference_set.SNRs,
-        lams=lambdas, fluxes=reference_set.fluxes, ivars = reference_set.ivars,
-        label_names=reference_set.label_names)
+# make a test sample. Currently just use the training sample.
+test_set = deepcopy(reference_set)
 
-from dataset import dataset_prediagnostics
+# Plot SNR distributions and triangle plot of reference labels
 dataset_prediagnostics(reference_set, test_set)
 
-from cannon1_train_model import train_model
-model = train_model(reference_set)
+# learn the model from the reference_set
+model = CannonModel(reference_set)
+model.fit()   # model.train would work equivalently.
 
-from cannon1_train_model import model_diagnostics
-model_diagnostics(reference_set, model, continua)
+# check the model
+model.diagnostics(df.contpix_file)
 
-from cannon2_infer_labels import infer_labels
-test_set, covs = infer_labels(model, test_set)
+# infer labels with the new model for the test_set
+# test_set, covs = model.infer_labels(test_set)
+test_set, covs = model.predict(test_set)
 
-from dataset import dataset_postdiagnostics
+# Make plots
 dataset_postdiagnostics(reference_set, test_set)
 
-from spectral_model import draw_spectra
-cannon_set = draw_spectra(model, test_set)
-
-from spectral_model import diagnostics
-diagnostics(cannon_set, test_set, model)
+cannon_set = model.draw_spectra(test_set)
+model.spectral_diagnostics(test_set)
