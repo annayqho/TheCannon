@@ -184,13 +184,16 @@ class ApogeeDF(DataFrame):
     def get_reference_labels(self, *args, **kwags):
         """Extracts training labels from file.
 
-        Assumes that the file has # then label names in first row, that first
-        column is the filename, that the remaining values are floats
-        and that you want all of the labels. User picks specific labels later.
+        Assumes that first row is # then label names, that first column is # 
+        then the filenames, that the remaining values are floats and that 
+        user wants all of the labels. User can pick specific labels later.
 
-        Input: name(string) of the data file containing the labels
-        Returns: label_names list, and np ndarray (size=numtrainingstars, nlabels)
-        consisting of all of the label values
+        Returns
+        -------
+        data['id']: 
+        label_names: list of label names
+        data: np ndarray of size (nstars, nlabels)
+            label values
         """
         data = Table(self.label_file)
         data.sort('id')
