@@ -60,10 +60,10 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
         array of fluxes
 
     flux_errs: ndarray
-        measurement uncertainties on fluxes
+        array of measurement uncertainties on fluxes
 
     ivars: ndarray
-        inverse variance matrix
+        array of inverse variances
 
     pixtest_fname: str
         filename against which testing continuum subtraction
@@ -74,13 +74,13 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
     Returns
     -------
     norm_flux: ndarray
-        3D continuum-normalized spectra (nstars, npixels, 3)
+        array of continuum-normalized fluxes
 
     norm_ivar: ndarray
-        normalized inverse variance
+        array of continuum-normalized inverse variances
 
     continua: ndarray
-            2D continuum array (nstars, npixels)
+        array corresponding to the fitted continuum 
     """
     continua = np.zeros(lambdas.shape)
     norm_flux = np.zeros(fluxes.shape)
