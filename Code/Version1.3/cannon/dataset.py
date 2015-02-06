@@ -26,8 +26,9 @@ class Dataset(object):
     label_names: (optional) list of strings of length (nlabels)
     """
 
-    def __init__(self, label_vals, SNRs, lams, fluxes, ivars,
+    def __init__(self, contmask, label_vals, SNRs, lams, fluxes, ivars,
                  label_names=None, label_names_tex=None):
+        self.contmask = contmask
         self.data = label_vals
         self.label_names = label_names
         self.data.add_column('SNRs', SNRs)
@@ -248,10 +249,11 @@ class DataFrame(object):
 
     def load_dataset(self, *args, **kwargs):
         print('Loading dataset... This may take a while')
-        lambdas, norm_fluxes, norm_ivars, SNRs = self.get_spectra(*args, **kwargs)
+        contpix, lambdas, norm_fluxes, norm_ivars, SNRs = self.get_spectra(
+                *args, **kwargs)
         IDs, all_label_names, all_label_values = self.get_reference_labels()
 
-        dataset = Dataset(all_label_values, SNRs, lambdas, norm_fluxes,
+        dataset = Dataset(contpix, all_label_values, SNRs, lambdas, norm_fluxes,
                           norm_ivars, all_label_names)
 
         self._dataset = dataset

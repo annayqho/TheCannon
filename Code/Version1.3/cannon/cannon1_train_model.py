@@ -201,7 +201,7 @@ def split_array(array, num):
     return out
 
 
-def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
+def model_diagnostics(reference_set, model, contmask,
                       baseline_spec_plot_name = "baseline_spec_with_cont_pix",
                       leading_coeffs_plot_name = "leading_coeffs.png",
                       chisq_dist_plot_name = "modelfit_chisqs.png"):
@@ -233,16 +233,17 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     lams = reference_set.lams
     label_names = reference_set.get_plotting_labels()
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
+    npixels = len(lams)
     nlabels = len(pivots)
 
     # Baseline spectrum with continuum
     baseline_spec = coeffs_all[:,0]
-    cont = np.round(baseline_spec,5) == 1
-    baseline_spec = np.ma.array(baseline_spec, mask=cont)
-    lams = np.ma.array(lams, mask=cont)
+    bad = np.round(baseline_spec,5) == 0
+    baseline_spec = np.ma.array(baseline_spec, mask=bad)
+    lams = np.ma.array(lams, mask=bad)
     
     # Continuum pixels
-    contpix_lambda = list(np.loadtxt(contpix, usecols=(0,), unpack=1))
+    contpix_lambda = lams[contmask]
     y = [1]*len(contpix_lambda)
    
     # Split into ten segments
@@ -290,9 +291,12 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     ax = axarr[0]
     ax.set_ylabel("Leading coefficient " + r"$\theta_i$")
     ax.set_title("First-Order Fit Coefficients for Labels")
+    
+    first_order = np.zeros((npixels, nlabels))
     lbl = r'$\theta_{0:d}$=coeff for ${1:s}$ * ${2:d}$'
     for i in range(nlabels):
         coeffs = coeffs_all[:,i+1] * ratios[i]
+        first_order[:,i] = coeffs
         ax.step(lams, coeffs, where='mid', linewidth=0.3,
                 label=lbl.format(i+1, label_names[i], int(ratios[i])))
     box = ax.get_position()
@@ -310,7 +314,7 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     plt.close(fig)
 
     # triangle plot of the higher-order coefficients
-    fig = corner(first_order, labels=texlabels, show_titles=True, 
+    fig = corner(first_order, labels=label_names, show_titles=True, 
                  title_args = {"fontsize":12})
     filename = "leading_coeffs_triangle.png"
     fig.savefig(filename)

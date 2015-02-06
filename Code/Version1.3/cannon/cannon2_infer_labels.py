@@ -26,7 +26,7 @@ def get_lvec(labels):
     linear_terms = labels
     quadratic_terms = np.outer(linear_terms, 
                                linear_terms)[np.triu_indices(nlabels)]
-    lvec = np.hstack((1, linear_terms, quadratic_terms))
+    lvec = np.hstack((linear_terms, quadratic_terms))
     return lvec
 
 
