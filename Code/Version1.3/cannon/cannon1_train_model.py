@@ -219,7 +219,7 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     plt.xlabel(r"Wavelength $\lambda (\AA)$")
     plt.xlim(np.ma.min(lams), np.ma.max(lams))
     ax = axarr[0]
-    ax.plot(lams, baseline_spec, c='k', linewidth=0.3,
+    ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
             label=r'$\theta_0$' + "= the leading fit coefficient")
     contpix_lambda = list(np.loadtxt(contpix, usecols=(0,), unpack=1))
     y = [1]*len(contpix_lambda)
@@ -228,7 +228,7 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     ax.set_title("Baseline Spectrum with Continuum Pixels")
     ax.set_ylabel(r'$\theta_0$')
     ax = axarr[1]
-    ax.plot(lams, baseline_spec, c='k', linewidth=0.3,
+    ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
             label=r'$\theta_0$' + "= the leading fit coefficient")
     ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
     ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
@@ -264,7 +264,7 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     ax = axarr[1]
     ax.set_ylabel("scatter")
     ax.set_title("Scatter of Fit")
-    ax.plot(lams, scatters, c='k', linewidth=0.3)
+    ax.step(lams, scatters, where='mid', c='k', linewidth=0.3)
     fig.tight_layout(pad=2.0, h_pad=4.0)
     print("Diagnostic plot: leading coeffs and scatters across wavelength.")
     print("Saved as %s" %leading_coeffs_plot_name)
