@@ -14,8 +14,8 @@ def get_lvec(labels):
 
     Parameters
     ----------
-    labels: int
-        number of labels
+    labels: numpy ndarray
+        pivoted label values for one star
 
     Returns
     -------
@@ -23,13 +23,10 @@ def get_lvec(labels):
         label vector
     """
     nlabels = len(labels)
-    lvec = labels  # linear terms
-    # Quadratic terms:
-    for i in range(nlabels):
-        for j in range(i, nlabels):
-            element = labels[i]*labels[j]
-            lvec.append(element)
-    lvec = np.array(lvec)
+    linear_terms = labels
+    quadratic_terms = np.outer(linear_terms, 
+                               linear_terms)[np.triu_indices(nlabels)]
+    lvec = np.hstack((1, linear_terms, quadratic_terms))
     return lvec
 
 

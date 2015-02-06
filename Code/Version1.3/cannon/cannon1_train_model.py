@@ -110,6 +110,29 @@ def do_one_regression(lams, fluxes, ivars, lvec):
                                             scatter=best_scatter)
     return _r + (best_scatter, )
 
+def get_lvec(label_vals, pivots):
+    """
+    Constructs a label vector for an arbitrary number of labels
+    Assumes that our model is quadratic in the labels
+
+    Parameters
+    ----------
+    label_vals: numpy ndarray, shape (nstars, nlabels)
+    pivots: array corresponding to the mean of the label_vals
+
+    Returns
+    -------
+    lvec_full: numpy ndarray
+        label vector
+    """
+    nlabels = label_vals.shape[1]
+    nstars = label_vals.shape[0]
+    linear_offsets = label_vals - pivots
+    quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)]
+                                  for m in (linear_offsets)])
+    ones = np.ones((nstars, 1))
+    lvec = np.hstack((ones, linear_offsets, quadratic_offsets))
+    return lvec
 
 def train_model(reference_set):
     """
@@ -143,24 +166,16 @@ def train_model(reference_set):
     print("Training model...")
     label_names = reference_set.label_names
     label_vals = reference_set.label_vals
-    nlabels = len(label_names)
     lams = reference_set.lams
+    npixels = len(lams)
     fluxes = reference_set.fluxes
     ivars = reference_set.ivars
-    nstars = fluxes.shape[0]
-    npixels = len(lams)
-
-    # Establish label vector
     pivots = np.mean(label_vals, axis=0)
-    ones = np.ones((nstars, 1))
-    linear_offsets = label_vals - pivots
-    quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)]
-                                  for m in (label_vals - pivots)])
-    lvec = np.hstack((ones, linear_offsets, quadratic_offsets))
+    lvec = get_lvec(label_vals, pivots)
     lvec_full = np.array([lvec,] * npixels)
 
     # Perform REGRESSIONS
-    fluxes = fluxes.swapaxes(0,1)  # for consistency with x_full
+    fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
     ivars = ivars.swapaxes(0,1)
     # one per pix
     blob = list(map(do_one_regression, lams, fluxes, ivars, lvec_full))
@@ -174,6 +189,16 @@ def train_model(reference_set):
     model = coeffs, covs, scatters, all_chisqs, pivots, lvec_full
     print("Done training model")
     return model
+
+
+def split_array(array, num):
+    avg = len(array) / float(num)
+    out = []
+    last = 0.0
+    while last < len(array):
+        out.append(array[int(last):int(last+avg)])
+        last += avg
+    return out
 
 
 def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
@@ -215,30 +240,43 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     cont = np.round(baseline_spec,5) == 1
     baseline_spec = np.ma.array(baseline_spec, mask=cont)
     lams = np.ma.array(lams, mask=cont)
-    fig, axarr = plt.subplots(2, sharex=True)
-    plt.xlabel(r"Wavelength $\lambda (\AA)$")
-    plt.xlim(np.ma.min(lams), np.ma.max(lams))
-    ax = axarr[0]
-    ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
-            label=r'$\theta_0$' + "= the leading fit coefficient")
+    
+    # Continuum pixels
     contpix_lambda = list(np.loadtxt(contpix, usecols=(0,), unpack=1))
     y = [1]*len(contpix_lambda)
-    ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
-    ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
-    ax.set_title("Baseline Spectrum with Continuum Pixels")
-    ax.set_ylabel(r'$\theta_0$')
-    ax = axarr[1]
-    ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
-            label=r'$\theta_0$' + "= the leading fit coefficient")
-    ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
-    ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
-    ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
-    ax.set_ylabel(r'$\theta_0$')
-    ax.set_ylim(0.95, 1.05)
-    print("Diagnostic plot: fitted 0th order spectrum, cont pix overlaid.")
-    print("Saved as %s" % baseline_spec_plot_name)
-    plt.savefig(baseline_spec_plot_name)
-    plt.close()
+   
+    # Split into ten segments
+    nseg = 10
+    lams_seg = split_array(lams.compressed(), nseg)
+    xmins = []
+    xmaxs = []
+    for seg in lams_seg:
+        xmins.append(seg[0])
+        xmaxs.append(seg[-1])
+
+    for i in range(nseg):
+        fig, axarr = plt.subplots(2, sharex=True)
+        plt.xlabel(r"Wavelength $\lambda (\AA)$")
+        plt.xlim(xmins[i], xmaxs[i])
+        ax = axarr[0]
+        ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
+                label=r'$\theta_0$' + "= the leading fit coefficient")
+        ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
+        ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
+        ax.set_title("Baseline Spectrum with Continuum Pixels")
+        ax.set_ylabel(r'$\theta_0$')
+        ax = axarr[1]
+        ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
+                label=r'$\theta_0$' + "= the leading fit coefficient")
+        ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
+        ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
+        ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
+        ax.set_ylabel(r'$\theta_0$')
+        ax.set_ylim(0.95, 1.05)
+        print("Diagnostic plot: fitted 0th order spectrum, cont pix overlaid.")
+        print("Saved as %s_%s" % (baseline_spec_plot_name, i))
+        plt.savefig(baseline_spec_plot_name)
+        plt.close()
 
     # Leading coefficients for each label & scatter
     # Scale coefficients so that they can be overlaid on the same plot
@@ -255,7 +293,7 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     lbl = r'$\theta_{0:d}=coeff for ${1:s}$ * {2:f}$'
     for i in range(nlabels):
         coeffs = coeffs_all[:,i+1] * ratios[i]
-        ax.plot(lams, coeffs, linewidth=0.3,
+        ax.step(lams, coeffs, where='mid', linewidth=0.3,
                 label=lbl.format(i+1, label_names[i], ratios[i]))
     box = ax.get_position()
     ax.set_position([box.x0, box.y0 + box.height*0.1, box.width, box.height*0.9])
@@ -269,6 +307,13 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     print("Diagnostic plot: leading coeffs and scatters across wavelength.")
     print("Saved as %s" %leading_coeffs_plot_name)
     fig.savefig(leading_coeffs_plot_name)
+    plt.close(fig)
+
+    # triangle plot of the higher-order coefficients
+    fig = triangle.corner(first_order, labels=texlabels,
+                          show_titles=True, title_args = {"fontsize":12})
+    filename = "leading_coeffs_triangle.png"
+    fig.savefig(filename)
     plt.close(fig)
 
     # Histogram of the chi squareds of ind. stars
