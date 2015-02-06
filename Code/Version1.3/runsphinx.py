@@ -24,6 +24,9 @@ reference_set = df.dataset
 cols = 'teff logg mh'.split()
 reference_set.choose_labels(cols)
 
+# set the headers for plotting
+reference_set.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
+
 # discard object with large corrections
 mask = '(abs(teff - teff_corr) < 600) & (logg < 100)'
 reference_set.choose_objects(mask)

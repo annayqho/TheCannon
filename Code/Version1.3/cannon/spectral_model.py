@@ -163,8 +163,8 @@ def residuals(cannon_set, test_set):
                                  (np.std(res_norm,axis=0) == 0)))
     res_norm = np.ma.compress_cols(res_norm)
 
-    for i in range(len(cannon_set.label_names)):
-        label_name = cannon_set.label_names[i]
+    for i in range(len(cannon_set.get_plotting_labels())):
+        label_name = cannon_set.get_plotting_labels()[i]
         print("Plotting residuals sorted by %s" % label_name)
         label_vals = cannon_set.label_vals[:,i]
         sorted_res = res_norm[np.argsort(label_vals)]

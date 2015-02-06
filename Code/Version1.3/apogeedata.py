@@ -37,7 +37,7 @@ def get_pixmask(fluxes, flux_errs):
     mask: ndarray, dtype=bool
         array giving bad pixels as True values
     """
-    bad_flux = ~np.isfinite(fluxes)   
+    bad_flux = (~np.isfinite(fluxes)) | (fluxes == 0)   
     bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
     bad_pix = bad_err | bad_flux
 
@@ -158,7 +158,7 @@ class ApogeeDF(DataFrame):
                 lambdas = np.array(wl_full)
             flux_errs = np.array((file_in[2].data))
             badpix = get_pixmask(fluxes, flux_errs)
-            fluxes = np.ma.array(fluxes, mask=badpix, fill_value=0.)
+            fluxes = np.ma.array(fluxes, mask=badpix, fill_value=1.)
             flux_errs = np.ma.array(flux_errs, mask=badpix, fill_value=LARGE)
             SNRs[jj] = np.ma.median(fluxes/flux_errs)
             ones = np.ma.array(np.ones(npixels), mask=badpix)

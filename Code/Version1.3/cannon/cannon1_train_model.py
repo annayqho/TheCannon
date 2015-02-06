@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 import numpy as np
 import matplotlib.pyplot as plt
 from .helpers.compatibility import range, map
-
+from .helpers.triangle import corner
 
 def do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
@@ -202,7 +202,7 @@ def split_array(array, num):
 
 
 def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
-                      baseline_spec_plot_name = "baseline_spec_with_cont_pix.png",
+                      baseline_spec_plot_name = "baseline_spec_with_cont_pix",
                       leading_coeffs_plot_name = "leading_coeffs.png",
                       chisq_dist_plot_name = "modelfit_chisqs.png"):
     """Run a set of diagnostics on the model.
@@ -231,7 +231,7 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     chisq_dist_plot_name:
     """
     lams = reference_set.lams
-    label_names = reference_set.label_names
+    label_names = reference_set.get_plotting_labels()
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
     nlabels = len(pivots)
 
@@ -274,8 +274,8 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
         ax.set_ylabel(r'$\theta_0$')
         ax.set_ylim(0.95, 1.05)
         print("Diagnostic plot: fitted 0th order spectrum, cont pix overlaid.")
-        print("Saved as %s_%s" % (baseline_spec_plot_name, i))
-        plt.savefig(baseline_spec_plot_name)
+        print("Saved as %s_%s.png" % (baseline_spec_plot_name, i))
+        plt.savefig(baseline_spec_plot_name + "_%s" %i)
         plt.close()
 
     # Leading coefficients for each label & scatter
@@ -290,11 +290,11 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     ax = axarr[0]
     ax.set_ylabel("Leading coefficient " + r"$\theta_i$")
     ax.set_title("First-Order Fit Coefficients for Labels")
-    lbl = r'$\theta_{0:d}=coeff for ${1:s}$ * {2:f}$'
+    lbl = r'$\theta_{0:d}$=coeff for ${1:s}$ * ${2:d}$'
     for i in range(nlabels):
         coeffs = coeffs_all[:,i+1] * ratios[i]
         ax.step(lams, coeffs, where='mid', linewidth=0.3,
-                label=lbl.format(i+1, label_names[i], ratios[i]))
+                label=lbl.format(i+1, label_names[i], int(ratios[i])))
     box = ax.get_position()
     ax.set_position([box.x0, box.y0 + box.height*0.1, box.width, box.height*0.9])
     ax.legend(bbox_to_anchor=(0., -.2, 1., .102), loc=3, ncol=3, mode="expand",
@@ -310,8 +310,8 @@ def model_diagnostics(reference_set, model, contpix="contpix_lambda.txt",
     plt.close(fig)
 
     # triangle plot of the higher-order coefficients
-    fig = triangle.corner(first_order, labels=texlabels,
-                          show_titles=True, title_args = {"fontsize":12})
+    fig = corner(first_order, labels=texlabels, show_titles=True, 
+                 title_args = {"fontsize":12})
     filename = "leading_coeffs_triangle.png"
     fig.savefig(filename)
     plt.close(fig)

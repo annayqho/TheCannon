@@ -27,7 +27,7 @@ class Dataset(object):
     """
 
     def __init__(self, label_vals, SNRs, lams, fluxes, ivars,
-                 label_names=None):
+                 label_names=None, label_names_tex=None):
         self.data = label_vals
         self.label_names = label_names
         self.data.add_column('SNRs', SNRs)
@@ -43,6 +43,9 @@ class Dataset(object):
         """ Set label vals from an array """
         self._label_vals = vals
 
+    def set_label_names_tex(self, names):
+        self.label_names_tex = names
+
     @property
     def IDs(self):
         return self.data['id']
@@ -51,6 +54,11 @@ class Dataset(object):
     def SNRs(self):
         return self.data['SNRs']
 
+    def get_plotting_labels(self):
+        if self.label_names_tex is None:
+            return self.label_names
+        return self.label_names_tex
+    
     def choose_labels(self, cols):
         """Updates the label_names and label_vals properties
 
@@ -97,8 +105,7 @@ class Dataset(object):
             dimension
         """
         data = np.array([self.data[k] for k in self.label_names]).T
-        if labels is None:
-            labels = [r"$%s$" % l for l in self.label_names]
+        labels = [r"$%s$" % l for l in self.get_plotting_labels()]
         print("Plotting every label against every other")
         fig = corner(data, labels=labels, show_titles=True,
                      title_args={"fontsize":12})
@@ -145,7 +152,7 @@ def dataset_prediagnostics(reference_set, test_set,
     plt.ylabel("Number of Objects")
     plt.savefig(SNR_plot_name)
     plt.close()
-    print("Saved fig %s" % figname)
+    print("Saved fig %s" %SNR_plot_name)
 
     # Plot all reference labels against each other
     reference_set.label_triangle_plot(triangle_plot_name)
@@ -196,7 +203,7 @@ def dataset_postdiagnostics(reference_set, test_set,
     
     # 1-1 plots of all labels
     for i in range(nlabels):
-        name = label_names[i]
+        name = reference_set.get_plotting_labels()[i]
         orig = reference_labels[:,i]
         cannon = test_labels[:,i]
         low = np.minimum(min(orig), min(cannon))
