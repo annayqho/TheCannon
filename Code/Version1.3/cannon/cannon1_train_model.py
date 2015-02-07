@@ -127,6 +127,7 @@ def get_lvec(label_vals, pivots):
     """
     nlabels = label_vals.shape[1]
     nstars = label_vals.shape[0]
+    # specialized to second-order model
     linear_offsets = label_vals - pivots
     quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)]
                                   for m in (linear_offsets)])
