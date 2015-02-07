@@ -23,6 +23,7 @@ def get_lvec(labels):
         label vector
     """
     nlabels = len(labels)
+    # specialized to second-order model
     linear_terms = labels
     quadratic_terms = np.outer(linear_terms, 
                                linear_terms)[np.triu_indices(nlabels)]
