@@ -136,7 +136,7 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
             ind = np.isfinite(norm_ivar) & (norm_ivar > 0)
             print(ind)
             norm_ivar[~ind] = norm_ivar[ind].min() * 1e-2
-            badpix2 = get_pixmask(norm_flux, 1. / np.sqrt(norm_ivar))
+            badpix2 = get_pixmask(norm_flux, norm_flux_err)
             temp = np.ma.array(norm_flux, mask=badpix2, fill_value=1.0)
             norm_fluxes[jj,start:stop] = np.ma.filled(temp)
             temp = np.ma.array(norm_ivar, mask=badpix2, fill_value=0.)
