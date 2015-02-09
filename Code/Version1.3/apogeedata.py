@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function,)
 import numpy as np
+import scipy.optimize as opt
 import os
 import sys
 from cannon.helpers import Table
@@ -11,12 +12,10 @@ PY3 = sys.version_info[0] > 2
 if not PY3:
     range = xrange
 
-
 try:
     from astropy.io import fits as pyfits
 except ImportError:
     import pyfits
-
 
 def get_contmask(lambdas, fluxes, f_cut=0.0001, sigma_cut=0.005):
     """ Identify continuum pixels for use in normalization.
@@ -45,7 +44,6 @@ def get_contmask(lambdas, fluxes, f_cut=0.0001, sigma_cut=0.005):
     print("%s cont pix identified" %sum(contmask))
     return contmask
 
-
 def get_pixmask(fluxes, flux_errs):
     """ Return a mask array of bad pixels
 
@@ -71,19 +69,32 @@ def get_pixmask(fluxes, flux_errs):
 
     return bad_pix
 
-def continuum_func(N, lambdas):
+def cont_func(x, a, b, N=3):
     """Return the fitting function for the continuum
 
     Parameters
     ----------
-    N: number of terms
-    lambdas: ndarray
-        common wavelength
-
+    x: ndarray
+        data to fit (wavelengths)
+    a: ndarray
+        coefficients for sin
+    b: ndarray
+        coefficients for cos
+    N: (optional) int
+        number of terms
+    
     Returns
     -------
     Function evaluated for an input x
     """
+    L = max(x)-min(x)
+    a = np.zeros(N)
+    b = np.zeros(N)
+    func = 0
+    for n in range(0, N):
+        k[n] = n*np.pi/L
+        func += a[n]*np.sin(k[n]*x)+b[n]*np.cos(k[n]*x)
+    return func
 
 def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
                                   contmask, ranges, deg=3):
@@ -139,11 +150,12 @@ def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
             flux_err_cut = flux_err[start:stop]
             lambda_cut = lambdas[start:stop]
             ivar_cut = ivar[start:stop]
-            fit = np.polynomial.chebyshev.Chebyshev.fit(x=lambda_cut, y=flux_cut,
-                                                        w=ivar_cut, deg=deg)
-            continua[start:stop] = fit(lambda_cut)
-            norm_flux = flux_cut/fit(lambda_cut)
-            norm_flux_err = flux_err_cut/fit(lambda_cut)
+            popt, pcov = opt.curve_fit(cont_func, lambda_cut, flux_cut,  
+                          sigma=flux_err_cut)
+            a, b = popt # a_n*sin(k_n*x) + b_n*cos(k_n*x)
+            continua[start:stop] = cont_func(lambda_cut, a, b)
+            norm_flux = flux_cut/continua[start:stop]
+            norm_flux_err = flux_err_cut/continua[start:stop]
             norm_ivar = 1. / norm_flux_err**2
             # check null division
             ind = np.isfinite(norm_ivar) & (norm_ivar > 0)
@@ -155,7 +167,6 @@ def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
             norm_ivars[jj,start:stop] = np.ma.filled(temp)
         norm_ivars[jj,:][contmask] = 0. # ignore cont pixels in fit
         return norm_fluxes, norm_ivars, continua
-
 
 class ApogeeDF(DataFrame):
     """ DataFrame for keeping an Apogee data organized. """
