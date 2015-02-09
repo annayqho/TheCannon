@@ -40,7 +40,7 @@ model = CannonModel(reference_set)
 model.fit() # model.train would work equivalently.
 
 # check the model
-model.diagnostics(df.contmask)
+model.diagnostics()
 
 # infer labels with the new model for the test_set
 # test_set, covs = model.infer_labels(test_set)

@@ -29,7 +29,7 @@ class CannonModel(object):
         """ Train the model """
         self._model = _train_model(self.training_set)
 
-    def diagnostics(self, contpix):
+    def diagnostics(self):
         """Run a set of diagnostics on the model.
 
         Plot the 0th order coefficients as the baseline spectrum.
@@ -46,7 +46,7 @@ class CannonModel(object):
         contpix: str
             continuum pixel definition file
         """
-        _model_diagnostics(self.training_set, self.model, contpix)
+        _model_diagnostics(self.training_set, self.model)
 
     def infer_labels(self, test_set):
         """
