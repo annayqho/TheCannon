@@ -202,7 +202,7 @@ def split_array(array, num):
     return out
 
 
-def model_diagnostics(reference_set, model, contmask,
+def model_diagnostics(reference_set, model,
                       baseline_spec_plot_name = "baseline_spec_with_cont_pix",
                       leading_coeffs_plot_name = "leading_coeffs.png",
                       chisq_dist_plot_name = "modelfit_chisqs.png"):
@@ -231,6 +231,7 @@ def model_diagnostics(reference_set, model, contmask,
 
     chisq_dist_plot_name:
     """
+    contmask = reference_set.contmask
     lams = reference_set.lams
     label_names = reference_set.get_plotting_labels()
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model

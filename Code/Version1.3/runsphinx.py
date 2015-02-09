@@ -12,9 +12,7 @@ from cannon.model import CannonModel
 
 
 df = ApogeeDF("example_DR10/Data",
-              "example_DR10/reference_labels.csv",
-              'example_DR10/contpix_lambda.txt',
-              'example_DR10/pixtest4.txt')
+              "example_DR10/reference_labels.csv")
 
 # generate the dataset necessary to run the code
 # DataFrame object will take care of book keeping necessary information

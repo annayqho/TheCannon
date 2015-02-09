@@ -29,7 +29,7 @@ class CannonModel(object):
         """ Train the model """
         self._model = _train_model(self.training_set)
 
-    def diagnostics(self, contpix="contpix_lambda.txt"):
+    def diagnostics(self, contpix):
         """Run a set of diagnostics on the model.
 
         Plot the 0th order coefficients as the baseline spectrum.

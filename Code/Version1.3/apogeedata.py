@@ -134,7 +134,6 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
             norm_ivar = 1. / norm_flux_err**2
             # check null division
             ind = np.isfinite(norm_ivar) & (norm_ivar > 0)
-            print(ind)
             norm_ivar[~ind] = norm_ivar[ind].min() * 1e-2
             badpix2 = get_pixmask(norm_flux, norm_flux_err)
             temp = np.ma.array(norm_flux, mask=badpix2, fill_value=1.0)
@@ -148,9 +147,8 @@ def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
 class ApogeeDF(DataFrame):
     """ DataFrame for keeping an Apogee data organized. """
    
-    def __init__(self, spec_dir, label_file, contpix_file, pixtest_file):
-        super(self.__class__, self).__init__(spec_dir, label_file, contpix_file)
-        self.pixtest_file = pixtest_file
+    def __init__(self, spec_dir, label_file):
+        super(self.__class__, self).__init__(spec_dir, label_file)
         # we discard the edges of the fluxes: 10 A, corresponding to ~50 pix
         self.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
@@ -210,9 +208,8 @@ class ApogeeDF(DataFrame):
             ivars[jj,:] = ivar
 
         # Continuum normalization
-        #print "Finding continuum pixels"
+        print("Finding continuum pixels")
         contmask = get_contmask(lambdas, fluxes)
-        
         norm_fluxes, norm_ivars, continua = \
                 continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
                                               contmask, self.ranges)

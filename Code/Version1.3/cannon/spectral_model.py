@@ -101,7 +101,6 @@ def overlay_spectra(cannon_set, test_set, model):
         spec_fit = np.ma.array(cannon_set.fluxes[i,:], mask=bad)
         ivars_orig = np.ma.array(test_set.ivars[i,:], mask=bad)
         ivars_fit = np.ma.array(cannon_set.ivars[i,:], mask=bad)
-
         fig, axarr = plt.subplots(2)
         ax1 = axarr[0]
         ax1.scatter(lambdas, spec_orig, label="Orig Spec",
