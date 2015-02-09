@@ -49,8 +49,10 @@ advantage of all of the pixels (and therefore information) in the spectrum.
 It works by fitting a flexible model that describes how the flux in each 
 pixel of any given continuum-normalized spectrum in the survey depends on 
 the labels. 
-For this demonstration, we train the model on \apogee\ spectra and use it
-to obtain labels for \lamost\ spectra. We obtain labels that are consistent
+For this demonstration, we use \apogee\ and \lamost to illustrate the 
+success of \tc\ at different wavelength regions and resolution regimes. 
+By training the model on \apogee\ spectra and using it to obtain labels for 
+\lamost\ spectra, we obtain labels that are consistent
 with the \apogee\ labels for these objects, thus successfully putting spectra
 from \lamost\ onto the \apogee\ parameter scale. 
 
@@ -80,22 +82,33 @@ resolutions, providing a great opportunity for a first test of the performance
 of \tc\ and its potential for cross-calibrating surveys and putting labels
 onto the same scale.
 
-\section{Preparing Data for \tc}
+\section{Preparing for \tc: Selection and Pre-Processing of Data}
 
-Data preparation for \tc\ in general. Needs to be radial velocity shifted,
-be sampled onto a common wavelength grid, need to be provided with inverse
-variance estimates (one per pixel), common line-spreaad function, some kind of
-consistent continuum normalization based on fitting or means but not medians
-or quantiles. This is because we don't want the model to be distorted as a 
-function of SNR. Next we go into the specifics of pre-processing for \apogee\
-and for \lamost\ as an illustration of how data of different formats needs to 
-be handled prior to use by \tc.
+\subsection{Choosing a Training Set for Cross-Calibration}
 
-\subsection{\apogee\ Data Pre-Processing}
+All overlap, then select some fraction of the highest signal-to-noise (S/N) 
+stars. But need to represent and cover label space as well. Repeat with 
+various fractions of the 12,000 stars in common.
+
+\subsection{Pre-Processing Data}
+
+Before being fed to \tc, any spectroscopic data set (whether used as the 
+training or the test set) must satisfy the criteria laid out in 
+\citep{ness2015}. More specifically, the spectra must be
+continuum-normalized in a consistent way that is independent of S/N, and need
+to be radial velocity shifted and sampled onto a common wavelength grid with
+a common line-spread function. Each pixel of each spectrum must be accompanied
+by a flux variance that takes sources like photon noise into account. 
+
+These are the criteria that apply to any data set. We now illustrate the 
+preparation of two different data sets for use by \tc: the \apogee\ training
+set and the \lamost\ test set. 
+
+\subsubsection{\apogee\ Data Pre-Processing}
 
 Similar to what's in the original method paper.
 
-\subsection{\lamost\ Data Pre-Processing}
+\subsubsection{\lamost\ Data Pre-Processing}
 
 Details from Melissa's e-mail.
 
@@ -108,11 +121,6 @@ continuum normalization. Find a certain fraction of pixels to use as continuum
 Fit a series of sines and cosines. Divide the spectra by this function. This 
 is different to what we did in the original \tc\ method paper \citep{ness2015}. 
 
-\subsection{Choosing a Training Set for Cross-Calibration}
-
-All overlap, then select some fraction of the highest signal-to-noise (S/N) 
-stars. But need to represent and cover label space as well. Repeat with 
-various fractions of the 12,000 stars in common.
 
 \section{Results: Stellar Labels for \lamost}
 
