@@ -16,33 +16,43 @@
 
 \begin{document}
 
-\title{\lamost\ labels from \apogee\ spectra: \\ The first spectroscopic survey cross-calibration using \tc}
+\title{\lamost\ labels on the \apogee\ scale: \\ The first spectroscopic survey cross-calibration using \tc}
 \author{A. Y. Q. ~Ho\altaffilmark{1},
 M.~Ness\altaffilmark{1},
 David~W.~Hogg\altaffilmark{1,2,3}, 
-H.-W.~Rix\altaffilmark{1}}
+H.-W.~Rix\altaffilmark{1},
+M.~Fouesneau\altaffilmark{1},
+C.~Chao\altaffilmark{4},
+F.~Yang\altaffilmark{4,5}
+}
 \altaffiltext{1}{Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17, D-69117 Heidelberg, Germany}
 \altaffiltext{2}{Center for Cosmology and Particle Physics, Department of Phyics,
 New York University, 4 Washington Pl., room 424, New York, NY, 10003, USA}
 \altaffiltext{3}{Center for Data Science, New York University, 726 Broadway, 7th Floor, New York, NY 10003, USA}
+\altaffiltext{4}{Key Laboratory of Optical Astronomy, National Astronomical Observatories, Chinese Academy of Sciences, Datun Road 20A,Beijin 100012, China}
+\altaffiltext{5}{University of Chinese Academy of Sciences, Beijing 100049, China}
+
 \email{annaho@mpia.de}
 
 \begin{abstract}
 
-\tc\ is a data-driven method for determining stellar labels (physical 
-parameters and chemical abundances) from stellar spectra in the context 
-of vast spectroscopic surveys. 
-Unlike many other methods for label determination, The Cannon does not 
+Using 12,000 objects observed with both the \apogee\ and \lamost\ stellar
+surveys, we demonstrate the ability of \tc\ to bring qualitatively 
+different stellar surveys onto a consistent stellar parameter and chemical 
+abundance scale. 
+\tc\ \citep{ness2015} is a data-driven method for determining stellar labels 
+(physical parameters and chemical abundances) from stellar spectra in the 
+context of vast spectroscopic surveys. 
+Unlike many other methods for label determination, \tc\ does not 
 explicitly rely on physics-based model spectra or line lists, and takes 
 advantage of all of the pixels (and therefore information) in the spectrum. 
 It works by fitting a flexible model that describes how the flux in each 
 pixel of any given continuum-normalized spectrum in the survey depends on 
-the labels. Arguably the most exciting long-term prospect of 
-The Cannon is its potential to bring qualitatively different stellar surveys 
-onto a consistent stellar parameter and chemical abundance scale. In this 
-paper, we present the results of a first attempt at cross-calibration using
-\tc\, using data from \apogee\ to train the model and infer labels 
-(\teff, \feh, and \logg) for stars in \lamost. 
+the labels. 
+For this demonstration, we train the model on \apogee\ spectra and use it
+to obtain labels for \lamost\ spectra. We obtain labels that are consistent
+with the \apogee\ labels for these objects, thus successfully putting spectra
+from \lamost\ onto the \apogee\ parameter scale. 
 
 \end{abstract}
 
@@ -62,24 +72,63 @@ techniques: spectroscopic
 
 \section{Introduction}
 
+Reference the original Cannon paper \citep{ness2015}. Say that if people want
+to cite \tc\ in general that they should cite both of these papers. Give an 
+overview of \apogee\ data as well as an overview of \lamost\ data. Point out
+that these two surveys are at different wavelength regions and different 
+resolutions, providing a great opportunity for a first test of the performance
+of \tc\ and its potential for cross-calibrating surveys and putting labels
+onto the same scale.
 
+\section{Preparing Data for \tc}
 
-\section{Data}
+Data preparation for \tc\ in general. Needs to be radial velocity shifted,
+be sampled onto a common wavelength grid, need to be provided with inverse
+variance estimates (one per pixel), common line-spreaad function, some kind of
+consistent continuum normalization based on fitting or means but not medians
+or quantiles. This is because we don't want the model to be distorted as a 
+function of SNR. Next we go into the specifics of pre-processing for \apogee\
+and for \lamost\ as an illustration of how data of different formats needs to 
+be handled prior to use by \tc.
 
-\subsection{A Training Set from \apogee}
+\subsection{\apogee\ Data Pre-Processing}
 
-\subsection{A Test Set from \lamost}
+Similar to what's in the original method paper.
+
+\subsection{\lamost\ Data Pre-Processing}
+
+Details from Melissa's e-mail.
+
+\section{\tc}
+
+\subsection{Continuum Normalization}
+
+After data has been shaped up and prepared for use by \tc\, \tc\ does its own
+continuum normalization. Find a certain fraction of pixels to use as continuum
+Fit a series of sines and cosines. Divide the spectra by this function. This 
+is different to what we did in the original \tc\ method paper \citep{ness2015}. 
+
+\subsection{Choosing a Training Set for Cross-Calibration}
+
+All overlap, then select some fraction of the highest signal-to-noise (S/N) 
+stars. But need to represent and cover label space as well. Repeat with 
+various fractions of the 12,000 stars in common.
 
 \section{Results: Stellar Labels for \lamost}
 
+\subsection{Take-One-Out Tests}
+
 \section{Discussion}
+
+\tc\ works at low and high resolution! We put \lamost\ onto the \apogee\ 
+parameter scale!
 
 \section{Acknowledgements}
 
 \begin{thebibliography}{24}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
-\bibitem[{{Ness}{et~al.}(2015){Ness}, {Hogg}, {Rix}, {Ho}, \& 
+\bibitem[{{Ness}{ et~al.}(2015){Ness}, {Hogg}, {Rix}, {Ho}, \& 
   {Zasowski}}]{ness2015}
 {Ness}, M., {Hogg}, D.W., {Rix}, H.-W., {Ho}, A.Y.Q., \& {Zasowski}, G. 2015
 

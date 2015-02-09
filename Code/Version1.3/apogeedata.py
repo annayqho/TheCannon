@@ -71,13 +71,26 @@ def get_pixmask(fluxes, flux_errs):
 
     return bad_pix
 
+def continuum_func(N, lambdas):
+    """Return the fitting function for the continuum
 
-def continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
+    Parameters
+    ----------
+    N: number of terms
+    lambdas: ndarray
+        common wavelength
+
+    Returns
+    -------
+    Function evaluated for an input x
+    """
+
+def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
                                   contmask, ranges, deg=3):
     """Continuum-normalizes the spectra.
 
-    Fit a 2nd order Chebyshev polynomial to each segment
-    and divide each segment by its corresponding polynomial
+    Fit a function of sines and cosines to each segment
+    and divide each segment by its corresponding fitted sinusoid
 
     Parameters
     ----------
@@ -211,7 +224,7 @@ class ApogeeDF(DataFrame):
         print("Finding continuum pixels")
         contmask = get_contmask(lambdas, fluxes)
         norm_fluxes, norm_ivars, continua = \
-                continuum_normalize_Chebyshev(lambdas, fluxes, flux_errs, ivars,
+                continuum_normalize(lambdas, fluxes, flux_errs, ivars,
                                               contmask, self.ranges)
 
         print("Loaded {0:d} stellar spectra".format(len(files)))
