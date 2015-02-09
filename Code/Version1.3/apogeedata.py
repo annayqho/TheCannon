@@ -69,7 +69,7 @@ def get_pixmask(fluxes, flux_errs):
 
     return bad_pix
 
-def cont_func(x, a, b, N=3):
+def cont_func(x, *p):
     """Return the fitting function for the continuum
 
     Parameters
@@ -87,13 +87,13 @@ def cont_func(x, a, b, N=3):
     -------
     Function evaluated for an input x
     """
+    N = int(len(p)/2)
+    n = np.linspace(0, N, N+1, dtype=int)
     L = max(x)-min(x)
-    a = np.zeros(N)
-    b = np.zeros(N)
-    func = 0
-    for n in range(0, N):
-        k[n] = n*np.pi/L
-        func += a[n]*np.sin(k[n]*x)+b[n]*np.cos(k[n]*x)
+    k = n*np.pi/L
+    func = 0.
+    for n in range(0, N): 
+        func += p[2*n]*np.sin(k[n]*x)+p[2*n+1]*np.cos(k[n]*x)
     return func
 
 def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
@@ -150,10 +150,11 @@ def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
             flux_err_cut = flux_err[start:stop]
             lambda_cut = lambdas[start:stop]
             ivar_cut = ivar[start:stop]
+            p0 = np.ones(deg*2)
             popt, pcov = opt.curve_fit(cont_func, lambda_cut, flux_cut,  
-                          sigma=flux_err_cut)
-            a, b = popt # a_n*sin(k_n*x) + b_n*cos(k_n*x)
-            continua[start:stop] = cont_func(lambda_cut, a, b)
+                          p0=p0, sigma=flux_err_cut)
+            p = popt
+            continua[start:stop] = cont_func(lambda_cut, p)
             norm_flux = flux_cut/continua[start:stop]
             norm_flux_err = flux_err_cut/continua[start:stop]
             norm_ivar = 1. / norm_flux_err**2
