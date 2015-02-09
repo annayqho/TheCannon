@@ -85,7 +85,9 @@ def infer_labels(model, test_set):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_norm = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
-        Cinv = 1. / ((1. / ivar) + scatters ** 2)
+        Cinv = 1. / scatters**2
+        mask = ivar != 0.
+        Cinv[mask] = 1. / ((1. / ivar) + scatters ** 2)
         weights = 1 / Cinv ** 0.5
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
         try:
