@@ -17,7 +17,7 @@ try:
 except ImportError:
     import pyfits
 
-def get_contmask(lambdas, fluxes, f_cut=0.0001, sigma_cut=0.005):
+def get_contmask(lambdas, fluxes, f_cut=0.002, sigma_cut=0.005):
     """ Identify continuum pixels for use in normalization.
 
     f_bar (ensemble median at each pixel) and sigma_f (variance)
@@ -36,12 +36,13 @@ def get_contmask(lambdas, fluxes, f_cut=0.0001, sigma_cut=0.005):
         True at indices of continuum pixels
     
     """
+    npix = len(lambdas)
     f_bar = np.median(fluxes, axis=0)
     sigma_f = np.var(fluxes, axis=0)
     cont1 = np.abs(f_bar-1)/1 < f_cut
     cont2 = sigma_f < sigma_cut
     contmask = np.logical_and(cont1, cont2)
-    print("%s cont pix identified" %sum(contmask))
+    print("%s cont pix identified of total %s" %(sum(contmask), npix))
     return contmask
 
 def get_pixmask(fluxes, flux_errs):
@@ -139,20 +140,28 @@ def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
     norm_flux_errs = np.zeros(flux_errs.shape)
     norm_ivars = np.zeros(ivars.shape)
     nstars = norm_fluxes.shape[0]
-    
+    lam_cont = np.ma.array(lambdas, mask=contmask)
+
     for jj in range(nstars):
         flux = fluxes[jj,:]
         flux_err = flux_errs[jj,:]
         ivar = ivars[jj,:]
+        flux_cont = np.ma.array(flux, mask=contmask)
+        err_cont = np.ma.array(flux_err, mask=contmask)
         for i in range(len(ranges)):
             start, stop = ranges[i][0], ranges[i][1]
             flux_cut = flux[start:stop]
             flux_err_cut = flux_err[start:stop]
             lambda_cut = lambdas[start:stop]
             ivar_cut = ivar[start:stop]
+            lam_cont = lam_cont[start:stop]
+            flux_cont = flux_cont[start:stop]
+            err_cont = err_cont[start:stop]
             p0 = np.ones(deg*2)
-            popt, pcov = opt.curve_fit(cont_func, lambda_cut, flux_cut,  
-                          p0=p0, sigma=flux_err_cut)
+            plt.scatter(lam_cont, flux_cont)
+            plt.show()
+            popt, pcov = opt.curve_fit(cont_func, lam_cont, flux_cont,  
+                          p0=p0, sigma=err_cont)
             p = popt
             continua[start:stop] = cont_func(lambda_cut, p)
             norm_flux = flux_cut/continua[start:stop]
@@ -235,6 +244,8 @@ class ApogeeDF(DataFrame):
         # Continuum normalization
         print("Finding continuum pixels")
         contmask = get_contmask(lambdas, fluxes)
+        
+
         norm_fluxes, norm_ivars, continua = \
                 continuum_normalize(lambdas, fluxes, flux_errs, ivars,
                                               contmask, self.ranges)

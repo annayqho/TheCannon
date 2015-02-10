@@ -36,7 +36,7 @@ New York University, 4 Washington Pl., room 424, New York, NY, 10003, USA}
 
 \begin{abstract}
 
-Using 12,000 objects observed with both the \apogee\ and \lamost\ stellar
+Using 11,061 objects observed with both the \apogee\ and \lamost\ stellar
 surveys, we demonstrate the ability of \tc\ to bring qualitatively 
 different stellar surveys onto a consistent stellar parameter and chemical 
 abundance scale. 
@@ -51,7 +51,7 @@ pixel of any given continuum-normalized spectrum in the survey depends on
 the labels. 
 For this demonstration, we use SDSS/DR12 data from the 
 SDSS-III/Apache Point Observatory Galactic Evolution Experiment (\apogee) 
-as well as data from the \lamost second data release (DR2) to illustrate the 
+as well as data from the \lamost\ second data release (DR2) to illustrate the 
 success of \tc\ at different wavelength regions and resolution regimes. 
 By training the model on \apogee\ spectra and using it to obtain labels for 
 \lamost\ spectra, we obtain labels that are consistent
@@ -100,17 +100,23 @@ models and line lists, and weak degradation with decreasing signal-to-noise.
 Perhaps most importantly, the method has the potential for bringing 
 qualitatively different surveys onto a consistent physical scale.
 
-To perform this cross-calibration, we use \apogee\ DR12 spectra as the 
+An opportunity for a first cross-calibration test lies at the intersection
+of \apogee\ DR12 and \lamost\ DR2: 11,061 objects were observed in common
+between the two surveys. We use \apogee\ DR12 spectra as the 
 training set and \lamost\ DR2 spectra as the test set, 
-thus bringing \lamost\ spectra onto the \apogee\ scale. 
+with the goal of bringing \lamost\ spectra onto the \apogee\ scale. 
 Cross-calibrating these two surveys provides an excellent opportunity to test
 the performance of \tc\ in both different wavelength and different resolution
-regimes. \apogee\ wavelength: H-band (15200-16900 Angstroms) at resolution 
-R ~ 22,500. \lamost\ DR2: R ~ 1,800. 370-900nm. 
+regimes: \apogee\ data is in the H-band (15200-16900\,$\AA$) at resolution 
+$R\,\sim\,22,500$ while \lamost\ data is in the window 3700-9000\,$\AA$ at
+resolution $R\,\sim\,1,000$. 
 
-The code used can be found here. This code is an implementation of the 
-procedure outlined in \citep{ness2015}. However, there are some differences
-from this original paper and those differences can be foudn in the appendix.
+The code used to produce the results as described in this paper was written in
+Python and is available online for public 
+use.\footnote{\url{www.github.com/annayqho/the-cannon}}
+Although the code is an implementation of the procedure outlined in 
+\citep{ness2015}, some changes have been made. A list of these changes 
+can be found in Appendix \ref{sec:appendix}.
 
 \section{Preparing for \tc: Selection and Pre-Processing of Data}
 
@@ -120,7 +126,7 @@ Digital Sky Survey (Alam et al. 2015, DR12). The pre-continuum normalized
 spectra have gone through the APOGEE data reduction pipeline 
 (Nidever et al. 2015). APOGEE survey (Majewski et al. 2012, 2015 in prep). 
 APOGEE, part of the SDSS-III (Eisenstein et al. 2011) is a high-res
-(R~22,500) high SNR (SNR~100) H-band (15200-16900 Angstroms) spectroscpoic
+(R~22,500) high SNR (SNR~100) H-band (15200-16900\,$\AA$) spectroscpoic
 survey of primarily red giants spanning the bulge, disk, and MW halo 
 (Zasowski et al. 2013). APOGEE'S ASPCAP pipeline provides stellar labels for
 these stars, which includes stellar parameters and multiple chemical 
@@ -130,8 +136,19 @@ the data to 1D LTE models for seven labels (Teff, logg, blah blah; Garcia
 Perez et al. 2015, in prep). 
 \subsection{Choosing a Training Set for Cross-Calibration}
 
-All overlap, then select some fraction of the highest signal-to-noise (S/N) 
-stars. But need to represent and cover label space as well. Repeat with 
+The two surveys have 11,061 objects in common. Of this overlap, a high 
+fidelity sample was selected by applying three cuts to \apogee\ objects: 
+first, a signal-to-noise cut such that objects with SNR\,\textgreater\,400 
+were selected. Second, a velocity scatter cut such that objects with 
+$\sigma_v\,\textless\,1$\,km/s were selected. And finally, only objects
+without a BAD STAR flag were selected. With these cuts, 1722 stars were
+selected to populate the training set with the remaining 9339 used as test
+objects. 
+
+\apogee\ spectra
+were used because labels are assumed to be higher for objects observed at
+higher SNR.  
+But need to represent and cover label space as well. Repeat with 
 various fractions of the 12,000 stars in common.
 
 \subsection{Data Pre-Processing Steps}
@@ -144,7 +161,10 @@ to be radial velocity shifted and sampled onto a common wavelength grid with
 a common line-spread function. Each pixel of each spectrum must be accompanied
 by a flux variance that takes sources like photon noise into account. 
 
-These are the criteria that apply to any data set. We now illustrate the 
+These are the criteria that apply to any data set. All \lamost\ and \apogee\
+spectra arrived with flux, variance, and wavelength arrays. 
+
+We now illustrate the 
 preparation of two different data sets for use by \tc: the \apogee\ training
 set and the \lamost\ test set. 
 
@@ -154,8 +174,16 @@ Similar to what's in the original method paper.
 
 \subsubsection{\lamost\ Data Pre-Processing}
 
-Details from Melissa's e-mail.
-
+For both test and training data, the stars were shifted back to the rest frame 
+by using the redshift value provided in the header of each star by LAMOST, 
+where wavelength shift = redshift*xdata in the data were then resampled on to 
+a common, evenly spaced grid (but this should to be corrected - change spacing 
+to evenly spaced in logarithm space not linear space) of 0.85\,$\AA$ 
+(which is the spacing at the lower wavelength limit of the data). Upper and 
+lower cuts were made to the data to span from 3900 to 8800\,$\AA$.
+This data, now radial velocity corrected and resampled on to a common grid, 
+All operations done to the flux were also performed 
+on the variance arrays. 
 \section{\tc}
 
 
@@ -166,10 +194,6 @@ continuum normalization. Find a certain fraction of pixels to use as continuum
 Fit a series of sines and cosines. Divide the spectra by this function. This 
 is different to what we did in the original \tc\ method paper \citep{ness2015}. 
 
-
-\section{Results: Stellar Labels for \lamost}
-
-\subsection{Take-One-Out Tests}
 
 \section{Discussion}
 
@@ -189,7 +213,22 @@ European Union's Seventh Framework Programme (FP 7) ERC Grant Agreement n.
 \addcontentsline{toc}{chapter}{APPENDIX}
 
 \section{Appendix: Code Specifics}
-Specific differences about the code.
+\label{sec:appendix}
+
+The following procedural changes were made to the code between the publication
+of \citep{ness2015} and this cross-calibration work:
+
+\begin{enumerate}
+  \item \textbf{Continuum pixel identification:} instead of identifying
+    continuum pixels through an iterative running quantile procedure, we 
+    simply apply a median and variance cut to each pixel. More precisely,
+    we assign a ``median flux'' and ``variance'' value to each pixel in the 
+    spectrum, determined using the flux at that pixel across all of the 
+    objects in the set. The median flux cut value was blah and the variance 
+    cut value was blah. Both values were set in order to select 6\% of pixels 
+    in each third of the spectrum. 
+  \item Sines and cosines instead of Chebyshev polynomial
+\end{enumerate}
 
 \begin{thebibliography}{24}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
