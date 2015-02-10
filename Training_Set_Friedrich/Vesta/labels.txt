@@ -1,2 +1,0 @@
-# ID    Teff    Teff_err    logg    logg_err    vt      vt_err  MH      MH_err
-Sun     5779    5           4.44    0.01        0.86    0.01    -0.01   0.01 
