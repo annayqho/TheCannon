@@ -49,12 +49,16 @@ advantage of all of the pixels (and therefore information) in the spectrum.
 It works by fitting a flexible model that describes how the flux in each 
 pixel of any given continuum-normalized spectrum in the survey depends on 
 the labels. 
-For this demonstration, we use \apogee\ and \lamost to illustrate the 
+For this demonstration, we use SDSS/DR12 data from the 
+SDSS-III/Apache Point Observatory Galactic Evolution Experiment (\apogee) 
+as well as data from the \lamost second data release (DR2) to illustrate the 
 success of \tc\ at different wavelength regions and resolution regimes. 
 By training the model on \apogee\ spectra and using it to obtain labels for 
 \lamost\ spectra, we obtain labels that are consistent
 with the \apogee\ labels for these objects, thus successfully putting spectra
 from \lamost\ onto the \apogee\ parameter scale. 
+The code used to generate the results in this paper is available for use by
+the community and can be found at this link (or downloaded in this way?)
 
 \end{abstract}
 
@@ -74,23 +78,63 @@ techniques: spectroscopic
 
 \section{Introduction}
 
-Reference the original Cannon paper \citep{ness2015}. Say that if people want
-to cite \tc\ in general that they should cite both of these papers. Give an 
-overview of \apogee\ data as well as an overview of \lamost\ data. Point out
-that these two surveys are at different wavelength regions and different 
-resolutions, providing a great opportunity for a first test of the performance
-of \tc\ and its potential for cross-calibrating surveys and putting labels
-onto the same scale.
+\tc\ was conceived with the goal of consistently measuring stellar labels 
+(physical parameters and chemical abundances) for the hundreds of thousands of 
+stars in the Milky Way observed with state-of-the-art spectroscopic surveys. 
+The method is described in detail in \citep{ness2015} and we recapitulate the 
+two fundamental steps here. First, \tc\ uses a set of \emph{reference objects}
+in a survey to create a model. Reference objects are a subset of spectra for
+which corresponding stellar labels are known with high fidelity, for
+calibration reasons or otherwise. These objects are used as a
+\emph{training set} to fix a flexible generative model that describes 
+a probability density function for the flux in each pixel of a 
+continuum-normalized spectrum as a function of the ``known'' labels.
+In the second step, the model is assumes to hold for all the 
+other objects in the survey (known collectively as the \emph{test set}) and 
+is applied to infer their labels. 
+
+One of the limitations of this method is its reliance on the existence of a 
+training set that is both trustworthy and fully spans the label space.
+Major strengths of this method include speed, independence from physical 
+models and line lists, and weak degradation with decreasing signal-to-noise. 
+Perhaps most importantly, the method has the potential for bringing 
+qualitatively different surveys onto a consistent physical scale.
+
+To perform this cross-calibration, we use \apogee\ DR12 spectra as the 
+training set and \lamost\ DR2 spectra as the test set, 
+thus bringing \lamost\ spectra onto the \apogee\ scale. 
+Cross-calibrating these two surveys provides an excellent opportunity to test
+the performance of \tc\ in both different wavelength and different resolution
+regimes. \apogee\ wavelength: H-band (15200-16900 Angstroms) at resolution 
+R ~ 22,500. \lamost\ DR2: R ~ 1,800. 370-900nm. 
+
+The code used can be found here. This code is an implementation of the 
+procedure outlined in \citep{ness2015}. However, there are some differences
+from this original paper and those differences can be foudn in the appendix.
 
 \section{Preparing for \tc: Selection and Pre-Processing of Data}
 
+\apogee\ DR12 data overview: SDSS-III/\apogee\ survey. APOGEE-1 survey 
+(Majewski et al. 2015) released as part of the 12th data release of the Sloan
+Digital Sky Survey (Alam et al. 2015, DR12). The pre-continuum normalized
+spectra have gone through the APOGEE data reduction pipeline 
+(Nidever et al. 2015). APOGEE survey (Majewski et al. 2012, 2015 in prep). 
+APOGEE, part of the SDSS-III (Eisenstein et al. 2011) is a high-res
+(R~22,500) high SNR (SNR~100) H-band (15200-16900 Angstroms) spectroscpoic
+survey of primarily red giants spanning the bulge, disk, and MW halo 
+(Zasowski et al. 2013). APOGEE'S ASPCAP pipeline provides stellar labels for
+these stars, which includes stellar parameters and multiple chemical 
+abundances in addition to numerous flags that warn of problems with spectra
+or fitting or label determination or both. It's based on chi-sq fitting of
+the data to 1D LTE models for seven labels (Teff, logg, blah blah; Garcia 
+Perez et al. 2015, in prep). 
 \subsection{Choosing a Training Set for Cross-Calibration}
 
 All overlap, then select some fraction of the highest signal-to-noise (S/N) 
 stars. But need to represent and cover label space as well. Repeat with 
 various fractions of the 12,000 stars in common.
 
-\subsection{Pre-Processing Data}
+\subsection{Data Pre-Processing Steps}
 
 Before being fed to \tc, any spectroscopic data set (whether used as the 
 training or the test set) must satisfy the criteria laid out in 
@@ -113,6 +157,7 @@ Similar to what's in the original method paper.
 Details from Melissa's e-mail.
 
 \section{\tc}
+
 
 \subsection{Continuum Normalization}
 
@@ -139,6 +184,12 @@ Fulbright Commission.
 The research has received funding from the European Research Council under the 
 European Union's Seventh Framework Programme (FP 7) ERC Grant Agreement n.
 [321035].
+
+\appendix
+\addcontentsline{toc}{chapter}{APPENDIX}
+
+\section{Appendix: Code Specifics}
+Specific differences about the code.
 
 \begin{thebibliography}{24}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
