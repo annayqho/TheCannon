@@ -1,9 +1,0 @@
-More things to do...
-- Learn how to use gh-pages
-- Implement continuum normalization
-
-For way further down the road:
-- spectral model needs to be allowed to vary from pixel to pixel (Gaussian process)
-- create non-identical subsets of the training set
-- shot noise in the creation of a training set
-- check the scatter at each pixel
