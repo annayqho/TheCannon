@@ -17,174 +17,38 @@ try:
 except ImportError:
     import pyfits
 
-def get_contmask(lambdas, fluxes, f_cut=0.002, sigma_cut=0.005):
-    """ Identify continuum pixels for use in normalization.
-
-    f_bar (ensemble median at each pixel) and sigma_f (variance)
-    Good cont pix have f_bar~1 and sigma_f<<1.
-    
-    Parameters
-    ----------
-    lambdas:
-    fluxes:
-    f_cut:
-    sigma_cut:
-
-    Returns:
-    --------
-    contmask: numpy ndarray, boolean
-        True at indices of continuum pixels
-    
-    """
-    npix = len(lambdas)
-    f_bar = np.median(fluxes, axis=0)
-    sigma_f = np.var(fluxes, axis=0)
-    cont1 = np.abs(f_bar-1)/1 < f_cut
-    cont2 = sigma_f < sigma_cut
-    contmask = np.logical_and(cont1, cont2)
-    print("%s cont pix identified of total %s" %(sum(contmask), npix))
-    return contmask
-
-def get_pixmask(fluxes, flux_errs):
-    """ Return a mask array of bad pixels
-
-    Bad pixels are defined as follows: fluxes or errors are not finite, or 
-    reported errors are negative.
-
-    Parameters
-    ----------
-    fluxes: ndarray
-        flux array
-
-    flux_errs: ndarray
-        measurement uncertainties on fluxes
-
-    Returns
-    -------
-    mask: ndarray, dtype=bool
-        array giving bad pixels as True values
-    """
-    bad_flux = (~np.isfinite(fluxes)) | (fluxes == 0)   
-    bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
-    bad_pix = bad_err | bad_flux
-
-    return bad_pix
-
-def cont_func(x, *p):
-    """Return the fitting function for the continuum
-
-    Parameters
-    ----------
-    x: ndarray
-        data to fit (wavelengths)
-    a: ndarray
-        coefficients for sin
-    b: ndarray
-        coefficients for cos
-    N: (optional) int
-        number of terms
-    
-    Returns
-    -------
-    Function evaluated for an input x
-    """
-    N = int(len(p)/2)
-    n = np.linspace(0, N, N+1, dtype=int)
-    L = max(x)-min(x)
-    k = n*np.pi/L
-    func = 0.
-    for n in range(0, N): 
-        func += p[2*n]*np.sin(k[n]*x)+p[2*n+1]*np.cos(k[n]*x)
-    return func
-
-def continuum_normalize(lambdas, fluxes, flux_errs, ivars,
-                                  contmask, ranges, deg=3):
-    """Continuum-normalizes the spectra.
-
-    Fit a function of sines and cosines to each segment
-    and divide each segment by its corresponding fitted sinusoid
-
-    Parameters
-    ----------
-    lambda: ndarray
-        common wavelength
-
-    fluxes: ndarray
-        array of fluxes
-
-    flux_errs: ndarray
-        array of measurement uncertainties on fluxes
-
-    ivars: ndarray
-        array of inverse variances
-
-    pixtest_fname: str
-        filename against which testing continuum subtraction
-
-    ranges: sequence
-        sequence of wavelength ranges defining the regions of interest
-
-    Returns
-    -------
-    norm_flux: ndarray
-        array of continuum-normalized fluxes
-
-    norm_ivar: ndarray
-        array of continuum-normalized inverse variances
-
-    continua: ndarray
-        array corresponding to the fitted continuum 
-    """
-    continua = np.zeros(lambdas.shape)
-    norm_fluxes = np.zeros(fluxes.shape)
-    norm_flux_errs = np.zeros(flux_errs.shape)
-    norm_ivars = np.zeros(ivars.shape)
-    nstars = norm_fluxes.shape[0]
-    lam_cont = np.ma.array(lambdas, mask=contmask)
-
-    for jj in range(nstars):
-        flux = fluxes[jj,:]
-        flux_err = flux_errs[jj,:]
-        ivar = ivars[jj,:]
-        flux_cont = np.ma.array(flux, mask=contmask)
-        err_cont = np.ma.array(flux_err, mask=contmask)
-        for i in range(len(ranges)):
-            start, stop = ranges[i][0], ranges[i][1]
-            flux_cut = flux[start:stop]
-            flux_err_cut = flux_err[start:stop]
-            lambda_cut = lambdas[start:stop]
-            ivar_cut = ivar[start:stop]
-            lam_cont = lam_cont[start:stop]
-            flux_cont = flux_cont[start:stop]
-            err_cont = err_cont[start:stop]
-            p0 = np.ones(deg*2)
-            plt.scatter(lam_cont, flux_cont)
-            plt.show()
-            popt, pcov = opt.curve_fit(cont_func, lam_cont, flux_cont,  
-                          p0=p0, sigma=err_cont)
-            p = popt
-            continua[start:stop] = cont_func(lambda_cut, p)
-            norm_flux = flux_cut/continua[start:stop]
-            norm_flux_err = flux_err_cut/continua[start:stop]
-            norm_ivar = 1. / norm_flux_err**2
-            # check null division
-            ind = np.isfinite(norm_ivar) & (norm_ivar > 0)
-            norm_ivar[~ind] = norm_ivar[ind].min() * 1e-2
-            badpix2 = get_pixmask(norm_flux, norm_flux_err)
-            temp = np.ma.array(norm_flux, mask=badpix2, fill_value=1.0)
-            norm_fluxes[jj,start:stop] = np.ma.filled(temp)
-            temp = np.ma.array(norm_ivar, mask=badpix2, fill_value=0.)
-            norm_ivars[jj,start:stop] = np.ma.filled(temp)
-        norm_ivars[jj,:][contmask] = 0. # ignore cont pixels in fit
-        return norm_fluxes, norm_ivars, continua
-
 class ApogeeDF(DataFrame):
-    """ DataFrame for keeping an Apogee data organized. """
+    """ DataFrame for keeping APOGEE data organized. """
    
     def __init__(self, spec_dir, label_file):
         super(self.__class__, self).__init__(spec_dir, label_file)
         # we discard the edges of the fluxes: 10 A, corresponding to ~50 pix
         self.ranges = [[371,3192], [3697,5997], [6461,8255]]
+
+    def get_pixmask(fluxes, flux_errs):
+        """ Return a mask array of bad pixels
+
+        Bad pixels are defined as follows: fluxes or errors are not finite, or 
+        reported errors are negative.
+
+        Parameters
+        ----------
+        fluxes: ndarray
+            flux array
+
+        flux_errs: ndarray
+            measurement uncertainties on fluxes
+
+        Returns
+        -------
+        mask: ndarray, dtype=bool
+            array giving bad pixels as True values
+        """
+        bad_flux = (~np.isfinite(fluxes)) | (fluxes == 0)   
+        bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
+        bad_pix = bad_err | bad_flux
+
+        return bad_pix
 
     def get_spectra(self, *args, **kwargs):
         """
@@ -241,16 +105,6 @@ class ApogeeDF(DataFrame):
             flux_errs[jj,:] = flux_err
             ivars[jj,:] = ivar
 
-        # Continuum normalization
-        print("Finding continuum pixels")
-        contmask = get_contmask(lambdas, fluxes)
-        
-
-        norm_fluxes, norm_ivars, continua = \
-                continuum_normalize(lambdas, fluxes, flux_errs, ivars,
-                                              contmask, self.ranges)
-
-        print("Loaded {0:d} stellar spectra".format(len(files)))
         return contmask, lambdas, norm_fluxes, norm_ivars, SNRs
 
     def get_reference_labels(self, *args, **kwags):
