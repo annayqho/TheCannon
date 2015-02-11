@@ -18,7 +18,13 @@ except ImportError:
     import pyfits
 
 class ApogeeDF(DataFrame):
-    """ DataFrame for keeping APOGEE data organized. """
+    """ DataFrame for keeping APOGEE data organized. 
+    
+    Performs the APOGEE Munging necessary for making the data "Cannonizable." 
+    Retrieves the data (assumse already in rest frame), creates and reads bad-
+    pixel mask, builds inverse variance vectors, packages them all into 
+    rectangular blocks.
+    """
    
     def __init__(self, spec_dir, label_file):
         super(self.__class__, self).__init__(spec_dir, label_file)
@@ -56,19 +62,16 @@ class ApogeeDF(DataFrame):
 
         Returns
         -------
-        lambdas: numpy ndarray of shape (npixels)
-            common wavelength of the spectra
+        lambdas: numpy ndarray of length npixels
+            rest-frame wavelength vector
 
         norm_fluxes: numpy ndarray of shape (nstars, npixels)
-            normalized fluxes for all the objects
+            training set or test set pixel intensities
 
         norm_ivars: numpy ndarray of shape (nstars, npixels)
-            normalized inverse variances for all the objects
+            inverse variances, parallel to norm_fluxes
 
-        SNRs: numpy ndarray of shape (nstars)
-
-        large: float
-            default dispersion value for bad data
+        SNRs: numpy ndarray of length nstars
         """
         files = [self.spec_dir + "/" + filename
                  for filename in os.listdir(self.spec_dir)]
@@ -105,7 +108,7 @@ class ApogeeDF(DataFrame):
             flux_errs[jj,:] = flux_err
             ivars[jj,:] = ivar
 
-        return contmask, lambdas, norm_fluxes, norm_ivars, SNRs
+        return lambdas, fluxes, ivars, SNRs
 
     def get_reference_labels(self, *args, **kwags):
         """Extracts training labels from file.
