@@ -1,6 +1,3 @@
-"""
-Compile the Sphinx documentation all at once
-"""
 from __future__ import (absolute_import, division, print_function)
 
 from copy import deepcopy
