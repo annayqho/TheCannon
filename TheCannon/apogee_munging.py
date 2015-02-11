@@ -65,11 +65,11 @@ class ApogeeDF(DataFrame):
         lambdas: numpy ndarray of length npixels
             rest-frame wavelength vector
 
-        norm_fluxes: numpy ndarray of shape (nstars, npixels)
+        fluxes: numpy ndarray of shape (nstars, npixels)
             training set or test set pixel intensities
 
-        norm_ivars: numpy ndarray of shape (nstars, npixels)
-            inverse variances, parallel to norm_fluxes
+        ivars: numpy ndarray of shape (nstars, npixels)
+            inverse variances, parallel to fluxes
 
         SNRs: numpy ndarray of length nstars
         """
