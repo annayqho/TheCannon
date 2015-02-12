@@ -33,27 +33,6 @@ def find_contpix_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     return contmask
 
 def find_contpix(wl, fluxes, ivars):
-    """ Find and return continuum pixels
-
-    Searches through some flux and sigma cuts such that between 5 and 10%
-    of pixels are identified as continuum.
-
-    Parameters
-    ----------
-    wl: numpy ndarray of length npixels
-        rest-frame wavelength vector
-    fluxes: numpy ndarray of shape (nstars, pixels)
-        pixel intensities
-    ivars: numpy ndarray of shape (nstars, npixels)
-        inverse variances, parallel to fluxes
-
-    Returns
-    -------
-    contmask: boolean mask of length npixels
-        True indicates that the pixel is continuum
-    """
-    # Apply a cut based on the median and variance vector
-    # Adjust the cut levels so that 5-7% of pixels are identified as continuum
     bad1 = np.median(ivars, axis=0) == 0
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)
