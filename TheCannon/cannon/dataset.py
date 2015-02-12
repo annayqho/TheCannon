@@ -259,3 +259,5 @@ def dataset_postdiagnostics(reference_set, test_set,
         print("Diagnostic for label output vs. input")
         print("Saved fig %s" % figname)
         plt.close()
+
+

@@ -4,7 +4,7 @@ import scipy.optimize as opt
 import os
 import sys
 from cannon.helpers import Table
-from cannon.dataset import DataFrame
+from cannon.dataset import Dataset
 import matplotlib.pyplot as plt
 
 # python 3 special
@@ -31,7 +31,7 @@ class ApogeeDataset(Dataset):
         # we discard the edges of the fluxes: 10 A, corresponding to ~50 pix
         self.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
-    def get_pixmask(fluxes, flux_errs):
+    def get_pixmask(self, fluxes, flux_errs):
         """ Return a mask array of bad pixels
 
         Bad pixels are defined as follows: fluxes or errors are not finite, or 
@@ -73,7 +73,7 @@ class ApogeeDataset(Dataset):
             
         SNRs: numpy ndarray of length nstars
         """
-        print("Loading spectra from directory %s") % data_dir
+        print("Loading spectra from directory %s" %data_dir)
         files = list(sorted([data_dir + "/" + filename
                  for filename in os.listdir(data_dir)]))
         nstars = len(files)  
@@ -85,7 +85,6 @@ class ApogeeDataset(Dataset):
                 npixels = len(flux)
                 SNRs = np.zeros(nstars, dtype=float)   
                 fluxes = np.zeros((nstars, npixels), dtype=float)
-                flux_errs = np.zeros(fluxes.shape, dtype=float) 
                 ivars = np.zeros(fluxes.shape, dtype=float)
                 start_wl = file_in[1].header['CRVAL1']
                 diff_wl = file_in[1].header['CDELT1']
@@ -94,17 +93,14 @@ class ApogeeDataset(Dataset):
                 wl_full = [10 ** aval for aval in wl_full_log]
                 wl = np.array(wl_full)
             flux_err = np.array((file_in[2].data))
-            badpix = get_pixmask(flux, flux_err)
-            flux = np.ma.array(flux, mask=badpix, fill_value=0.)
-            flux_err = np.ma.array(flux_err, mask=badpix, fill_value=LARGE)
+            badpix = self.get_pixmask(flux, flux_err)
+            flux = np.ma.array(flux, mask=badpix)
+            flux_err = np.ma.array(flux_err, mask=badpix)
             SNRs[jj] = np.ma.median(flux/flux_err)
             ones = np.ma.array(np.ones(npixels), mask=badpix)
-            flux = np.ma.filled(flux)
-            flux_err = np.ma.filled(flux_err)
-            ivar = ones / (flux_err**2)
+            ivar = ones / flux_err**2
             ivar = np.ma.filled(ivar, fill_value=0.)
             fluxes[jj,:] = flux
-            flux_errs[jj,:] = flux_err
             ivars[jj,:] = ivar
 
         print("Spectra loaded")
