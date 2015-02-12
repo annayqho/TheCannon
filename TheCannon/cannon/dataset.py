@@ -79,14 +79,6 @@ class Dataset(object):
     def set_label_names_tex(self, names):
         self.label_names_tex = names
 
-    #@property
-    #def IDs(self):
-    #    return self.data['id']
-
-    #@property
-    #def SNRs(self):
-    #    return self.data['SNRs']
-
     def get_plotting_labels(self):
         if self.label_names_tex is None:
             return self.label_names
@@ -99,13 +91,13 @@ class Dataset(object):
         ----------
         cols: list of column indices corresponding to which to keep
         """
-        self.label_names = []
+        self.tr_label_names = []
         for k in cols:
-            key = self.data.resolve_alias(k)
-            if key not in self.data:
+            key = self.tr_label_vals.resolve_alias(k)
+            if key not in self.tr_label_vals:
                 raise KeyError('Attribute {0:s} not found'.format(key))
             else:
-                self.label_names.append(key)
+                self.tr_label_names.append(key)
 
     def choose_objects(self, mask):
         """Updates the ID, spectra, label_vals properties to the subset that
@@ -146,15 +138,6 @@ class Dataset(object):
             fig.savefig(figname)
             print("Saved fig %s" % figname)
             plt.close(fig)
-
-    #@property
-    #def label_vals(self):
-    #    """ return the array of labels [nstars, nlabels] """
-    #    if self._label_vals is None:
-    #        return np.array([self.data[k] for k in self.label_names]).T
-    #    else:
-    #        return self._label_vals
-
 
 def dataset_prediagnostics(reference_set, test_set,
                            SNR_plot_name = "SNRdist.png", 

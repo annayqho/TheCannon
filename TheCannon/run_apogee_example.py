@@ -1,7 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-#from copy import deepcopy
-
 from apogee_munging import ApogeeDataset
 
 #from cannon.dataset import (dataset_prediagnostics, dataset_postdiagnostics)
@@ -13,9 +11,8 @@ dataset = ApogeeDataset("example_DR10/Data",
                         "example_DR10/Data",
                         "example_DR10/reference_labels.csv")
 
-# cols = [1, 3, 5]
-# cols = 'teff logg mh'.split()
-# reference_set.choose_labels(cols)
+cols = ['teff', 'logg', 'mh']
+dataset.choose_labels(cols)
 
 # set the headers for plotting
 # reference_set.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
