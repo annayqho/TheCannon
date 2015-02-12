@@ -29,8 +29,7 @@ class Dataset(object):
         self.tr_ivars = tr_ivars
         self.tr_SNRs = tr_SNRs
 
-        IDs, label_names, label_vals = self._load_reference_labels(label_file)
-        self.tr_IDs = IDs
+        label_names, label_vals = self._load_reference_labels(label_file)
         self.tr_label_names = label_names
         self.tr_label_vals = label_vals
 
@@ -68,7 +67,7 @@ class Dataset(object):
         print("Loaded stellar IDs, format: %s" % data['id'][0])
         print("Loaded %d labels:" % nlabels)
         print(label_names)
-        return data['id'], label_names, data
+        return label_names, data
 
     def reset_label_vals(self):
         self._label_vals = None
@@ -84,9 +83,9 @@ class Dataset(object):
     #def IDs(self):
     #    return self.data['id']
 
-    @property
-    def SNRs(self):
-        return self.data['SNRs']
+    #@property
+    #def SNRs(self):
+    #    return self.data['SNRs']
 
     def get_plotting_labels(self):
         if self.label_names_tex is None:
@@ -148,13 +147,13 @@ class Dataset(object):
             print("Saved fig %s" % figname)
             plt.close(fig)
 
-    @property
-    def label_vals(self):
-        """ return the array of labels [nstars, nlabels] """
-        if self._label_vals is None:
-            return np.array([self.data[k] for k in self.label_names]).T
-        else:
-            return self._label_vals
+    #@property
+    #def label_vals(self):
+    #    """ return the array of labels [nstars, nlabels] """
+    #    if self._label_vals is None:
+    #        return np.array([self.data[k] for k in self.label_names]).T
+    #    else:
+    #        return self._label_vals
 
 
 def dataset_prediagnostics(reference_set, test_set,
