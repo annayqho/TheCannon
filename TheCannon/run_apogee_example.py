@@ -2,7 +2,6 @@ from __future__ import (absolute_import, division, print_function)
 
 from apogee_munging import ApogeeDataset
 
-#from cannon.dataset import (dataset_prediagnostics, dataset_postdiagnostics)
 #from cannon.model import CannonModel
 
 # Three inputs: dir w/ training files, dir w/ test files, file w/ tr labels
@@ -22,7 +21,7 @@ dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
 # learn the model from the reference_set
-model = CannonModel(reference_set)
+# model = CannonModel(reference_set)
 #model.fit() # model.train would work equivalently.
 
 # check the model

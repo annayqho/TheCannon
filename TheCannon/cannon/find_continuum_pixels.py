@@ -2,7 +2,7 @@ import numpy as np
 
 """ Finds and returns list of continuum pixels, as a mask. """
 
-def get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars):
+def get_num_contpix(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
 
     Parameters
@@ -11,7 +11,7 @@ def get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars):
         the upper limit imposed on the quantity (fbar-1)
     sig_cut: float
         the upper limit imposed on the quantity (f_sig)
-    lambdas: numpy ndarray of length npixels
+    wl: numpy ndarray of length npixels
         rest-frame wavelength vector
     fluxes: numpy ndarray of shape (nstars, npixels)
         pixel intensities
@@ -30,7 +30,7 @@ def get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars):
     contmask = np.logical_and(cont1, cont2)
     return contmask
 
-def find_contpix(lambdas, fluxes, ivars):
+def find_contpix(wl, fluxes, ivars):
     """ Find and return continuum pixels
 
     Searches through some flux and sigma cuts such that between 5 and 10%
@@ -38,7 +38,7 @@ def find_contpix(lambdas, fluxes, ivars):
 
     Parameters
     ----------
-    lambdas: numpy ndarray of length npixels
+    wl: numpy ndarray of length npixels
         rest-frame wavelength vector
     fluxes: numpy ndarray of shape (nstars, pixels)
         pixel intensities
@@ -52,15 +52,15 @@ def find_contpix(lambdas, fluxes, ivars):
     """
     # Apply a cut based on the median and variance vector
     # Adjust the cut levels so that 5-7% of pixels are identified as continuum
-    npixels = len(lambdas)
+    npixels = len(wl)
     f_cut = 0.003
     stepsize = 0.0001
     sig_cut = 0.003
-    contmask = get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars)
+    contmask = get_num_contpix(f_cut, sig_cut, wl, fluxes, ivars)
     frac = sum(contmask)/float(npixels)
     while frac < 0.05*npixels: 
         f_cut += sig_step
-        contmask = get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars)
+        contmask = get_num_contpix(f_cut, sig_cut, wl, fluxes, ivars)
         frac = sum(contmask)/npixels
     if frac > 0.10*npixels:
         print("Warning: Over 10% of pixels identified as continuum.")
