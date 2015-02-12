@@ -16,26 +16,58 @@ else:
 class Dataset(object):
     """A class to represent a Dataset of stellar spectra and labels.
 
-    Attributes
-    ----------
-    label_vals: numpy ndarray of shape (nstars, nlabels)
-    SNRs: numpy ndarray of shape (nstars)
-    lams: numpy ndarray of shape (nstars, npixels)
-    fluxes: numpy ndarray of shape (nstars, npixels)
-    ivars: numpy ndarray of shape (nstars, npixels)
-    label_names: (optional) list of strings of length (nlabels)
+    Framework for performing the munging necessary for making data "Cannonizable."
+    Each survey will have its own implementation of the following: how data is 
+    retrieved, how bad pixels are identified. Packages all of this information
+    into rectangular blocks.
     """
 
-    def __init__(self, contmask, label_vals, SNRs, lams, fluxes, ivars,
-                 label_names=None, label_names_tex=None):
-        self.contmask = contmask
-        self.data = label_vals
+    def __init__(self, training_dir, test_dir, label_file):
+        wl, tr_fluxes, tr_ivars, tr_SNRs = self.load_spectra(training_dir)
+        self.wl = wl
+        self.tr_fluxes = tr_fluxes
+        self.tr_ivars = tr_ivars
+        self.tr_SNRs = tr_SNRs
+
+        IDs, label_names, label_vals = self.load_reference_labels(label_file)
         self.label_names = label_names
-        self.data.add_column('SNRs', SNRs)
-        self.lams = lams
-        self.fluxes = fluxes
-        self.ivars = ivars
-        self.reset_label_vals()
+        self.tr_label_vals = label_vals
+
+        wl, test_fluxes, test_ivars, test_SNRs = self.load_spectra(test_dir)
+        self.test_fluxes = test_fluxes
+        self.test_ivars = test_ivars
+        self.test_SNRs = test_SNRs 
+    
+    def get_pixmask(self, *args, **kwags):
+        raise NotImplemented('Derived classes need to implement this method')
+
+    def load_spectra(self, data_dir):
+        raise NotImplemented('Derived classes need to implement this method')
+
+    def load_reference_labels(self, label_file):
+        """Extracts training labels from file.
+
+        Assumes that first row is # then label names, that first column is # 
+        then the filenames, that the remaining values are floats and that 
+        user wants all of the labels. User can pick specific labels later.
+
+        Returns
+        -------
+        data['id']: 
+        label_names: list of label names
+        data: np ndarray of size (nstars, nlabels)
+            label values
+        """
+        print("Loading reference labels from file %s") % label_file
+        data = Table(label_file)
+        data.sort('id')
+        label_names = data.keys()
+        nlabels = len(label_names)
+
+        print("Loaded stellar IDs, format: %s" % data['id'][0])
+        print("Loaded %d labels:" % nlabels)
+        print(label_names)
+        return data['id'], label_names, data
 
     def reset_label_vals(self):
         self._label_vals = None
@@ -230,20 +262,6 @@ def dataset_postdiagnostics(reference_set, test_set,
 
 
 class DataFrame(object):
-    def __init__(self, training_dir, test_dir, label_file):
-        self.training_dir = training_dir
-        self.test_dir = test_dir
-        self.label_file = label_file
-
-    def get_pixmask(self, *args, **kwags):
-        raise NotImplemented('Derived classes need to implement this method')
-
-    def get_spectra(self, *args, **kwags):
-        raise NotImplemented('Derived classes need to implement this method')
-
-    def get_reference_labels(self, *args, **kwags):
-        raise NotImplemented('Derived classes need to implement this method')
-
     @property
     def dataset(self):
         if not hasattr(self, "_dataset"):

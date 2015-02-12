@@ -17,9 +17,9 @@ try:
 except ImportError:
     import pyfits
 
-class ApogeeDF(DataFrame):
-    """ DataFrame for keeping APOGEE data organized. 
-    
+class ApogeeDataset(Dataset):
+    """ A class to represent a Dataset of APOGEE spectra and labels.
+
     Performs the APOGEE Munging necessary for making the data "Cannonizable." 
     Retrieves the data (assumse already in rest frame), creates and reads bad-
     pixel mask, builds inverse variance vectors, packages them all into 
@@ -56,13 +56,13 @@ class ApogeeDF(DataFrame):
 
         return bad_pix
 
-    def get_spectra(self, *args, **kwargs):
+    def load_spectra(self, data_dir):
         """
         Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
 
         Returns
         -------
-        lambdas: numpy ndarray of length npixels
+        wl: numpy ndarray of length npixels
             rest-frame wavelength vector
 
         fluxes: numpy ndarray of shape (nstars, npixels)
@@ -70,13 +70,12 @@ class ApogeeDF(DataFrame):
 
         ivars: numpy ndarray of shape (nstars, npixels)
             inverse variances, parallel to fluxes
-
+            
         SNRs: numpy ndarray of length nstars
         """
-        files = [self.spec_dir + "/" + filename
-                 for filename in os.listdir(self.spec_dir)]
-        files = list(sorted(files))  
-        LARGE = kwargs.get('large', 1000000.)
+        print("Loading spectra from directory %s") % data_dir
+        files = list(sorted([data_dir + "/" + filename
+                 for filename in os.listdir(data_dir)]))
         nstars = len(files)  
         
         for jj, fits_file in enumerate(files):
@@ -93,7 +92,7 @@ class ApogeeDF(DataFrame):
                 val = diff_wl * (npixels) + start_wl
                 wl_full_log = np.arange(start_wl,val, diff_wl)
                 wl_full = [10 ** aval for aval in wl_full_log]
-                lambdas = np.array(wl_full)
+                wl = np.array(wl_full)
             flux_err = np.array((file_in[2].data))
             badpix = get_pixmask(flux, flux_err)
             flux = np.ma.array(flux, mask=badpix, fill_value=0.)
@@ -108,28 +107,5 @@ class ApogeeDF(DataFrame):
             flux_errs[jj,:] = flux_err
             ivars[jj,:] = ivar
 
-        return lambdas, fluxes, ivars, SNRs
-
-    def get_reference_labels(self, *args, **kwags):
-        """Extracts training labels from file.
-
-        Assumes that first row is # then label names, that first column is # 
-        then the filenames, that the remaining values are floats and that 
-        user wants all of the labels. User can pick specific labels later.
-
-        Returns
-        -------
-        data['id']: 
-        label_names: list of label names
-        data: np ndarray of size (nstars, nlabels)
-            label values
-        """
-        data = Table(self.label_file)
-        data.sort('id')
-        label_names = data.keys()
-        nlabels = len(label_names)
-
-        print("Loaded stellar IDs, format: %s" % data['id'][0])
-        print("Loaded %d labels:" % nlabels)
-        print(label_names)
-        return data['id'], label_names, data
+        print("Spectra loaded")
+        return wl, fluxes, ivars, SNRs
