@@ -17,14 +17,12 @@ dataset.choose_labels(cols)
 # set the headers for plotting
 dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 
-# make a test sample. Currently just use the training sample.
-# test_set = df.dataset
-
 # Plot SNR distributions and triangle plot of reference labels
-#dataset_prediagnostics(reference_set, test_set)
+dataset.diagnostics_SNR()
+dataset.diagnostics_ref_labels()
 
 # learn the model from the reference_set
-#model = CannonModel(reference_set)
+model = CannonModel(reference_set)
 #model.fit() # model.train would work equivalently.
 
 # check the model

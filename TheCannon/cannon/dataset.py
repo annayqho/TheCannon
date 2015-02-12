@@ -36,8 +36,8 @@ class Dataset(object):
         wl, test_fluxes, test_ivars, test_SNRs = self._load_spectra(test_dir)
         self.test_fluxes = test_fluxes
         self.test_ivars = test_ivars
-        self.test_SNRs = test_SNRs 
-    
+        self.test_SNRs = test_SNRs
+
     def _get_pixmask(self, *args, **kwags):
         raise NotImplemented('Derived classes need to implement this method')
 
@@ -99,7 +99,7 @@ class Dataset(object):
             else:
                 self.tr_label_names.append(key)
 
-    def label_triangle_plot(self, figname=None, labels=None):
+    def label_triangle_plot(self, figname):
         """Make a triangle plot for the selected labels
 
         Parameters
@@ -111,50 +111,44 @@ class Dataset(object):
             if provided, use this sequence as text labels for each label
             dimension
         """
-        data = np.array([self.data[k] for k in self.label_names]).T
+        data = np.array([self.tr_label_vals[k] for k in self.tr_label_names]).T
         labels = [r"$%s$" % l for l in self.get_plotting_labels()]
         print("Plotting every label against every other")
         fig = corner(data, labels=labels, show_titles=True,
                      title_args={"fontsize":12})
-        if figname is not None:
-            fig.savefig(figname)
-            print("Saved fig %s" % figname)
-            plt.close(fig)
+        fig.savefig(figname)
+        print("Saved fig %s" % figname)
+        plt.close(fig)
 
-def dataset_prediagnostics(reference_set, test_set,
-                           SNR_plot_name = "SNRdist.png", 
-                           triangle_plot_name = "reference_labels_triangle.png"):
-    """ Plot SNR distributions and triangle plot of reference labels
+    def diagnostics_SNR(self, figname = "SNRdist.png"): 
+        """ Plot SNR distributions of ref and test objects
 
-    Parameters
-    ----------
-    reference_set: Dataset
-        set used as training sample
+        Parameters
+        ----------
+        SNR_plot_name: (optional) string
+            title of the saved SNR diagnostic plot
+        """
+        print("Diagnostic for SNRs of reference and survey stars")
+        plt.hist(self.tr_SNRs, alpha=0.5, label="Ref Stars")
+        plt.hist(self.test_SNRs, alpha=0.5, label="Survey Stars")
+        plt.legend(loc='upper right')
+        plt.xscale('log')
+        plt.title("SNR Comparison Between Reference & Test Stars")
+        plt.xlabel("log(Formal SNR)")
+        plt.ylabel("Number of Objects")
+        plt.savefig(figname)
+        plt.close()
+        print("Saved fig %s" %figname)
 
-    test_set: Dataset
-        set for which labels are going to be inferred
-
-    SNR_plot_name: string
-        title of the saved SNR diagnostic plot
-    
-    triangle_plot_name: string
-        title of the saved triangle plot for reference labels
-    """
-    print("Diagnostic for SNRs of reference and survey stars")
-    plt.hist(reference_set.SNRs, alpha=0.5, label="Ref Stars")
-    plt.hist(test_set.SNRs, alpha=0.5, label="Survey Stars")
-    plt.legend(loc='upper right')
-    plt.xscale('log')
-    plt.title("SNR Comparison Between Reference & Test Stars")
-    plt.xlabel("log(Formal SNR)")
-    plt.ylabel("Number of Objects")
-    plt.savefig(SNR_plot_name)
-    plt.close()
-    print("Saved fig %s" %SNR_plot_name)
-
-    # Plot all reference labels against each other
-    reference_set.label_triangle_plot(triangle_plot_name)
-
+    def diagnostics_ref_labels(self, figname = "ref_labels_triangle.png"):
+        """ Plot all training labels against each other. 
+        
+        Parameters
+        ----------
+        triangle_plot_name: (optional) string
+            title of the saved triangle plot for reference labels
+        """
+        self.label_triangle_plot(figname)
 
 def dataset_postdiagnostics(reference_set, test_set,
                             triangle_plot_name = "survey_labels_triangle.png"):
