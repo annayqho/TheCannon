@@ -259,22 +259,3 @@ def dataset_postdiagnostics(reference_set, test_set,
         print("Diagnostic for label output vs. input")
         print("Saved fig %s" % figname)
         plt.close()
-
-
-class DataFrame(object):
-    @property
-    def dataset(self):
-        if not hasattr(self, "_dataset"):
-            self.load_dataset()
-        return self._dataset
-
-    def load_dataset(self, *args, **kwargs):
-        print('Loading dataset... This may take a while')
-        contpix, lambdas, norm_fluxes, norm_ivars, SNRs = self.get_spectra(
-                *args, **kwargs)
-        IDs, all_label_names, all_label_values = self.get_reference_labels()
-
-        dataset = Dataset(contpix, all_label_values, SNRs, lambdas, norm_fluxes,
-                          norm_ivars, all_label_names)
-
-        self._dataset = dataset
