@@ -24,7 +24,7 @@ def get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars):
     f_bar = np.median(fluxes, axis=0)
     sigma_f = np.var(fluxes, axis=0)
     cont1 = np.abs(f_bar-1) < f_cut
-    cont2 = sigma_f < sigma_cut
+    cont2 = sigma_f < sig_cut
     contmask = np.logical_and(cont1, cont2)
     return contmask
 
@@ -55,7 +55,7 @@ def find_contpix(lambdas, fluxes, ivars):
     stepsize = 0.0001
     sig_cut = 0.003
     contmask = get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars)
-    frac = sum(contmask)/npixels
+    frac = sum(contmask)/float(npixels)
     while frac < 0.05*npixels: 
         f_cut += sig_step
         contmask = get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars)

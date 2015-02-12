@@ -34,15 +34,21 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
 
     Parameters
     ----------
-    fluxes:
-    ivars:
-    contmask:
-    deg: (optional) 
+    fluxes: numpy ndarray 
+        pixel intensities
+    ivars: numpy ndarray 
+        inverse variances, parallel to fluxes
+    contmask: boolean mask
+        True indicates that pixel is continuum
+    deg: (optional) int
+        degree of fit, corresponds to # of sines or # of cosines
 
     Returns
     -------
-    norm_fluxes
-    norm_ivars
+    norm_fluxes: numpy ndarray
+        normalized pixel intensities
+    norm_ivars: numpy ndarray
+        rescaled inverse variances
     """
     nstars = fluxes.shape[0]
     npixels = fluxes.shape[1]
@@ -62,4 +68,19 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
 
+    return norm_fluxes, norm_ivars
+
+def cont_norm_segments(fluxes, ivars, contmask, deg=3):
+    """ Continuum-normalize a list of continuous spectrum segments.
+
+    Loops through segments and calls cont_norm
+    """
+    nseg = len(fluxes)
+    norm_fluxes = np.zeros((2,)+fluxes.shape)
+    norm_ivars = norm_fluxes.shape
+    for seg in nseg:
+        norm_flux, norm_ivar = cont_norm(fluxes[seg], ivars[seg], 
+                                         contmask, deg=deg)
+        norm_fluxes[seg,:,:] = norm_flux
+        norm_ivars[seg,:,:] = norm_ivar
     return norm_fluxes, norm_ivars
