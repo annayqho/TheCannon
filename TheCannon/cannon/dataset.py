@@ -23,29 +23,29 @@ class Dataset(object):
     """
 
     def __init__(self, training_dir, test_dir, label_file):
-        wl, tr_fluxes, tr_ivars, tr_SNRs = self.load_spectra(training_dir)
+        wl, tr_fluxes, tr_ivars, tr_SNRs = self._load_spectra(training_dir)
         self.wl = wl
         self.tr_fluxes = tr_fluxes
         self.tr_ivars = tr_ivars
         self.tr_SNRs = tr_SNRs
 
-        IDs, label_names, label_vals = self.load_reference_labels(label_file)
+        IDs, label_names, label_vals = self._load_reference_labels(label_file)
         self.tr_IDs = IDs
         self.tr_label_names = label_names
         self.tr_label_vals = label_vals
 
-        wl, test_fluxes, test_ivars, test_SNRs = self.load_spectra(test_dir)
+        wl, test_fluxes, test_ivars, test_SNRs = self._load_spectra(test_dir)
         self.test_fluxes = test_fluxes
         self.test_ivars = test_ivars
         self.test_SNRs = test_SNRs 
     
-    def get_pixmask(self, *args, **kwags):
+    def _get_pixmask(self, *args, **kwags):
         raise NotImplemented('Derived classes need to implement this method')
 
-    def load_spectra(self, data_dir):
+    def _load_spectra(self, data_dir):
         raise NotImplemented('Derived classes need to implement this method')
 
-    def load_reference_labels(self, label_file):
+    def _load_reference_labels(self, label_file):
         """Extracts training labels from file.
 
         Assumes that first row is # then label names, that first column is # 

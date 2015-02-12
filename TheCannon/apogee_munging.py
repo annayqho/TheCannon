@@ -31,7 +31,7 @@ class ApogeeDataset(Dataset):
         # we discard the edges of the fluxes: 10 A, corresponding to ~50 pix
         self.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
-    def get_pixmask(self, fluxes, flux_errs):
+    def _get_pixmask(self, fluxes, flux_errs):
         """ Return a mask array of bad pixels
 
         Bad pixels are defined as follows: fluxes or errors are not finite, or 
@@ -56,7 +56,7 @@ class ApogeeDataset(Dataset):
 
         return bad_pix
 
-    def load_spectra(self, data_dir):
+    def _load_spectra(self, data_dir):
         """
         Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
 
@@ -93,7 +93,7 @@ class ApogeeDataset(Dataset):
                 wl_full = [10 ** aval for aval in wl_full_log]
                 wl = np.array(wl_full)
             flux_err = np.array((file_in[2].data))
-            badpix = self.get_pixmask(flux, flux_err)
+            badpix = self._get_pixmask(flux, flux_err)
             flux = np.ma.array(flux, mask=badpix)
             flux_err = np.ma.array(flux_err, mask=badpix)
             SNRs[jj] = np.ma.median(flux/flux_err)
