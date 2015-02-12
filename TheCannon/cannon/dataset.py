@@ -230,9 +230,13 @@ def dataset_postdiagnostics(reference_set, test_set,
 
 
 class DataFrame(object):
-    def __init__(self, spec_dir, label_file):
-        self.spec_dir = spec_dir
+    def __init__(self, training_dir, test_dir, label_file):
+        self.training_dir = training_dir
+        self.test_dir = test_dir
         self.label_file = label_file
+
+    def get_pixmask(self, *args, **kwags):
+        raise NotImplemented('Derived classes need to implement this method')
 
     def get_spectra(self, *args, **kwags):
         raise NotImplemented('Derived classes need to implement this method')

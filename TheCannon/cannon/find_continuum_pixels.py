@@ -1,3 +1,5 @@
+import numpy as np
+
 """ Finds and returns list of continuum pixels, as a mask. """
 
 def get_num_contpix(f_cut, sig_cut, lambdas, fluxes, ivars):

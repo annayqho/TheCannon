@@ -26,8 +26,8 @@ class ApogeeDF(DataFrame):
     rectangular blocks.
     """
    
-    def __init__(self, spec_dir, label_file):
-        super(self.__class__, self).__init__(spec_dir, label_file)
+    def __init__(self, training_dir, test_dir, label_file):
+        super(self.__class__, self).__init__(training_dir, test_dir, label_file)
         # we discard the edges of the fluxes: 10 A, corresponding to ~50 pix
         self.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
