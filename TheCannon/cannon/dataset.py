@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import matplotlib.pyplot as plt
 from .helpers.triangle import corner
-
+from cannon.helpers import Table
 import sys
 
 PY3 = sys.version_info[0] > 2
@@ -30,7 +30,8 @@ class Dataset(object):
         self.tr_SNRs = tr_SNRs
 
         IDs, label_names, label_vals = self.load_reference_labels(label_file)
-        self.label_names = label_names
+        self.tr_IDs = IDs
+        self.tr_label_names = label_names
         self.tr_label_vals = label_vals
 
         wl, test_fluxes, test_ivars, test_SNRs = self.load_spectra(test_dir)
@@ -58,7 +59,7 @@ class Dataset(object):
         data: np ndarray of size (nstars, nlabels)
             label values
         """
-        print("Loading reference labels from file %s") % label_file
+        print("Loading reference labels from file %s" %label_file)
         data = Table(label_file)
         data.sort('id')
         label_names = data.keys()
@@ -79,9 +80,9 @@ class Dataset(object):
     def set_label_names_tex(self, names):
         self.label_names_tex = names
 
-    @property
-    def IDs(self):
-        return self.data['id']
+    #@property
+    #def IDs(self):
+    #    return self.data['id']
 
     @property
     def SNRs(self):
