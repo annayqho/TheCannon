@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from .helpers.triangle import corner
 from cannon.helpers import Table
 import sys
+from find_continuum_pixels import find_contpix
 
 PY3 = sys.version_info[0] > 2
 
@@ -149,6 +150,9 @@ class Dataset(object):
             title of the saved triangle plot for reference labels
         """
         self.label_triangle_plot(figname)
+
+    def find_continuum(self):
+        contmask = find_contpix(wl, fluxes, ivars)
 
 def dataset_postdiagnostics(reference_set, test_set,
                             triangle_plot_name = "survey_labels_triangle.png"):

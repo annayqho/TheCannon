@@ -1,15 +1,16 @@
 from __future__ import (absolute_import, division, print_function)
-
 from apogee_munging import ApogeeDataset
 
 #from cannon.model import CannonModel
 
-# Three inputs: dir w/ training files, dir w/ test files, file w/ tr labels
-# also initializes self.ranges, which tell you the ranges containing data
+###### WORKFLOW
+
+# RUN APOGEE MUNGING CODE
 dataset = ApogeeDataset("example_DR10/Data",
                         "example_DR10/Data",
                         "example_DR10/reference_labels.csv")
 
+# Choose labels
 cols = ['teff', 'logg', 'mh']
 dataset.choose_labels(cols)
 
@@ -19,6 +20,10 @@ dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 # Plot SNR distributions and triangle plot of reference labels
 dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
+
+# RUN CONTINUUM IDENTIFICATION CODE
+dataset.find_continuum()
+
 
 # learn the model from the reference_set
 # model = CannonModel(reference_set)
