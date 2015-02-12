@@ -85,7 +85,7 @@ class Dataset(object):
         return self.label_names_tex
     
     def choose_labels(self, cols):
-        """Updates the label_names and label_vals properties
+        """Updates the tr_label_names property
 
         Parameters
         ----------
@@ -98,24 +98,6 @@ class Dataset(object):
                 raise KeyError('Attribute {0:s} not found'.format(key))
             else:
                 self.tr_label_names.append(key)
-
-    def choose_objects(self, mask):
-        """Updates the ID, spectra, label_vals properties to the subset that
-        fits the mask
-
-        Parameters
-        ----------
-        mask: ndarray or str
-            boolean array where False means discard
-            or str giving the condition on the label data table.
-        """
-        if type(mask) in basestring:
-            _m = self.data.where(mask)
-        else:
-            _m = mask
-        self.data = self.data.select('*', indices=_m)
-        self.fluxes = self.fluxes[_m]
-        self.ivars = self.ivars[_m]
 
     def label_triangle_plot(self, figname=None, labels=None):
         """Make a triangle plot for the selected labels

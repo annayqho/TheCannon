@@ -15,7 +15,7 @@ cols = ['teff', 'logg', 'mh']
 dataset.choose_labels(cols)
 
 # set the headers for plotting
-# reference_set.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
+dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 
 # make a test sample. Currently just use the training sample.
 # test_set = df.dataset
