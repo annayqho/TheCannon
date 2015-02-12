@@ -105,3 +105,4 @@ class ApogeeDataset(Dataset):
 
         print("Spectra loaded")
         return wl, fluxes, ivars, SNRs
+

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from .helpers.triangle import corner
 from cannon.helpers import Table
 import sys
-from find_continuum_pixels import find_contpix
+from .find_continuum_pixels import find_contpix
 
 PY3 = sys.version_info[0] > 2
 
@@ -152,7 +152,30 @@ class Dataset(object):
         self.label_triangle_plot(figname)
 
     def find_continuum(self):
-        contmask = find_contpix(wl, fluxes, ivars)
+        """ Find and return continuum pixels
+
+        For spectra split into regions, performs cont pix identification
+        separately for each region.
+        
+        Returns
+        -------
+        contmask: boolean mask of length npixels
+            True indicates that the pixel is continuum
+        """
+        print("Finding continuum pixels...")
+        if self.ranges is None:
+            print("assuming continuous spectra")
+            contmask = find_contpix(self.wl, self.tr_fluxes, self.ivars)
+        else:
+            print("taking spectra in %s regions" %len(self.ranges))
+            contmask = np.zeros(len(self.wl), dtype=bool)
+            for chunk in self.ranges:
+                start = chunk[0]
+                stop = chunk[1]
+                contmask[start:stop] = find_contpix(self.wl[start:stop], 
+                                                    self.tr_fluxes[:,start:stop], 
+                                                    self.tr_ivars[:,start:stop])
+        return contmask
 
 def dataset_postdiagnostics(reference_set, test_set,
                             triangle_plot_name = "survey_labels_triangle.png"):
