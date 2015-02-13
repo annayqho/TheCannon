@@ -13,7 +13,7 @@ Authors
 
 * **Anna Ho** (MPIA)
 * **Melissa Ness** (MPIA)
-* **David W. Hogg** (MPIA)
+* **David W. Hogg** (NYU CCPP)(MPIA)
 * **Hans-Walter Rix** (MPIA)
 
 License
@@ -22,7 +22,8 @@ License
 Copyright 2015 the authors. TheCannon is open-source software released under 
 the MIT License. See the file ``LICENSE`` for details.
 
-When using this code, please cite Ness et al. 2015 and Ho et al. (in prep). 
+When using this code, the user is asked to cite Ness et al. 2015 and 
+Ho et al. (in prep). 
 
 Projects
 --------
