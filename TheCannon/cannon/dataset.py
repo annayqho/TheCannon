@@ -189,6 +189,12 @@ class Dataset(object):
                     self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
             norm_test_fluxes, norm_test_ivars = cont_norm_regions(
                     self.test_fluxes, self.test_ivars, contmask, self.ranges)
+        # update dataset
+        print("Continuum normalized, updating dataset")
+        self.tr_fluxes = norm_tr_fluxes
+        self.tr_ivars = norm_tr_ivars
+        self.test_fluxes = norm_test_fluxes
+        self.test_ivars = norm_test_ivars
 
 def dataset_postdiagnostics(reference_set, test_set,
                             triangle_plot_name = "survey_labels_triangle.png"):
