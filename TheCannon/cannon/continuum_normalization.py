@@ -59,12 +59,13 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         # Fit continuum to cont pixels
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
+        pix = np.arange(0, npixels)
         y = flux[contmask]
-        x = np.arange(0, npixels)[contmask]
+        x = pix[contmask]
         yivar = ivar[contmask]
         p0 = np.ones(deg*2) # one for cos, one for sin
         popt, pcov = opt.curve_fit(cont_func, x, y, p0=p0, sigma=1./np.sqrt(yivar))
-        cont = cont_func(x, popt)
+        cont = cont_func(pix, popt)
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
 
