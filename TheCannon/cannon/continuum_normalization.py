@@ -69,3 +69,18 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         norm_ivars[jj,:] = cont**2 * ivar
 
     return norm_fluxes, norm_ivars
+
+def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=3):
+    print("taking spectra in %s regions" %len(ranges))
+    norm_tr_fluxes = np.zeros(fluxes.shape)
+    norm_tr_ivars = np.zeros(ivars.shape)
+    for chunk in ranges:
+        start = chunk[0]
+        stop = chunk[1]
+        output = cont_norm(fluxes[:,start:stop],
+                           ivars[:,start:stop],
+                           contmask[start:stop])
+        norm_fluxes[:,start:stop] = output[0]
+        norm_ivars[:,start:stop] = output[1]
+    return norm_fluxes, norm_ivars
+

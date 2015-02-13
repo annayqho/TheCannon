@@ -180,28 +180,15 @@ class Dataset(object):
         print("Continuum normalizing...")
         if self.ranges is None:
             print("assuming continuous spectra")
-            norm_tr_fluxes, norm_tr_ivars = cont_norm(self.tr_fluxes, 
-                                                      self.tr_ivars, 
-                                                      contmask)
-            norm_test_fluxes, norm_test_ivars = cont_norm(self.test_fluxes, 
-                                                          self.test_ivars, 
-                                                          contmask)
+            norm_tr_fluxes, norm_tr_ivars = cont_norm(
+                    self.tr_fluxes, self.tr_ivars, contmask)
+            norm_test_fluxes, norm_test_ivars = cont_norm(
+                    self.test_fluxes, self.test_ivars, contmask)
         else:
-            print("taking spectra in %s regions" %len(self.ranges))
-            norm_tr_fluxes = np.zeros(self.tr_fluxes.shape)
-            norm_tr_ivars = np.zeros(self.tr_ivars.shape)
-            for chunk in self.ranges:
-                start = chunk[0]
-                stop = chunk[1]
-                output = cont_norm(self.tr_fluxes[:,start:stop],
-                                   self.tr_ivars[:,start:stop],
-                                   contmask[start:stop])
-                norm_tr_fluxes[:,start:stop] = output[0]
-                norm_tr_ivars[:,start:stop] = output[1]
-
-            norm_test_fluxes = np.zeros(self.test_fluxes.shape)
-            norm_test_ivars = np.zeros(self.test_ivars.shape)
-             
+            norm_tr_fluxes, norm_tr_ivars = cont_norm_regions(
+                    self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
+            norm_test_fluxes, norm_test_ivars = cont_norm_regions(
+                    self.test_fluxes, self.test_ivars, contmask, self.ranges)
 
 def dataset_postdiagnostics(reference_set, test_set,
                             triangle_plot_name = "survey_labels_triangle.png"):
