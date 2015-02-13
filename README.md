@@ -1,7 +1,12 @@
 TheCannon
 =========
 
-Description of the code
+This is the code associated with *The Cannon*, a new data-driven method for 
+determining stellar labels (physical parameters and chemical abundances) from
+stellar spectra in the context of vast spectroscopic surveys. It closely 
+follows the method outlined in Ness et al. 2015, although some minor changes 
+have subsequently been made. A list of these changes can be found in Ho et al. 
+2015 (in prep.)   
 
 Authors
 -------
