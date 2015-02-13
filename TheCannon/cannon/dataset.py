@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from .helpers.triangle import corner
 from cannon.helpers import Table
 import sys
-from .find_continuum_pixels import find_contpix
+from .find_continuum_pixels import find_contpix, find_contpix_regions
+from .continuum_normalization import cont_norm, cont_norm_regions
 
 PY3 = sys.version_info[0] > 2
 
