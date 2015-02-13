@@ -14,8 +14,9 @@ Authors
 License
 -------
 
-Copyright 2015 the authors. TheCannon is open-source software released under 
-the MIT \ License. See the file ``LICENSE`` for details.
+|Copyright 2015 the authors. TheCannon is open-source software released under 
+the MIT 
+|License. See the file ``LICENSE`` for details.
 
 Projects
 --------
