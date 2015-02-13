@@ -54,7 +54,7 @@ def find_contpix(wl, fluxes, ivars):
     return contmask
 
 def find_contpix_regions(wl, fluxes, ivars, ranges):
-    print("taking spectra in %s regions" %len(self.ranges))
+    print("taking spectra in %s regions" %len(ranges))
     contmask = np.zeros(len(wl), dtype=bool)
     for chunk in ranges:
         start = chunk[0]
