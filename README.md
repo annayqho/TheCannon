@@ -28,4 +28,5 @@ Ho et al. (in prep).
 Projects
 --------
 
-* Cross-calibration of APOGEE and LAMOST
+* Cross-calibration of APOGEE and LAMOST: putting LAMOST spectra onto the 
+APOGEE parameter scale.
