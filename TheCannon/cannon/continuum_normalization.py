@@ -26,8 +26,6 @@ def cont_func(x, p, L):
     func: float
         function evaluated for the input x
     """
-    print("L:")
-    print(L)
     N = int(len(p)/2)
     n = np.linspace(0, N, N+1, dtype=int)
     k = n*np.pi/L
@@ -77,13 +75,11 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         pcont_func = partial_func(cont_func, L=L)
         popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                    sigma=1./np.sqrt(yivar))
-        print("parameters of function:")
-        print(popt)
-        cont = np.array(len(pix))
+        cont = np.zeros(len(pix))
         for element in pix:
-            contval[element] = cont_func(element, popt, L=L)
-        plt.scatter(pix, cont)
-        plt.show()
+            cont[element] = cont_func(element, popt, L=L)
+        #plt.scatter(pix, cont)
+        #plt.show()
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
 
@@ -96,8 +92,6 @@ def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=3):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        print("Contmask")
-        print sum(contmask[start:stop])
         output = cont_norm(fluxes[:,start:stop],
                            ivars[:,start:stop],
                            contmask[start:stop])
