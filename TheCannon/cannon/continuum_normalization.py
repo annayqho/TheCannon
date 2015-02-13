@@ -69,18 +69,3 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         norm_ivars[jj,:] = cont**2 * ivar
 
     return norm_fluxes, norm_ivars
-
-def cont_norm_segments(fluxes, ivars, contmask, deg=3):
-    """ Continuum-normalize a list of continuous spectrum segments.
-
-    Loops through segments and calls cont_norm
-    """
-    nseg = len(fluxes)
-    norm_fluxes = np.zeros((2,)+fluxes.shape)
-    norm_ivars = norm_fluxes.shape
-    for seg in nseg:
-        norm_flux, norm_ivar = cont_norm(fluxes[seg], ivars[seg], 
-                                         contmask, deg=deg)
-        norm_fluxes[seg,:,:] = norm_flux
-        norm_ivars[seg,:,:] = norm_ivar
-    return norm_fluxes, norm_ivars

@@ -107,9 +107,9 @@ training set and \lamost\ DR2 spectra as the test set,
 with the goal of bringing \lamost\ spectra onto the \apogee\ scale. 
 Cross-calibrating these two surveys provides an excellent opportunity to test
 the performance of \tc\ in both different wavelength and different resolution
-regimes: \apogee\ data is in the H-band (15200-16900\,$\AA$) at resolution 
-$R\,\sim\,22,500$ while \lamost\ data is in the window 3700-9000\,$\AA$ at
-resolution $R\,\sim\,1,000$. 
+regimes: \apogee\ data is in the H-band (15200 to 16900\,$\mbox{\AA}$) at 
+resolution$R\,\sim\,22,500$ while \lamost\ data is in the window 
+3700-9000\,$\mbox{\AA}$ at resolution $R\,\sim\,1,000$. 
 
 The code used to produce the results as described in this paper was written in
 Python and is available online for public 
@@ -126,7 +126,7 @@ Digital Sky Survey (Alam et al. 2015, DR12). The pre-continuum normalized
 spectra have gone through the APOGEE data reduction pipeline 
 (Nidever et al. 2015). APOGEE survey (Majewski et al. 2012, 2015 in prep). 
 APOGEE, part of the SDSS-III (Eisenstein et al. 2011) is a high-res
-(R~22,500) high SNR (SNR~100) H-band (15200-16900\,$\AA$) spectroscpoic
+(R~22,500) high SNR (SNR~100) H-band (15200-16900\,$\mbox{\AA}$) spectroscpoic
 survey of primarily red giants spanning the bulge, disk, and MW halo 
 (Zasowski et al. 2013). APOGEE'S ASPCAP pipeline provides stellar labels for
 these stars, which includes stellar parameters and multiple chemical 
@@ -140,7 +140,7 @@ The two surveys have 11,061 objects in common. Of this overlap, a high
 fidelity sample was selected by applying three cuts to \apogee\ objects: 
 first, a signal-to-noise cut such that objects with SNR\,\textgreater\,400 
 were selected. Second, a velocity scatter cut such that objects with 
-$\sigma_v\,\textless\,1$\,km/s were selected. And finally, only objects
+$\sigma_v\, < \,1$\,km/s were selected. And finally, only objects
 without a BAD STAR flag were selected. With these cuts, 1722 stars were
 selected to populate the training set with the remaining 9339 used as test
 objects. 
@@ -178,9 +178,9 @@ For both test and training data, the stars were shifted back to the rest frame
 by using the redshift value provided in the header of each star by LAMOST, 
 where wavelength shift = redshift*xdata in the data were then resampled on to 
 a common, evenly spaced grid (but this should to be corrected - change spacing 
-to evenly spaced in logarithm space not linear space) of 0.85\,$\AA$ 
+to evenly spaced in logarithm space not linear space) of 0.85\,$\mbox{\AA}$ 
 (which is the spacing at the lower wavelength limit of the data). Upper and 
-lower cuts were made to the data to span from 3900 to 8800\,$\AA$.
+lower cuts were made to the data to span from 3900 to 8800\,$\mbox{\AA}$.
 This data, now radial velocity corrected and resampled on to a common grid, 
 All operations done to the flux were also performed 
 on the variance arrays. 

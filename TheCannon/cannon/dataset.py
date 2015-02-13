@@ -152,7 +152,7 @@ class Dataset(object):
         self.label_triangle_plot(figname)
 
     def find_continuum(self):
-        """ Find and return continuum pixels
+        """ Use training spectra to find and return continuum pixels
 
         For spectra split into regions, performs cont pix identification
         separately for each region.
@@ -167,14 +167,8 @@ class Dataset(object):
             print("assuming continuous spectra")
             contmask = find_contpix(self.wl, self.tr_fluxes, self.ivars)
         else:
-            print("taking spectra in %s regions" %len(self.ranges))
-            contmask = np.zeros(len(self.wl), dtype=bool)
-            for chunk in self.ranges:
-                start = chunk[0]
-                stop = chunk[1]
-                contmask[start:stop] = find_contpix(self.wl[start:stop], 
-                                                    self.tr_fluxes[:,start:stop], 
-                                                    self.tr_ivars[:,start:stop])
+            contmask = find_contpix_regions(self.wl, self.tr_fluxes, 
+                                            self.tr_ivars, self.ranges)
         return contmask
 
     def continuum_normalize(self, contmask):
@@ -207,7 +201,7 @@ class Dataset(object):
 
             norm_test_fluxes = np.zeros(self.test_fluxes.shape)
             norm_test_ivars = np.zeros(self.test_ivars.shape)
-            
+             
 
 def dataset_postdiagnostics(reference_set, test_set,
                             triangle_plot_name = "survey_labels_triangle.png"):

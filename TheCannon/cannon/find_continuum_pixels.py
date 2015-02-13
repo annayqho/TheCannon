@@ -2,7 +2,7 @@ import numpy as np
 
 """ Finds and returns list of continuum pixels, as a mask. """
 
-def find_contpix_cuts(f_cut, sig_cut, wl, fluxes, ivars):
+def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
 
     Parameters
@@ -40,15 +40,26 @@ def find_contpix(wl, fluxes, ivars):
     f_cut = 0.003
     stepsize = 0.0001
     sig_cut = 0.003
-    contmask = find_contpix_cuts(f_cut, sig_cut, wl, fluxes, ivars)
+    contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
     frac = sum(contmask)/float(npixels)
     while frac < 0.05: 
         f_cut += stepsize
         sig_cut += stepsize
-        contmask = find_contpix_cuts(f_cut, sig_cut, wl, fluxes, ivars)
+        contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
         frac = sum(contmask)/float(npixels)
     if frac > 0.10*npixels:
         print("Warning: Over 10% of pixels identified as continuum.")
     print("%s out of %s pixels identified as continuum" %(sum(contmask), 
                                                           npixels))
+    return contmask
+
+def find_contpix_regions(wl, fluxes, ivars, ranges):
+    print("taking spectra in %s regions" %len(self.ranges))
+    contmask = np.zeros(len(wl), dtype=bool)
+    for chunk in ranges:
+        start = chunk[0]
+        stop = chunk[1]
+        contmask[start:stop] = find_contpix(wl[start:stop],
+                                            fluxes[:,start:stop],
+                                            ivars[:,start:stop])
     return contmask
