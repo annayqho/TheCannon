@@ -78,8 +78,6 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         cont = np.zeros(len(pix))
         for element in pix:
             cont[element] = cont_func(element, popt, L=L)
-        #plt.scatter(pix, cont)
-        #plt.show()
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
 

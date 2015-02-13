@@ -186,13 +186,19 @@ class Dataset(object):
             norm_test_fluxes, norm_test_ivars = cont_norm(
                     self.test_fluxes, self.test_ivars, contmask)
         else:
+            print("cont norm training spectra")
             norm_tr_fluxes, norm_tr_ivars = cont_norm_regions(
                     self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
+            print("cont norm test spectra")
             norm_test_fluxes, norm_test_ivars = cont_norm_regions(
                     self.test_fluxes, self.test_ivars, contmask, self.ranges)
         # update dataset
         print("Continuum normalized, updating dataset")
+        print("Test plot")
+        plt.plot(self.tr_fluxes[0,:], alpha=0.7)
         self.tr_fluxes = norm_tr_fluxes
+        plt.plot(self.tr_fluxes[0,:], alpha=0.7)
+        plt.show()
         self.tr_ivars = norm_tr_ivars
         self.test_fluxes = norm_test_fluxes
         self.test_ivars = norm_test_ivars
