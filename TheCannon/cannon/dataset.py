@@ -206,73 +206,67 @@ class Dataset(object):
         self.test_fluxes = norm_test_fluxes
         self.test_ivars = norm_test_ivars
 
-def dataset_postdiagnostics(reference_set, test_set,
-                            triangle_plot_name = "survey_labels_triangle.png"):
-    """ Run diagnostic tests on the test set after labels have been inferred.
+    def dataset_postdiagnostics(self, figname = "survey_labels_triangle.png"):
+        """ Run diagnostic tests on the test set after labels have been inferred.
 
-    Tests result in the following output: one .txt file for each label listing
-    all of the stars whose inferred labels lie >= 2 standard deviations outside
-    the reference label space, a triangle plot showing all the survey labels 
-    plotted against each other, and 1-to-1 plots for all of the labels showing
-    how they compare to each other. 
+        Tests result in the following output: one .txt file for each label 
+        listing all of the stars whose inferred labels lie >= 2 standard 
+        deviations outside the reference label space, a triangle plot showing 
+        all the survey labels plotted against each other, and 1-to-1 plots 
+        for all of the labels showing how they compare to each other. 
 
-    Parameters
-    ----------
-    reference_set: Dataset
-        set used as training sample
-
-    test_set: Dataset
-        set for which labels are going to be inferred
-    """
-    # Find stars whose inferred labels lie outside the ref label space by 2-sig+
-    label_names = reference_set.label_names
-    nlabels = len(label_names)
-    reference_labels = reference_set.label_vals
-    test_labels = test_set.label_vals
-    test_IDs = test_set.IDs
-    mean = np.mean(reference_labels, 0)
-    stdev = np.std(reference_labels, 0)
-    lower = mean - 2 * stdev
-    upper = mean + 2 * stdev
-    for i in range(nlabels):
-        label_name = label_names[i]
-        test_vals = test_labels[:,i]
-        warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
-        filename = "flagged_stars_%s.txt" % i
-        with open(filename, 'w') as output:
-            for star in test_IDs[warning]:
-                output.write('{0:s}\n'.format(star))
-        print("Reference label %s" % label_name)
-        print("flagged %s stars beyond 2-sig of reference labels" % sum(warning))
-        print("Saved list %s" % filename)
+        Parameters
+        ----------
+        """
+        # Find stars whose inferred labels lie >2-sig outside ref label space
+        label_names = self.tr_label_names
+        nlabels = len(label_names)
+        reference_labels = self.tr_label_vals
+        test_labels = self.test_label_vals
+        test_IDs = self.test_IDs
+        mean = np.mean(reference_labels, 0)
+        stdev = np.std(reference_labels, 0)
+        lower = mean - 2 * stdev
+        upper = mean + 2 * stdev
+        for i in range(nlabels):
+            label_name = label_names[i]
+            test_vals = test_labels[:,i]
+            warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
+            filename = "flagged_stars_%s.txt" % i
+            with open(filename, 'w') as output:
+                for star in test_IDs[warning]:
+                    output.write('{0:s}\n'.format(star))
+            print("Reference label %s" % label_name)
+            print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
+            print("Saved list %s" % filename)
     
-    # Plot all survey labels against each other
-    test_set.label_triangle_plot(triangle_plot_name)
+        # Plot all survey labels against each other
+        self.label_triangle_plot(figname)
     
-    # 1-1 plots of all labels
-    for i in range(nlabels):
-        name = reference_set.get_plotting_labels()[i]
-        orig = reference_labels[:,i]
-        cannon = test_labels[:,i]
-        low = np.minimum(min(orig), min(cannon))
-        high = np.maximum(max(orig), max(cannon))
-        fig, axarr = plt.subplots(2)
-        ax1 = axarr[0]
-        ax1.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
-        ax1.scatter(orig, cannon)
-        ax1.legend()
-        ax1.set_xlabel("Reference Value")
-        ax1.set_ylabel("Cannon Output Value")
-        ax1.set_title("1-1 Plot of Label " + r"$%s$" % name)
-        ax2 = axarr[1]
-        ax2.hist(cannon-orig)
-        ax2.set_xlabel("Difference")
-        ax2.set_ylabel("Count")
-        ax2.set_title("Histogram of Output Minus Ref Labels")
-        figname = "1to1_label_%s.png" % i
-        plt.savefig(figname)
-        print("Diagnostic for label output vs. input")
-        print("Saved fig %s" % figname)
-        plt.close()
+        # 1-1 plots of all labels
+        for i in range(nlabels):
+            name = self.get_plotting_labels()[i]
+            orig = reference_labels[:,i]
+            cannon = test_labels[:,i]
+            low = np.minimum(min(orig), min(cannon))
+            high = np.maximum(max(orig), max(cannon))
+            fig, axarr = plt.subplots(2)
+            ax1 = axarr[0]
+            ax1.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
+            ax1.scatter(orig, cannon)
+            ax1.legend()
+            ax1.set_xlabel("Reference Value")
+            ax1.set_ylabel("Cannon Output Value")
+            ax1.set_title("1-1 Plot of Label " + r"$%s$" % name)
+            ax2 = axarr[1]
+            ax2.hist(cannon-orig)
+            ax2.set_xlabel("Difference")
+            ax2.set_ylabel("Count")
+            ax2.set_title("Histogram of Output Minus Ref Labels")
+            figname = "1to1_label_%s.png" % i
+            plt.savefig(figname)
+            print("Diagnostic for label output vs. input")
+            print("Saved fig %s" % figname)
+            plt.close()
 
 

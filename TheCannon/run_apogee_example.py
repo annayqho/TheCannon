@@ -34,11 +34,11 @@ model.fit() # model.train would work equivalently.
 model.diagnostics()
 
 # infer labels with the new model for the test_set
-test_set, covs = model.infer_labels(test_set)
-#test_set, covs = model.predict(test_set)
+dataset, covs = model.infer_labels(dataset)
+#dataset, covs = model.predict(dataset)
 
 # Make plots
-#dataset_postdiagnostics(reference_set, test_set)
+dataset_postdiagnostics(dataset)
 
 #cannon_set = model.draw_spectra(test_set)
 #model.spectral_diagnostics(test_set)
