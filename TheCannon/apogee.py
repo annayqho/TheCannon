@@ -62,6 +62,9 @@ class ApogeeDataset(Dataset):
 
         Returns
         -------
+        IDs: list of length nstars
+            stellar IDs
+        
         wl: numpy ndarray of length npixels
             rest-frame wavelength vector
 
@@ -104,5 +107,5 @@ class ApogeeDataset(Dataset):
             ivars[jj,:] = ivar
 
         print("Spectra loaded")
-        return wl, fluxes, ivars, SNRs
+        return files, wl, fluxes, ivars, SNRs
 

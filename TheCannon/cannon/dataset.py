@@ -25,20 +25,22 @@ class Dataset(object):
     """
 
     def __init__(self, training_dir, test_dir, label_file):
-        wl, tr_fluxes, tr_ivars, tr_SNRs = self._load_spectra(training_dir)
+        IDs, wl, fluxes, ivars, SNRs = self._load_spectra(training_dir)
+        self.tr_IDs = IDs
         self.wl = wl
-        self.tr_fluxes = tr_fluxes
-        self.tr_ivars = tr_ivars
-        self.tr_SNRs = tr_SNRs
+        self.tr_fluxes = fluxes
+        self.tr_ivars = ivars
+        self.tr_SNRs = SNRs
 
         label_names, label_vals = self._load_reference_labels(label_file)
         self.tr_label_names = label_names
         self.tr_label_vals = label_vals
 
-        wl, test_fluxes, test_ivars, test_SNRs = self._load_spectra(test_dir)
-        self.test_fluxes = test_fluxes
-        self.test_ivars = test_ivars
-        self.test_SNRs = test_SNRs
+        IDs, wl, fluxes, ivars, SNRs = self._load_spectra(test_dir)
+        self.test_IDs = IDs
+        self.test_fluxes = fluxes
+        self.test_ivars = ivars
+        self.test_SNRs = SNRs
 
         self.contmask = None
 
