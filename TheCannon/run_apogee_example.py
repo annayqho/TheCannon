@@ -1,7 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 from apogee import ApogeeDataset
-
-#from cannon.model import CannonModel
+from cannon.model import CannonModel
 
 ###### WORKFLOW
 
@@ -11,15 +10,15 @@ dataset = ApogeeDataset("example_DR10/Data",
                         "example_DR10/reference_labels.csv")
 
 # Choose labels
- cols = ['teff', 'logg', 'mh']
- dataset.choose_labels(cols)
+cols = ['teff', 'logg', 'mh']
+dataset.choose_labels(cols)
 
 # set the headers for plotting
- dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
+dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels
- dataset.diagnostics_SNR()
- dataset.diagnostics_ref_labels()
+dataset.diagnostics_SNR()
+dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
 contmask = dataset.find_continuum()
@@ -28,8 +27,8 @@ contmask = dataset.find_continuum()
 dataset.continuum_normalize(contmask)
 
 # learn the model from the reference_set
-model = CannonModel(dataset)
-model.fit() # model.train would work equivalently.
+#model = CannonModel(dataset)
+#model.fit() # model.train would work equivalently.
 
 # check the model
 #model.diagnostics()

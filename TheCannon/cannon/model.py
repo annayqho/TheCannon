@@ -9,12 +9,11 @@ from copy import deepcopy
 
 
 class CannonModel(object):
-    def __init__(self, training_set):
-        if not isinstance(training_set, Dataset):
+    def __init__(self, dataset):
+        if not isinstance(dataset, Dataset):
             txt = 'Expecting a Dataset instance, got {0}'
             raise TypeError(txt.format(type(training_set)))
-        self.training_set = training_set
-
+        self.dataset = dataset
         self._model = None
 
     @property
@@ -27,7 +26,7 @@ class CannonModel(object):
 
     def train(self, *args, **kwargs):
         """ Train the model """
-        self._model = _train_model(self.training_set)
+        self._model = _train_model(self.dataset)
 
     def diagnostics(self):
         """Run a set of diagnostics on the model.
@@ -46,9 +45,9 @@ class CannonModel(object):
         contpix: str
             continuum pixel definition file
         """
-        _model_diagnostics(self.training_set, self.model)
+        _model_diagnostics(self.dataset, self.model)
 
-    def infer_labels(self, test_set):
+    def infer_labels(self, dataset):
         """
         Uses the model to solve for labels of the test set.
 
@@ -65,9 +64,9 @@ class CannonModel(object):
         covs_all:
             covariance matrix of the fit
         """
-        return infer_labels(self.model, test_set)
+        return infer_labels(self.model, dataset)
 
-    def draw_spectra(self, test_set):
+    def draw_spectra(self, dataset):
         """
         Parameters
         ----------
@@ -81,22 +80,22 @@ class CannonModel(object):
 
         """
         coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = self.model
-        nstars = len(test_set.IDs)
-        cannon_fluxes = np.zeros(test_set.fluxes.shape)
-        cannon_ivars = np.zeros(test_set.ivars.shape)
+        nstars = len(dataset.test_SNRs)
+        cannon_fluxes = np.zeros(dataset.test_fluxes.shape)
+        cannon_ivars = np.zeros(dataset.test_ivars.shape)
         for i in range(nstars):
             x = label_vector[:,i,:]
             spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
             cannon_fluxes[i,:] = spec_fit
             cannon_ivars[i,:] = 1. / scatters ** 2
         cannon_set = deepcopy(test_set)
-        cannon_set.fluxes = cannon_fluxes
-        cannon_set.ivars = cannon_ivars
+        cannon_set.test_fluxes = cannon_fluxes
+        cannon_set.test_ivars = cannon_ivars
 
         return cannon_set
 
-    def spectral_diagnostics(self, test_set):
-        _diagnostics(self.draw_spectra(test_set), test_set, self.model)
+    def spectral_diagnostics(self, dataset):
+        _diagnostics(self.draw_spectra(dataset), dataset, self.model)
 
     # convenient namings to match existing packages
     predict = infer_labels
