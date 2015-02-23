@@ -135,7 +135,7 @@ def get_lvec(label_vals, pivots):
     lvec = np.hstack((ones, linear_offsets, quadratic_offsets))
     return lvec
 
-def train_model(reference_set):
+def train_model(dataset):
     """
     This determines the coefficients of the model using the training data
 
@@ -165,12 +165,12 @@ def train_model(reference_set):
         the label vector
     """
     print("Training model...")
-    label_names = reference_set.label_names
-    label_vals = reference_set.label_vals
-    lams = reference_set.lams
+    label_names = dataset.tr_label_names
+    label_vals = dataset.tr_label_vals
+    lams = dataset.wl
     npixels = len(lams)
-    fluxes = reference_set.fluxes
-    ivars = reference_set.ivars
+    fluxes = dataset.tr_fluxes
+    ivars = dataset.tr_ivars
     pivots = np.mean(label_vals, axis=0)
     lvec = get_lvec(label_vals, pivots)
     lvec_full = np.array([lvec,] * npixels)
@@ -202,7 +202,7 @@ def split_array(array, num):
     return out
 
 
-def model_diagnostics(reference_set, model,
+def model_diagnostics(dataset, model,
                       baseline_spec_plot_name = "baseline_spec_with_cont_pix",
                       leading_coeffs_plot_name = "leading_coeffs.png",
                       chisq_dist_plot_name = "modelfit_chisqs.png"):
@@ -231,9 +231,9 @@ def model_diagnostics(reference_set, model,
 
     chisq_dist_plot_name:
     """
-    contmask = reference_set.contmask
-    lams = reference_set.lams
-    label_names = reference_set.get_plotting_labels()
+    contmask = dataset.contmask
+    lams = dataset.wl
+    label_names = dataset.get_plotting_labels()
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
     npixels = len(lams)
     nlabels = len(pivots)

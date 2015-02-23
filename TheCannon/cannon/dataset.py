@@ -40,6 +40,8 @@ class Dataset(object):
         self.test_ivars = test_ivars
         self.test_SNRs = test_SNRs
 
+        self.contmask = None
+
     def _get_pixmask(self, *args, **kwags):
         raise NotImplemented('Derived classes need to implement this method')
 
@@ -170,6 +172,7 @@ class Dataset(object):
         else:
             contmask = find_contpix_regions(self.wl, self.tr_fluxes, 
                                             self.tr_ivars, self.ranges)
+        self.contmask = contmask
         return contmask
 
     def continuum_normalize(self, contmask):
