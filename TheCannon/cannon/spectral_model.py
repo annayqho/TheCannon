@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colorbar
 from copy import deepcopy
 
-def draw_spectra(model, test_set):
+def draw_spectra(model, dataset):
     """ Generate a set of spectra given the model and test set labels 
 
     Parameters
@@ -22,22 +22,22 @@ def draw_spectra(model, test_set):
     """
     
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
-    nstars = len(test_set.IDs)
-    cannon_fluxes = np.zeros(test_set.fluxes.shape)
-    cannon_ivars = np.zeros(test_set.ivars.shape)
+    nstars = len(dataset.test_SNRs)
+    cannon_fluxes = np.zeros(dataset.test_fluxes.shape)
+    cannon_ivars = np.zeros(dataset.test_ivars.shape)
     for i in range(nstars):
         x = label_vector[:,i,:]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
         cannon_fluxes[i,:] = spec_fit
         cannon_ivars[i,:] = 1. / scatters ** 2
     cannon_set = deepcopy(test_set)
-    cannon_set.fluxes = cannon_fluxes
-    cannon_set.ivars = cannon_ivars
+    cannon_set.test_fluxes = cannon_fluxes
+    cannon_set.test_ivars = cannon_ivars
 
     return cannon_set
 
 
-def diagnostics(cannon_set, test_set, model):
+def diagnostics(cannon_set, dataset, model):
     """ Run diagnostics on the fitted spectra
 
     Parameters
@@ -48,8 +48,8 @@ def diagnostics(cannon_set, test_set, model):
 
     model:
     """
-    overlay_spectra(cannon_set, test_set, model)
-    residuals(cannon_set, test_set)
+    overlay_spectra(cannon_set, dataset, model)
+    residuals(cannon_set, dataset)
 
 
 def triangle_pixels(cannon_set):
@@ -60,11 +60,11 @@ def triangle_pixels(cannon_set):
     cannon_set
     """
     
-    fluxes = cannon_set.fluxes
+    fluxes = cannon_set.test_fluxes
     corner(fluxes)
 
 
-def overlay_spectra(cannon_set, test_set, model):
+def overlay_spectra(cannon_set, dataset, model):
     """ Run a series of diagnostics on the fitted spectra 
 
     Parameters
@@ -79,28 +79,28 @@ def overlay_spectra(cannon_set, test_set, model):
     
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
     # Overplot original spectra with best-fit spectra
-    res = test_set.fluxes-cannon_set.fluxes
+    res = dataset.test_fluxes-cannon_set.test_fluxes
     bad_ivar = np.std(res, axis=0) <= 1e-5
     os.system("mkdir SpectrumFits")
     print("Overplotting spectra for ten random stars")
-    lambdas = test_set.lams
+    lambdas = dataset.wl
     npix = len(lambdas)
-    nstars = cannon_set.fluxes.shape[0]
+    nstars = cannon_set.test_fluxes.shape[0]
     pickstars = []
     for i in range(10):
         pickstars.append(random.randrange(0, nstars-1))
     for i in pickstars:
         print("Star %s" % i)
-        ID = cannon_set.IDs[i]
-        spec_orig = test_set.fluxes[i,:]
+        #ID = cannon_set.IDs[i]
+        spec_orig = dataset.test_fluxes[i,:]
         bad_flux = (spec_orig == 0) | (spec_orig == 1)  # unique to star
         bad = (bad_ivar | bad_flux)
         lambdas = np.ma.array(lambdas, mask=bad, dtype=float)
         npix = len(lambdas.compressed())
-        spec_orig = np.ma.array(test_set.fluxes[i,:], mask=bad)
-        spec_fit = np.ma.array(cannon_set.fluxes[i,:], mask=bad)
-        ivars_orig = np.ma.array(test_set.ivars[i,:], mask=bad)
-        ivars_fit = np.ma.array(cannon_set.ivars[i,:], mask=bad)
+        spec_orig = np.ma.array(dataset.test_fluxes[i,:], mask=bad)
+        spec_fit = np.ma.array(cannon_set.test_fluxes[i,:], mask=bad)
+        ivars_orig = np.ma.array(dataset.test_ivars[i,:], mask=bad)
+        ivars_fit = np.ma.array(cannon_set.test_ivars[i,:], mask=bad)
         fig, axarr = plt.subplots(2)
         ax1 = axarr[0]
         ax1.scatter(lambdas, spec_orig, label="Orig Spec",
@@ -115,7 +115,8 @@ def overlay_spectra(cannon_set, test_set, model):
         ax1.errorbar(lambdas, spec_fit, yerr=1/np.sqrt(ivars_fit), fmt='ro')
         ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
         ax1.set_ylabel("Normalized flux")
-        ax1.set_title("Spectrum Fit: %s" % ID)
+        #ax1.set_title("Spectrum Fit: %s" % ID)
+        ax1.set_title("Spectrum Fit")
         ax1.legend(loc='lower center', fancybox=True, shadow=True)
         ax2 = axarr[1]
         ax2.scatter(spec_orig, spec_fit, c=1/np.sqrt(ivars_orig))
@@ -143,7 +144,7 @@ def overlay_spectra(cannon_set, test_set, model):
         plt.close(fig)
 
 
-def residuals(cannon_set, test_set):
+def residuals(cannon_set, dataset):
     """ Stack spectrum fit residuals, sort by each label. Include histogram of
     the RMS at each pixel.
 
@@ -154,8 +155,8 @@ def residuals(cannon_set, test_set):
     test_set:
     """
     print("Stacking spectrum fit residuals")
-    res = test_set.fluxes - cannon_set.fluxes
-    err = np.sqrt(1. / test_set.ivars + 1. / cannon_set.ivars)
+    res = dataset.test_fluxes - cannon_set.test_fluxes
+    err = np.sqrt(1. / dataset.test_ivars + 1. / cannon_set.test_ivars)
     res_norm = res / err
     res_norm = np.ma.array(res_norm,
                            mask=(np.ones_like(res_norm) *
@@ -165,7 +166,7 @@ def residuals(cannon_set, test_set):
     for i in range(len(cannon_set.get_plotting_labels())):
         label_name = cannon_set.get_plotting_labels()[i]
         print("Plotting residuals sorted by %s" % label_name)
-        label_vals = cannon_set.label_vals[:,i]
+        label_vals = cannon_set.tr_label_vals[:,i]
         sorted_res = res_norm[np.argsort(label_vals)]
         mu = np.mean(sorted_res.flatten())
         sigma = np.std(sorted_res.flatten())
@@ -182,7 +183,7 @@ def residuals(cannon_set, test_set):
         im = axScatter.imshow(sorted_res, cmap=plt.cm.bwr_r,
                               interpolation="nearest", vmin=mu - 3. * sigma,
                               vmax=mu + 3. * sigma, aspect='auto',
-                              origin='lower', extent=[0, len(test_set.lams),
+                              origin='lower', extent=[0, len(dataset.wl),
                                                       min(label_vals),
                                                       max(label_vals)])
         cax, kw = colorbar.make_axes(axScatter.axes, location='bottom')

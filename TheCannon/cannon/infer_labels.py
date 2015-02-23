@@ -49,7 +49,7 @@ def func(coeffs, *labels):
     return np.dot(coeffs, lvec)
 
 
-def infer_labels(model, test_set):
+def infer_labels(model, dataset):
     """
     Uses the model to solve for labels of the test set.
 
@@ -73,8 +73,8 @@ def infer_labels(model, test_set):
     print("Inferring Labels...")
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nlabels = len(pivots)
-    fluxes = test_set.fluxes
-    ivars = test_set.ivars
+    fluxes = dataset.test_fluxes
+    ivars = dataset.test_ivars
     nstars = fluxes.shape[0]
     labels_all = np.zeros((nstars, nlabels))
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1] - 1,
@@ -110,5 +110,5 @@ def infer_labels(model, test_set):
         MCM_rotate_all[jj, :, :] = MCM_rotate
         covs_all[jj, :, :] = covs
 
-    test_set.set_label_vals(labels_all)
-    return test_set, covs_all
+    dataset.set_label_vals(labels_all)
+    return dataset, covs_all

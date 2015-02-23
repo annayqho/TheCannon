@@ -27,14 +27,14 @@ contmask = dataset.find_continuum()
 dataset.continuum_normalize(contmask)
 
 # learn the model from the reference_set
-#model = CannonModel(dataset)
-#model.fit() # model.train would work equivalently.
+model = CannonModel(dataset)
+model.fit() # model.train would work equivalently.
 
 # check the model
-#model.diagnostics()
+model.diagnostics()
 
 # infer labels with the new model for the test_set
-# test_set, covs = model.infer_labels(test_set)
+test_set, covs = model.infer_labels(test_set)
 #test_set, covs = model.predict(test_set)
 
 # Make plots
