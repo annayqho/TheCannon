@@ -70,7 +70,7 @@ class Dataset(object):
         label_names = data.keys()
         nlabels = len(label_names)
 
-        print("Loaded stellar IDs, format: %s" % data['id'][0])
+        #print("Loaded stellar IDs, format: %s" % data['id'][0])
         print("Loaded %d labels:" % nlabels)
         print(label_names)
         return label_names, data

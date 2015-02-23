@@ -91,7 +91,7 @@ def overlay_spectra(cannon_set, dataset, model):
         pickstars.append(random.randrange(0, nstars-1))
     for i in pickstars:
         print("Star %s" % i)
-        #ID = cannon_set.IDs[i]
+        ID = cannon_set.test_IDs[i]
         spec_orig = dataset.test_fluxes[i,:]
         bad_flux = (spec_orig == 0) | (spec_orig == 1)  # unique to star
         bad = (bad_ivar | bad_flux)
@@ -115,7 +115,7 @@ def overlay_spectra(cannon_set, dataset, model):
         ax1.errorbar(lambdas, spec_fit, yerr=1/np.sqrt(ivars_fit), fmt='ro')
         ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
         ax1.set_ylabel("Normalized flux")
-        #ax1.set_title("Spectrum Fit: %s" % ID)
+        ax1.set_title("Spectrum Fit: %s" % ID)
         ax1.set_title("Spectrum Fit")
         ax1.legend(loc='lower center', fancybox=True, shadow=True)
         ax2 = axarr[1]
