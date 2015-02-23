@@ -1,8 +1,8 @@
 """ Make a single model class to rule them all """
 from .dataset import Dataset
-from .cannon1_train_model import train_model as _train_model
-from .cannon1_train_model import model_diagnostics as _model_diagnostics
-from .cannon2_infer_labels import infer_labels
+from .train_model import train_model as _train_model
+from .train_model import model_diagnostics as _model_diagnostics
+from .infer_labels import infer_labels
 from .spectral_model import diagnostics as _diagnostics
 import numpy as np
 from copy import deepcopy
