@@ -38,7 +38,7 @@ dataset, covs = model.infer_labels(dataset)
 #dataset, covs = model.predict(dataset)
 
 # Make plots
-dataset_postdiagnostics(dataset)
+dataset.dataset_postdiagnostics(dataset)
 
 #cannon_set = model.draw_spectra(test_set)
 #model.spectral_diagnostics(test_set)

@@ -165,7 +165,7 @@ def train_model(dataset):
         the label vector
     """
     print("Training model...")
-    label_names = dataset.tr_label_names
+    label_names = dataset.label_names
     label_vals = dataset.tr_label_vals
     lams = dataset.wl
     npixels = len(lams)

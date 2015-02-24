@@ -33,7 +33,7 @@ class Dataset(object):
         self.tr_SNRs = SNRs
 
         label_names, label_data = self._load_reference_labels(label_file)
-        self.tr_label_names = label_names
+        self.label_names = label_names
         self.tr_label_data = label_data
         self.reset_label_vals()
         
@@ -66,7 +66,7 @@ class Dataset(object):
         """ return the array of labels [Nsamples x Ndim] """
         if self._tr_label_vals is None:
             return np.array([self.tr_label_data[k] for 
-                            k in self.tr_label_names]).T
+                            k in self.label_names]).T
         else:
             return self._tr_label_vals
 
@@ -102,19 +102,19 @@ class Dataset(object):
         return self.label_names_tex
     
     def choose_labels(self, cols):
-        """Updates the tr_label_names property
+        """Updates the label_names property
 
         Parameters
         ----------
         cols: list of column indices corresponding to which to keep
         """
-        self.tr_label_names = []
+        self.label_names = []
         for k in cols:
             key = self.tr_label_data.resolve_alias(k)
             if key not in self.tr_label_data:
                 raise KeyError('Attribute {0:s} not found'.format(key))
             else:
-                self.tr_label_names.append(key)
+                self.label_names.append(key)
 
     def label_triangle_plot(self, figname):
         """Make a triangle plot for the selected labels
@@ -129,7 +129,7 @@ class Dataset(object):
             dimension
         """
         label_vals = np.array([self.tr_label_data[k] 
-                              for k in self.tr_label_names]).T
+                              for k in self.label_names]).T
         labels = [r"$%s$" % l for l in self.get_plotting_labels()]
         print("Plotting every label against every other")
         fig = corner(label_vals, labels=labels, show_titles=True,
@@ -234,7 +234,7 @@ class Dataset(object):
         ----------
         """
         # Find stars whose inferred labels lie >2-sig outside ref label space
-        label_names = self.tr_label_names
+        label_names = self.label_names
         nlabels = len(label_names)
         reference_labels = self.tr_label_vals
         test_labels = self.test_label_vals
