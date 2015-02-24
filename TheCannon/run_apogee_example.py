@@ -34,7 +34,7 @@ model.fit() # model.train would work equivalently.
 model.diagnostics()
 
 # infer labels with the new model for the test_set
-dataset, covs = model.infer_labels(dataset)
+dataset, label_errs = model.infer_labels(dataset)
 #dataset, covs = model.predict(dataset)
 
 # Make plots

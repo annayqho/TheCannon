@@ -79,7 +79,8 @@ def infer_labels(model, dataset):
     labels_all = np.zeros((nstars, nlabels))
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1] - 1,
                                coeffs_all.shape[1]-1.))
-    covs_all = np.zeros((nstars, nlabels, nlabels))
+    #covs_all = np.zeros((nstars, nlabels, nlabels))
+    err_all = np.zeros(nstars, nlabels)
 
     for jj in range(nstars):
         flux = fluxes[jj,:]
@@ -111,7 +112,8 @@ def infer_labels(model, dataset):
         #MCM_rotate = np.dot(coeffs.T, Cinv[:,None] * coeffs)
         labels_all[jj,:] = labels
         #MCM_rotate_all[jj, :, :] = MCM_rotate
-        covs_all[jj, :, :] = covs
+        errs_all[jj,:] = covs.diagonal()
+        #covs_all[jj, :, :] = covs
 
     dataset.set_test_label_vals(labels_all)
-    return dataset, covs_all
+    return dataset, errs_all
