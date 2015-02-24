@@ -32,10 +32,11 @@ class Dataset(object):
         self.tr_ivars = ivars
         self.tr_SNRs = SNRs
 
-        label_names, label_vals = self._load_reference_labels(label_file)
+        label_names, label_data = self._load_reference_labels(label_file)
         self.tr_label_names = label_names
-        self.tr_label_vals = label_vals
-
+        self.tr_label_data = label_data
+        self.reset_label_vals()
+        
         IDs, wl, fluxes, ivars, SNRs = self._load_spectra(test_dir)
         self.test_IDs = IDs
         self.test_fluxes = fluxes
@@ -49,6 +50,25 @@ class Dataset(object):
 
     def _load_spectra(self, data_dir):
         raise NotImplemented('Derived classes need to implement this method')
+
+    def reset_label_vals(self):
+        self._tr_label_vals = None
+    
+    def set_label_vals(self, vals):
+        """ Set label vals from an array """
+        self._label_vals = vals
+
+    def set_label_names_tex(self, names):
+        self.label_names_tex = names
+
+    @property
+    def tr_label_vals(self):
+        """ return the array of labels [Nsamples x Ndim] """
+        if self._tr_label_vals is None:
+            return np.array([self.tr_label_data[k] for 
+                            k in self.tr_label_names]).T
+        else:
+            return self._tr_label_vals
 
     def _load_reference_labels(self, label_file):
         """Extracts training labels from file.
@@ -70,20 +90,11 @@ class Dataset(object):
         label_names = data.keys()
         nlabels = len(label_names)
 
-        #print("Loaded stellar IDs, format: %s" % data['id'][0])
+        print("Loaded stellar IDs, format: %s" % data['id'][0])
         print("Loaded %d labels:" % nlabels)
         print(label_names)
         return label_names, data
 
-    def reset_label_vals(self):
-        self._label_vals = None
-
-    def set_label_vals(self, vals):
-        """ Set label vals from an array """
-        self._label_vals = vals
-
-    def set_label_names_tex(self, names):
-        self.label_names_tex = names
 
     def get_plotting_labels(self):
         if self.label_names_tex is None:
@@ -99,8 +110,8 @@ class Dataset(object):
         """
         self.tr_label_names = []
         for k in cols:
-            key = self.tr_label_vals.resolve_alias(k)
-            if key not in self.tr_label_vals:
+            key = self.tr_label_data.resolve_alias(k)
+            if key not in self.tr_label_data:
                 raise KeyError('Attribute {0:s} not found'.format(key))
             else:
                 self.tr_label_names.append(key)
@@ -117,10 +128,11 @@ class Dataset(object):
             if provided, use this sequence as text labels for each label
             dimension
         """
-        data = np.array([self.tr_label_vals[k] for k in self.tr_label_names]).T
+        label_vals = np.array([self.tr_label_data[k] 
+                              for k in self.tr_label_names]).T
         labels = [r"$%s$" % l for l in self.get_plotting_labels()]
         print("Plotting every label against every other")
-        fig = corner(data, labels=labels, show_titles=True,
+        fig = corner(label_vals, labels=labels, show_titles=True,
                      title_args={"fontsize":12})
         fig.savefig(figname)
         print("Saved fig %s" % figname)
@@ -183,6 +195,7 @@ class Dataset(object):
         For spectra split into regions, perform cont normalization
         separately for each region.
         """
+        contmask = self.contmask
         print("Continuum normalizing...")
         if self.ranges is None:
             print("assuming continuous spectra")

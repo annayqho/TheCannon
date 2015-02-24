@@ -21,10 +21,10 @@ dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
-contmask = dataset.find_continuum()
+dataset.find_continuum()
 
 # RUN CONTINUUM NORMALIZATION CODE
-dataset.continuum_normalize(contmask)
+dataset.continuum_normalize()
 
 # learn the model from the reference_set
 model = CannonModel(dataset)
