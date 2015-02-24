@@ -35,6 +35,7 @@ class Dataset(object):
         label_names, label_data = self._load_reference_labels(label_file)
         self.label_names = label_names
         self.tr_label_data = label_data
+        self.test_label_vals = None
         self.reset_label_vals()
         
         IDs, wl, fluxes, ivars, SNRs = self._load_spectra(test_dir)
@@ -54,9 +55,9 @@ class Dataset(object):
     def reset_label_vals(self):
         self._tr_label_vals = None
     
-    def set_label_vals(self, vals):
+    def set_test_label_vals(self, vals):
         """ Set label vals from an array """
-        self._label_vals = vals
+        self.test_label_vals = vals
 
     def set_label_names_tex(self, names):
         self.label_names_tex = names

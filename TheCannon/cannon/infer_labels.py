@@ -110,5 +110,5 @@ def infer_labels(model, dataset):
         MCM_rotate_all[jj, :, :] = MCM_rotate
         covs_all[jj, :, :] = covs
 
-    dataset.set_label_vals(labels_all)
+    dataset.set_test_label_vals(labels_all)
     return dataset, covs_all
