@@ -117,7 +117,7 @@ class Dataset(object):
             else:
                 self.label_names.append(key)
 
-    def label_triangle_plot(self, figname):
+    def label_triangle_plot(self, label_vals, figname):
         """Make a triangle plot for the selected labels
 
         Parameters
@@ -129,12 +129,11 @@ class Dataset(object):
             if provided, use this sequence as text labels for each label
             dimension
         """
-        label_vals = np.array([self.tr_label_data[k] 
-                              for k in self.label_names]).T
         labels = [r"$%s$" % l for l in self.get_plotting_labels()]
         print("Plotting every label against every other")
         fig = corner(label_vals, labels=labels, show_titles=True,
                      title_args={"fontsize":12})
+        print("figname: %s" %figname)
         fig.savefig(figname)
         print("Saved fig %s" % figname)
         plt.close(fig)
@@ -159,7 +158,7 @@ class Dataset(object):
         plt.close()
         print("Saved fig %s" %figname)
 
-    def diagnostics_ref_labels(self, figname = "ref_labels_triangle.png"):
+    def diagnostics_ref_labels(self, figname="ref_labels_triangle.png"):
         """ Plot all training labels against each other. 
         
         Parameters
@@ -167,7 +166,9 @@ class Dataset(object):
         triangle_plot_name: (optional) string
             title of the saved triangle plot for reference labels
         """
-        self.label_triangle_plot(figname)
+        label_vals = np.array([self.tr_label_data[k] 
+                              for k in self.label_names]).T
+        self.label_triangle_plot(label_vals, figname)
 
     def find_continuum(self):
         """ Use training spectra to find and return continuum pixels
@@ -190,7 +191,7 @@ class Dataset(object):
         self.contmask = contmask
         return contmask
 
-    def continuum_normalize(self, contmask):
+    def continuum_normalize(self):
         """ Continuum normalize spectra
 
         For spectra split into regions, perform cont normalization
@@ -222,7 +223,7 @@ class Dataset(object):
         self.test_fluxes = norm_test_fluxes
         self.test_ivars = norm_test_ivars
 
-    def dataset_postdiagnostics(self, figname = "survey_labels_triangle.png"):
+    def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):
         """ Run diagnostic tests on the test set after labels have been inferred.
 
         Tests result in the following output: one .txt file for each label 
@@ -239,7 +240,7 @@ class Dataset(object):
         nlabels = len(label_names)
         reference_labels = self.tr_label_vals
         test_labels = self.test_label_vals
-        test_IDs = self.test_IDs
+        test_IDs = np.array(self.test_IDs)
         mean = np.mean(reference_labels, 0)
         stdev = np.std(reference_labels, 0)
         lower = mean - 2 * stdev
@@ -257,7 +258,8 @@ class Dataset(object):
             print("Saved list %s" % filename)
     
         # Plot all survey labels against each other
-        self.label_triangle_plot(figname)
+        figname="survey_labels_triangle.png"
+        self.label_triangle_plot(self.test_label_vals, figname)
     
         # 1-1 plots of all labels
         for i in range(nlabels):
