@@ -29,8 +29,9 @@ def draw_spectra(model, dataset):
         x = label_vector[:,i,:]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
         cannon_fluxes[i,:] = spec_fit
-        cannon_ivars[i,:] = 1. / scatters ** 2
-    cannon_set = deepcopy(test_set)
+        bad = dataset.test_ivars[i,:] == 0
+        cannon_ivars[i,:][~bad] = 1. / scatters[~bad] ** 2
+    cannon_set = deepcopy(dataset)
     cannon_set.test_fluxes = cannon_fluxes
     cannon_set.test_ivars = cannon_ivars
 
@@ -157,6 +158,8 @@ def residuals(cannon_set, dataset):
     """
     print("Stacking spectrum fit residuals")
     res = dataset.test_fluxes - cannon_set.test_fluxes
+    bad = dataset.test_ivars == 0
+    err = np.zeros(len(dataset.test_ivars))
     err = np.sqrt(1. / dataset.test_ivars + 1. / cannon_set.test_ivars)
     res_norm = res / err
     res_norm = np.ma.array(res_norm,

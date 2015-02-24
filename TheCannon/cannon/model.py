@@ -89,7 +89,8 @@ class CannonModel(object):
             x = label_vector[:,i,:]
             spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
             cannon_fluxes[i,:] = spec_fit
-            cannon_ivars[i,:] = 1. / scatters ** 2
+            bad = dataset.test_ivars[i,:] == 0
+            cannon_ivars[i,:][~bad] = 1. / scatters[~bad] ** 2
         cannon_set = deepcopy(dataset)
         cannon_set.test_fluxes = cannon_fluxes
         cannon_set.test_ivars = cannon_ivars

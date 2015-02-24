@@ -35,7 +35,9 @@ class ApogeeDataset(Dataset):
         """ Return a mask array of bad pixels
 
         Bad pixels are defined as follows: fluxes or errors are not finite, or 
-        reported errors are negative.
+        reported errors are negative, or the standard deviation of the fluxes
+        across all the stars is zero (if that pixel is exactly the same, then
+        we're looking at the gaps in the spectrum.)
 
         Parameters
         ----------
@@ -50,7 +52,7 @@ class ApogeeDataset(Dataset):
         mask: ndarray, dtype=bool
             array giving bad pixels as True values
         """
-        bad_flux = (~np.isfinite(fluxes)) | (fluxes == 0)   
+        bad_flux = (~np.isfinite(fluxes)) | std(fluxes, axis=0) == 0
         bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
         bad_pix = bad_err | bad_flux
 

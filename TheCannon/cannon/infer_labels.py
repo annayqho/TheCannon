@@ -85,33 +85,32 @@ def infer_labels(model, dataset):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_norm = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
-        
-        Cinv = 1. / ((1. / ivar) + scatters ** 2)
-
-        #Cinv = 1. / scatters**2
-        #mask = ivar != 0.
-        #Cinv[mask] = 1. / ((1. / ivar[mask]) + scatters[mask] ** 2)
-        
-        weights = 1 / Cinv ** 0.5
+        #Cinv = ivar / (1 + ivar * scatters**2)
+        bad = ivar == 0
+        sig = np.zeros(ivar.shape)
+        sig = np.ma.array(sig, mask=bad)
+        ivar = np.ma.array(ivar, mask=bad)
+        scatters = np.ma.array(scatters, mask=bad)
+        sig = np.sqrt(1./ivar + scatters**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
         try:
             labels, covs = opt.curve_fit(func, coeffs, flux_norm,
                                          p0=np.repeat(1, nlabels),
-                                         sigma=weights, absolute_sigma=True)
+                                         sigma=sig, absolute_sigma=True)
         except TypeError:  # old scipy version
             labels, covs = opt.curve_fit(func, coeffs, flux_norm,
-                                         p0=np.repeat(1,nlabels), sigma=weights)
+                                         p0=np.repeat(1, nlabels), sigma=sig)
             # rescale covariance matrix
-            chi = (flux_norm-func(coeffs, *labels)) / weights
+            chi = (flux_norm-func(coeffs, *labels)) / sig
             chi2 = (chi**2).sum()
             # FIXME: dof does not seem to be right to me (MF)
             dof = len(flux_norm) - nlabels
             factor = (chi2 / dof)
             covs /= factor
         labels = labels + pivots
-        MCM_rotate = np.dot(coeffs.T, Cinv[:,None] * coeffs)
+        #MCM_rotate = np.dot(coeffs.T, Cinv[:,None] * coeffs)
         labels_all[jj,:] = labels
-        MCM_rotate_all[jj, :, :] = MCM_rotate
+        #MCM_rotate_all[jj, :, :] = MCM_rotate
         covs_all[jj, :, :] = covs
 
     dataset.set_test_label_vals(labels_all)
