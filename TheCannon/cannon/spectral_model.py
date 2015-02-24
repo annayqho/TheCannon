@@ -101,10 +101,10 @@ def overlay_spectra(cannon_set, dataset, model):
         spec_fit = np.ma.array(cannon_set.test_fluxes[i,:], mask=bad)
         ivars_orig = np.ma.array(dataset.test_ivars[i,:], mask=bad)
         ivars_fit = np.ma.array(cannon_set.test_ivars[i,:], mask=bad)
-        fig, axarr = plt.subplots(2)
-        ax1 = axarr[0]
-        ax1.scatter(lambdas, spec_orig, label="Orig Spec",
-                    c=1. / np.sqrt(ivars_orig))
+        #fig, axarr = plt.subplots(2)
+        #ax1 = axarr[0]
+        #ax1.scatter(lambdas, spec_orig, label="Orig Spec",
+        #            c=1. / np.sqrt(ivars_orig))
         red_chisq = np.sum(chisqs[:,i], axis=0) / (npix - coeffs_all.shape[1])
         red_chisq = np.round(red_chisq, 2)
         fig,axarr = plt.subplots(2)
@@ -124,8 +124,9 @@ def overlay_spectra(cannon_set, dataset, model):
                      ecolor='k', fmt="none")
         fig.subplots_adjust(right=0.8)
         cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-        fig.colorbar(im, cax=cbar_ax)
-        im.set_label("Uncertainties on the Fluxes from the Original Spectrum")
+        fig.colorbar(
+                im, cax=cbar_ax,
+                label="Uncertainties on the Fluxes from the Original Spectrum")
         xlims = ax2.get_xlim()
         ylims = ax2.get_ylim()
         lims = [np.min([xlims, ylims]), np.max([xlims, ylims])]
