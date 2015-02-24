@@ -40,5 +40,5 @@ dataset, covs = model.infer_labels(dataset)
 # Make plots
 dataset.dataset_postdiagnostics(dataset)
 
-#cannon_set = model.draw_spectra(test_set)
-#model.spectral_diagnostics(test_set)
+cannon_set = model.draw_spectra(dataset)
+model.spectral_diagnostics(dataset)
