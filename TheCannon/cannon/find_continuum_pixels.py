@@ -2,7 +2,7 @@ import numpy as np
 
 """ Finds and returns list of continuum pixels, as a mask. """
 
-def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
+def find_contpix(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
 
     Parameters
@@ -32,7 +32,7 @@ def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     contmask = np.logical_and(contmask1, cont3)
     return contmask
 
-def find_contpix(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
+def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
     # have not cont normalized yet, so ivars still have 0 vals
     bad1 = np.median(ivars, axis=0) == 0
     bad2 = np.var(ivars, axis=0) == 0
@@ -41,12 +41,12 @@ def find_contpix(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
     f_cut = 0.003
     stepsize = 0.0001
     sig_cut = 0.003
-    contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
+    contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
     frac = sum(contmask)/float(npixels)
     while frac < 0.05: 
         f_cut += stepsize
         sig_cut += stepsize
-        contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
+        contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
         frac = sum(contmask)/float(npixels)
     if frac > 0.10*npixels:
         print("Warning: Over 10% of pixels identified as continuum.")
@@ -60,7 +60,7 @@ def find_contpix_regions(wl, fluxes, ivars, ranges, f_cut=0.003, sig_cut=0.003):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        contmask[start:stop] = find_contpix(wl[start:stop],
+        contmask[start:stop] = find_cuts(wl[start:stop],
                                             fluxes[:,start:stop],
                                             ivars[:,start:stop],
                                             f_cut, sig_cut)

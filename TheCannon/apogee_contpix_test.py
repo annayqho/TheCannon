@@ -24,3 +24,9 @@ float(sum(same))/len(dataset.contmask)
 scatter(pix, dataset.contmask+0.1, c='r')
 scatter(pix, mkn_contmask, c='b')
 
+# running contpix identifier
+
+dataset = ApogeeDataset("example_DR10/Data",
+                        "example_DR10/Data",
+                                                "example_DR10/reference_labels.csv")
+
