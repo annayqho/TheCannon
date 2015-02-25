@@ -16,13 +16,14 @@ Authors
 * **David W. Hogg** (NYU CCPP)(MPIA)
 * **Hans-Walter Rix** (MPIA)
 
-License
--------
+License and Citation
+--------------------
 
 Copyright 2015 the authors. TheCannon is open-source software released under 
 the MIT License. See the file ``LICENSE`` for details.
 
-When using this code, cite Ness et al. 2015 and Ho et al. (in prep). 
+A condition on using this code for any academic purpose is citation of
+Ness et al. 2015 (arXiv:1501.07604) and Ho et al. (in preparation). 
 
 Projects
 --------
