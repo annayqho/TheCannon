@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from matplotlib import colorbar
 from copy import deepcopy
 
+LARGE = 100.
+SMALL = 1. / LARGE
+
 def draw_spectra(model, dataset):
     """ Generate a set of spectra given the model and test set labels 
 
@@ -29,7 +32,7 @@ def draw_spectra(model, dataset):
         x = label_vector[:,i,:]
         spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
         cannon_fluxes[i,:] = spec_fit
-        bad = dataset.test_ivars[i,:] == 0
+        bad = dataset.test_ivars[i,:] == SMALL
         cannon_ivars[i,:][~bad] = 1. / scatters[~bad] ** 2
     cannon_set = deepcopy(dataset)
     cannon_set.test_fluxes = cannon_fluxes
@@ -158,7 +161,7 @@ def residuals(cannon_set, dataset):
     """
     print("Stacking spectrum fit residuals")
     res = dataset.test_fluxes - cannon_set.test_fluxes
-    bad = dataset.test_ivars == 0
+    bad = dataset.test_ivars == SMALL
     err = np.zeros(len(dataset.test_ivars))
     err = np.sqrt(1. / dataset.test_ivars + 1. / cannon_set.test_ivars)
     res_norm = res / err

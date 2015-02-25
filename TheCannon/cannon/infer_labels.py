@@ -6,6 +6,8 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from scipy import optimize as opt
 import numpy as np
 
+LARGE = 100.
+SMALL = 1. / LARGE
 
 def get_lvec(labels):
     """
@@ -87,7 +89,7 @@ def infer_labels(model, dataset):
         ivar = ivars[jj,:]
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
         #Cinv = ivar / (1 + ivar * scatters**2)
-        bad = ivar == 0
+        bad = ivar == SMALL
         sig = np.zeros(ivar.shape)
         sig = np.ma.array(sig, mask=bad)
         ivar = np.ma.array(ivar, mask=bad)

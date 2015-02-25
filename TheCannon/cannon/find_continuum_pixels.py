@@ -33,6 +33,7 @@ def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     return contmask
 
 def find_contpix(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
+    # have not cont normalized yet, so ivars still have 0 vals
     bad1 = np.median(ivars, axis=0) == 0
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)
