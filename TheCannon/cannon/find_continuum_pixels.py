@@ -43,7 +43,7 @@ def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
     sig_cut = 0.003
     contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
     frac = sum(contmask)/float(npixels)
-    while frac < 0.05: 
+    while frac < 0.065: 
         f_cut += stepsize
         sig_cut += stepsize
         contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
@@ -52,6 +52,7 @@ def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
         print("Warning: Over 10% of pixels identified as continuum.")
     print("%s out of %s pixels identified as continuum" %(sum(contmask), 
                                                           npixels))
+    print("Cuts: f_cut %s, sig_cut %s" %(f_cut, sig_cut))
     return contmask
 
 def find_contpix_regions(wl, fluxes, ivars, ranges, f_cut=0.003, sig_cut=0.003):

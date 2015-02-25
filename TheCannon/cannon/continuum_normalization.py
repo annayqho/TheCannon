@@ -86,9 +86,9 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
         # avoid having ivar = 0, which will throw error later
-        bad = (ivar < SMALL)
-        flux_norm[bad] = 1.
-        ivar[bad] = SMALL
+        bad = (norm_ivars[jj,:] < SMALL)
+        norm_fluxes[jj,:][bad] = 1.
+        norm_ivars[jj,:][bad] = SMALL
 
     return norm_fluxes, norm_ivars
 
