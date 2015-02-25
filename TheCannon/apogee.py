@@ -32,7 +32,7 @@ class ApogeeDataset(Dataset):
         self.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
     def _get_pixmask(self, fluxes, flux_errs):
-        """ Return a mask array of bad pixels
+        """ Return a mask array of bad pixels for one object's spectrum
 
         Bad pixels are defined as follows: fluxes or errors are not finite, or 
         reported errors are negative, or the standard deviation of the fluxes
@@ -52,7 +52,7 @@ class ApogeeDataset(Dataset):
         mask: ndarray, dtype=bool
             array giving bad pixels as True values
         """
-        bad_flux = (~np.isfinite(fluxes)) | (np.std(fluxes, axis=0) == 0)
+        bad_flux = (~np.isfinite(fluxes)) | (fluxes == 0)
         bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
         bad_pix = bad_err | bad_flux
 
