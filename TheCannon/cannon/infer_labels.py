@@ -85,7 +85,7 @@ def infer_labels(model, dataset):
     for jj in range(nstars):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
-        flux_norm = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
+        flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
         #Cinv = ivar / (1 + ivar * scatters**2)
         bad = ivar == 0
         sig = np.zeros(ivar.shape)
@@ -95,17 +95,17 @@ def infer_labels(model, dataset):
         sig = np.sqrt(1./ivar + scatters**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
         try:
-            labels, covs = opt.curve_fit(func, coeffs, flux_norm,
+            labels, covs = opt.curve_fit(func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels),
                                          sigma=sig, absolute_sigma=True)
         except TypeError:  # old scipy version
-            labels, covs = opt.curve_fit(func, coeffs, flux_norm,
+            labels, covs = opt.curve_fit(func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels), sigma=sig)
             # rescale covariance matrix
-            chi = (flux_norm-func(coeffs, *labels)) / sig
+            chi = (flux_piv-func(coeffs, *labels)) / sig
             chi2 = (chi**2).sum()
             # FIXME: dof does not seem to be right to me (MF)
-            dof = len(flux_norm) - nlabels
+            dof = len(flux_piv) - nlabels
             factor = (chi2 / dof)
             covs /= factor
         labels = labels + pivots
