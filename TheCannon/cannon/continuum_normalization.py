@@ -5,6 +5,9 @@ import scipy.optimize as opt
 
 """ Performs continuum normalization on Cannon input spectra. """
 
+LARGE = 100.
+SMALL = 1. / LARGE
+
 # Thank you Morgan for this...
 def partial_func(func, *args, **kwargs):
     
@@ -82,6 +85,10 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
             cont[element] = cont_func(element, popt, L=L)
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
+        # avoid having ivar = 0, which will throw error later
+        bad = (ivar < SMALL)
+        flux_norm[bad] = 1.
+        ivar[bad] = SMALL
 
     return norm_fluxes, norm_ivars
 
