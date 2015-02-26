@@ -76,8 +76,9 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         p0 = np.ones(deg*2) # one for cos, one for sin
         L = max(x)-min(x)
         pcont_func = partial_func(cont_func, L=L)
-        bad = yivar == 0
-        yivar = np.ma.array(yivar, mask=bad)
+        #bad pixels should not be identified as continuum pixels!
+        #bad = yivar == 0 | yivar == SMALL 
+        #yivar = np.ma.array(yivar, mask=bad)
         popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                    sigma=1./np.sqrt(yivar))
         cont = np.zeros(len(pix))

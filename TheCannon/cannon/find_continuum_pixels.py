@@ -23,6 +23,8 @@ def find_contpix(f_cut, sig_cut, wl, fluxes, ivars):
     contmask: boolean mask of length npixels
         True indicates that the pixel is continuum
     """
+    # bad pixels should not be identified as continuum pixels
+    # 
     f_bar = np.median(fluxes, axis=0)
     sigma_f = np.var(fluxes, axis=0)
     cont1 = np.abs(f_bar-1) <= f_cut

@@ -52,7 +52,7 @@ class ApogeeDataset(Dataset):
         mask: ndarray, dtype=bool
             array giving bad pixels as True values
         """
-        bad_flux = (~np.isfinite(fluxes)) | (fluxes == 0)
+        bad_flux = (~np.isfinite(fluxes)) 
         bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
         bad_pix = bad_err | bad_flux
 
