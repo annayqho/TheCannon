@@ -189,7 +189,9 @@ class Dataset(object):
             contmask = find_contpix_regions(self.wl, self.tr_fluxes, 
                                             self.tr_ivars, self.ranges)
         self.contmask = contmask
-        return contmask
+
+    def set_continuum(self, contmask):
+        self.contmask = contmask
 
     def continuum_normalize(self):
         """ Continuum normalize spectra

@@ -7,7 +7,7 @@ from cannon.model import CannonModel
 # RUN APOGEE MUNGING CODE
 dataset = ApogeeDataset("example_DR10/Data",
                         "example_DR10/Data",
-                        "example_DR10/reference_labels.csv")
+                        "example_MKN_Check/reference_labels.csv")
 
 # Choose labels
 cols = ['teff', 'logg', 'mh']
@@ -21,7 +21,14 @@ dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
-dataset.find_continuum()
+# not for MKN testing
+# dataset.find_continuum()
+pixlist = np.array(
+        np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1, dtype=int))
+npix = len(dataset.wl)
+contmask = np.zeros(npix, dtype=bool)
+contmask[pixlist] = True
+dataset.contmask = contmask
 
 # RUN CONTINUUM NORMALIZATION CODE
 dataset.continuum_normalize()
