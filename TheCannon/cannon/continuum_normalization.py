@@ -76,9 +76,12 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         p0 = np.ones(deg*2) # one for cos, one for sin
         L = max(x)-min(x)
         pcont_func = partial_func(cont_func, L=L)
-        #bad pixels should not be identified as continuum pixels!
-        #bad = yivar == 0 | yivar == SMALL 
-        #yivar = np.ma.array(yivar, mask=bad)
+        # It should not be possible to have a cont pix that's also
+        # a bad pixel, because bad means flux_err==0, and flux_err==0
+        # should also correspond to flux==0. If flux==0 at this pixel,
+        # it should throw off the median(flux) and ivar(flux) cuts.
+        # bad = yivar == 0 #| yivar == SMALL 
+        # yivar = np.ma.array(yivar, mask=bad)
         popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                    sigma=1./np.sqrt(yivar))
         cont = np.zeros(len(pix))
@@ -87,9 +90,11 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
         # avoid having ivar = 0, which will throw error later
-        bad = (norm_ivars[jj,:] < SMALL)
-        norm_fluxes[jj,:][bad] = 1.
-        norm_ivars[jj,:][bad] = SMALL
+        # for now don't do this, since we are running the cont norm process
+        # iteratively. turn this back on later. 
+        # bad = (norm_ivars[jj,:] < SMALL)
+        # norm_fluxes[jj,:][bad] = 1.
+        # norm_ivars[jj,:][bad] = SMALL
 
     return norm_fluxes, norm_ivars
 
