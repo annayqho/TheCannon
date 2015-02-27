@@ -17,15 +17,15 @@ try:
 except ImportError:
     import pyfits
 
-class LamostDataset(Dataset):
+class LAMOSTDataset(Dataset):
     """ A class to represent a Dataset of LAMOST spectra and labels.
 
-    Performs the LAMOST Munging necessary for making the data "Cannonizable."
-    Retrieves the data (assumes already in rest frame), creates and reads bad-
+    Performs the LAMOST Munging necessary for making the data "Cannonizable." 
+    Retrieves the data (assumse already in rest frame), creates and reads bad-
     pixel mask, builds inverse variance vectors, packages them all into 
     rectangular blocks.
     """
-
+   
     def __init__(self, training_dir, test_dir, label_file):
         super(self.__class__, self).__init__(training_dir, test_dir, label_file)
 
@@ -43,12 +43,12 @@ class LamostDataset(Dataset):
             flux array
 
         flux_errs: ndarray
-           measurement uncertainties on fluxes
+            measurement uncertainties on fluxes
 
         Returns
         -------
         mask: ndarray, dtype=bool
-            ndarray giving bad pixels as True values
+            array giving bad pixels as True values
         """
         bad_flux = (~np.isfinite(fluxes)) 
         bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
@@ -56,6 +56,57 @@ class LamostDataset(Dataset):
 
         return bad_pix
 
-    
+    def _load_spectra(self, data_dir):
+        """
+        Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
 
+        Returns
+        -------
+        IDs: list of length nstars
+            stellar IDs
+        
+        wl: numpy ndarray of length npixels
+            rest-frame wavelength vector
+
+        fluxes: numpy ndarray of shape (nstars, npixels)
+            training set or test set pixel intensities
+
+        ivars: numpy ndarray of shape (nstars, npixels)
+            inverse variances, parallel to fluxes
+            
+        SNRs: numpy ndarray of length nstars
+        """
+        print("Loading spectra from directory %s" %data_dir)
+        files = list(sorted([data_dir + "/" + filename
+                 for filename in os.listdir(data_dir)]))
+        nstars = len(files)  
+        
+        for jj, fits_file in enumerate(files):
+            file_in = pyfits.open(fits_file)
+            flux = np.array(file_in[0].data[0])
+            if jj == 0:
+                pixels = np.array(file_in[0].data[2])
+                npixels = len(flux)
+                SNRs = np.zeros(nstars, dtype=float)   
+                fluxes = np.zeros((nstars, npixels), dtype=float)
+                ivars = np.zeros(fluxes.shape, dtype=float)
+                start_wl = file_in[1].header['CRVAL1']
+                diff_wl = file_in[1].header['CDELT1']
+                val = diff_wl * (npixels) + start_wl
+                wl_full_log = np.arange(start_wl,val, diff_wl)
+                wl_full = [10 ** aval for aval in wl_full_log]
+                wl = np.array(wl_full)
+            flux_err = np.array((file_in[0].data[1]))
+            badpix = self._get_pixmask(flux, flux_err)
+            flux = np.ma.array(flux, mask=badpix)
+            flux_err = np.ma.array(flux_err, mask=badpix)
+            SNRs[jj] = np.ma.median(flux/flux_err)
+            ones = np.ma.array(np.ones(npixels), mask=badpix)
+            ivar = ones / flux_err**2
+            ivar = np.ma.filled(ivar, fill_value=0.)
+            fluxes[jj,:] = flux
+            ivars[jj,:] = ivar
+
+        print("Spectra loaded")
+        return files, wl, fluxes, ivars, SNRs
 
