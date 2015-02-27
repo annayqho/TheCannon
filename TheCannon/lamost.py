@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function,)
 import numpy as np
 import scipy.optimize as opt
+from scipy import interpolate 
 import os
 import sys
 from cannon.helpers import Table
@@ -29,13 +30,17 @@ class LAMOSTDataset(Dataset):
     def __init__(self, training_dir, test_dir, label_file):
         super(self.__class__, self).__init__(training_dir, test_dir, label_file)
 
-    def _get_pixmask(self, fluxes, flux_errs):
+    def _get_pixmask(self, file_in, middle, grid, flux, ivar):
         """ Return a mask array of bad pixels for one object's spectrum
 
-        Bad pixels are defined as follows: fluxes or errors are not finite, or 
-        reported errors are negative, or the standard deviation of the fluxes
-        across all the stars is zero (if that pixel is exactly the same, then
-        we're looking at the gaps in the spectrum.)
+        Bad pixels are defined as follows: fluxes or ivars are not finite, or 
+        ivars are negative
+
+        Major sky lines. 4046, 4358, 5460, 5577, 6300, 6363, 6863
+
+        Where the red and blue wings join together: 5800-6000
+
+        Read bad pix mask: file_in[0].data[4] is the ormask 
 
         Parameters
         ----------
@@ -50,9 +55,27 @@ class LAMOSTDataset(Dataset):
         mask: ndarray, dtype=bool
             array giving bad pixels as True values
         """
-        bad_flux = (~np.isfinite(fluxes)) 
-        bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
-        bad_pix = bad_err | bad_flux
+        npix = len(grid)
+        
+        bad_flux = (~np.isfinite(flux)) 
+        bad_err = (~np.isfinite(ivar)) | (ivar <= 0)
+        bad_pix_a = bad_err | bad_flux
+        
+        wings = np.logical_and(grid > 5750, grid < 6050)
+        ormask = (file_in[0].data[4] > 0)[middle]
+        bad_pix_b = wings | ormask
+
+        max_pix_width = grid[npix-1]-grid[npix-2]
+        skylines = np.array([4046, 4358, 5460, 5577, 6300, 6363, 6863])
+        bad_pix_c = np.zeros(npix, dtype=bool)
+        for skyline in skylines:
+            badmin = skyline-max_pix_width
+            badmax = skyline+max_pix_width
+            bad_pix_temp = np.logical_and(grid > badmin, grid < badmax)
+            bad_pix_c[bad_pix_temp] = True
+
+        bad_pix_ab = bad_pix_a | bad_pix_b
+        bad_pix = bad_pix_ab | bad_pix_c
 
         return bad_pix
 
@@ -83,30 +106,35 @@ class LAMOSTDataset(Dataset):
         
         for jj, fits_file in enumerate(files):
             file_in = pyfits.open(fits_file)
-            flux = np.array(file_in[0].data[0])
+            wl_temp = np.array(file_in[0].data[2])
             if jj == 0:
-                pixels = np.array(file_in[0].data[2])
-                npixels = len(flux)
+                npixels = len(wl_temp)
                 SNRs = np.zeros(nstars, dtype=float)   
                 fluxes = np.zeros((nstars, npixels), dtype=float)
                 ivars = np.zeros(fluxes.shape, dtype=float)
-                start_wl = file_in[1].header['CRVAL1']
-                diff_wl = file_in[1].header['CDELT1']
+                start_wl = file_in[0].header['CRVAL1']
+                diff_wl = file_in[0].header['CD1_1']
                 val = diff_wl * (npixels) + start_wl
-                wl_full_log = np.arange(start_wl,val, diff_wl)
-                wl_full = [10 ** aval for aval in wl_full_log]
-                wl = np.array(wl_full)
-            flux_err = np.array((file_in[0].data[1]))
-            badpix = self._get_pixmask(flux, flux_err)
+                grid_log = np.arange(start_wl,val, diff_wl)
+                grid = np.array([10 ** aval for aval in wl_full_log])
+                # get rid of edges
+                middle = np.logical_and(grid > 3900, grid < 8800)
+                grid = grid[middle]
+            redshift = file_in[0].header['Z']
+            wlshifts = redshift*wl_temp
+            wl = wl_temp - wlshifts
+            flux = np.array(file_in[0].data[0])
+            ivar = np.array((file_in[0].data[1]))
+            flux_rs = (interpolate.interp1d(wl, flux))(grid)[middle]
+            ivar_rs = (interpolate.interp1d(wl, ivar))(grid)[middle]
+            badpix = self._get_pixmask(file_in, middle, grid, flux_rs, ivar_rs)
             flux = np.ma.array(flux, mask=badpix)
-            flux_err = np.ma.array(flux_err, mask=badpix)
-            SNRs[jj] = np.ma.median(flux/flux_err)
-            ones = np.ma.array(np.ones(npixels), mask=badpix)
-            ivar = ones / flux_err**2
+            ivar = np.ma.array(ivar, mask=badpix)
+            SNRs[jj] = np.ma.median(flux*ivar**0.5)
             ivar = np.ma.filled(ivar, fill_value=0.)
-            fluxes[jj,:] = flux
-            ivars[jj,:] = ivar
+            fluxes[jj,:] = flux_rs
+            ivars[jj,:] = ivar_rs
 
         print("Spectra loaded")
-        return files, wl, fluxes, ivars, SNRs
+        return files, grid, fluxes, ivars, SNRs
 
