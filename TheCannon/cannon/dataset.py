@@ -170,6 +170,12 @@ class Dataset(object):
                               for k in self.label_names]).T
         self.label_triangle_plot(label_vals, figname)
 
+    def find_gaps(self, fluxes):
+        # Gaps: regions where median(flux) == 0., and var(flux) == 0.
+        gaps = np.logical_and(np.median(fluxes, axis=0) == 0, 
+                              np.std(fluxes, axis=0) == 0)    
+        return gaps
+
     def find_continuum(self):
         """ Use training spectra to find and return continuum pixels
 

@@ -82,11 +82,17 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         # it should throw off the median(flux) and ivar(flux) cuts.
         # bad = yivar == 0 #| yivar == SMALL 
         # yivar = np.ma.array(yivar, mask=bad)
-        popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
-                                   sigma=1./np.sqrt(yivar))
+        
+        # in the sine/cosine version:
+        # popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
+        #                           sigma=1./np.sqrt(yivar))
+        fit = np.polynomial.chebyshev.Chebyshev.fit(x=x, y=y, w=yivar, deg=3)
         cont = np.zeros(len(pix))
         for element in pix:
-            cont[element] = cont_func(element, popt, L=L)
+            # sine/cosine version:
+            # cont[element] = cont_func(element, popt, L=L)
+            cont[element] = fit(element)
+
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
         # avoid having ivar = 0, which will throw error later

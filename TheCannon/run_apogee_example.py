@@ -1,12 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
 from apogee import ApogeeDataset
 from cannon.model import CannonModel
+import numpy as np
 
 ###### WORKFLOW
 
 # RUN APOGEE MUNGING CODE
-dataset = ApogeeDataset("example_DR10/Data",
-                        "example_DR10/Data",
+dataset = ApogeeDataset("example_MKN_Check/Data",
+                        "example_MKN_Check/Data",
                         "example_MKN_Check/reference_labels.csv")
 
 # Choose labels
@@ -28,7 +29,10 @@ pixlist = np.array(
 npix = len(dataset.wl)
 contmask = np.zeros(npix, dtype=bool)
 contmask[pixlist] = True
-dataset.contmask = contmask
+# get rid of the contpix that are in the gap
+gapmask = dataset.find_gaps(dataset.tr_fluxes)
+contmask[gapmask] = False
+dataset.set_continuum(contmask)
 
 # RUN CONTINUUM NORMALIZATION CODE
 dataset.continuum_normalize()
@@ -41,11 +45,11 @@ model.fit() # model.train would work equivalently.
 model.diagnostics()
 
 # infer labels with the new model for the test_set
-dataset, label_errs = model.infer_labels(dataset)
+# dataset, label_errs = model.infer_labels(dataset)
 #dataset, covs = model.predict(dataset)
 
 # Make plots
-dataset.dataset_postdiagnostics(dataset)
+# dataset.dataset_postdiagnostics(dataset)
 
-cannon_set = model.draw_spectra(dataset)
-model.spectral_diagnostics(dataset)
+# cannon_set = model.draw_spectra(dataset)
+# model.spectral_diagnostics(dataset)
