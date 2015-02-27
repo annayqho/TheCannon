@@ -18,7 +18,7 @@ try:
 except ImportError:
     import pyfits
 
-class LAMOSTDataset(Dataset):
+class LamostDataset(Dataset):
     """ A class to represent a Dataset of LAMOST spectra and labels.
 
     Performs the LAMOST Munging necessary for making the data "Cannonizable." 
