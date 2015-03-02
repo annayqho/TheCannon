@@ -120,14 +120,14 @@ class LamostDataset(Dataset):
                 grid = np.array([10 ** aval for aval in grid_log])
                 # get rid of edges
                 middle = np.logical_and(grid > 3900, grid < 8800)
+                grid = grid[middle]
             redshift = file_in[0].header['Z']
             wlshifts = redshift*wl_temp
             wl = wl_temp - wlshifts
             flux = np.array(file_in[0].data[0])
             ivar = np.array((file_in[0].data[1]))
-            flux_rs = (interpolate.interp1d(wl, flux))(grid)[middle]
-            ivar_rs = (interpolate.interp1d(wl, ivar))(grid)[middle]
-            grid = grid[middle]
+            flux_rs = (interpolate.interp1d(wl, flux))(grid)
+            ivar_rs = (interpolate.interp1d(wl, ivar))(grid)
             badpix = self._get_pixmask(file_in, middle, grid, flux_rs, ivar_rs)
             flux = np.ma.array(flux, mask=badpix)
             ivar = np.ma.array(ivar, mask=badpix)
