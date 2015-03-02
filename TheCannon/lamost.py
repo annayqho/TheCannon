@@ -110,8 +110,6 @@ class LamostDataset(Dataset):
             if jj == 0:
                 npixels = len(wl_temp)
                 SNRs = np.zeros(nstars, dtype=float)   
-                fluxes = np.zeros((nstars, npixels), dtype=float)
-                ivars = np.zeros(fluxes.shape, dtype=float)
                 start_wl = file_in[0].header['CRVAL1']
                 diff_wl = file_in[0].header['CD1_1']
                 val = diff_wl * (npixels) + start_wl
@@ -121,6 +119,9 @@ class LamostDataset(Dataset):
                 # get rid of edges
                 middle = np.logical_and(grid > 3900, grid < 8800)
                 grid = grid[middle]
+                npixels = len(grid)
+                fluxes = np.zeros((nstars, npixels), dtype=float)
+                ivars = np.zeros(fluxes.shape, dtype=float)
             redshift = file_in[0].header['Z']
             wlshifts = redshift*wl_temp
             wl = wl_temp - wlshifts
@@ -129,10 +130,10 @@ class LamostDataset(Dataset):
             flux_rs = (interpolate.interp1d(wl, flux))(grid)
             ivar_rs = (interpolate.interp1d(wl, ivar))(grid)
             badpix = self._get_pixmask(file_in, middle, grid, flux_rs, ivar_rs)
-            flux = np.ma.array(flux, mask=badpix)
-            ivar = np.ma.array(ivar, mask=badpix)
-            SNRs[jj] = np.ma.median(flux*ivar**0.5)
-            ivar = np.ma.filled(ivar, fill_value=0.)
+            flux_rs = np.ma.array(flux_rs, mask=badpix)
+            ivar_rs = np.ma.array(ivar_rs, mask=badpix)
+            SNRs[jj] = np.ma.median(flux_rs*ivar_rs**0.5)
+            ivar_rs = np.ma.filled(ivar_rs, fill_value=0.)
             fluxes[jj,:] = flux_rs
             ivars[jj,:] = ivar_rs
 
