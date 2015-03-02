@@ -10,7 +10,6 @@ SMALL = 1. / LARGE
 
 # Thank you Morgan for this...
 def partial_func(func, *args, **kwargs):
-    
     def wrap(x, *p):
         return func(x, p, **kwargs)
     return wrap
@@ -98,10 +97,42 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         # avoid having ivar = 0, which will throw error later
         # for now don't do this, since we are running the cont norm process
         # iteratively. turn this back on later. 
-        # bad = (norm_ivars[jj,:] < SMALL)
-        # norm_fluxes[jj,:][bad] = 1.
-        # norm_ivars[jj,:][bad] = SMALL
+        bad = (norm_ivars[jj,:] < SMALL)
+        norm_fluxes[jj,:][bad] = 1.
+        norm_ivars[jj,:][bad] = SMALL
 
+    return norm_fluxes, norm_ivars
+
+def weighted_median(values, weights, quantile):
+    sindx = np.argsort(values)
+    cvalues = 1. * np.cumsum(weights[sindx])
+    cvalues = cvalues / cvalues[-1]
+    foo = sindx[cvalues > quantile]
+    if len(foo) == 0:
+        return values[0]
+    indx = foo[0]
+    return values[indx]
+
+def cont_norm_q(wl, fluxes, ivars, q=0.90, delta_lambda=50):
+    norm_fluxes = np.zeros(fluxes.shape)
+    norm_ivars = np.zeros(ivars.shape)
+    cont = np.zeros(fluxes.shape)
+    nstars = fluxes.shape[0]
+    for jj in range(nstars):
+        print "cont_norm_q(): working on star", jj
+        flux = fluxes[jj,:]
+        ivar = ivars[jj,:]
+        for ll, lam in enumerate(wl):
+            indx = (np.where(abs(wl-lam) < delta_lambda))[0]
+            flux_cut = flux[indx]
+            ivar_cut = ivar[indx]
+            cont[jj,ll] = weighted_median(flux_cut, ivar_cut, q)
+    for jj in range(nstars):
+        norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
+        norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
+        bad = (norm_ivars[jj,:] < SMALL)
+        norm_fluxes[jj,:][bad] = 1.
+        norm_ivars[jj,:][bad] = SMALL
     return norm_fluxes, norm_ivars
 
 def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=3):
