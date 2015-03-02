@@ -38,8 +38,8 @@ dataset.diagnostics_ref_labels()
 #dataset.continuum_normalize()
 
 # learn the model from the reference_set
-#model = CannonModel(dataset, 2) # 2 = quadratic model
-#model.fit() # model.train would work equivalently.
+model = CannonModel(dataset, 2) # 2 = quadratic model
+model.fit() # model.train would work equivalently.
 
 # check the model
 #model.diagnostics()
