@@ -4,6 +4,7 @@ from .train_model import train_model as _train_model
 from .infer_labels import infer_labels
 from .spectral_model import diagnostics as _diagnostics
 import numpy as np
+import matplotlib.pyplot as plt
 from copy import deepcopy
 
 LARGE = 100.
@@ -98,7 +99,7 @@ class CannonModel(object):
 
         return cannon_set
 
-    def split_array(array, num):
+    def split_array(self, array, num):
         avg = len(array) / float(num)
         out = []
         last = 0.0
@@ -147,7 +148,7 @@ class CannonModel(object):
 
         # Split into ten segments
         nseg = 10
-        lams_seg = split_array(lams.compressed(), nseg)
+        lams_seg = self.split_array(lams.compressed(), nseg)
         xmins = [] 
         xmaxs = [] 
         for seg in lams_seg:
