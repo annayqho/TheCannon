@@ -43,9 +43,11 @@ if __name__ == "__main__":
     
     for star in starlist:
         searchFor = filter(None, star.split(' '))[0]
+        print star
         index = findIndex(searchFor, searchIn)
         field = fitsfields[index]
         command = "wget --no-parent http://data.sdss3.org/sas/dr12/apogee/spectro/redux/r5/stars/l25_6d/v603/%s/aspcapStar-r5-v603-%s.fits" %(field,searchFor)
+        print(command)
         outputfile.write(command + '\n')
 
     outputfile.close()
