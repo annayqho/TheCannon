@@ -98,9 +98,19 @@ class CannonModel(object):
 
         return cannon_set
 
-    def diagnostics(baseline_spec_plot_name = "baseline_spec_with_cont_pix",
-                    leading_coeffs_plot_name = "leading_coeffs.png",
-                    chisq_dist_plot_name = "modelfit_chisqs.png"):
+    def split_array(array, num):
+        avg = len(array) / float(num)
+        out = []
+        last = 0.0
+        while last < len(array):
+            out.append(array[int(last):int(last+avg)])
+            last += avg
+        return out
+
+    def diagnostics(
+            self, baseline_spec_plot_name = "baseline_spec_with_cont_pix",
+            leading_coeffs_plot_name = "leading_coeffs.png",
+            chisq_dist_plot_name = "modelfit_chisqs.png"):
         """Run a set of diagnostics on the model.
 
         Plot the 0th order coefficients as the baseline spectrum.
