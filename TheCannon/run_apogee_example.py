@@ -18,24 +18,24 @@ dataset.choose_labels(cols)
 dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels
-dataset.diagnostics_SNR()
-dataset.diagnostics_ref_labels()
+# dataset.diagnostics_SNR()
+# dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
 # not for MKN testing
 # dataset.find_continuum()
-pixlist = np.array(
-        np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1, dtype=int))
-npix = len(dataset.wl)
-contmask = np.zeros(npix, dtype=bool)
-contmask[pixlist] = True
+# pixlist = np.array(
+#        np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1, dtype=int))
+# npix = len(dataset.wl)
+# contmask = np.zeros(npix, dtype=bool)
+# contmask[pixlist] = True
 # get rid of the contpix that are in the gap
-gapmask = dataset.find_gaps(dataset.tr_fluxes)
-contmask[gapmask] = False
-dataset.set_continuum(contmask)
+# gapmask = dataset.find_gaps(dataset.tr_fluxes)
+# contmask[gapmask] = False
+# dataset.set_continuum(contmask)
 
 # RUN CONTINUUM NORMALIZATION CODE
-dataset.continuum_normalize()
+dataset.continuum_normalize(q=0.90)
 
 # learn the model from the reference_set
 model = CannonModel(dataset, 2) # 2 = quadratic model

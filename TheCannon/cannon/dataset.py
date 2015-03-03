@@ -199,27 +199,35 @@ class Dataset(object):
     def set_continuum(self, contmask):
         self.contmask = contmask
 
-    def continuum_normalize(self):
+    def continuum_normalize(self, q=None):
         """ Continuum normalize spectra
 
         For spectra split into regions, perform cont normalization
         separately for each region.
+
+        If you give it q, performs continuum normalization using percentile
         """
-        contmask = self.contmask
-        print("Continuum normalizing...")
-        if self.ranges is None:
-            print("assuming continuous spectra")
-            norm_tr_fluxes, norm_tr_ivars = cont_norm(
-                    self.tr_fluxes, self.tr_ivars, contmask)
-            norm_test_fluxes, norm_test_ivars = cont_norm(
-                    self.test_fluxes, self.test_ivars, contmask)
+        if q==None:
+            print("Continuum normalizing using contmask...")
+            contmask = self.contmask
+            if self.ranges is None:
+                print("assuming continuous spectra")
+                norm_tr_fluxes, norm_tr_ivars = cont_norm(
+                        self.tr_fluxes, self.tr_ivars, contmask)
+                norm_test_fluxes, norm_test_ivars = cont_norm(
+                        self.test_fluxes, self.test_ivars, contmask)
+            else:
+                norm_tr_fluxes, norm_tr_ivars = cont_norm_regions(
+                        self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
+                norm_test_fluxes, norm_test_ivars = cont_norm_regions(
+                        self.test_fluxes, self.test_ivars, contmask, self.ranges)
         else:
-            print("cont norm training spectra")
-            norm_tr_fluxes, norm_tr_ivars = cont_norm_regions(
-                    self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
-            print("cont norm test spectra")
-            norm_test_fluxes, norm_test_ivars = cont_norm_regions(
-                    self.test_fluxes, self.test_ivars, contmask, self.ranges)
+            print("Continuum normalizing using running percentile...")
+            norm_tr_fluxes, norm_tr_ivars = cont_norm_q(
+                    self.wl, self.tr_fluxes, self.tr_ivars, q=q)
+            norm_test_fluxes, norm_test_ivars = cont_norm_q(
+                    self.wl, self.test_fluxes, self.test_ivars, q=q)
+
         # update dataset
         print("Continuum normalized, updating dataset")
         print("Test plot")
