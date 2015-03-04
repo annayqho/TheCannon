@@ -105,6 +105,7 @@ class LamostDataset(Dataset):
         nstars = len(files)  
         
         for jj, fits_file in enumerate(files):
+            print(jj)
             file_in = pyfits.open(fits_file)
             wl_temp = np.array(file_in[0].data[2])
             if jj == 0:
