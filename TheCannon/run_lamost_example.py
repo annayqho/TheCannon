@@ -6,12 +6,12 @@ import numpy as np
 ###### WORKFLOW
 
 # RUN APOGEE MUNGING CODE
-dataset = LamostDataset("example_LAMOST/data_testing",
-                        "example_LAMOST/data_testing",
-                        "example_LAMOST/reference_labels.csv")
+dataset = LamostDataset("example_LAMOST/Training_Data",
+                        "example_LAMOST/Training_Data",
+                        "example_DR12/reference_labels.csv")
 
 # Choose labels
-cols = ['teff', 'logg', 'mh']
+cols = ['teff', 'logg', 'feh']
 dataset.choose_labels(cols)
 
 # set the headers for plotting
@@ -42,10 +42,10 @@ model = CannonModel(dataset, 2) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
 
 # check the model
-#model.diagnostics()
+model.diagnostics()
 
 # infer labels with the new model for the test_set
-# dataset, label_errs = model.infer_labels(dataset)
+dataset, label_errs = model.infer_labels(dataset)
 #dataset, covs = model.predict(dataset)
 
 # Make plots
