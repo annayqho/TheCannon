@@ -82,20 +82,21 @@ def infer_labels(model, dataset):
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1] - 1,
                                coeffs_all.shape[1]-1.))
     #covs_all = np.zeros((nstars, nlabels, nlabels))
-    err_all = np.zeros(nstars, nlabels)
+    errs_all = np.zeros((nstars, nlabels))
 
     for jj in range(nstars):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
         #Cinv = ivar / (1 + ivar * scatters**2)
-        bad = ivar == SMALL
-        sig = np.zeros(ivar.shape)
-        sig = np.ma.array(sig, mask=bad)
-        ivar = np.ma.array(ivar, mask=bad)
-        scatters = np.ma.array(scatters, mask=bad)
+        #bad = ivar == SMALL
+        #sig = np.zeros(ivar.shape)
+        #sig = np.ma.array(sig, mask=bad)
+        #ivar = np.ma.array(ivar, mask=bad)
+        #scatters = np.ma.array(scatters, mask=bad)
         sig = np.sqrt(1./ivar + scatters**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
+        #print(sig)
         try:
             labels, covs = opt.curve_fit(func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels),

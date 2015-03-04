@@ -35,21 +35,21 @@ dataset.diagnostics_ref_labels()
 #dataset.set_continuum(contmask)
 
 # RUN CONTINUUM NORMALIZATION CODE
-#dataset.continuum_normalize()
+dataset.continuum_normalize(q=0.90)
 
 # learn the model from the reference_set
 model = CannonModel(dataset, 2) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
 
 # check the model
-model.diagnostics()
+# model.diagnostics()
 
 # infer labels with the new model for the test_set
 dataset, label_errs = model.infer_labels(dataset)
 #dataset, covs = model.predict(dataset)
 
 # Make plots
-# dataset.dataset_postdiagnostics(dataset)
+dataset.dataset_postdiagnostics(dataset)
 
 # cannon_set = model.draw_spectra(dataset)
 # model.spectral_diagnostics(dataset)

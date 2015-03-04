@@ -117,7 +117,7 @@ class LamostDataset(Dataset):
                 grid_log = np.delete(grid_log,-1)
                 grid = np.array([10 ** aval for aval in grid_log])
                 # get rid of edges
-                middle = np.logical_and(grid > 3900, grid < 8800)
+                middle = np.logical_and(grid > 4000, grid < 8800)
                 grid = grid[middle]
                 npixels = len(grid)
                 fluxes = np.zeros((nstars, npixels), dtype=float)
