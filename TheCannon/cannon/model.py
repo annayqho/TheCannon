@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-LARGE = 100.
+LARGE = 200.
 SMALL = 1. / LARGE
 
 class CannonModel(object):

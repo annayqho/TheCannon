@@ -5,7 +5,7 @@ import scipy.optimize as opt
 
 """ Performs continuum normalization on Cannon input spectra. """
 
-LARGE = 100.
+LARGE = 200.
 SMALL = 1. / LARGE
 
 # Thank you Morgan for this...

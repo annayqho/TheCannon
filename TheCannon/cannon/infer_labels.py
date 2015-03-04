@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from scipy import optimize as opt
 import numpy as np
 
-LARGE = 100.
+LARGE = 200.
 SMALL = 1. / LARGE
 
 def get_lvec(labels):
