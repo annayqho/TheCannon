@@ -18,8 +18,8 @@ dataset.choose_labels(cols)
 dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels
-# dataset.diagnostics_SNR()
-# dataset.diagnostics_ref_labels()
+dataset.diagnostics_SNR()
+dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
 # not for MKN testing
@@ -42,14 +42,14 @@ model = CannonModel(dataset, 2) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
 
 # check the model
-model.diagnostics()
+#model.diagnostics()
 
 # infer labels with the new model for the test_set
-# dataset, label_errs = model.infer_labels(dataset)
+dataset, label_errs = model.infer_labels(dataset)
 #dataset, covs = model.predict(dataset)
 
 # Make plots
-# dataset.dataset_postdiagnostics(dataset)
+dataset.dataset_postdiagnostics(dataset)
 
 # cannon_set = model.draw_spectra(dataset)
 # model.spectral_diagnostics(dataset)
