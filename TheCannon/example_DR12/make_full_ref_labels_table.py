@@ -11,7 +11,7 @@ for i in range(0, len(apstarid)):
 t = datain['TEFF']
 g = datain['LOGG']
 f = datain['FE_H']
-a = params[:,-1]
+#a = params[:,-1]
 
 # read the real list of training stars
 
@@ -44,18 +44,21 @@ ids = apstarid[inds]
 teff = t[inds]
 logg = g[inds]
 feh = f[inds]
-alpha = a[inds]
+#alpha = a[inds]
 
 # and now write the training file
 
 nstars = len(teff)
 
-file_out = open("reference_set.csv", "w")
+file_out = open("reference_labels.csv", "w")
+
+header = 'id,teff,logg,feh\n'
+
+file_out.write(header)
 
 for i in range(nstars):
-    line = str(ids[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
     print(i)
-    print(line)
+    line = str(ids[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+'\n'
     file_out.write(line)
 
 file_out.flush()

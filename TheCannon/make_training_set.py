@@ -2,7 +2,7 @@ import os
 import pyfits
 import numpy as np
 
-training_set_size = 200
+training_set_size = 1200
 
 # read in all files from LAMOST data directory: these are the "working stars"
 
@@ -12,7 +12,7 @@ nstars = len(stars_lamost)
 # find corresponding SNR, BAD_STAR, APOGEE values
 
 # the following should all be in the same consistent order...
-snrs = np.loadtxt('example_LAMOST/snr_list.txt', dtype=float))
+snrs = np.loadtxt('example_LAMOST/snr_list.txt', dtype=float)
 flags = np.loadtxt('example_DR12/star_flags.txt', dtype=float)
 sorted_lamost = np.loadtxt('example_LAMOST/lamost_sorted_by_ra.txt', dtype=str)
 sorted_apogee = np.loadtxt('example_DR12/apogee_sorted_by_ra.txt', dtype=str)
@@ -49,19 +49,18 @@ for lamost_file in ts_lamost:
 
 # make the reference label file
 
-file_in = open("example_LAMOST/reference_labels.csv", 'r')
-file_out = open("example_LAMOST/reference_labels_update.csv", 'w')
+#file_in = open("example_LAMOST/reference_labels.csv", 'r')
+#file_out = open("example_LAMOST/reference_labels_update.csv", 'w')
 
-lines = file_in.readlines()
-lines = lines[1:]
+#lines = file_in.readlines()
+#lines = lines[1:]
 
-filenames = []
-for line in lines:
-    filename = line.split(',')[0]
-    filenames.append(filename)
-    print(filename)
-    if filename in ts_apogee:
-        file_out.write(line)
+#filenames = []
+#for line in lines:
+#    filename = line.split(',')[0]
+#    filenames.append(filename)
+#    if filename in ts_apogee:
+#        file_out.write(line)
 
-file_in.close()
-file_out.close()
+#file_in.close()
+#file_out.close()
