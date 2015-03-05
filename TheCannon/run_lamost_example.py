@@ -8,7 +8,7 @@ import numpy as np
 # RUN APOGEE MUNGING CODE
 dataset = LamostDataset("example_LAMOST/Training_Data",
                         "example_LAMOST/Training_Data",
-                        "example_DR12/reference_labels.csv")
+                        "example_LAMOST/reference_labels.csv")
 
 # Choose labels
 cols = ['teff', 'logg', 'feh']

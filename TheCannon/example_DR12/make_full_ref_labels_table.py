@@ -21,6 +21,8 @@ lamost_sorted = np.loadtxt('../example_LAMOST/lamost_sorted_by_ra.txt',
 apogee_sorted = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
 
 # find the apogee equivalents of the ts_lamost stars
+# inds...these are the indices, in lamost_sorted, of all the training stars
+# and thus these are the indices in apogee_sorted of all the training stars
 
 inds = []
 for star in ts_lamost:
@@ -39,6 +41,7 @@ for star in ts_apogee:
 inds = np.array(inds)
 
 # now find the corresponding training values...
+# this is in the order in which they appear in ts_apogee and ts_lamost
 
 ids = apstarid[inds]
 teff = t[inds]
@@ -58,7 +61,7 @@ file_out.write(header)
 
 for i in range(nstars):
     print(i)
-    line = str(ids[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+'\n'
+    line = str(ts_lamost[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+'\n'
     file_out.write(line)
 
 file_out.flush()
