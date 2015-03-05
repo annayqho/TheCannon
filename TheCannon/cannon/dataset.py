@@ -230,11 +230,11 @@ class Dataset(object):
 
         # update dataset
         print("Continuum normalized, updating dataset")
-        print("Test plot")
-        plt.plot(self.tr_fluxes[0,:], alpha=0.7)
+        #print("Test plot")
+        #plt.plot(self.tr_fluxes[0,:], alpha=0.7)
         self.tr_fluxes = norm_tr_fluxes
-        plt.plot(self.tr_fluxes[0,:], alpha=0.7)
-        plt.show()
+        #plt.plot(self.tr_fluxes[0,:], alpha=0.7)
+        #plt.show()
         self.tr_ivars = norm_tr_ivars
         self.test_fluxes = norm_test_fluxes
         self.test_ivars = norm_test_ivars
