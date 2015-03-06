@@ -283,16 +283,16 @@ class Dataset(object):
             orig = reference_labels[:,i]
             cannon = test_labels[:,i]
             # calculate bias and scatter
-            scatter = np.std(orig-cannon)
-            bias  = np.mean(orig-cannon)
+            scatter = np.round(np.std(orig-cannon),3)
+            bias  = np.round(np.mean(orig-cannon),3)
             low = np.minimum(min(orig), min(cannon))
             high = np.maximum(max(orig), max(cannon))
             fig, axarr = plt.subplots(2)
             ax1 = axarr[0]
             ax1.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
             ax1.scatter(orig, cannon)
-            textstr = 'Scatter: %s \n Bias: %s' %(scatter, bias)
-            ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14,
+            textstr = 'Scatter: %s \nBias: %s' %(scatter, bias)
+            ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=10,
                     verticalalignment='top')
             ax1.set_xlabel("Reference Value")
             ax1.set_ylabel("Cannon Output Value")
