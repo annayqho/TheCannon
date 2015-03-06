@@ -218,7 +218,8 @@ class CannonModel(object):
         plt.close(fig)
 
         # triangle plot of the higher-order coefficients
-        fig = corner(first_order, labels=label_names, show_titles=True,
+        labels = [r"$%s$" % l for l in label_names]
+        fig = corner(first_order, labels=labels, show_titles=True,
                      title_args = {"fontsize":12})
         filename = "leading_coeffs_triangle.png"
         fig.savefig(filename)
