@@ -3,6 +3,7 @@ from .dataset import Dataset
 from .train_model import train_model as _train_model
 from .infer_labels import infer_labels
 from .spectral_model import diagnostics as _diagnostics
+from .helpers.triangle import corner
 import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
@@ -136,48 +137,49 @@ class CannonModel(object):
         npixels = len(lams)
         nlabels = len(pivots)
 
-        # Baseline spectrum with continuum
-        baseline_spec = coeffs_all[:,0]
-        bad = np.round(baseline_spec,5) == 0
-        baseline_spec = np.ma.array(baseline_spec, mask=bad)
-        lams = np.ma.array(lams, mask=bad)
+        if contmask != None:
+            # Baseline spectrum with continuum
+            baseline_spec = coeffs_all[:,0]
+            bad = np.round(baseline_spec,5) == 0
+            baseline_spec = np.ma.array(baseline_spec, mask=bad)
+            lams = np.ma.array(lams, mask=bad)
 
-        # Continuum pixels
-        contpix_lambda = lams[contmask]
-        y = [1]*len(contpix_lambda)
+            # Continuum pixels
+            contpix_lambda = lams[contmask]
+            y = [1]*len(contpix_lambda)
 
-        # Split into ten segments
-        nseg = 10
-        lams_seg = self.split_array(lams.compressed(), nseg)
-        xmins = [] 
-        xmaxs = [] 
-        for seg in lams_seg:
-            xmins.append(seg[0])
-            xmaxs.append(seg[-1])
+            # Split into ten segments
+            nseg = 10
+            lams_seg = self.split_array(lams.compressed(), nseg)
+            xmins = [] 
+            xmaxs = [] 
+            for seg in lams_seg:
+                xmins.append(seg[0])
+                xmaxs.append(seg[-1])
 
-        for i in range(nseg):
-            fig, axarr = plt.subplots(2, sharex=True)
-            plt.xlabel(r"Wavelength $\lambda (\AA)$")
-            plt.xlim(xmins[i], xmaxs[i])
-            ax = axarr[0]
-            ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
-                    label=r'$\theta_0$' + "= the leading fit coefficient")
-            ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
-            ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
-            ax.set_title("Baseline Spectrum with Continuum Pixels")
-            ax.set_ylabel(r'$\theta_0$')
-            ax = axarr[1]
-            ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
-                    label=r'$\theta_0$' + "= the leading fit coefficient")
-            ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
-            ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
-            ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
-            ax.set_ylabel(r'$\theta_0$')
-            ax.set_ylim(0.95, 1.05)
-            print("Diagnostic plot: fitted 0th order spec, cont pix overlaid.")
-            print("Saved as %s_%s.png" % (baseline_spec_plot_name, i))
-            plt.savefig(baseline_spec_plot_name + "_%s" %i)
-            plt.close()
+            for i in range(nseg):
+                fig, axarr = plt.subplots(2, sharex=True)
+                plt.xlabel(r"Wavelength $\lambda (\AA)$")
+                plt.xlim(xmins[i], xmaxs[i])
+                ax = axarr[0]
+                ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
+                        label=r'$\theta_0$' + "= the leading fit coefficient")
+                ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
+                ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
+                ax.set_title("Baseline Spectrum with Continuum Pixels")
+                ax.set_ylabel(r'$\theta_0$')
+                ax = axarr[1]
+                ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
+                     label=r'$\theta_0$' + "= the leading fit coefficient")
+                ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
+                ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
+                ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
+                ax.set_ylabel(r'$\theta_0$')
+                ax.set_ylim(0.95, 1.05)
+                print("Diagnostic plot: fitted 0th order spec, cont pix overlaid.")
+                print("Saved as %s_%s.png" % (baseline_spec_plot_name, i))
+                plt.savefig(baseline_spec_plot_name + "_%s" %i)
+                plt.close()
 
         # Leading coefficients for each label & scatter
         # Scale coefficients so that they can be overlaid on the same plot
