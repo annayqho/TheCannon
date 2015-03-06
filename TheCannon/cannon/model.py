@@ -234,7 +234,7 @@ class CannonModel(object):
         plt.ylabel("Count")
         plt.xlabel(r"$\chi^2$" + " of Individual Star")
         print("Diagnostic plot: histogram of the red chi squareds of the fit")
-        print("Saved as %s" % chisq_dist_plot_name)
+        print("Saved as %s" %chisq_dist_plot_name)
         plt.savefig(chisq_dist_plot_name)
         plt.close()
 
