@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colorbar
 from copy import deepcopy
 
-LARGE = 100.
+LARGE = 200.
 SMALL = 1. / LARGE
 
 def draw_spectra(model, dataset):

@@ -7,7 +7,7 @@ import numpy as np
 
 # RUN APOGEE MUNGING CODE
 dataset = LamostDataset("example_LAMOST/Training_Data",
-                        "example_LAMOST/Data",
+                        "example_LAMOST/Training_Data",
                         "example_DR12/reference_labels.csv")
 
 # Choose labels
@@ -42,7 +42,7 @@ model = CannonModel(dataset, 2) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
 
 # check the model
-# model.diagnostics()
+model.diagnostics()
 
 # infer labels with the new model for the test_set
 dataset, label_errs = model.infer_labels(dataset)
@@ -51,5 +51,5 @@ dataset, label_errs = model.infer_labels(dataset)
 # Make plots
 dataset.dataset_postdiagnostics(dataset)
 
-# cannon_set = model.draw_spectra(dataset)
-# model.spectral_diagnostics(dataset)
+cannon_set = model.draw_spectra(dataset)
+model.spectral_diagnostics(dataset)

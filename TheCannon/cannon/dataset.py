@@ -282,12 +282,15 @@ class Dataset(object):
             name = self.get_plotting_labels()[i]
             orig = reference_labels[:,i]
             cannon = test_labels[:,i]
+            # calculate bias and scatter
+            scatter = np.std(orig-cannon)
+            bias  = np.mean(orig-cannon)
             low = np.minimum(min(orig), min(cannon))
             high = np.maximum(max(orig), max(cannon))
             fig, axarr = plt.subplots(2)
             ax1 = axarr[0]
             ax1.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
-            ax1.scatter(orig, cannon)
+            ax1.scatter(orig, cannon, label="scatter=%s, bias=%s"%(scatter,bias))
             ax1.legend()
             ax1.set_xlabel("Reference Value")
             ax1.set_ylabel("Cannon Output Value")
