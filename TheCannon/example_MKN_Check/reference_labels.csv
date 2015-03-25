@@ -1,4 +1,4 @@
-ID,Rvel,Teff,Teff_{corr},logg,logg_{corr},[M/H],[M/H]_{corr},[C/M],[N/M],[a/M],S/N,Jmag,Hmag,Kmag,e_Teff_corr,e_[MH]+corr
+id,rvel,teff,teff_corr,logg,logg_corr,mh,mh_corr,cm,nm,am,sn,jmag,hmag,kmag,e_teff_corr,e_mh_corr
 aspcapStar-v304-2M17162228+4258036.fits,-118.06,5067.8,4995.2,2.56,2.08,-1.94,-2.20,0.58,0.90,0.04,163.1,12.826,12.267,12.247,171.3,0.134
 aspcapStar-v304-2M17163427+4307363.fits,-119.60,4776.2,4819.3,1.85,1.35,-2.13,-2.32,0.19,0.78,0.15,142.6,11.948,11.407,11.340,176.3,0.139
 aspcapStar-v304-2M17163577+4256392.fits,-117.42,5200.8,5075.4,2.87,2.40,-1.92,-2.21,0.83,0.94,0.06,125.0,13.171,12.675,12.612,171.7,0.135

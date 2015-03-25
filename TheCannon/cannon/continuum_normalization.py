@@ -36,7 +36,7 @@ def cont_func(x, p, L):
         func += p[2*n]*np.sin(k[n]*x)+p[2*n+1]*np.cos(k[n]*x)
     return func
 
-def cont_norm(fluxes, ivars, contmask, deg=3):
+def cont_norm(fluxes, ivars, contmask, deg=2):
     """ Continuum-normalize a continuous segment of spectra.
 
     Fit a function of sines and cosines and divide the spectra by it
@@ -85,7 +85,7 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         # in the sine/cosine version:
         # popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
         #                           sigma=1./np.sqrt(yivar))
-        fit = np.polynomial.chebyshev.Chebyshev.fit(x=x, y=y, w=yivar, deg=3)
+        fit = np.polynomial.chebyshev.Chebyshev.fit(x=x, y=y, w=yivar, deg=deg)
         cont = np.zeros(len(pix))
         for element in pix:
             # sine/cosine version:
@@ -97,9 +97,9 @@ def cont_norm(fluxes, ivars, contmask, deg=3):
         # avoid having ivar = 0, which will throw error later
         # for now don't do this, since we are running the cont norm process
         # iteratively. turn this back on later. 
-        bad = (norm_ivars[jj,:] < SMALL)
-        norm_fluxes[jj,:][bad] = 1.
-        norm_ivars[jj,:][bad] = SMALL
+        # bad = (norm_ivars[jj,:] < SMALL**2)
+        # norm_fluxes[jj,:][bad] = 1.
+        # norm_ivars[jj,:][bad] = SMALL**2
 
     return norm_fluxes, norm_ivars
 
@@ -130,13 +130,14 @@ def cont_norm_q(wl, fluxes, ivars, q=0.90, delta_lambda=50):
     for jj in range(nstars):
         norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
-        bad = (norm_ivars[jj,:] < SMALL)
+        bad = (norm_ivars[jj,:] < SMALL**2)
         norm_fluxes[jj,:][bad] = 1.
-        norm_ivars[jj,:][bad] = SMALL
+        norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars
 
-def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=3):
+def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=2):
     print("taking spectra in %s regions" %len(ranges))
+    nstars = fluxes.shape[0]
     norm_fluxes = np.zeros(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
     for chunk in ranges:
@@ -144,8 +145,12 @@ def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=3):
         stop = chunk[1]
         output = cont_norm(fluxes[:,start:stop],
                            ivars[:,start:stop],
-                           contmask[start:stop])
+                           contmask[start:stop], deg=deg)
         norm_fluxes[:,start:stop] = output[0]
         norm_ivars[:,start:stop] = output[1]
+    for jj in range(nstars):
+        bad = (norm_ivars[jj,:] < SMALL**2)
+        norm_fluxes[jj,:][bad] = 1.
+        norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars
 
