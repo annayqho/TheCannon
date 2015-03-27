@@ -199,7 +199,7 @@ class Dataset(object):
     def set_continuum(self, contmask):
         self.contmask = contmask
 
-    def continuum_normalize(self, q=None):
+    def continuum_normalize(self, q=None, delta_lambda=None):
         """ Continuum normalize spectra
 
         For spectra split into regions, perform cont normalization
@@ -224,9 +224,11 @@ class Dataset(object):
         else:
             print("Continuum normalizing using running percentile...")
             norm_tr_fluxes, norm_tr_ivars = cont_norm_q(
-                    self.wl, self.tr_fluxes, self.tr_ivars, q=q)
+                    self.wl, self.tr_fluxes, self.tr_ivars, 
+                    q=q, delta_lambda=delta_lambda)
             norm_test_fluxes, norm_test_ivars = cont_norm_q(
-                    self.wl, self.test_fluxes, self.test_ivars, q=q)
+                    self.wl, self.test_fluxes, self.test_ivars, 
+                    q=q, delta_lambda=delta_lambda)
 
         # update dataset
         print("Continuum normalized, updating dataset")
