@@ -57,10 +57,12 @@ class LamostDataset(Dataset):
         """
         npix = len(grid)
         
-        bad_flux = (~np.isfinite(flux)) 
+        bad_flux = (~np.isfinite(flux)) # count: 0
         bad_err = (~np.isfinite(ivar)) | (ivar <= 0)
+        # ivar == 0 for approximately 3-5% of pixels
         bad_pix_a = bad_err | bad_flux
         
+        # LAMOST people: wings join together, 5800-6000 Angstroms
         # wings = np.logical_and(grid > 5750, grid < 6050)
         # ormask = (file_in[0].data[4] > 0)[middle]
         # bad_pix_b = wings | ormask
@@ -103,30 +105,34 @@ class LamostDataset(Dataset):
         print("Loading spectra from directory %s" %data_dir)
         files = list(sorted([data_dir + "/" + filename
                  for filename in os.listdir(data_dir)]))
-        nstars = len(files)  
-        lengths = np.zeros(nstars) 
-        
+        files = np.array(files)
+        nstars = len(files)
+
         for jj, fits_file in enumerate(files):
             file_in = pyfits.open(fits_file)
             if jj == 0:
                 # all stars start out on the same wavelength grid
-                grid = np.array(file_in[0].data[2])
-                npixels = len(wl)
+                grid_all = np.array(file_in[0].data[2])
+                # some spectra will end up with different pixels
+                # because of the wavelength correction. so do this to ensure
+                # that the interpolation never extrapolates...
+                # values determined by experimentation, may change later
+                middle = np.logical_and(grid_all > 3705, grid_all < 9091)
+                # only lost 10 pixels here
+                grid = grid_all[middle]
+                npixels = len(grid) 
                 SNRs = np.zeros(nstars, dtype=float)   
                 fluxes = np.zeros((nstars, npixels), dtype=float)
                 ivars = np.zeros(fluxes.shape, dtype=float)
             # correct for radial velocity of star
             redshift = file_in[0].header['Z']
-            wlshift = redshift*grid
-            wl = grid - wlshift
+            wlshift = redshift*grid_all
+            wl = grid_all - wlshift
             flux = np.array(file_in[0].data[0])
-            lengths[jj] = len(flux)
             ivar = np.array((file_in[0].data[1]))
             # resample onto a common grid
-            # can only interpolate *within* the original range
-            keep = np.logical_and(grid > wl[0], grid < wl[-1])
-            flux_rs = (interpolate.interp1d(wl, flux))(grid[keep])
-            ivar_rs = (interpolate.interp1d(wl, ivar))(grid[keep])
+            flux_rs = (interpolate.interp1d(wl, flux))(grid)
+            ivar_rs = (interpolate.interp1d(wl, ivar))(grid)
             badpix = self._get_pixmask(file_in, middle, grid, flux_rs, ivar_rs)
             flux_rs = np.ma.array(flux_rs, mask=badpix)
             ivar_rs = np.ma.array(ivar_rs, mask=badpix)
