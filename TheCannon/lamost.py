@@ -61,23 +61,24 @@ class LamostDataset(Dataset):
         bad_err = (~np.isfinite(ivar)) | (ivar <= 0)
         bad_pix_a = bad_err | bad_flux
         
-        wings = np.logical_and(grid > 5750, grid < 6050)
-        ormask = (file_in[0].data[4] > 0)[middle]
-        bad_pix_b = wings | ormask
+        # wings = np.logical_and(grid > 5750, grid < 6050)
+        # ormask = (file_in[0].data[4] > 0)[middle]
+        # bad_pix_b = wings | ormask
 
-        max_pix_width = grid[npix-1]-grid[npix-2]
-        skylines = np.array([4046, 4358, 5460, 5577, 6300, 6363, 6863])
-        bad_pix_c = np.zeros(npix, dtype=bool)
-        for skyline in skylines:
-            badmin = skyline-max_pix_width
-            badmax = skyline+max_pix_width
-            bad_pix_temp = np.logical_and(grid > badmin, grid < badmax)
-            bad_pix_c[bad_pix_temp] = True
+        # max_pix_width = grid[npix-1]-grid[npix-2]
+        # skylines = np.array([4046, 4358, 5460, 5577, 6300, 6363, 6863])
+        # bad_pix_c = np.zeros(npix, dtype=bool)
+        # for skyline in skylines:
+        #     badmin = skyline-max_pix_width
+        #     badmax = skyline+max_pix_width
+        #     bad_pix_temp = np.logical_and(grid > badmin, grid < badmax)
+        #     bad_pix_c[bad_pix_temp] = True
 
-        bad_pix_ab = bad_pix_a | bad_pix_b
-        bad_pix = bad_pix_ab | bad_pix_c
+        # bad_pix_ab = bad_pix_a | bad_pix_b
+        # bad_pix = bad_pix_ab | bad_pix_c
 
-        return bad_pix
+        # return bad_pix
+        return bad_pix_a
 
     def _load_spectra(self, data_dir):
         """
@@ -106,19 +107,14 @@ class LamostDataset(Dataset):
         
         for jj, fits_file in enumerate(files):
             file_in = pyfits.open(fits_file)
-            wl_temp = np.array(file_in[0].data[2])
+            wl = np.array(file_in[0].data[2])
             if jj == 0:
                 npixels = len(wl_temp)
                 SNRs = np.zeros(nstars, dtype=float)   
-                start_wl = file_in[0].header['CRVAL1']
-                diff_wl = file_in[0].header['CD1_1']
-                val = diff_wl * (npixels) + start_wl
-                grid_log = np.arange(start_wl,val, diff_wl)
-                grid_log = np.delete(grid_log,-1)
-                grid = np.array([10 ** aval for aval in grid_log])
                 # get rid of edges
-                middle = np.logical_and(grid > 4000, grid < 8800)
-                grid = grid[middle]
+                # middle = np.logical_and(grid > 4000, grid < 8800)
+                middle = np.logical_and(grid>1000,grid<10000)
+                # grid = grid[middle]
                 npixels = len(grid)
                 fluxes = np.zeros((nstars, npixels), dtype=float)
                 ivars = np.zeros(fluxes.shape, dtype=float)
