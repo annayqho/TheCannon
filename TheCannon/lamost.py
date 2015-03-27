@@ -107,24 +107,24 @@ class LamostDataset(Dataset):
         
         for jj, fits_file in enumerate(files):
             file_in = pyfits.open(fits_file)
-            wl = np.array(file_in[0].data[2])
             if jj == 0:
-                npixels = len(wl_temp)
+                # all stars start out on the same wavelength grid
+                grid = np.array(file_in[0].data[2])
+                npixels = len(wl)
                 SNRs = np.zeros(nstars, dtype=float)   
-                # get rid of edges
-                # middle = np.logical_and(grid > 4000, grid < 8800)
-                middle = np.logical_and(grid>1000,grid<10000)
-                # grid = grid[middle]
-                npixels = len(grid)
                 fluxes = np.zeros((nstars, npixels), dtype=float)
                 ivars = np.zeros(fluxes.shape, dtype=float)
+            # correct for radial velocity of star
             redshift = file_in[0].header['Z']
-            wlshifts = redshift*wl_temp
-            wl = wl_temp - wlshifts
+            wlshift = redshift*grid
+            wl = grid - wlshift
             flux = np.array(file_in[0].data[0])
             ivar = np.array((file_in[0].data[1]))
-            flux_rs = (interpolate.interp1d(wl, flux))(grid)
-            ivar_rs = (interpolate.interp1d(wl, ivar))(grid)
+            # resample onto a common grid
+            # can only interpolate *within* the original range
+            keep = grid > wl[0]
+            flux_rs = (interpolate.interp1d(wl, flux))(grid[keep])
+            ivar_rs = (interpolate.interp1d(wl, ivar))(grid[keep])
             badpix = self._get_pixmask(file_in, middle, grid, flux_rs, ivar_rs)
             flux_rs = np.ma.array(flux_rs, mask=badpix)
             ivar_rs = np.ma.array(ivar_rs, mask=badpix)
