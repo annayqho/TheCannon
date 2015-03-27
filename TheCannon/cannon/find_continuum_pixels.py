@@ -27,23 +27,23 @@ def find_contpix(f_cut, sig_cut, wl, fluxes, ivars):
         True indicates that the pixel is continuum
     """
     # bad pixels should not be identified as continuum pixels
-    bad = np.median(ivars, axis=0) < SMALL
-
+    bad1 = np.median(ivars, axis=0) < SMALL
+    bad2 = np.var(ivars, axis=0) == 0
+    bad = np.logical_and(bad1, bad2)
     f_bar = np.median(fluxes, axis=0)
     sigma_f = np.var(fluxes, axis=0)
     f_bar = np.ma.array(f_bar, mask=bad)
     sigma_f = np.ma.array(sigma_f, mask=bad)
     cont1 = np.abs(f_bar-1) <= f_cut
     cont2 = sigma_f <= sig_cut
-    cont3 = sigma_f >= np.abs(1-f_bar)
+    # cont3 = sigma_f >= np.abs(1-f_bar)
     contmask1 = np.logical_and(cont1, cont2)
-    contmask = np.logical_and(contmask1, cont3)
-    contmask = np.ma.filled(contmask, fill_value=False)
-    return contmask
+    # contmask = np.logical_and(contmask1, cont3)
+    contmask1 = np.ma.filled(contmask1, fill_value=False)
+    return contmask1
 
 def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
-    # have not cont normalized yet, so ivars still have 0 vals
-    bad1 = np.median(ivars, axis=0) == 0
+    bad1 = np.median(ivars, axis=0) < SMALL
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)
     npixels = len(wl)-sum(bad)
@@ -53,10 +53,12 @@ def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
     contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
     frac = sum(contmask)/float(npixels)
     while frac < 0.065: 
+        print(f_cut, sig_cut)
         f_cut += stepsize
         sig_cut += stepsize
         contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
         frac = sum(contmask)/float(npixels)
+        print(frac)
     if frac > 0.10*npixels:
         print("Warning: Over 10% of pixels identified as continuum.")
     print("%s out of %s pixels identified as continuum" %(sum(contmask), 

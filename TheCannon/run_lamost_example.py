@@ -22,20 +22,13 @@ dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
 # Pseudo-continuum normalization
-dataset.continuum_normalize(q=0.50, delta_lambda=90)
+dataset.continuum_normalize(q=0.90, delta_lambda=50)
 
 # RUN CONTINUUM IDENTIFICATION CODE
 dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
-# pixlist = np.array(
-#        np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1, dtype=int))
-#npix = len(dataset.wl)
-#contmask = np.zeros(npix, dtype=bool)
-#contmask[pixlist] = True
-# get rid of the contpix that are in the gap
-#gapmask = dataset.find_gaps(dataset.tr_fluxes)
-#contmask[gapmask] = False
-#dataset.set_continuum(contmask)
 
+# RUN CONTINUUM NORMALIZATION CODE
+dataset.continuum_normalize()
 
 # learn the model from the reference_set
 model = CannonModel(dataset, 2) # 2 = quadratic model

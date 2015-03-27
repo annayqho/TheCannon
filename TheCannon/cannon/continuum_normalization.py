@@ -83,14 +83,14 @@ def cont_norm(fluxes, ivars, contmask, deg=2):
         # yivar = np.ma.array(yivar, mask=bad)
         
         # in the sine/cosine version:
-        # popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
-        #                           sigma=1./np.sqrt(yivar))
-        fit = np.polynomial.chebyshev.Chebyshev.fit(x=x, y=y, w=yivar, deg=deg)
+        popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
+                                   sigma=1./np.sqrt(yivar))
+        # fit = np.polynomial.chebyshev.Chebyshev.fit(x=x, y=y, w=yivar, deg=deg)
         cont = np.zeros(len(pix))
         for element in pix:
             # sine/cosine version:
-            # cont[element] = cont_func(element, popt, L=L)
-            cont[element] = fit(element)
+            cont[element] = cont_func(element, popt, L=L)
+            # cont[element] = fit(element)
 
         norm_fluxes[jj,:] = flux/cont
         norm_ivars[jj,:] = cont**2 * ivar
