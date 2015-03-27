@@ -63,24 +63,28 @@ class LamostDataset(Dataset):
         bad_pix_a = bad_err | bad_flux
         
         # LAMOST people: wings join together, 5800-6000 Angstroms
-        # wings = np.logical_and(grid > 5750, grid < 6050)
+        wings = np.logical_and(grid > 5800, grid < 6000)
+        # this is another 3-4% of the spectrum
         # ormask = (file_in[0].data[4] > 0)[middle]
+        # ^ problematic...this is over a third of the spectrum!
+        # leave out for now
         # bad_pix_b = wings | ormask
+        bad_pix_b = wings
 
-        # max_pix_width = grid[npix-1]-grid[npix-2]
-        # skylines = np.array([4046, 4358, 5460, 5577, 6300, 6363, 6863])
-        # bad_pix_c = np.zeros(npix, dtype=bool)
-        # for skyline in skylines:
-        #     badmin = skyline-max_pix_width
-        #     badmax = skyline+max_pix_width
-        #     bad_pix_temp = np.logical_and(grid > badmin, grid < badmax)
-        #     bad_pix_c[bad_pix_temp] = True
+        spread = 3 # due to redshift
+        skylines = np.array([4046, 4358, 5460, 5577, 6300, 6363, 6863])
+        bad_pix_c = np.zeros(npix, dtype=bool)
+        for skyline in skylines:
+            badmin = skyline-spread
+            badmax = skyline+spread
+            bad_pix_temp = np.logical_and(grid > badmin, grid < badmax)
+            bad_pix_c[bad_pix_temp] = True
+        # 34 pixels
 
-        # bad_pix_ab = bad_pix_a | bad_pix_b
-        # bad_pix = bad_pix_ab | bad_pix_c
+        bad_pix_ab = bad_pix_a | bad_pix_b
+        bad_pix = bad_pix_ab | bad_pix_c
 
-        # return bad_pix
-        return bad_pix_a
+        return bad_pix
 
     def _load_spectra(self, data_dir):
         """
