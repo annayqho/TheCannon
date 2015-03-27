@@ -104,6 +104,7 @@ class LamostDataset(Dataset):
         files = list(sorted([data_dir + "/" + filename
                  for filename in os.listdir(data_dir)]))
         nstars = len(files)  
+        lengths = np.zeros(nstars) 
         
         for jj, fits_file in enumerate(files):
             file_in = pyfits.open(fits_file)
@@ -119,10 +120,11 @@ class LamostDataset(Dataset):
             wlshift = redshift*grid
             wl = grid - wlshift
             flux = np.array(file_in[0].data[0])
+            lengths[jj] = len(flux)
             ivar = np.array((file_in[0].data[1]))
             # resample onto a common grid
             # can only interpolate *within* the original range
-            keep = grid > wl[0]
+            keep = np.logical_and(grid > wl[0], grid < wl[-1])
             flux_rs = (interpolate.interp1d(wl, flux))(grid[keep])
             ivar_rs = (interpolate.interp1d(wl, ivar))(grid[keep])
             badpix = self._get_pixmask(file_in, middle, grid, flux_rs, ivar_rs)
