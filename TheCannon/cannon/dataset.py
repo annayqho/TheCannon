@@ -176,7 +176,7 @@ class Dataset(object):
                               np.std(fluxes, axis=0) == 0)    
         return gaps
 
-    def find_continuum(self):
+    def find_continuum(self, f_cut=0.003, sig_cut=0.003):
         """ Use training spectra to find and return continuum pixels
 
         For spectra split into regions, performs cont pix identification
@@ -190,7 +190,8 @@ class Dataset(object):
         print("Finding continuum pixels...")
         if self.ranges is None:
             print("assuming continuous spectra")
-            contmask = find_contpix(self.wl, self.tr_fluxes, self.ivars)
+            contmask = find_contpix(f_cut, sig_cut, self.wl, 
+                    self.tr_fluxes, self.tr_ivars)
         else:
             contmask = find_contpix_regions(self.wl, self.tr_fluxes, 
                                             self.tr_ivars, self.ranges)

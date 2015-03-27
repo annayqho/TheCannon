@@ -25,7 +25,7 @@ dataset.diagnostics_ref_labels()
 dataset.continuum_normalize(q=0.50, delta_lambda=90)
 
 # RUN CONTINUUM IDENTIFICATION CODE
-dataset.find_continuum()
+dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
 # pixlist = np.array(
 #        np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1, dtype=int))
 #npix = len(dataset.wl)

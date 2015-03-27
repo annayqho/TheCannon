@@ -29,7 +29,7 @@ class LamostDataset(Dataset):
    
     def __init__(self, training_dir, test_dir, label_file):
         super(self.__class__, self).__init__(training_dir, test_dir, label_file)
-        self.ranges == None
+        self.ranges = None
 
     def _get_pixmask(self, file_in, middle, grid, flux, ivar):
         """ Return a mask array of bad pixels for one object's spectrum
