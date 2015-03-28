@@ -205,7 +205,7 @@ class Dataset(object):
         test_cont = fit_cont(self.test_fluxes, self.test_ivars, self.contmask)
         return tr_cont, test_cont
 
-    def continuum_normalize(self, cont=None, delta_lambda=None):
+    def continuum_normalize(self, cont=None, q=None, delta_lambda=None):
         """ Continuum normalize spectra
 
         For spectra split into regions, perform cont normalization
@@ -213,14 +213,15 @@ class Dataset(object):
 
         If you give it q, performs continuum normalization using percentile
         """
-        if cont!=None:
+        if q==None:
             print("Cont provided, norm by sinusoid...")
             if self.ranges is None:
                 print("assuming continuous spectra")
+                tr_cont, test_cont = cont
                 norm_tr_fluxes, norm_tr_ivars = cont_norm(
-                        self.tr_fluxes, self.tr_ivars, cont)
+                        self.tr_fluxes, self.tr_ivars, tr_cont)
                 norm_test_fluxes, norm_test_ivars = cont_norm(
-                        self.test_fluxes, self.test_ivars, cont)
+                        self.test_fluxes, self.test_ivars, test_cont)
             else:
                 norm_tr_fluxes, norm_tr_ivars, cont = cont_norm_regions(
                         self.tr_fluxes, self.tr_ivars, contmask, self.ranges)

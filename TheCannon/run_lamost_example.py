@@ -33,12 +33,10 @@ dataset = LamostDataset("example_LAMOST/Testing",
 pseudo_cont_dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
 dataset.set_continuum(pseudo_cont_dataset.contmask)
 
+tr_cont, test_cont = dataset.fit_continuum()
+
 # RUN CONTINUUM NORMALIZATION CODE
-# fit continuum
-cont = pseudo_cont_dataset.continuum_normalize()
-
-dataset.continuum_normalize()
-
+dataset.continuum_normalize(cont=(tr_cont, test_cont))
 
 # learn the model from the reference_set
 model = CannonModel(dataset, 2) # 2 = quadratic model

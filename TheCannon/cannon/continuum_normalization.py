@@ -32,14 +32,15 @@ def cont_func(x, p, L, y):
     n = np.linspace(0, N, N+1, dtype=int)
     k = n*np.pi/L
     baseline = 0 #if you were fitting a flat spectrum...
-    baseline = y[x]
+    #baseline = y[x]
     func = 0
     for n in range(0, N):
         func += p[2*n]*np.sin(k[n]*x)+p[2*n+1]*np.cos(k[n]*x)
-    return baseline*func
+    return func
+    #return baseline+func
 
 
-def fit_cont(fluxes, ivars, contmask, deg=2):
+def fit_cont(fluxes, ivars, contmask, deg=7):
     """ Fit a continuum to a continuous segment of spectra.
 
     Fit a function of sines and cosines with specified degree.
@@ -105,7 +106,7 @@ def cont_norm(fluxes, ivars, cont):
     norm_fluxes = np.zeros(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
     for jj in range(nstars):
-        norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
+        norm_fluxes[jj,:] = float(fluxes[jj,:])/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
     return norm_fluxes, norm_ivars 
 
