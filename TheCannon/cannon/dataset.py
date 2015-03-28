@@ -200,6 +200,13 @@ class Dataset(object):
     def set_continuum(self, contmask):
         self.contmask = contmask
 
+    def fit_continuum(self):
+        tr_fit_params = fit_sinusoid_continuum(
+                self.tr_fluxes, self.tr_ivars, contmask)
+        test_fit_params = fit_sinusoid_continuum(
+                self.test_fluxes, self.test_ivars, contmask)
+        return tr_fit_params, test_fit_params
+
     def continuum_normalize(self, q=None, delta_lambda=None):
         """ Continuum normalize spectra
 
@@ -213,14 +220,15 @@ class Dataset(object):
             contmask = self.contmask
             if self.ranges is None:
                 print("assuming continuous spectra")
-                norm_tr_fluxes, norm_tr_ivars, fit_params = cont_norm(
+                norm_tr_fluxes, norm_tr_ivars, cont = cont_norm(
                         self.tr_fluxes, self.tr_ivars, contmask)
-                norm_test_fluxes, norm_test_ivars, fit_params = cont_norm(
+                norm_test_fluxes, norm_test_ivars, cont = cont_norm(
                         self.test_fluxes, self.test_ivars, contmask)
+                return cont 
             else:
-                norm_tr_fluxes, norm_tr_ivars, fit_params = cont_norm_regions(
+                norm_tr_fluxes, norm_tr_ivars, cont = cont_norm_regions(
                         self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
-                norm_test_fluxes, norm_test_ivars, fit_params = cont_norm_regions(
+                norm_test_fluxes, norm_test_ivars, cont = cont_norm_regions(
                         self.test_fluxes, self.test_ivars, contmask, self.ranges)
         else:
             print("Continuum normalizing using running percentile...")
@@ -241,7 +249,7 @@ class Dataset(object):
         self.tr_ivars = norm_tr_ivars
         self.test_fluxes = norm_test_fluxes
         self.test_ivars = norm_test_ivars
-        return fit_params
+        return None
 
     def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):
         """ Run diagnostic tests on the test set after labels have been inferred.

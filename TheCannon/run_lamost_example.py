@@ -34,7 +34,11 @@ pseudo_cont_dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
 
 
 # RUN CONTINUUM NORMALIZATION CODE
+# fit continuum
+cont = pseudo_cont_dataset.continuum_normalize()
+
 dataset.continuum_normalize()
+
 
 # learn the model from the reference_set
 model = CannonModel(dataset, 2) # 2 = quadratic model
