@@ -213,14 +213,14 @@ class Dataset(object):
             contmask = self.contmask
             if self.ranges is None:
                 print("assuming continuous spectra")
-                norm_tr_fluxes, norm_tr_ivars = cont_norm(
+                norm_tr_fluxes, norm_tr_ivars, fit_params = cont_norm(
                         self.tr_fluxes, self.tr_ivars, contmask)
-                norm_test_fluxes, norm_test_ivars = cont_norm(
+                norm_test_fluxes, norm_test_ivars, fit_params = cont_norm(
                         self.test_fluxes, self.test_ivars, contmask)
             else:
-                norm_tr_fluxes, norm_tr_ivars = cont_norm_regions(
+                norm_tr_fluxes, norm_tr_ivars, fit_params = cont_norm_regions(
                         self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
-                norm_test_fluxes, norm_test_ivars = cont_norm_regions(
+                norm_test_fluxes, norm_test_ivars, fit_params = cont_norm_regions(
                         self.test_fluxes, self.test_ivars, contmask, self.ranges)
         else:
             print("Continuum normalizing using running percentile...")
@@ -241,6 +241,7 @@ class Dataset(object):
         self.tr_ivars = norm_tr_ivars
         self.test_fluxes = norm_test_fluxes
         self.test_ivars = norm_test_ivars
+        return fit_params
 
     def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):
         """ Run diagnostic tests on the test set after labels have been inferred.
