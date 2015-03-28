@@ -14,7 +14,7 @@ def partial_func(func, *args, **kwargs):
         return func(x, p, **kwargs)
     return wrap
 
-def cont_func(x, p, L):
+def cont_func(x, p, L, y):
     """ Return the fitting function for the continuum.
 
     Parameters
@@ -31,7 +31,8 @@ def cont_func(x, p, L):
     N = int(len(p)/2)
     n = np.linspace(0, N, N+1, dtype=int)
     k = n*np.pi/L
-    func = 0.
+    # func = 0 if you were fitting a flat spectrum...
+    func = y[x]
     for n in range(0, N):
         func += p[2*n]*np.sin(k[n]*x)+p[2*n+1]*np.cos(k[n]*x)
     return func
@@ -74,7 +75,7 @@ def cont_norm(fluxes, ivars, contmask, deg=2):
         yivar = ivar[contmask]
         p0 = np.ones(deg*2) # one for cos, one for sin
         L = max(x)-min(x)
-        pcont_func = partial_func(cont_func, L=L)
+        pcont_func = partial_func(cont_func, L=L, y=flux)
         # It should not be possible to have a cont pix that's also
         # a bad pixel, because bad means flux_err==0, and flux_err==0
         # should also correspond to flux==0. If flux==0 at this pixel,
@@ -86,6 +87,7 @@ def cont_norm(fluxes, ivars, contmask, deg=2):
         popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                    sigma=1./np.sqrt(yivar))
         # fit = np.polynomial.chebyshev.Chebyshev.fit(x=x, y=y, w=yivar, deg=deg)
+        print(popt)
         cont = np.zeros(len(pix))
         for element in pix:
             # sine/cosine version:
@@ -101,7 +103,7 @@ def cont_norm(fluxes, ivars, contmask, deg=2):
         # norm_fluxes[jj,:][bad] = 1.
         # norm_ivars[jj,:][bad] = SMALL**2
 
-    return norm_fluxes, norm_ivars
+    return norm_fluxes, norm_ivars, (popt, pcov)
 
 def weighted_median(values, weights, quantile):
     sindx = np.argsort(values)

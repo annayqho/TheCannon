@@ -23,9 +23,15 @@ dataset.diagnostics_ref_labels()
 
 # Pseudo-continuum normalization
 dataset.continuum_normalize(q=0.90, delta_lambda=50)
+pseudo_cont_dataset = dataset
+dataset = LamostDataset("example_LAMOST/Testing",
+                        "example_LAMOST/Testing",
+                        "example_DR12/reference_labels.csv")
+
 
 # RUN CONTINUUM IDENTIFICATION CODE
-dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
+pseudo_cont_dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
+
 
 # RUN CONTINUUM NORMALIZATION CODE
 dataset.continuum_normalize()
