@@ -38,7 +38,7 @@ def cont_func(x, p, L, y):
     return func
 
 
-def find_cont(fluxes, ivars, contmask, deg=2):
+def fit_cont(fluxes, ivars, contmask, deg=2):
     """ Fit a continuum to a continuous segment of spectra.
 
     Fit a function of sines and cosines with specified degree.
@@ -106,7 +106,7 @@ def cont_norm(fluxes, ivars, cont):
     for jj in range(nstars):
         norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
-    return norm_fluxes, norm_ivars, cont 
+    return norm_fluxes, norm_ivars 
 
 def weighted_median(values, weights, quantile):
     sindx = np.argsort(values)

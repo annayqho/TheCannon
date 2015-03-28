@@ -5,7 +5,7 @@ from .helpers.triangle import corner
 from cannon.helpers import Table
 import sys
 from .find_continuum_pixels import find_contpix, find_contpix_regions
-from .continuum_normalization import cont_norm, cont_norm_regions, cont_norm_q
+from .continuum_normalization import fit_cont, cont_norm, cont_norm_regions, cont_norm_q
 
 PY3 = sys.version_info[0] > 2
 
@@ -201,13 +201,11 @@ class Dataset(object):
         self.contmask = contmask
 
     def fit_continuum(self):
-        tr_fit_params = fit_sinusoid_continuum(
-                self.tr_fluxes, self.tr_ivars, contmask)
-        test_fit_params = fit_sinusoid_continuum(
-                self.test_fluxes, self.test_ivars, contmask)
-        return tr_fit_params, test_fit_params
+        tr_cont = fit_cont(self.tr_fluxes, self.tr_ivars, self.contmask)
+        test_cont = fit_cont(self.test_fluxes, self.test_ivars, self.contmask)
+        return tr_cont, test_cont
 
-    def continuum_normalize(self, q=None, delta_lambda=None):
+    def continuum_normalize(self, cont=None, delta_lambda=None):
         """ Continuum normalize spectra
 
         For spectra split into regions, perform cont normalization
@@ -215,16 +213,14 @@ class Dataset(object):
 
         If you give it q, performs continuum normalization using percentile
         """
-        if q==None:
-            print("Continuum normalizing using contmask...")
-            contmask = self.contmask
+        if cont!=None:
+            print("Cont provided, norm by sinusoid...")
             if self.ranges is None:
                 print("assuming continuous spectra")
-                norm_tr_fluxes, norm_tr_ivars, cont = cont_norm(
-                        self.tr_fluxes, self.tr_ivars, contmask)
-                norm_test_fluxes, norm_test_ivars, cont = cont_norm(
-                        self.test_fluxes, self.test_ivars, contmask)
-                return cont 
+                norm_tr_fluxes, norm_tr_ivars = cont_norm(
+                        self.tr_fluxes, self.tr_ivars, cont)
+                norm_test_fluxes, norm_test_ivars = cont_norm(
+                        self.test_fluxes, self.test_ivars, cont)
             else:
                 norm_tr_fluxes, norm_tr_ivars, cont = cont_norm_regions(
                         self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
@@ -249,7 +245,6 @@ class Dataset(object):
         self.tr_ivars = norm_tr_ivars
         self.test_fluxes = norm_test_fluxes
         self.test_ivars = norm_test_ivars
-        return None
 
     def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):
         """ Run diagnostic tests on the test set after labels have been inferred.
