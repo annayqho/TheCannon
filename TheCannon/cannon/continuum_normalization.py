@@ -31,11 +31,12 @@ def cont_func(x, p, L, y):
     N = int(len(p)/2)
     n = np.linspace(0, N, N+1, dtype=int)
     k = n*np.pi/L
-    func = 0 #if you were fitting a flat spectrum...
-    # func = y[x]
+    baseline = 0 #if you were fitting a flat spectrum...
+    baseline = y[x]
+    func = 0
     for n in range(0, N):
         func += p[2*n]*np.sin(k[n]*x)+p[2*n+1]*np.cos(k[n]*x)
-    return func
+    return baseline*func
 
 
 def fit_cont(fluxes, ivars, contmask, deg=2):

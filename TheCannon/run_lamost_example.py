@@ -31,7 +31,7 @@ dataset = LamostDataset("example_LAMOST/Testing",
 
 # RUN CONTINUUM IDENTIFICATION CODE
 pseudo_cont_dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
-
+dataset.set_continuum(pseudo_cont_dataset.contmask)
 
 # RUN CONTINUUM NORMALIZATION CODE
 # fit continuum
