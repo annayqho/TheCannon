@@ -40,11 +40,12 @@ def cont_func(x, p, L, y):
     #return baseline+func
 
 
-def fit_cont(fluxes, ivars, contmask, deg=7):
+def fit_cont(fluxes, ivars, contmask, deg):
     """ Fit a continuum to a continuous segment of spectra.
 
     Fit a function of sines and cosines with specified degree.
     """
+    print("order: %s" %deg)
     nstars = fluxes.shape[0]
     npixels = fluxes.shape[1]
     cont = np.zeros(fluxes.shape)
@@ -106,8 +107,11 @@ def cont_norm(fluxes, ivars, cont):
     norm_fluxes = np.zeros(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
     for jj in range(nstars):
-        norm_fluxes[jj,:] = float(fluxes[jj,:])/cont[jj,:]
+        bad = (ivars[jj,:] < SMALL**2)
+        norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
+        norm_fluxes[jj,:][bad] = 1.
+        norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars 
 
 def weighted_median(values, weights, quantile):
@@ -137,7 +141,7 @@ def cont_norm_q(wl, fluxes, ivars, q=0.90, delta_lambda=50):
     for jj in range(nstars):
         norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
-        bad = (norm_ivars[jj,:] < SMALL**2)
+        bad = (ivars[jj,:] < SMALL**2) 
         norm_fluxes[jj,:][bad] = 1.
         norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars

@@ -200,9 +200,9 @@ class Dataset(object):
     def set_continuum(self, contmask):
         self.contmask = contmask
 
-    def fit_continuum(self):
-        tr_cont = fit_cont(self.tr_fluxes, self.tr_ivars, self.contmask)
-        test_cont = fit_cont(self.test_fluxes, self.test_ivars, self.contmask)
+    def fit_continuum(self, deg=9):
+        tr_cont = fit_cont(self.tr_fluxes, self.tr_ivars, self.contmask, deg)
+        test_cont = fit_cont(self.test_fluxes, self.test_ivars, self.contmask, deg)
         return tr_cont, test_cont
 
     def continuum_normalize(self, cont=None, q=None, delta_lambda=None):
