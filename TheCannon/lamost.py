@@ -31,7 +31,7 @@ class LamostDataset(Dataset):
         super(self.__class__, self).__init__(training_dir, test_dir, label_file)
         self.ranges = None
 
-    def _get_pixmask(self, file_in, middle, grid, flux, ivar):
+    def _get_pixmask(self, file_in, wl, flux, ivar):
         """ Return a mask array of bad pixels for one object's spectrum
 
         Bad pixels are defined as follows: fluxes or ivars are not finite, or 
@@ -129,20 +129,22 @@ class LamostDataset(Dataset):
                 SNRs = np.zeros(nstars, dtype=float)   
                 fluxes = np.zeros((nstars, npixels), dtype=float)
                 ivars = np.zeros(fluxes.shape, dtype=float)
+            flux = np.array(file_in[0].data[0])
+            ivar = np.array((file_in[0].data[1]))
+            # identify bad pixels PRIOR to shifting, so that the sky lines
+            # don't move around
+            badpix = self._get_pixmask(file_in, grid_all, flux, ivar)
+            flux = np.ma.array(flux, mask=badpix)
+            ivar = np.ma.array(ivar, mask=badpix)
+            SNRs[jj] = np.ma.median(flux*ivar**0.5)
+            ivar = np.ma.filled(ivar, fill_value=0.)
             # correct for radial velocity of star
             redshift = file_in[0].header['Z']
             wlshift = redshift*grid_all
             wl = grid_all - wlshift
-            flux = np.array(file_in[0].data[0])
-            ivar = np.array((file_in[0].data[1]))
             # resample onto a common grid
             flux_rs = (interpolate.interp1d(wl, flux))(grid)
             ivar_rs = (interpolate.interp1d(wl, ivar))(grid)
-            badpix = self._get_pixmask(file_in, middle, grid, flux_rs, ivar_rs)
-            flux_rs = np.ma.array(flux_rs, mask=badpix)
-            ivar_rs = np.ma.array(ivar_rs, mask=badpix)
-            SNRs[jj] = np.ma.median(flux_rs*ivar_rs**0.5)
-            ivar_rs = np.ma.filled(ivar_rs, fill_value=0.)
             fluxes[jj,:] = flux_rs
             ivars[jj,:] = ivar_rs
 

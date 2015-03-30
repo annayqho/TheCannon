@@ -35,10 +35,11 @@ dataset.set_continuum(pseudo_cont_dataset.contmask)
 
 dataset.ranges = [[0,1883],[2094,3899]]
 
-tr_cont, test_cont = dataset.fit_continuum(deg=3)
+tr_cont, test_cont = dataset.fit_continuum(deg=5)
 
 
 # RUN CONTINUUM NORMALIZATION CODE
+dataset.ranges = None
 dataset.continuum_normalize(cont=(tr_cont, test_cont))
 
 # learn the model from the reference_set

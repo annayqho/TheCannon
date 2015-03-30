@@ -5,7 +5,7 @@ from .helpers.triangle import corner
 from cannon.helpers import Table
 import sys
 from .find_continuum_pixels import find_contpix, find_contpix_regions
-from .continuum_normalization import fit_cont, cont_norm, cont_norm_regions, cont_norm_q
+from .continuum_normalization import fit_cont, fit_cont_regions, cont_norm, cont_norm_regions, cont_norm_q
 
 PY3 = sys.version_info[0] > 2
 
