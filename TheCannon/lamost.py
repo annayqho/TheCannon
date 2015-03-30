@@ -129,7 +129,7 @@ class LamostDataset(Dataset):
                 SNRs = np.zeros(nstars, dtype=float)   
                 fluxes = np.zeros((nstars, npixels), dtype=float)
                 ivars = np.zeros(fluxes.shape, dtype=float)
-                badpixs = np.zeros(fluxes.shape, dtype=bool)
+                badpixs = np.zeros((nstars, len(grid_all)), dtype=bool)
             flux = np.array(file_in[0].data[0])
             ivar = np.array((file_in[0].data[1]))
             # identify bad pixels PRIOR to shifting, so that the sky lines
