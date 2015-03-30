@@ -42,7 +42,7 @@ def find_contpix(f_cut, sig_cut, wl, fluxes, ivars):
     contmask1 = np.ma.filled(contmask1, fill_value=False)
     return contmask1
 
-def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
+def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003, frac=0.065):
     bad1 = np.median(ivars, axis=0) < SMALL
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)
@@ -52,7 +52,7 @@ def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
     sig_cut = 0.003
     contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
     frac = sum(contmask)/float(npixels)
-    while frac < 0.065: 
+    while (frac < 0.065): 
         print(f_cut, sig_cut)
         f_cut += stepsize
         sig_cut += stepsize
@@ -66,7 +66,7 @@ def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003):
     print("Cuts: f_cut %s, sig_cut %s" %(f_cut, sig_cut))
     return contmask
 
-def find_contpix_regions(wl, fluxes, ivars, ranges, f_cut=0.003, sig_cut=0.003):
+def find_contpix_regions(wl, fluxes, ivars, ranges, f_cut=0.003, sig_cut=0.003, frac=0.065):
     print("taking spectra in %s regions" %len(ranges))
     contmask = np.zeros(len(wl), dtype=bool)
     for chunk in ranges:

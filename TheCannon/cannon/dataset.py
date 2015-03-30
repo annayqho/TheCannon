@@ -195,14 +195,24 @@ class Dataset(object):
         else:
             contmask = find_contpix_regions(self.wl, self.tr_fluxes, 
                                             self.tr_ivars, self.ranges)
+        print("%s pixels returned as continuum" %sum(contmask))
         self.contmask = contmask
 
     def set_continuum(self, contmask):
         self.contmask = contmask
 
     def fit_continuum(self, deg=9):
-        tr_cont = fit_cont(self.tr_fluxes, self.tr_ivars, self.contmask, deg)
-        test_cont = fit_cont(self.test_fluxes, self.test_ivars, self.contmask, deg)
+        if self.ranges == None:
+            tr_cont = fit_cont(
+                    self.tr_fluxes, self.tr_ivars, self.contmask, deg)
+            test_cont = fit_cont(
+                    self.test_fluxes, self.test_ivars, self.contmask, deg)
+        else:
+            tr_cont = fit_cont_regions(self.tr_fluxes, self.tr_ivars, 
+                                       self.contmask, deg, self.ranges)
+            test_cont = fit_cont_regions(self.tr_fluxes, self.tr_ivars,
+                                         self.contmask, deg, self.ranges)
+            
         return tr_cont, test_cont
 
     def continuum_normalize(self, cont=None, q=None, delta_lambda=None):

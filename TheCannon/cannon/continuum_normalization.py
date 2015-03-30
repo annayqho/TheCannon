@@ -79,6 +79,19 @@ def fit_cont(fluxes, ivars, contmask, deg):
 
     return cont
 
+def fit_cont_regions(fluxes, ivars, contmask, deg, ranges):
+    print("taking spectra in %s regions" %len(ranges))
+    nstars = fluxes.shape[0]
+    npixels = fluxes.shape[1]
+    cont = np.zeros(fluxes.shape)
+    for chunk in ranges:
+        start = chunk[0]
+        stop = chunk[1]
+        output = fit_cont(fluxes[:,start:stop],
+                          ivars[:,start:stop],
+                          contmask[start:stop], deg=deg)
+        cont[:,start:stop] = output
+    return cont
 
 def cont_norm(fluxes, ivars, cont):
     """ Continuum-normalize a continuous segment of spectra.
@@ -145,6 +158,7 @@ def cont_norm_q(wl, fluxes, ivars, q=0.90, delta_lambda=50):
         norm_fluxes[jj,:][bad] = 1.
         norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars
+
 
 def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=2):
     print("taking spectra in %s regions" %len(ranges))

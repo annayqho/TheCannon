@@ -30,10 +30,13 @@ dataset = LamostDataset("example_LAMOST/Testing",
 
 
 # RUN CONTINUUM IDENTIFICATION CODE
-pseudo_cont_dataset.find_continuum(f_cut=0.003, sig_cut=0.003)
+pseudo_cont_dataset.find_continuum(f_cut=0.008, sig_cut=0.008)
 dataset.set_continuum(pseudo_cont_dataset.contmask)
 
-tr_cont, test_cont = dataset.fit_continuum(deg=9)
+dataset.ranges = [[0,1883],[2094,3899]]
+
+tr_cont, test_cont = dataset.fit_continuum(deg=3)
+
 
 # RUN CONTINUUM NORMALIZATION CODE
 dataset.continuum_normalize(cont=(tr_cont, test_cont))
