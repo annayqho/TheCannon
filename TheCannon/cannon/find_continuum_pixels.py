@@ -26,7 +26,15 @@ def find_contpix(f_cut, sig_cut, wl, fluxes, ivars):
     contmask: boolean mask of length npixels
         True indicates that the pixel is continuum
     """
-    # bad pixels should not be identified as continuum pixels
+    # if it's a bad pixel for ANY of the stars, it should not be identified
+    # as a continuum pixel
+    badpix = np.zeros(len(wl))
+    for pix in range(len(wl)):
+        n_badpix = sum(ivars[:,pix] == SMALL**2) 
+        if n_badpix > 0: 
+            badpix[pix] = n_badpix  
+    bad = badpix 
+
     bad1 = np.median(ivars, axis=0) < SMALL
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)

@@ -56,7 +56,7 @@ class LamostDataset(Dataset):
         mask: ndarray, dtype=bool
             array giving bad pixels as True values
         """
-        npix = len(grid)
+        npix = len(wl)
         
         bad_flux = (~np.isfinite(flux)) # count: 0
         bad_err = (~np.isfinite(ivar)) | (ivar <= 0)
@@ -64,7 +64,7 @@ class LamostDataset(Dataset):
         bad_pix_a = bad_err | bad_flux
         
         # LAMOST people: wings join together, 5800-6000 Angstroms
-        wings = np.logical_and(grid > 5800, grid < 6000)
+        wings = np.logical_and(wl > 5800, wl < 6000)
         # this is another 3-4% of the spectrum
         # ormask = (file_in[0].data[4] > 0)[middle]
         # ^ problematic...this is over a third of the spectrum!
@@ -78,7 +78,7 @@ class LamostDataset(Dataset):
         for skyline in skylines:
             badmin = skyline-spread
             badmax = skyline+spread
-            bad_pix_temp = np.logical_and(grid > badmin, grid < badmax)
+            bad_pix_temp = np.logical_and(wl > badmin, wl < badmax)
             bad_pix_c[bad_pix_temp] = True
         # 34 pixels
 
@@ -129,11 +129,13 @@ class LamostDataset(Dataset):
                 SNRs = np.zeros(nstars, dtype=float)   
                 fluxes = np.zeros((nstars, npixels), dtype=float)
                 ivars = np.zeros(fluxes.shape, dtype=float)
+                badpixs = np.zeros(fluxes.shape, dtype=bool)
             flux = np.array(file_in[0].data[0])
             ivar = np.array((file_in[0].data[1]))
             # identify bad pixels PRIOR to shifting, so that the sky lines
             # don't move around
             badpix = self._get_pixmask(file_in, grid_all, flux, ivar)
+            badpixs[jj,:] = badpix
             flux = np.ma.array(flux, mask=badpix)
             ivar = np.ma.array(ivar, mask=badpix)
             SNRs[jj] = np.ma.median(flux*ivar**0.5)
@@ -149,5 +151,5 @@ class LamostDataset(Dataset):
             ivars[jj,:] = ivar_rs
 
         print("Spectra loaded")
-        return files, grid, fluxes, ivars, SNRs
+        return files, grid, fluxes, ivars, SNRs, badpixs
 
