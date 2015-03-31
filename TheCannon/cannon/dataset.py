@@ -25,7 +25,7 @@ class Dataset(object):
     """
 
     def __init__(self, training_dir, test_dir, label_file):
-        IDs, wl, fluxes, ivars, SNRs, pixmask = self._load_spectra(training_dir)
+        IDs, wl, fluxes, ivars, SNRs = self._load_spectra(training_dir)
         self.tr_IDs = IDs
         self.wl = wl
         self.tr_fluxes = fluxes
@@ -39,7 +39,7 @@ class Dataset(object):
         self.test_label_vals = None
         self.reset_label_vals()
         
-        IDs, wl, fluxes, ivars, SNRs, pixmask = self._load_spectra(test_dir)
+        IDs, wl, fluxes, ivars, SNRs = self._load_spectra(test_dir)
         self.test_IDs = IDs
         self.test_fluxes = fluxes
         self.test_ivars = ivars

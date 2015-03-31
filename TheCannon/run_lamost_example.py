@@ -6,8 +6,8 @@ import numpy as np
 ###### WORKFLOW
 
 # RUN APOGEE MUNGING CODE
-dataset = LamostDataset("example_LAMOST/Testing",
-                        "example_LAMOST/Testing",
+dataset = LamostDataset("example_LAMOST/Training_Data",
+                        "example_LAMOST/Training_Data",
                         "example_DR12/reference_labels.csv")
 
 # Choose labels
@@ -30,7 +30,7 @@ dataset = LamostDataset("example_LAMOST/Testing",
 
 
 # RUN CONTINUUM IDENTIFICATION CODE
-pseudo_cont_dataset.find_continuum(f_cut=0.03, sig_cut=0.03)
+pseudo_cont_dataset.find_continuum(f_cut=0.003, sig_cut=0.09)
 dataset.set_continuum(pseudo_cont_dataset.contmask)
 
 dataset.ranges = [[0,1883],[2094,3899]]
