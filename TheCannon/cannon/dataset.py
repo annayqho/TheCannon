@@ -31,7 +31,6 @@ class Dataset(object):
         self.tr_fluxes = fluxes
         self.tr_ivars = ivars
         self.tr_SNRs = SNRs
-        self.tr_pixmask = pixmask
 
         label_names, label_data = self._load_reference_labels(label_file)
         self.label_names = label_names
@@ -44,7 +43,6 @@ class Dataset(object):
         self.test_fluxes = fluxes
         self.test_ivars = ivars
         self.test_SNRs = SNRs
-        self.test_pixmask = pixmask
 
         self.contmask = None
 
