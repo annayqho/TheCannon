@@ -30,7 +30,7 @@ dataset = LamostDataset("example_LAMOST/Testing",
 
 
 # RUN CONTINUUM IDENTIFICATION CODE
-pseudo_cont_dataset.find_continuum(f_cut=0.001, sig_cut=0.001)
+pseudo_cont_dataset.find_continuum(f_cut=0.03, sig_cut=0.03)
 dataset.set_continuum(pseudo_cont_dataset.contmask)
 
 dataset.ranges = [[0,1883],[2094,3899]]
