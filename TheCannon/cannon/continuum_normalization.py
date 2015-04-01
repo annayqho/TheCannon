@@ -51,6 +51,7 @@ def fit_cont(fluxes, ivars, contmask, deg):
     cont = np.zeros(fluxes.shape)
     
     for jj in range(nstars):
+        print(jj)
         # Fit continuum to cont pixels
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
@@ -58,6 +59,7 @@ def fit_cont(fluxes, ivars, contmask, deg):
         y = flux[contmask]
         x = pix[contmask]
         yivar = ivar[contmask]
+        yivar[yivar == 0] = SMALL**2 # for nont cont norm spectra 
         p0 = np.ones(deg*2) # one for cos, one for sin
         L = max(x)-min(x)
         pcont_func = partial_func(cont_func, L=L, y=flux)
@@ -72,10 +74,10 @@ def fit_cont(fluxes, ivars, contmask, deg):
         popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                    sigma=1./np.sqrt(yivar))
     
-    for element in pix:
-        # sine/cosine version:
-        cont[jj,element] = cont_func(element, popt, L=L, y=flux)
-        # cont[element] = fit(element)
+        for element in pix:
+            # sine/cosine version:
+            cont[jj,element] = cont_func(element, popt, L=L, y=flux)
+            # cont[element] = fit(element)
 
     return cont
 
