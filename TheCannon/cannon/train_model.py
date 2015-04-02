@@ -95,11 +95,12 @@ def do_one_regression(lams, fluxes, ivars, lvec):
                                                 scatter=best_scatter)
         return _r + (best_scatter, )
     lowest = np.argmin(chis_eval)
-    if (lowest == 0) or (lowest == len(ln_scatter_vals) + 1):
+    if (lowest == 0) or (lowest == len(ln_scatter_vals) - 1):
         best_scatter = np.exp(ln_scatter_vals[lowest])
         _r = do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
                                                 scatter=best_scatter)
         return _r + (best_scatter, )
+    print(lowest)
     ln_scatter_vals_short = ln_scatter_vals[np.array(
         [lowest-1, lowest, lowest+1])]
     chis_eval_short = chis_eval[np.array([lowest-1, lowest, lowest+1])]

@@ -122,7 +122,7 @@ def cont_norm(fluxes, ivars, cont):
     norm_fluxes = np.zeros(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
     for jj in range(nstars):
-        bad = (ivars[jj,:] < SMALL**2)
+        bad = (ivars[jj,:] == 0)
         norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
         norm_fluxes[jj,:][bad] = 1.
