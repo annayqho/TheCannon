@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from lamost import LamostDataset
 from cannon.model import CannonModel
+from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
 import numpy as np
 
 ###### WORKFLOW
@@ -41,7 +42,7 @@ for wl in range(0,len(dataset.wl)):
     f_bar[wl] = np.median(array[array>0])
     nbad[wl] = sum(array==0)
     ngood = len(array==0)-sum(array==0)
-    sigma_f[wl] = 10*np.var(array[array>0])
+    sigma_f[wl] = np.sqrt(np.var(array[array>0]))
     #sigma_f[wl] = 100*np.var(array[array>0])/(2*(ngood))**0.5
     nbad[wl] = sum(array==0)
 
@@ -90,9 +91,9 @@ sum(contmask) # looking for ~60-100...
 err = np.sqrt(sigma_f)
 
 plot(dataset.wl[start:end], f_bar[start:end], alpha=0.7)
-fill_between(dataset.wl[start:end], (f_bar+np.sqrt(sigma_f))[start:end], (f_bar-np.sqrt(sigma_f))[start:end], alpha=0.2)
+fill_between(dataset.wl[start:end], (f_bar+sigma_f)[start:end], (f_bar-sigma_f)[start:end], alpha=0.2)
 scatter(dataset.wl[start:end][contmask], f_bar[start:end][contmask], c='r')
-errorbar(dataset.wl[start:end][contmask], f_bar[start:end][contmask], yerr=err[start:end][contmask], c='r', fmt=None)
+#errorbar(dataset.wl[start:end][contmask], f_bar[start:end][contmask], yerr=err[start:end][contmask], c='r', fmt=None)
 scatter(sigma_f[start:end][contmask], np.abs(1-f_bar[start:end][contmask]))
 scatter(sigma_f[start:end], np.abs(1-f_bar[start:end]))
 np.where(contmask==True)
@@ -131,5 +132,5 @@ dataset, label_errs = model.infer_labels(dataset)
 # Make plots
 dataset.dataset_postdiagnostics(dataset)
 
-cannon_set = model.draw_spectra(dataset)
-model.spectral_diagnostics(dataset)
+cannon_set = draw_spectra(model.model, dataset)
+diagnostics(cannon_set, dataset, model.model)

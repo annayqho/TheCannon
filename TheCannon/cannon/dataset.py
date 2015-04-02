@@ -316,7 +316,7 @@ class Dataset(object):
             ax1.set_ylabel("Cannon Output Value")
             ax1.set_title("1-1 Plot of Label " + r"$%s$" % name)
             ax2 = axarr[1]
-            ax2.hist(cannon-orig)
+            ax2.hist(cannon-orig, range=[-0.5,0.5])
             ax2.set_xlabel("Difference")
             ax2.set_ylabel("Count")
             ax2.set_title("Histogram of Output Minus Ref Labels")

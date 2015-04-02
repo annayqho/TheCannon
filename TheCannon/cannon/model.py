@@ -146,7 +146,7 @@ class CannonModel(object):
 
             # Continuum pixels
             contpix_lambda = lams[contmask]
-            y = [1]*len(contpix_lambda)
+            y = baseline_spec[contmask]
 
             # Split into ten segments
             nseg = 10

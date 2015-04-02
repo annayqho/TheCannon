@@ -52,7 +52,7 @@ def diagnostics(cannon_set, dataset, model):
 
     model:
     """
-    overlay_spectra(cannon_set, dataset, model)
+    #overlay_spectra(cannon_set, dataset, model)
     residuals(cannon_set, dataset)
 
 
@@ -161,7 +161,7 @@ def residuals(cannon_set, dataset):
     """
     print("Stacking spectrum fit residuals")
     res = dataset.test_fluxes - cannon_set.test_fluxes
-    bad = dataset.test_ivars == SMALL
+    bad = dataset.test_ivars == SMALL**2
     err = np.zeros(len(dataset.test_ivars))
     err = np.sqrt(1. / dataset.test_ivars + 1. / cannon_set.test_ivars)
     res_norm = res / err
@@ -199,7 +199,7 @@ def residuals(cannon_set, dataset):
                 r"Spectral Residuals Sorted by ${0:s}$".format(label_name))
         axScatter.set_xlabel("Pixels")
         axScatter.set_ylabel(r"$%s$" % label_name)
-        axHisty.hist(np.std(res_norm,axis=1), orientation='horizontal')
+        axHisty.hist(np.std(res_norm,axis=1)[~np.isnan(np.std(res_norm, axis=1))], orientation='horizontal', range=[0,2])
         axHisty.axhline(y=1, c='k', linewidth=3, label="y=1")
         axHisty.legend(bbox_to_anchor=(0., 0.8, 1., .102),
                        prop={'family':'serif', 'size':'small'})
@@ -211,7 +211,7 @@ def residuals(cannon_set, dataset):
         axHisty.xaxis.set_ticks(np.linspace(start, end, 3))
         axHisty.set_xlabel("Number of Stars")
         axHisty.xaxis.set_label_position("top")
-        axHistx.hist(np.std(res_norm, axis=0))
+        axHistx.hist(np.std(res_norm, axis=0)[~np.isnan(np.std(res_norm, axis=0))], range=[0.8,1.1])
         axHistx.axvline(x=1, c='k', linewidth=3, label="x=1")
         axHistx.set_title("Distribution of Stdev of Pixel Residuals")
         axHistx.set_xlabel("Standard Deviation")
