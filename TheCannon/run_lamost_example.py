@@ -7,6 +7,9 @@ import numpy as np
 ###### WORKFLOW
 
 # RUN APOGEE MUNGING CODE
+dataset = LamostDataset("example_LAMOST/Diverse_Stars",
+                        "example_LAMOST/Diverse_Stars", "example_LAMOST/HW_Meeting_2Apr/Diverse_Stars/diverse_stars.csv")
+
 dataset = LamostDataset("example_LAMOST/Training_Data",
                         "example_LAMOST/Training_Data",
                         "example_DR12/reference_labels.csv")

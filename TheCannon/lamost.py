@@ -31,7 +31,7 @@ class LamostDataset(Dataset):
         super(self.__class__, self).__init__(training_dir, test_dir, label_file)
         self.ranges = None
 
-    def _get_pixmask(self, file_in, wl, flux, ivar):
+    def _get_pixmask(self, file_in, wl, middle, flux, ivar):
         """ Return a mask array of bad pixels for one object's spectrum
 
         Bad pixels are defined as follows: fluxes or ivars are not finite, or 
@@ -66,11 +66,12 @@ class LamostDataset(Dataset):
         # LAMOST people: wings join together, 5800-6000 Angstroms
         wings = np.logical_and(wl > 5800, wl < 6000)
         # this is another 3-4% of the spectrum
+        ormask = (file_in[0].data[4] >0)
         # ormask = (file_in[0].data[4] > 0)[middle]
         # ^ problematic...this is over a third of the spectrum!
         # leave out for now
-        # bad_pix_b = wings | ormask
-        bad_pix_b = wings
+        bad_pix_b = wings | ormask
+        # bad_pix_b = wings
 
         spread = 3 # due to redshift
         skylines = np.array([4046, 4358, 5460, 5577, 6300, 6363, 6863])
@@ -134,7 +135,7 @@ class LamostDataset(Dataset):
             ivar = np.array((file_in[0].data[1]))
             # identify bad pixels PRIOR to shifting, so that the sky lines
             # don't move around
-            badpix = self._get_pixmask(file_in, grid_all, flux, ivar)
+            badpix = self._get_pixmask(file_in, grid_all, middle, flux, ivar)
             #badpixs[jj,:] = badpix
             flux = np.ma.array(flux, mask=badpix)
             ivar = np.ma.array(ivar, mask=badpix)
