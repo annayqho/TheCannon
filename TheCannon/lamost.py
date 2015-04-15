@@ -122,8 +122,11 @@ class LamostDataset(Dataset):
                 # because of the wavelength correction. so do this to ensure
                 # that the interpolation never extrapolates...
                 # values determined by experimentation, may change later
-                middle = np.logical_and(grid_all > 3705, grid_all < 9091)
+                # middle = np.logical_and(grid_all > 3705, grid_all < 9091)
                 # only lost 10 pixels here
+                # now, add on 200 pixels at the beginning to save the Ca H&K
+                # lines
+                middle = np.logical_and(grid_all > 3905, grid_all < 9091)
                 grid = grid_all[middle]
                 npixels = len(grid) 
                 SNRs = np.zeros(nstars, dtype=float)   
