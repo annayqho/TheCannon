@@ -69,7 +69,6 @@ class LamostDataset(Dataset):
         ormask = (file_in[0].data[4] >0)
         # ormask = (file_in[0].data[4] > 0)[middle]
         # ^ problematic...this is over a third of the spectrum!
-        # leave out for now
         bad_pix_b = wings | ormask
         # bad_pix_b = wings
 

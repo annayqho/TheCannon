@@ -162,7 +162,7 @@ def cont_norm_q(wl, fluxes, ivars, q=0.90, delta_lambda=50):
     return norm_fluxes, norm_ivars
 
 
-def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=2):
+def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=3):
     print("taking spectra in %s regions" %len(ranges))
     nstars = fluxes.shape[0]
     norm_fluxes = np.zeros(fluxes.shape)
@@ -176,7 +176,8 @@ def cont_norm_regions(fluxes, ivars, contmask, ranges, deg=2):
         norm_fluxes[:,start:stop] = output[0]
         norm_ivars[:,start:stop] = output[1]
     for jj in range(nstars):
-        bad = (norm_ivars[jj,:] < SMALL**2)
+        bad = (norm_ivars[jj,:] == 0.)
+        #bad = (norm_ivars[jj,:] == SMALL**2)
         norm_fluxes[jj,:][bad] = 0.
         norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars
