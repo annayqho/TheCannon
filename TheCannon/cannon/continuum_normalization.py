@@ -162,9 +162,6 @@ def cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
     for jj in range(nstars):
         norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
-        bad = (ivars[jj,:] == SMALL**2) 
-        norm_fluxes[jj,:][bad] = 0.
-        norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars
 
 
