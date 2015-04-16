@@ -145,7 +145,7 @@ def weighted_median(values, weights, quantile):
     return values[indx]
 
 
-def cont_norm_q(wl, fluxes, ivars, q=0.90, delta_lambda=50):
+def cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
     norm_fluxes = np.zeros(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
     cont = np.zeros(fluxes.shape)
