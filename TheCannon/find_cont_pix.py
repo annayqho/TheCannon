@@ -6,7 +6,7 @@ f_bar = np.zeros(len(dataset.wl))
 sigma_f = np.zeros(len(dataset.wl))
 nbad = np.zeros(len(dataset.wl))
 for wl in range(0,len(dataset.wl)):
-    array = pseudo_cont_dataset.tr_fluxes[:,wl]
+    array = dataset.tr_fluxes[:,wl]
     f_bar[wl] = np.median(array[array>0])
     nbad[wl] = sum(array==0)
     ngood = len(array==0)-sum(array==0)

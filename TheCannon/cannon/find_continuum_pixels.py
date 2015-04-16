@@ -5,7 +5,7 @@ SMALL = 1. / LARGE
 
 """ Finds and returns list of continuum pixels, as a mask. """
 
-def find_contpix(f_cut, sig_cut, wl, fluxes, ivars):
+def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
 
     Parameters
@@ -43,21 +43,21 @@ def find_contpix(f_cut, sig_cut, wl, fluxes, ivars):
     contmask1 = np.ma.filled(contmask1, fill_value=False)
     return contmask1
 
-def find_cuts(wl, fluxes, ivars, f_cut=0.003, sig_cut=0.003, frac=0.065):
-    bad1 = np.median(ivars, axis=0) < SMALL
+def find_contpix(wl, fluxes, ivars, target_frac):
+    bad1 = np.median(ivars, axis=0) == SMALL
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)
     npixels = len(wl)-sum(bad)
-    f_cut = 0.003
+    f_cut = 0.0001
     stepsize = 0.0001
-    sig_cut = 0.003
-    contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
+    sig_cut = 0.0001
+    contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
     frac = sum(contmask)/float(npixels)
-    while (frac < 0.065): 
+    while (frac < target_frac): 
         print(f_cut, sig_cut)
         f_cut += stepsize
         sig_cut += stepsize
-        contmask = find_contpix(f_cut, sig_cut, wl, fluxes, ivars)
+        contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
         frac = sum(contmask)/float(npixels)
         print(frac)
     if frac > 0.10*npixels:
