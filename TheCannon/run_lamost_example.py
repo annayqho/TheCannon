@@ -24,9 +24,9 @@ dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
 
-# Pseudo-continuum normalization
-norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars \
-        = dataset.continuum_normalize_q(q=0.90, delta_lambda=400)
+# Pseudo-continuum normalization for the training spectra
+norm_tr_fluxes, norm_tr_ivars = dataset.continuum_normalize_q(
+        dataset.tr_fluxes, dataset.tr_ivars, q=0.90, delta_lambda=400)
 
 dataset.set_continuum(pseudo_cont_dataset.contmask)
 dataset.ranges = [[0,1883],[2094,3899]]

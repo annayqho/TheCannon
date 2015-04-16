@@ -216,16 +216,12 @@ class Dataset(object):
         return tr_cont, test_cont
 
 
-    def continuum_normalize_q(self, q, delta_lambda):
+    def continuum_normalize_q(self, fluxes, ivars, q, delta_lambda):
         """ Continuum normalize spectra using a running quantile."""
         print("Continuum normalizing using running percentile...")
-        norm_tr_fluxes, norm_tr_ivars = cont_norm_q(
-                self.wl, self.tr_fluxes, self.tr_ivars, 
-                q=q, delta_lambda=delta_lambda)
-        norm_test_fluxes, norm_test_ivars = cont_norm_q(
-                self.wl, self.test_fluxes, self.test_ivars, 
-                q=q, delta_lambda=delta_lambda)
-        return norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars
+        norm_fluxes, norm_ivars = cont_norm_q(
+                self.wl, fluxes, ivars, q=q, delta_lambda=delta_lambda)
+        return norm_fluxes, norm_ivars
 
 
     def continuum_normalize_f(self):
