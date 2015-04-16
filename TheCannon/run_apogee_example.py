@@ -19,8 +19,8 @@ dataset.choose_labels(cols)
 dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels
-# dataset.diagnostics_SNR()
-# dataset.diagnostics_ref_labels()
+dataset.diagnostics_SNR()
+dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
 # not for MKN testing
