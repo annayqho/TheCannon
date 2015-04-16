@@ -215,39 +215,40 @@ class Dataset(object):
             
         return tr_cont, test_cont
 
-    def continuum_normalize(self, cont=None, q=None, delta_lambda=None):
-        """ Continuum normalize spectra
+
+    def continuum_normalize_q(self, q, delta_lambda):
+        """ Continuum normalize spectra using a running quantile."""
+        print("Continuum normalizing using running percentile...")
+        norm_tr_fluxes, norm_tr_ivars = cont_norm_q(
+                self.wl, self.tr_fluxes, self.tr_ivars, 
+                q=q, delta_lambda=delta_lambda)
+        norm_test_fluxes, norm_test_ivars = cont_norm_q(
+                self.wl, self.test_fluxes, self.test_ivars, 
+                q=q, delta_lambda=delta_lambda)
+        return norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars
+
+
+    def continuum_normalize(self):
+        """ Continuum normalize spectra by fitting a function to continuum pix 
 
         For spectra split into regions, perform cont normalization
         separately for each region.
-
-        If you give it q, performs continuum normalization using percentile
         """
-        if q==None:
-            if self.ranges is None:
-                print("assuming continuous spectra")
-                tr_cont, test_cont = cont
-                norm_tr_fluxes, norm_tr_ivars = cont_norm(
-                        self.tr_fluxes, self.tr_ivars, tr_cont)
-                norm_test_fluxes, norm_test_ivars = cont_norm(
-                        self.test_fluxes, self.test_ivars, test_cont)
-            else:
-                norm_tr_fluxes, norm_tr_ivars, cont = cont_norm_regions(
-                        self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
-                norm_test_fluxes, norm_test_ivars, cont = cont_norm_regions(
-                        self.test_fluxes, self.test_ivars, contmask, self.ranges)
+        if self.ranges is None:
+            print("assuming continuous spectra")
+            tr_cont, test_cont = cont
+            norm_tr_fluxes, norm_tr_ivars = cont_norm(
+                    self.tr_fluxes, self.tr_ivars, tr_cont)
+            norm_test_fluxes, norm_test_ivars = cont_norm(
+                    self.test_fluxes, self.test_ivars, test_cont)
         else:
-            print("Continuum normalizing using running percentile...")
-            norm_tr_fluxes, norm_tr_ivars = cont_norm_q(
-                    self.wl, self.tr_fluxes, self.tr_ivars, 
-                    q=q, delta_lambda=delta_lambda)
-            norm_test_fluxes, norm_test_ivars = cont_norm_q(
-                    self.wl, self.test_fluxes, self.test_ivars, 
-                    q=q, delta_lambda=delta_lambda)
-
-        # update dataset
-        print("Continuum normalized, returning new arrays")
+            print("taking spectra in %s regions" %(len(self.ranges)))
+            norm_tr_fluxes, norm_tr_ivars, cont = cont_norm_regions(
+                    self.tr_fluxes, self.tr_ivars, contmask, self.ranges)
+            norm_test_fluxes, norm_test_ivars, cont = cont_norm_regions(
+                    self.test_fluxes, self.test_ivars, contmask, self.ranges)
         return norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars
+
 
     def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):
         """ Run diagnostic tests on the test set after labels have been inferred.
