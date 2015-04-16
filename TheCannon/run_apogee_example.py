@@ -23,8 +23,6 @@ dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
 # RUN CONTINUUM IDENTIFICATION CODE
-# not for MKN testing
-# dataset.find_continuum()
 pixlist = np.array(
       np.loadtxt("pixtest4.txt", usecols = (0,), unpack =1, dtype=int))
 npix = len(dataset.wl)

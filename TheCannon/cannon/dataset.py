@@ -224,7 +224,6 @@ class Dataset(object):
         If you give it q, performs continuum normalization using percentile
         """
         if q==None:
-            print("Cont provided, norm by Chebyshev...")
             if self.ranges is None:
                 print("assuming continuous spectra")
                 tr_cont, test_cont = cont
@@ -247,15 +246,8 @@ class Dataset(object):
                     q=q, delta_lambda=delta_lambda)
 
         # update dataset
-        print("Continuum normalized, updating dataset")
-        #print("Test plot")
-        #plt.plot(self.tr_fluxes[0,:], alpha=0.7)
-        self.tr_fluxes = norm_tr_fluxes
-        #plt.plot(self.tr_fluxes[0,:], alpha=0.7)
-        #plt.show()
-        self.tr_ivars = norm_tr_ivars
-        self.test_fluxes = norm_test_fluxes
-        self.test_ivars = norm_test_ivars
+        print("Continuum normalized, returning new arrays")
+        return norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars
 
     def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):
         """ Run diagnostic tests on the test set after labels have been inferred.

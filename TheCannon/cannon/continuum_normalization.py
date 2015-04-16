@@ -14,6 +14,7 @@ def partial_func(func, *args, **kwargs):
         return func(x, p, **kwargs)
     return wrap
 
+
 def cont_func(x, p, L, y):
     """ Return the fitting function for the continuum.
 
@@ -82,6 +83,7 @@ def fit_cont(fluxes, ivars, contmask, deg):
 
     return cont
 
+
 def fit_cont_regions(fluxes, ivars, contmask, deg, ranges):
     print("taking spectra in %s regions" %len(ranges))
     nstars = fluxes.shape[0]
@@ -95,6 +97,7 @@ def fit_cont_regions(fluxes, ivars, contmask, deg, ranges):
                           contmask[start:stop], deg=deg)
         cont[:,start:stop] = output
     return cont
+
 
 def cont_norm(fluxes, ivars, cont):
     """ Continuum-normalize a continuous segment of spectra.
@@ -130,6 +133,7 @@ def cont_norm(fluxes, ivars, cont):
         norm_ivars[jj,:][bad] = SMALL**2
     return norm_fluxes, norm_ivars 
 
+
 def weighted_median(values, weights, quantile):
     sindx = np.argsort(values)
     cvalues = 1. * np.cumsum(weights[sindx])
@@ -139,6 +143,7 @@ def weighted_median(values, weights, quantile):
         return values[0]
     indx = foo[0]
     return values[indx]
+
 
 def cont_norm_q(wl, fluxes, ivars, q=0.90, delta_lambda=50):
     norm_fluxes = np.zeros(fluxes.shape)

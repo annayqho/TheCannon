@@ -22,14 +22,11 @@ dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
-# Pseudo-continuum normalization
-dataset.continuum_normalize(q=0.90, delta_lambda=400)
-pseudo_cont_dataset = dataset
-dataset = LamostDataset("example_LAMOST/Testing",
-                        "example_LAMOST/Testing",
-                        "example_DR12/reference_labels.csv")
-
 # RUN CONTINUUM IDENTIFICATION CODE
+
+# Pseudo-continuum normalization
+pseudo_cont_dataset = dataset.continuum_normalize(q=0.90, delta_lambda=400)
+
 start = 300
 end = 400
 contmask = np.ma.array(contmask, mask=bad)
