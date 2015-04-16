@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from apogee import ApogeeDataset
 from cannon.model import CannonModel
+from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
 import numpy as np
 
 ###### WORKFLOW

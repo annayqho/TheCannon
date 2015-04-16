@@ -224,7 +224,7 @@ class Dataset(object):
         If you give it q, performs continuum normalization using percentile
         """
         if q==None:
-            print("Cont provided, norm by sinusoid...")
+            print("Cont provided, norm by Chebyshev...")
             if self.ranges is None:
                 print("assuming continuous spectra")
                 tr_cont, test_cont = cont

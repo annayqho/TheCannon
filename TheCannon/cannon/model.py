@@ -15,7 +15,7 @@ class CannonModel(object):
     def __init__(self, dataset, order):
         if not isinstance(dataset, Dataset):
             txt = 'Expecting a Dataset instance, got {0}'
-            raise TypeError(txt.format(type(training_set)))
+            raise TypeError(txt.format(type(dataset)))
         self.dataset = dataset
         self._model = None
         self.order = order # right now this does nothing,

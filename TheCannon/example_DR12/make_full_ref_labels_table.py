@@ -11,7 +11,7 @@ for i in range(0, len(apstarid)):
 t = datain['TEFF']
 g = datain['LOGG']
 f = datain['FE_H']
-#a = params[:,-1]
+a = params[:,-1]
 
 # read the real list of training stars
 
