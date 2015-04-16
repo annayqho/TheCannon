@@ -72,7 +72,7 @@ def fit_cont(fluxes, ivars, contmask, deg):
         
         # in the sine/cosine version:
         #popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
-                                   sigma=1./np.sqrt(yivar))
+        #                           sigma=1./np.sqrt(yivar))
         fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=3)
 
         for element in pix:
