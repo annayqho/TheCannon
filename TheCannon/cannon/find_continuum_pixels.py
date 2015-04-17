@@ -44,6 +44,7 @@ def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     return contmask1
 
 def find_contpix(wl, fluxes, ivars, target_frac):
+    print("Target frac: %s" %(target_frac))
     bad1 = np.median(ivars, axis=0) == SMALL
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)
@@ -52,14 +53,18 @@ def find_contpix(wl, fluxes, ivars, target_frac):
     stepsize = 0.0001
     sig_cut = 0.0001
     contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
-    frac = sum(contmask)/float(npixels)
+    if npixels > 0:
+        frac = sum(contmask)/float(npixels)
+    else:
+        frac = 0
     while (frac < target_frac): 
-        print(f_cut, sig_cut)
         f_cut += stepsize
         sig_cut += stepsize
         contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
-        frac = sum(contmask)/float(npixels)
-        print(frac)
+        if npixels > 0:
+            frac = sum(contmask)/float(npixels)
+        else:
+            frac = 0
     if frac > 0.10*npixels:
         print("Warning: Over 10% of pixels identified as continuum.")
     print("%s out of %s pixels identified as continuum" %(sum(contmask), 
@@ -67,14 +72,12 @@ def find_contpix(wl, fluxes, ivars, target_frac):
     print("Cuts: f_cut %s, sig_cut %s" %(f_cut, sig_cut))
     return contmask
 
-def find_contpix_regions(wl, fluxes, ivars, ranges, f_cut=0.003, sig_cut=0.003, frac=0.065):
+def find_contpix_regions(wl, fluxes, ivars, frac, ranges):
     print("taking spectra in %s regions" %len(ranges))
     contmask = np.zeros(len(wl), dtype=bool)
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        contmask[start:stop] = find_cuts(wl[start:stop],
-                                            fluxes[:,start:stop],
-                                            ivars[:,start:stop],
-                                            f_cut, sig_cut)
+        contmask[start:stop] = find_contpix(
+                wl[start:stop], fluxes[:,start:stop], ivars[:,start:stop], frac)
     return contmask

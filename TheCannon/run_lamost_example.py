@@ -29,22 +29,49 @@ dataset.diagnostics_ref_labels()
 # Pseudo-continuum normalization for the training spectra
 norm_tr_fluxes, norm_tr_ivars = dataset.continuum_normalize_q(
         dataset.tr_fluxes, dataset.tr_ivars, q=0.90, delta_lambda=400)
+# pickle.dump((norm_tr_fluxes, norm_tr_ivars), open("pseudo_normed_spec.p", "w"))
 
 # From the cont norm training spectra, identify continuum pixels
-# Split spectrum into red and blue wings, identify 6% of pixels as continuum
-# in each region
-dataset.ranges = [[0,1722],[1863,len(dataset.wl)]]
-contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.6)
-dataset.set_continuum(contmask)
+# Identify the best 5% of continuum pixels
+contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
 
+# Identify the best 5% of continuum pixels in each 100-pixel region 
+dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 1950], [1950, 2500], [2500,3000], [3000, len(dataset.wl)]]
+
+# Check it out...
+f_bar = np.zeros(len(dataset.wl))
+sigma_f = np.zeros(len(dataset.wl))
+for wl in range(0,len(dataset.wl)):
+    flux = norm_tr_fluxes[:,wl]
+    ivar = norm_tr_ivars[:,wl]
+    f_bar[wl] = np.median(flux[ivar>0])
+    sigma_f[wl] = np.sqrt(np.var(flux[ivar>0]))
+bad = np.var(norm_tr_ivars, axis=0) == 0
+f_bar = np.ma.array(f_bar, mask=bad)
+sigma_f = np.ma.array(sigma_f, mask=bad)
+plot(dataset.wl, f_bar, alpha=0.7)
+fill_between(dataset.wl, (f_bar+sigma_f), (f_bar-sigma_f), alpha=0.2)
+scatter(dataset.wl[contmask], f_bar[contmask], c='r')
+
+dataset.set_continuum(contmask)
 
 # RUN CONTINUUM NORMALIZATION CODE
 
-# Fit a continuum to the training pixels, splitting the spectrum
-# into the blue and red wings
-
+dataset.ranges = [[0,1720], [1863,len(dataset.wl)]] # split into two wings
 tr_cont, test_cont = dataset.fit_continuum(deg=3)
-dataset.ranges = None
+
+# Check it out...
+jj = 50
+bad = np.var(norm_tr_ivars, axis=0) == 0
+flux = np.ma.array(dataset.tr_fluxes[jj,:], mask=bad)
+plot(dataset.wl, flux, alpha=0.7)
+scatter(dataset.wl[contmask], flux[contmask], c='r')
+# the cont is only defined within the ranges
+gaps = np.zeros(len(dataset.wl), dtype=bool)
+gaps[1720:1863] = 1
+cont = np.ma.array(tr_cont[jj,:], mask=np.logical_and(bad, gaps))
+plot(dataset.wl, cont)
+
 dataset.continuum_normalize(cont=(tr_cont, test_cont))
 
 # learn the model from the reference_set

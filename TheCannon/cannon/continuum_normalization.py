@@ -41,7 +41,7 @@ def cont_func(x, p, L, y):
     #return baseline+func
 
 
-def fit_cont(fluxes, ivars, contmask, deg):
+def fit_cont(fluxes, ivars, contmask, deg, ffunc):
     """ Fit a continuum to a continuous segment of spectra.
 
     Fit a function of sines and cosines with specified degree.
@@ -60,7 +60,7 @@ def fit_cont(fluxes, ivars, contmask, deg):
         y = flux[contmask]
         x = pix[contmask]
         yivar = ivar[contmask]
-        yivar[yivar == 0] = SMALL**2 # for nont cont norm spectra 
+        yivar[yivar == 0] = SMALL**2   
         p0 = np.ones(deg*2) # one for cos, one for sin
         L = max(x)-min(x)
         pcont_func = partial_func(cont_func, L=L, y=flux)
@@ -71,20 +71,22 @@ def fit_cont(fluxes, ivars, contmask, deg):
         # bad = yivar == 0 #| yivar == SMALL 
         # yivar = np.ma.array(yivar, mask=bad)
         
-        # in the sine/cosine version:
-        #popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
-        #                           sigma=1./np.sqrt(yivar))
-        fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=3)
+        if ffunc=="sinusoid": 
+            popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
+                                       sigma=1./np.sqrt(yivar))
+        elif ffunc=="chebyshev":
+            fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=3)
 
         for element in pix:
-            # sine/cosine version:
-            # cont[jj,element] = cont_func(element, popt, L=L, y=flux)
-            cont[element] = fit(element)
+            if ffunc=="sinusoid":
+                cont[jj,element] = cont_func(element, popt, L=L, y=flux)
+            elif ffunc=="chebyshev":
+                cont[element] = fit(element)
 
     return cont
 
 
-def fit_cont_regions(fluxes, ivars, contmask, deg, ranges):
+def fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
     print("taking spectra in %s regions" %len(ranges))
     nstars = fluxes.shape[0]
     npixels = fluxes.shape[1]
@@ -92,9 +94,14 @@ def fit_cont_regions(fluxes, ivars, contmask, deg, ranges):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        output = fit_cont(fluxes[:,start:stop],
-                          ivars[:,start:stop],
-                          contmask[start:stop], deg=deg)
+        if ffunc=="chebyshev":
+            output = fit_cont(fluxes[:,start:stop],
+                              ivars[:,start:stop],
+                              contmask[start:stop], deg=deg, ffunc="chebyshev")
+        elif ffunc="sinusoid":
+            output = fit_func(fluxes[:,start:stop],
+                              ivars[:,start:stop],
+                              contmask[start:stop], deg=deg, ffunc="sinusoid")
         cont[:,start:stop] = output
     return cont
 
