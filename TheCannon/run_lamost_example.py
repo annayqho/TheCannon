@@ -14,7 +14,7 @@ dataset = LamostDataset("example_LAMOST/Training_Data",
                         "example_DR12/reference_labels.csv")
 
 # Choose labels
-cols = ['teff', 'logg', 'feh']
+cols = ['teff', 'logg', 'feh', 'alpha']
 dataset.choose_labels(cols)
 
 # set the headers for plotting

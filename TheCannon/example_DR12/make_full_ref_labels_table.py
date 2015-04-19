@@ -56,7 +56,7 @@ nstars = len(teff)
 
 file_out = open("reference_labels.csv", "w")
 
-header = 'id,teff,logg,feh\n'
+header = 'id,teff,logg,feh,alpha\n'
 
 file_out.write(header)
 
