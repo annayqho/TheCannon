@@ -11,6 +11,7 @@ for i in range(0, len(apstarid)):
 t = datain['TEFF']
 g = datain['LOGG']
 f = datain['FE_H']
+params = datain['PARAM']
 a = params[:,-1]
 
 # read the real list of training stars
@@ -47,7 +48,7 @@ ids = apstarid[inds]
 teff = t[inds]
 logg = g[inds]
 feh = f[inds]
-#alpha = a[inds]
+alpha = a[inds]
 
 # and now write the training file
 
@@ -61,7 +62,7 @@ file_out.write(header)
 
 for i in range(nstars):
     print(i)
-    line = str(ts_lamost[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+'\n'
+    line = str(ts_lamost[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
     file_out.write(line)
 
 file_out.flush()
