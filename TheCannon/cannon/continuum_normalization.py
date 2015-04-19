@@ -98,8 +98,8 @@ def fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
             output = fit_cont(fluxes[:,start:stop],
                               ivars[:,start:stop],
                               contmask[start:stop], deg=deg, ffunc="chebyshev")
-        elif ffunc="sinusoid":
-            output = fit_func(fluxes[:,start:stop],
+        elif ffunc=="sinusoid":
+            output = fit_cont(fluxes[:,start:stop],
                               ivars[:,start:stop],
                               contmask[start:stop], deg=deg, ffunc="sinusoid")
         cont[:,start:stop] = output

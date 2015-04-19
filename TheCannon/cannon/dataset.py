@@ -202,7 +202,7 @@ class Dataset(object):
     def set_continuum(self, contmask):
         self.contmask = contmask
 
-    def fit_continuum(self, deg=3, ffunc="chebyshev"):
+    def fit_continuum(self, deg=3, ffunc):
         if self.ranges == None:
             tr_cont = fit_cont(
                     self.tr_fluxes, self.tr_ivars, self.contmask, deg, ffunc)
