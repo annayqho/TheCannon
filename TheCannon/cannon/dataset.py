@@ -202,7 +202,7 @@ class Dataset(object):
     def set_continuum(self, contmask):
         self.contmask = contmask
 
-    def fit_continuum(self, deg=3, ffunc):
+    def fit_continuum(self, deg, ffunc):
         if self.ranges == None:
             tr_cont = fit_cont(
                     self.tr_fluxes, self.tr_ivars, self.contmask, deg, ffunc)
@@ -225,26 +225,25 @@ class Dataset(object):
         return norm_fluxes, norm_ivars
 
 
-    def continuum_normalize_f(self):
+    def continuum_normalize_f(self, cont):
         """ Continuum normalize spectra by fitting a function to continuum pix 
 
         For spectra split into regions, perform cont normalization
         separately for each region.
         """
+        tr_cont, test_cont = cont
         if self.ranges is None:
             print("assuming continuous spectra")
             norm_tr_fluxes, norm_tr_ivars = cont_norm(
-                    self.tr_fluxes, self.tr_ivars, dataset.contmask)
+                    self.tr_fluxes, self.tr_ivars, tr_cont)
             norm_test_fluxes, norm_test_ivars = cont_norm(
-                    self.test_fluxes, self.test_ivars, dataset.contmask)
+                    self.test_fluxes, self.test_ivars, test_cont)
         else:
             print("taking spectra in %s regions" %(len(self.ranges)))
-            norm_tr_fluxes, norm_tr_ivars, cont = cont_norm_regions(
-                    self.tr_fluxes, self.tr_ivars, 
-                    dataset.contmask, self.ranges)
-            norm_test_fluxes, norm_test_ivars, cont = cont_norm_regions(
-                    self.test_fluxes, self.test_ivars, 
-                    dataset.contmask, self.ranges)
+            norm_tr_fluxes, norm_tr_ivars = cont_norm_regions(
+                    self.tr_fluxes, self.tr_ivars, tr_cont, self.ranges)
+            norm_test_fluxes, norm_test_ivars = cont_norm_regions(
+                    self.test_fluxes, self.test_ivars, test_cont, self.ranges)
         return norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars
 
 

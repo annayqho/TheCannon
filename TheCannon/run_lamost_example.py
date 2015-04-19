@@ -42,6 +42,8 @@ contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
 # pixel regions 
 dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 1950], [1950, 2500], [2500,3000], [3000, len(dataset.wl)]]
 contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
+# or, if it's already done
+contmask = pickle.load(open("contmask.p", "r"))
 
 # Check it out...
 f_bar = np.zeros(len(dataset.wl))
@@ -64,6 +66,8 @@ dataset.set_continuum(contmask)
 
 dataset.ranges = [[0,1723], [1863,len(dataset.wl)]] # split into two wings
 tr_cont, test_cont = dataset.fit_continuum(deg=3, ffunc="sinusoid")
+# or, if it's already done
+tr_cont, test_cont = pickle.load(open("cont.p", "r"))
 
 # Check it out...
 jj = 50
@@ -74,7 +78,21 @@ scatter(dataset.wl[contmask], flux[contmask], c='r')
 cont = np.ma.array(tr_cont[jj,:], mask=bad)
 plot(dataset.wl, cont)
 
-dataset.continuum_normalize(cont=(tr_cont, test_cont))
+norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars = \
+        dataset.continuum_normalize_f(cont=(tr_cont, test_cont))
+
+# Check it out...
+jj = 50
+bad = norm_tr_ivars[jj,:] == SMALL**2
+flux = np.ma.array(norm_tr_fluxes[jj,:], mask=bad)
+plot(dataset.wl, flux, alpha=0.7)
+
+# If you approve...
+
+dataset.tr_fluxes = norm_tr_fluxes
+dataset.tr_ivars = norm_tr_ivars
+dataset.test_fluxes = norm_test_fluxes
+dataset.test_ivars = norm_test_ivars
 
 # learn the model from the reference_set
 model = CannonModel(dataset, 2) # 2 = quadratic model

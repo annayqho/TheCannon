@@ -43,7 +43,6 @@ def do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     #sig2 = 100**2*np.ones(len(ivars))
     #mask = ivars != 0
     #sig2[mask] = 1. / ivars[mask]
-    print("this is working")
     sig2 = 1. / ivars
     Cinv = 1. / (sig2 + scatter**2)
     lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
