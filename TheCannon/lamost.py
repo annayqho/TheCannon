@@ -27,8 +27,8 @@ class LamostDataset(Dataset):
     rectangular blocks.
     """
    
-    def __init__(self, training_dir, test_dir, label_file):
-        super(self.__class__, self).__init__(training_dir, test_dir, label_file)
+    def __init__(self, data_dir, tr_list, test_list, label_file):
+        super(self.__class__, self).__init__(data_dir, tr_list, test_list, label_file)
         self.ranges = None
 
     def _get_pixmask(self, file_in, wl, middle, flux, ivar):
@@ -87,7 +87,7 @@ class LamostDataset(Dataset):
 
         return bad_pix
 
-    def _load_spectra(self, data_dir):
+    def _load_spectra(self, data_dir, filenames):
         """
         Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
 
@@ -108,13 +108,14 @@ class LamostDataset(Dataset):
         SNRs: numpy ndarray of length nstars
         """
         print("Loading spectra from directory %s" %data_dir)
-        files = list(sorted([data_dir + "/" + filename
-                 for filename in os.listdir(data_dir)]))
+        files = list(sorted(filenames))
+        #files = list(sorted([data_dir + "/" + filename
+        #         for filename in os.listdir(data_dir)]))
         files = np.array(files)
         nstars = len(files)
 
         for jj, fits_file in enumerate(files):
-            file_in = pyfits.open(fits_file)
+            file_in = pyfits.open("%s/%s" %(data_dir, fits_file))
             if jj == 0:
                 # all stars start out on the same wavelength grid
                 grid_all = np.array(file_in[0].data[2])

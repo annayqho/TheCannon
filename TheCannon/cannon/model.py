@@ -183,6 +183,7 @@ class CannonModel(object):
 
         # Leading coefficients for each label & scatter
         # Scale coefficients so that they can be overlaid on the same plot
+        c = ['r', 'g', 'b', 'k']
         stds = np.array([np.std(coeffs_all[:, i + 1]) for i in range(nlabels)])
         pivot_std = max(stds)
         ratios = np.round(pivot_std / stds, -1)  # round to the nearest 10
@@ -199,8 +200,8 @@ class CannonModel(object):
         for i in range(nlabels):
             coeffs = coeffs_all[:,i+1] * ratios[i]
             first_order[:,i] = coeffs
-            ax.step(lams, coeffs, where='mid', linewidth=0.3,
-                    label=lbl.format(i+1, label_names[i], int(ratios[i])))
+            ax.step(lams, coeffs, where='mid', linewidth=0.5,
+                    label=lbl.format(i+1, label_names[i], int(ratios[i])), c=c[i])
         box = ax.get_position()
         ax.set_position(
                 [box.x0, box.y0 + box.height*0.1, box.width, box.height*0.9])
@@ -210,7 +211,7 @@ class CannonModel(object):
         ax = axarr[1]
         ax.set_ylabel("scatter")
         ax.set_title("Scatter of Fit")
-        ax.step(lams, scatters, where='mid', c='k', linewidth=0.3)
+        ax.step(lams, scatters, where='mid', c='k', linewidth=0.7)
         fig.tight_layout(pad=2.0, h_pad=4.0)
         print("Diagnostic plot: leading coeffs and scatters across wavelength.")
         print("Saved as %s" %leading_coeffs_plot_name)

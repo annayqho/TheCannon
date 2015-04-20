@@ -9,8 +9,10 @@ import pickle
 
 
 # RUN LAMOST MUNGING CODE
+tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
+test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
 dataset = LamostDataset("example_LAMOST/Training_Data",
-                        "example_LAMOST/Training_Data",
+                        tr_files, test_files, 
                         "example_DR12/reference_labels.csv")
 
 # Choose labels
@@ -18,7 +20,7 @@ cols = ['teff', 'logg', 'feh', 'alpha']
 dataset.choose_labels(cols)
 
 # set the headers for plotting
-dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
+dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]', 'alpha'])
 
 # Plot SNR distributions and triangle plot of reference labels
 dataset.diagnostics_SNR()
