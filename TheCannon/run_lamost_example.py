@@ -11,7 +11,7 @@ import pickle
 # RUN LAMOST MUNGING CODE
 tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
 test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
-dataset = LamostDataset("example_LAMOST/Training_Data",
+dataset = LamostDataset("example_LAMOST/Data_All",
                         tr_files, test_files, 
                         "example_DR12/reference_labels.csv")
 

@@ -114,11 +114,13 @@ class LamostDataset(Dataset):
         files = np.array(files)
         nstars = len(files)
 
+        npix = np.zeros(nstars)
         for jj, fits_file in enumerate(files):
             file_in = pyfits.open("%s/%s" %(data_dir, fits_file))
+            grid_all = np.array(file_in[0].data[2])
             if jj == 0:
-                # all stars start out on the same wavelength grid
-                grid_all = np.array(file_in[0].data[2])
+                # all stars do NOT start out on the same wavelength grid
+                # grid_all = np.array(file_in[0].data[2])
                 # some spectra will end up with different pixels
                 # because of the wavelength correction. so do this to ensure
                 # that the interpolation never extrapolates...
@@ -127,7 +129,7 @@ class LamostDataset(Dataset):
                 # only lost 10 pixels here
                 # now, add on 200 pixels at the beginning to save the Ca H&K
                 # lines
-                middle = np.logical_and(grid_all > 3905, grid_all < 9091)
+                middle = np.logical_and(grid_all > 3905, grid_all < 9000)
                 grid = grid_all[middle]
                 npixels = len(grid) 
                 SNRs = np.zeros(nstars, dtype=float)   
@@ -135,6 +137,7 @@ class LamostDataset(Dataset):
                 ivars = np.zeros(fluxes.shape, dtype=float)
                 #badpixs = np.zeros((nstars, len(grid_all)), dtype=bool)
             flux = np.array(file_in[0].data[0])
+            npix[jj] = len(flux)
             ivar = np.array((file_in[0].data[1]))
             # identify bad pixels PRIOR to shifting, so that the sky lines
             # don't move around
