@@ -46,6 +46,8 @@ dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 195
 contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
 # or, if it's already done
 contmask = pickle.load(open("contmask.p", "r"))
+# since I changed the array size...
+contmask1 = contmask[0:3626]
 
 # Check it out...
 f_bar = np.zeros(len(dataset.wl))
@@ -62,13 +64,14 @@ plot(dataset.wl, f_bar, alpha=0.7)
 fill_between(dataset.wl, (f_bar+sigma_f), (f_bar-sigma_f), alpha=0.2)
 scatter(dataset.wl[contmask], f_bar[contmask], c='r')
 
-dataset.set_continuum(contmask)
+dataset.set_continuum(contmask1)
 
 # RUN CONTINUUM NORMALIZATION CODE
 
 dataset.ranges = [[0,1723], [1863,len(dataset.wl)]] # split into two wings
 tr_cont, test_cont = dataset.fit_continuum(deg=3, ffunc="sinusoid")
 # or, if it's already done
+pickle.dump((tr_cont, test_cont), open("cont.p", "w"))
 tr_cont, test_cont = pickle.load(open("cont.p", "r"))
 
 # Check it out...
@@ -99,6 +102,9 @@ dataset.test_ivars = norm_test_ivars
 # learn the model from the reference_set
 model = CannonModel(dataset, 2) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
+
+# or...
+coeffs_all = pickle.load(open("coeffs_all.p", "r"))
 
 # check the model
 model.diagnostics()

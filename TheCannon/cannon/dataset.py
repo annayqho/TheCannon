@@ -211,7 +211,7 @@ class Dataset(object):
         else:
             tr_cont = fit_cont_regions(self.tr_fluxes, self.tr_ivars, 
                                        self.contmask, deg, self.ranges, ffunc)
-            test_cont = fit_cont_regions(self.tr_fluxes, self.tr_ivars,
+            test_cont = fit_cont_regions(self.test_fluxes, self.test_ivars,
                                          self.contmask, deg, self.ranges, ffunc)
             
         return tr_cont, test_cont

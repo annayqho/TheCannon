@@ -200,7 +200,7 @@ class CannonModel(object):
         for i in range(nlabels):
             coeffs = coeffs_all[:,i+1] * ratios[i]
             first_order[:,i] = coeffs
-            ax.step(lams, coeffs, where='mid', linewidth=0.5,
+            ax.step(lams, coeffs, where='mid', linewidth=0.5, 
                     label=lbl.format(i+1, label_names[i], int(ratios[i])), c=c[i])
         box = ax.get_position()
         ax.set_position(
