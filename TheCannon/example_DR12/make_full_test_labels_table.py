@@ -13,6 +13,10 @@ g = datain['LOGG']
 f = datain['FE_H']
 params = datain['PARAM']
 a = params[:,-1]
+vscat = datain['VSCATTER']
+starflag = datain['STARFLAGS']
+SNR = datain['SNR']
+aspcapflag = datain['ASPCAPFLAG']
 
 # read the real list of test stars
 ts_lamost = np.loadtxt("../example_LAMOST/Test_Data.txt", dtype=str)
@@ -48,6 +52,13 @@ teff = t[inds]
 logg = g[inds]
 feh = f[inds]
 alpha = a[inds]
+snr = SNR[inds]
+vscatter = vscat[inds]
+starflags = starflag[inds]
+aspcapflags = aspcapflag[inds]
+badbits = 2**23
+flags = np.bitwise_and(aspcapflag, badbits)
+flags[flags!=0] = 1
 
 # and now write the training file
 
@@ -55,13 +66,13 @@ nstars = len(teff)
 
 file_out = open("apogee_test_labels.csv", "w")
 
-header = 'id,teff,logg,feh,alpha\n'
+header = 'id,teff,logg,feh,alpha,snr,vscatter,flag\n'
 
 file_out.write(header)
 
 for i in range(nstars):
     print(i)
-    line = str(ts_lamost[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
+    line = str(ts_lamost[i])+','+str(teff[i])+','+str(logg[i])+','+ str(feh[i])+','+str(alpha[i])+','+str(snr[i])+','+str(vscatter[i])+','+str(flags[i])+'\n'
     file_out.write(line)
 
 file_out.flush()

@@ -20,7 +20,7 @@ cols = ['teff', 'logg', 'feh', 'alpha']
 dataset.choose_labels(cols)
 
 # set the headers for plotting
-dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]', 'alpha'])
+dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]', '\alpha'])
 
 # Plot SNR distributions and triangle plot of reference labels
 dataset.diagnostics_SNR()

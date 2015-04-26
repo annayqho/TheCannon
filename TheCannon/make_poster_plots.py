@@ -22,20 +22,27 @@ dataset = LamostDataset("example_LAMOST/Data_All",
 # SNR of jj=150 is 172.30452688124373
 # SNR of jj=10 is 280.99611610353145
 
-jj = 150 
-bad = dataset.tr_fluxes[jj,:] == 0.
+tr_cont, test_cont = pickle.load(open("cont.p", "r"))
+
+jj = 0 
+bad1 = dataset.tr_fluxes[jj,:] == 0.
+bad2 = np.var(dataset.tr_ivars, axis=0) == 0.
+bad = np.logical_or(bad1, bad2)
 x = dataset.wl
 fluxes = np.ma.array(dataset.tr_fluxes[jj,:], mask=bad)
+cont = np.ma.array(tr_cont[jj,:], mask=bad)
 x = np.ma.array(dataset.wl, mask=bad)
-plot(x, fluxes, c='k', alpha=0.7)
+plot(x, fluxes, c='k', alpha=0.7, label="Raw Spectrum")
+plot(x, cont, c='r', alpha=0.7, label="Cannon Continuum Fit")
 title(r"Typical High-S/N LAMOST Spectrum", fontsize=27)
 xlim(3500, 9500)
 tick_params(axis='x', labelsize=27)
 tick_params(axis='y', labelsize=27)
 xlabel("Wavelength ($\AA$)", fontsize=27)
 ylabel("Flux", fontsize=27)
+legend(loc='bottom right')
 tight_layout()
-savefig("typical_lamost_spec_snr172.png")
+savefig("poster_typical_spec_snr134_withcont.png")
 
 import pickle
 coeffs_all = pickle.load(open("coeffs_all.p", "r"))
@@ -94,16 +101,28 @@ feh = test_labels[:,2]
 alpha = test_labels[:,3]
 feh = np.array(apogee_label_vals[:,3], dtype=float)
 alpha = np.array(apogee_label_vals[:,4], dtype=float)
-snr = dataset.test_SNRs
-good = feh > -8000
+snr_lamost = dataset.test_SNRs
+snr_apogee = np.array(apogee_label_vals[:,5], dtype=float)
+vscat = np.array(apogee_label_vals[:,6], dtype=float)
+flag = np.array(apogee_label_vals[:,7], dtype=bool)
+good1 = np.logical_and(feh > -8000, snr_lamost > 50)
+good2 = np.logical_and(vscat < 1.0, flag==0)
+good3 = snr_apogee > 300 
+good12 = np.logical_and(good1, good2)
+good = np.logical_and(good12, good3)
 feh2 = feh[good]
 alpha2 = alpha[good]
 snr2 = snr[good]
+vscat2 = vscat[good]
+flag2 = flag[good]
 from matplotlib.colors import LogNorm
-a = hist2d(feh, alpha, bins=200, norm=LogNorm())
+scatter(feh2, alpha2, c=snr2, marker='x', alpha=0.5, vmin=50, vmax=500)
+a = hist2d(feh2, alpha2, bins=60, range=[[-2.5, 1.0],[-0.2,0.6]], norm=LogNorm(), vmin=1, vmax=50)
+tick_params(axis='x', labelsize=20)
+tick_params(axis='y', labelsize=20)
 ylabel(r"$[\alpha/Fe]$", fontsize=27)
 xlabel(r"$[Fe/H]$", fontsize=27)
-title(r"$[Fe/H]-[\alpha/Fe]$ Distribution for Test Objects", fontsize=27)
+title(r"$[Fe/H]-[\alpha/Fe]$ Distribution for \newline Test Objects, ASPCAP Values", fontsize=27)
 xlim(-2,1)
 ylim(-0.2,0.5)
 
