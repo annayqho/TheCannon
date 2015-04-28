@@ -111,6 +111,7 @@ def do_one_regression(lams, fluxes, ivars, lvec):
                                             scatter=best_scatter)
     return _r + (best_scatter, )
 
+
 def get_lvec(label_vals, pivots):
     """
     Constructs a label vector for an arbitrary number of labels
@@ -135,6 +136,7 @@ def get_lvec(label_vals, pivots):
     ones = np.ones((nstars, 1))
     lvec = np.hstack((ones, linear_offsets, quadratic_offsets))
     return lvec
+
 
 def train_model(dataset):
     """

@@ -8,7 +8,6 @@ import scipy.optimize as opt
 LARGE = 200.
 SMALL = 1. / LARGE
 
-# Thank you Morgan for this...
 def partial_func(func, *args, **kwargs):
     def wrap(x, *p):
         return func(x, p, **kwargs)
