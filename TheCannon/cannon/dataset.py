@@ -156,19 +156,19 @@ class Dataset(object):
 
 
     def diagnostics_contmask(self, figname='contpix.png'):
-        f_bar = np.zeros(len(dataset.wl))
-        sigma_f = np.zeros(len(dataset.wl))
-        for wl in range(0,len(dataset.wl)):
-            flux = dataset.tr_flux[:,wl]
-            ivar = dataset.tr_ivar[:,wl]
+        f_bar = np.zeros(len(self.wl))
+        sigma_f = np.zeros(len(self.wl))
+        for wl in range(0,len(self.wl)):
+            flux = self.tr_flux[:,wl]
+            ivar = self.tr_ivar[:,wl]
             f_bar[wl] = np.median(flux[ivar>0])
             sigma_f[wl] = np.sqrt(np.var(flux[ivar>0]))
-        bad = np.var(dataset.tr_ivar, axis=0) == 0
+        bad = np.var(self.tr_ivar, axis=0) == 0
         f_bar = np.ma.array(f_bar, mask=bad)
         sigma_f = np.ma.array(sigma_f, mask=bad)
-        plt.plot(dataset.wl, f_bar, alpha=0.7)
-        plt.fill_between(dataset.wl, (f_bar+sigma_f), (f_bar-sigma_f), alpha=0.2)
-        plt.scatter(dataset.wl[contmask], f_bar[contmask], c='r', label="Cont Pix")
+        plt.plot(self.wl, f_bar, alpha=0.7)
+        plt.fill_between(self.wl, (f_bar+sigma_f), (f_bar-sigma_f), alpha=0.2)
+        plt.scatter(self.wl[contmask], f_bar[contmask], c='r', label="Cont Pix")
         plt.xlabel("Wavelength (A)")
         plt.ylabel("Median Flux Across Training Objects")
         legend()
@@ -184,9 +184,9 @@ class Dataset(object):
             test_cont = fit_cont(
                     self.test_flux, self.test_ivar, self.contmask, deg, ffunc)
         else:
-            tr_cont = fit_cont_regions(self.tr_fluxes, self.tr_ivars, 
+            tr_cont = fit_cont_regions(self.tr_flux, self.tr_ivar, 
                                        self.contmask, deg, self.ranges, ffunc)
-            test_cont = fit_cont_regions(self.test_fluxes, self.test_ivars,
+            test_cont = fit_cont_regions(self.test_flux, self.test_ivar,
                                          self.contmask, deg, self.ranges, ffunc)
             
         return tr_cont, test_cont
@@ -209,17 +209,17 @@ class Dataset(object):
         tr_cont, test_cont = cont
         if self.ranges is None:
             print("assuming continuous spectra")
-            norm_tr_fluxes, norm_tr_ivars = cont_norm(
-                    self.tr_fluxes, self.tr_ivars, tr_cont)
-            norm_test_fluxes, norm_test_ivars = cont_norm(
-                    self.test_fluxes, self.test_ivars, test_cont)
+            norm_tr_flux, norm_tr_ivar = cont_norm(
+                    self.tr_flux, self.tr_ivar, tr_cont)
+            norm_test_flux, norm_test_ivar = cont_norm(
+                    self.test_flux, self.test_ivar, test_cont)
         else:
             print("taking spectra in %s regions" %(len(self.ranges)))
-            norm_tr_fluxes, norm_tr_ivars = cont_norm_regions(
-                    self.tr_fluxes, self.tr_ivars, tr_cont, self.ranges)
-            norm_test_fluxes, norm_test_ivars = cont_norm_regions(
-                    self.test_fluxes, self.test_ivars, test_cont, self.ranges)
-        return norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars
+            norm_tr_flux, norm_tr_ivar = cont_norm_regions(
+                    self.tr_flux, self.tr_ivar, tr_cont, self.ranges)
+            norm_test_flux, norm_test_ivar = cont_norm_regions(
+                    self.test_flux, self.test_ivar, test_cont, self.ranges)
+        return norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar
 
 
     def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):

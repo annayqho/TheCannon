@@ -6,6 +6,8 @@ import glob
 from scipy.io.idl import readsav
 
 from cannon.dataset import Dataset
+from cannon.model import CannonModel
+
 
 # STEP 1: PREPARE DATA
 
@@ -82,5 +84,19 @@ dataset.diagnostics_contmask()
 
 
 # STEP 3: CONTINUUM NORMALIZATION
+dataset.ranges = None
+if glob.glob('rave_cont.p'):
+    (tr_cont, test_cont) = pickle.load(open('rave_cont.p', 'r'))
+else:
+    tr_cont, test_cont = dataset.fit_continuum(deg=3, ffunc="sinusoid")
+    pickle.dump((tr_cont, test_cont), open("rave_cont.p", "w"))
 
+norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
+        dataset.continuum_normalize_f(cont=(tr_cont, test_cont))
 
+dataset.tr_fluxes = norm_tr_fluxes
+dataset.tr_ivars = norm_tr_ivars
+dataset.test_fluxes = norm_test_fluxes
+dataset.test_ivars = norm_test_ivars
+
+model = CannonModel(dataset, 2)

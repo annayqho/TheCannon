@@ -18,8 +18,7 @@ class CannonModel(object):
             raise TypeError(txt.format(type(dataset)))
         self.dataset = dataset
         self._model = None
-        self.order = order # right now this does nothing,
-                           # because we only have one fitting func...
+        self.order = order
 
     @property
     def model(self):

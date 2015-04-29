@@ -51,7 +51,6 @@ def fit_cont(fluxes, ivars, contmask, deg, ffunc):
     cont = np.zeros(fluxes.shape)
     
     for jj in range(nstars):
-        print(jj)
         # Fit continuum to cont pixels
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
