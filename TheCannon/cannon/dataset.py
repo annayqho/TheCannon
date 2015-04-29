@@ -18,10 +18,8 @@ else:
 class Dataset(object):
     """A class to represent a Dataset of stellar spectra and labels.
 
-    Framework for performing the munging necessary for making data "Cannonizable."
-    Each survey will have its own implementation of the following: how data is 
-    retrieved, how bad pixels are identified. Packages all of this information
-    into rectangular blocks.
+    Initialize this object after performing the munging necessary 
+    for making data "Cannonizable."
     """
 
     def __init__(self, wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar):
@@ -31,47 +29,49 @@ class Dataset(object):
         self.tr_label = tr_label
         self.test_flux = test_flux
         self.test_ivar = test_ivar
+        self.tr_SNR = tr_flux*np.sqrt(tr_ivar)
+        self.test_SNR = test_flux*np.sqrt(test_ivar)
+
+
+    def diagnostics_SNR(self, figname = "SNRdist.png"): 
+        """ Plot SNR distributions of ref and test objects
+
+        Parameters
+        ----------
+        figname: (optional) string
+            title of the saved SNR diagnostic plot
+        """
+        print("Diagnostic for SNRs of reference and survey stars")
+        plt.hist(self.tr_SNR, alpha=0.5, label="Ref Stars")
+        plt.hist(self.test_SNR, alpha=0.5, label="Survey Stars")
+        plt.legend(loc='upper right')
+        plt.xscale('log')
+        plt.title("SNR Comparison Between Reference & Test Stars")
+        plt.xlabel("log(Formal SNR)")
+        plt.ylabel("Number of Objects")
+        plt.savefig(figname)
+        plt.close()
+        print("Saved fig %s" %figname)
+
+    
+    def diagnostics_ref_labels(self, figname="ref_labels_triangle.png"):
+        """ Plot all training labels against each other. 
+        
+        Parameters
+        ----------
+        figname: (optional) string
+            title of the saved triangle plot for reference labels
+        """
+        self.label_triangle_plot(self.tr_label, figname)
+
 
     def set_test_label_vals(self, vals):
         """ Set label vals from an array """
         self.test_label_vals = vals
 
+
     def set_label_names_tex(self, names):
         self.label_names_tex = names
-
-    @property
-    def tr_label_vals(self):
-        """ return the array of labels [Nsamples x Ndim] """
-        if self._tr_label_vals is None:
-            return np.array([self.tr_label_data[k] for 
-                            k in self.label_names]).T
-        else:
-            return self._tr_label_vals
-
-    def _load_reference_labels(self, label_file):
-        """Extracts training labels from file.
-
-        Assumes that first row is # then label names, that first column is # 
-        then the filenames, that the remaining values are floats and that 
-        user wants all of the labels. User can pick specific labels later.
-
-        Returns
-        -------
-        data['id']: 
-        label_names: list of label names
-        data: np ndarray of size (nstars, nlabels)
-            label values
-        """
-        print("Loading reference labels from file %s" %label_file)
-        data = Table(label_file)
-        data.sort('id')
-        label_names = data.keys()
-        nlabels = len(label_names)
-
-        print("Loaded stellar IDs, format: %s" % data['id'][0])
-        print("Loaded %d labels:" % nlabels)
-        print(label_names)
-        return label_names, data
 
 
     def get_plotting_labels(self):
@@ -79,20 +79,6 @@ class Dataset(object):
             return self.label_names
         return self.label_names_tex
     
-    def choose_labels(self, cols):
-        """Updates the label_names property
-
-        Parameters
-        ----------
-        cols: list of column indices corresponding to which to keep
-        """
-        self.label_names = []
-        for k in cols:
-            key = self.tr_label_data.resolve_alias(k)
-            if key not in self.tr_label_data:
-                raise KeyError('Attribute {0:s} not found'.format(key))
-            else:
-                self.label_names.append(key)
 
     def label_triangle_plot(self, label_vals, figname):
         """Make a triangle plot for the selected labels
@@ -115,43 +101,13 @@ class Dataset(object):
         print("Saved fig %s" % figname)
         plt.close(fig)
 
-    def diagnostics_SNR(self, figname = "SNRdist.png"): 
-        """ Plot SNR distributions of ref and test objects
-
-        Parameters
-        ----------
-        SNR_plot_name: (optional) string
-            title of the saved SNR diagnostic plot
-        """
-        print("Diagnostic for SNRs of reference and survey stars")
-        plt.hist(self.tr_SNRs, alpha=0.5, label="Ref Stars")
-        plt.hist(self.test_SNRs, alpha=0.5, label="Survey Stars")
-        plt.legend(loc='upper right')
-        plt.xscale('log')
-        plt.title("SNR Comparison Between Reference & Test Stars")
-        plt.xlabel("log(Formal SNR)")
-        plt.ylabel("Number of Objects")
-        plt.savefig(figname)
-        plt.close()
-        print("Saved fig %s" %figname)
-
-    def diagnostics_ref_labels(self, figname="ref_labels_triangle.png"):
-        """ Plot all training labels against each other. 
-        
-        Parameters
-        ----------
-        triangle_plot_name: (optional) string
-            title of the saved triangle plot for reference labels
-        """
-        label_vals = np.array([self.tr_label_data[k] 
-                              for k in self.label_names]).T
-        self.label_triangle_plot(label_vals, figname)
 
     def find_gaps(self, fluxes):
         # Gaps: regions where median(flux) == 0., and var(flux) == 0.
         gaps = np.logical_and(np.median(fluxes, axis=0) == 0, 
                               np.std(fluxes, axis=0) == 0)    
         return gaps
+
 
     def make_contmask(self, fluxes, ivars, frac):
         """ Use training spectra to find and return continuum pixels
@@ -176,8 +132,10 @@ class Dataset(object):
         #self.contmask = contmask
         return contmask
 
+
     def set_continuum(self, contmask):
         self.contmask = contmask
+
 
     def fit_continuum(self, deg, ffunc):
         if self.ranges == None:

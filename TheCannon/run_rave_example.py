@@ -60,7 +60,7 @@ else:
     pickle.dump((wl, test_flux, test_ivar), open("rave_test_data.p", "w"), -1)
 
 # initialize a dataset object
-
+dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 
 # STEP 2: diagnostic plots for input spectra and reference labels
 dataset.diagnostics_SNR()
