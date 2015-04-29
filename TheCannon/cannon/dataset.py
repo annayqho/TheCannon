@@ -23,15 +23,53 @@ class Dataset(object):
     """
 
     def __init__(self, wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar):
+        print("Loading dataset")
+        print("This may take a while...")
         self.wl = wl
         self.tr_flux = tr_flux
         self.tr_ivar = tr_ivar
         self.tr_label = tr_label
         self.test_flux = test_flux
         self.test_ivar = test_ivar
-        self.tr_SNR = tr_flux*np.sqrt(tr_ivar)
-        self.test_SNR = test_flux*np.sqrt(test_ivar)
+        self.ranges = None
+        
+        # calculate SNR
+        self.tr_SNR = np.array(
+                [self._SNR(*s) for s in zip(tr_flux, tr_ivar)])
+        self.test_SNR = np.array(
+                [self._SNR(*s) for s in zip(test_flux, test_ivar)])
 
+
+    def _SNR(self, flux, ivar):
+        """ Calculate the SNR of a spectrum, ignoring bad pixels
+
+        Parameters
+        ----------
+        flux: 1D array of flux values
+        ivar: 1D array of ivar values
+
+        Returns
+        -------
+        SNR: float
+        """
+        bad = ivar == 0
+        flux = np.ma.array(flux, mask=bad)
+        ivar = np.ma.array(ivar, mask=bad)
+        SNR = float(np.ma.median(flux*ivar**0.5).data)
+        return SNR  
+
+
+    def set_label_names(self, names):
+        self._label_names = names
+
+
+    def get_plotting_labels(self):
+        if self._label_names is None:
+            print("No label names yet!")
+            return None
+        else:
+            return self._label_names
+ 
 
     def diagnostics_SNR(self, figname = "SNRdist.png"): 
         """ Plot SNR distributions of ref and test objects
@@ -42,8 +80,10 @@ class Dataset(object):
             title of the saved SNR diagnostic plot
         """
         print("Diagnostic for SNRs of reference and survey stars")
-        plt.hist(self.tr_SNR, alpha=0.5, label="Ref Stars")
-        plt.hist(self.test_SNR, alpha=0.5, label="Survey Stars")
+        data = self.tr_SNR
+        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, label="Ref Stars")
+        data = self.test_SNR
+        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, label="Survey Stars")
         plt.legend(loc='upper right')
         plt.xscale('log')
         plt.title("SNR Comparison Between Reference & Test Stars")
@@ -65,21 +105,6 @@ class Dataset(object):
         self.label_triangle_plot(self.tr_label, figname)
 
 
-    def set_test_label_vals(self, vals):
-        """ Set label vals from an array """
-        self.test_label_vals = vals
-
-
-    def set_label_names_tex(self, names):
-        self.label_names_tex = names
-
-
-    def get_plotting_labels(self):
-        if self.label_names_tex is None:
-            return self.label_names
-        return self.label_names_tex
-    
-
     def label_triangle_plot(self, label_vals, figname):
         """Make a triangle plot for the selected labels
 
@@ -100,13 +125,6 @@ class Dataset(object):
         fig.savefig(figname)
         print("Saved fig %s" % figname)
         plt.close(fig)
-
-
-    def find_gaps(self, fluxes):
-        # Gaps: regions where median(flux) == 0., and var(flux) == 0.
-        gaps = np.logical_and(np.median(fluxes, axis=0) == 0, 
-                              np.std(fluxes, axis=0) == 0)    
-        return gaps
 
 
     def make_contmask(self, fluxes, ivars, frac):
@@ -137,12 +155,34 @@ class Dataset(object):
         self.contmask = contmask
 
 
+    def diagnostics_contmask(self, figname='contpix.png'):
+        f_bar = np.zeros(len(dataset.wl))
+        sigma_f = np.zeros(len(dataset.wl))
+        for wl in range(0,len(dataset.wl)):
+            flux = dataset.tr_flux[:,wl]
+            ivar = dataset.tr_ivar[:,wl]
+            f_bar[wl] = np.median(flux[ivar>0])
+            sigma_f[wl] = np.sqrt(np.var(flux[ivar>0]))
+        bad = np.var(dataset.tr_ivar, axis=0) == 0
+        f_bar = np.ma.array(f_bar, mask=bad)
+        sigma_f = np.ma.array(sigma_f, mask=bad)
+        plt.plot(dataset.wl, f_bar, alpha=0.7)
+        plt.fill_between(dataset.wl, (f_bar+sigma_f), (f_bar-sigma_f), alpha=0.2)
+        plt.scatter(dataset.wl[contmask], f_bar[contmask], c='r', label="Cont Pix")
+        plt.xlabel("Wavelength (A)")
+        plt.ylabel("Median Flux Across Training Objects")
+        legend()
+        plt.title("Continuum Pix Found by The Cannon")
+        savefig(figname)
+        print("Saving fig %s" %figname)
+
+
     def fit_continuum(self, deg, ffunc):
         if self.ranges == None:
             tr_cont = fit_cont(
-                    self.tr_fluxes, self.tr_ivars, self.contmask, deg, ffunc)
+                    self.tr_flux, self.tr_ivar, self.contmask, deg, ffunc)
             test_cont = fit_cont(
-                    self.test_fluxes, self.test_ivars, self.contmask, deg, ffunc)
+                    self.test_flux, self.test_ivar, self.contmask, deg, ffunc)
         else:
             tr_cont = fit_cont_regions(self.tr_fluxes, self.tr_ivars, 
                                        self.contmask, deg, self.ranges, ffunc)
@@ -250,5 +290,10 @@ class Dataset(object):
             print("Diagnostic for label output vs. input")
             print("Saved fig %s" % figname)
             plt.close()
+
+
+    def set_test_label_vals(self, vals):
+        """ Set label vals from an array """
+        self.test_label_vals = vals
 
 

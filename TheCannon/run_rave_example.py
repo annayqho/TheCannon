@@ -5,6 +5,8 @@ import pickle
 import glob
 from scipy.io.idl import readsav
 
+from cannon.dataset import Dataset
+
 # STEP 1: PREPARE DATA
 
 # The Cannon needs: length-L wavelength vec 
@@ -39,11 +41,12 @@ def read_test(filename):
     test_flux = np.zeros((len(sp), len(sp[0])))
     for jj in range(0, len(sp)):
         test_flux[jj,:] = sp[jj]
-    snr = data['snr']
+    snr = np.array(data['snr'])
     test_ivar = (snr[:,None]/test_flux)**2
+    bad = np.logical_or(np.isnan(test_ivar), np.isnan(test_flux)) 
+    test_ivar[bad] = 0.
+    test_flux[bad] = 0.
     wl = data['lambda'][0] # assuming they're all the same... 
-    npix = len(wl)
-    nstars = len(snr)
     return (test_flux, test_ivar, wl)
 
 if glob.glob('rave_test_data.p'):
@@ -62,8 +65,22 @@ else:
 # initialize a dataset object
 dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 
-# STEP 2: diagnostic plots for input spectra and reference labels
+# diagnostic plots for input spectra and reference labels
+dataset.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
 dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
+
+
+# STEP 2: CONTINUUM IDENTIFICATION
+
+# Identify continuum pixels using a median and var flux cut
+# Split spectrum into three regions, to make it more evenly spaced
+dataset.ranges = [[0,200], [200,400], [400,600], [600,len(dataset.wl)]]
+contmask = dataset.make_contmask(dataset.tr_flux, dataset.tr_ivar, frac=0.05)
+dataset.set_continuum(contmask)
+dataset.diagnostics_contmask()
+
+
+# STEP 3: CONTINUUM NORMALIZATION
 
 
