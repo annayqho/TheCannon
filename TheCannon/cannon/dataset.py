@@ -24,37 +24,14 @@ class Dataset(object):
     into rectangular blocks.
     """
 
-    def __init__(self, data_dir, tr_list, test_list, label_file):
-        IDs, wl, fluxes, ivars, SNRs = self._load_spectra(data_dir, tr_list)
-        self.tr_IDs = IDs
+    def __init__(self, wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar):
         self.wl = wl
-        self.tr_fluxes = fluxes
-        self.tr_ivars = ivars
-        self.tr_SNRs = SNRs
+        self.tr_flux = tr_flux
+        self.tr_ivar = tr_ivar
+        self.tr_label = tr_label
+        self.test_flux = test_flux
+        self.test_ivar = test_ivar
 
-        label_names, label_data = self._load_reference_labels(label_file)
-        self.label_names = label_names
-        self.tr_label_data = label_data
-        self.test_label_vals = None
-        self.reset_label_vals()
-        
-        IDs, wl, fluxes, ivars, SNRs = self._load_spectra(data_dir, test_list)
-        self.test_IDs = IDs
-        self.test_fluxes = fluxes
-        self.test_ivars = ivars
-        self.test_SNRs = SNRs
-
-        self.contmask = None
-
-    def _get_pixmask(self, *args, **kwags):
-        raise NotImplemented('Derived classes need to implement this method')
-
-    def _load_spectra(self, data_dir):
-        raise NotImplemented('Derived classes need to implement this method')
-
-    def reset_label_vals(self):
-        self._tr_label_vals = None
-    
     def set_test_label_vals(self, vals):
         """ Set label vals from an array """
         self.test_label_vals = vals
