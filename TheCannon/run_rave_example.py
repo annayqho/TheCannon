@@ -69,8 +69,8 @@ dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 
 # diagnostic plots for input spectra and reference labels
 dataset.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
-dataset.diagnostics_SNR()
-dataset.diagnostics_ref_labels()
+#dataset.diagnostics_SNR()
+#dataset.diagnostics_ref_labels()
 
 
 # STEP 2: CONTINUUM IDENTIFICATION
@@ -94,9 +94,14 @@ else:
 norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
         dataset.continuum_normalize_f(cont=(tr_cont, test_cont))
 
-dataset.tr_fluxes = norm_tr_fluxes
-dataset.tr_ivars = norm_tr_ivars
-dataset.test_fluxes = norm_test_fluxes
-dataset.test_ivars = norm_test_ivars
+dataset.tr_flux = norm_tr_flux
+dataset.tr_ivar = norm_tr_ivar
+dataset.test_flux = norm_test_flux
+dataset.test_ivar = norm_test_ivar
 
 model = CannonModel(dataset, 2)
+model.fit()
+model.diagnostics()
+dataset, label_errs = model.infer_labels(dataset)
+dataset.dataset_postdiagnostics(dataset)
+

@@ -168,12 +168,12 @@ def train_model(dataset):
         the label vector
     """
     print("Training model...")
-    label_names = dataset.label_names
-    label_vals = dataset.tr_label_vals
+    label_names = dataset.get_plotting_labels()
+    label_vals = dataset.tr_label
     lams = dataset.wl
     npixels = len(lams)
-    fluxes = dataset.tr_fluxes
-    ivars = dataset.tr_ivars
+    fluxes = dataset.tr_flux
+    ivars = dataset.tr_ivar
     pivots = np.mean(label_vals, axis=0)
     lvec = get_lvec(label_vals, pivots)
     lvec_full = np.array([lvec,] * npixels)

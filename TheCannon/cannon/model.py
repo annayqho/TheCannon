@@ -84,7 +84,7 @@ class CannonModel(object):
 
         """
         coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = self.model
-        nstars = len(dataset.test_SNRs)
+        nstars = len(dataset.test_SNR)
         cannon_fluxes = np.zeros(dataset.test_fluxes.shape)
         cannon_ivars = np.zeros(dataset.test_ivars.shape)
         for i in range(nstars):

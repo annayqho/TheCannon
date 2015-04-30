@@ -156,6 +156,7 @@ class Dataset(object):
 
 
     def diagnostics_contmask(self, figname='contpix.png'):
+        contmask = self.contmask
         f_bar = np.zeros(len(self.wl))
         sigma_f = np.zeros(len(self.wl))
         for wl in range(0,len(self.wl)):
@@ -171,9 +172,9 @@ class Dataset(object):
         plt.scatter(self.wl[contmask], f_bar[contmask], c='r', label="Cont Pix")
         plt.xlabel("Wavelength (A)")
         plt.ylabel("Median Flux Across Training Objects")
-        legend()
+        plt.legend()
         plt.title("Continuum Pix Found by The Cannon")
-        savefig(figname)
+        plt.savefig(figname)
         print("Saving fig %s" %figname)
 
 
@@ -235,26 +236,26 @@ class Dataset(object):
         ----------
         """
         # Find stars whose inferred labels lie >2-sig outside ref label space
-        label_names = self.label_names
+        label_names = self.get_plotting_labels()
         nlabels = len(label_names)
-        reference_labels = self.tr_label_vals
+        reference_labels = self.tr_label
         test_labels = self.test_label_vals
-        test_IDs = np.array(self.test_IDs)
-        mean = np.mean(reference_labels, 0)
-        stdev = np.std(reference_labels, 0)
-        lower = mean - 2 * stdev
-        upper = mean + 2 * stdev
-        for i in range(nlabels):
-            label_name = label_names[i]
-            test_vals = test_labels[:,i]
-            warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
-            filename = "flagged_stars_%s.txt" % i
-            with open(filename, 'w') as output:
-                for star in test_IDs[warning]:
-                    output.write('{0:s}\n'.format(star))
-            print("Reference label %s" % label_name)
-            print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
-            print("Saved list %s" % filename)
+        #test_IDs = np.array(self.test_IDs)
+        #mean = np.mean(reference_labels, 0)
+        #stdev = np.std(reference_labels, 0)
+        #lower = mean - 2 * stdev
+        #upper = mean + 2 * stdev
+        #for i in range(nlabels):
+        #    label_name = label_names[i]
+        #    test_vals = test_labels[:,i]
+        #    warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
+        #    filename = "flagged_stars_%s.txt" % i
+        #    with open(filename, 'w') as output:
+        #        for star in test_IDs[warning]:
+        #            output.write('{0:s}\n'.format(star))
+        #    print("Reference label %s" % label_name)
+        #    print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
+        #    print("Saved list %s" % filename)
     
         # Plot all survey labels against each other
         figname="survey_labels_triangle.png"

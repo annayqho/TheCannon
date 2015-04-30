@@ -75,8 +75,8 @@ def infer_labels(model, dataset):
     print("Inferring Labels...")
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nlabels = len(pivots)
-    fluxes = dataset.test_fluxes
-    ivars = dataset.test_ivars
+    fluxes = dataset.test_flux
+    ivars = dataset.test_ivar
     nstars = fluxes.shape[0]
     labels_all = np.zeros((nstars, nlabels))
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1] - 1,
