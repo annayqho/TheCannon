@@ -1,19 +1,20 @@
 from __future__ import (absolute_import, division, print_function)
-from lamost import LamostDataset
+from cannon.dataset import Dataset
 from cannon.model import CannonModel
 from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
 import numpy as np
 import pickle
 
-###### WORKFLOW
-
-
-# RUN LAMOST MUNGING CODE
+# STEP 1: PREPARE DATA 
 tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
 test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
-dataset = LamostDataset("example_LAMOST/Data_All",
-                        tr_files, test_files, 
-                        "example_DR12/reference_labels.csv")
+dir_lab = "example_DR12/reference_labels.csv"
+dir_dat = "example_LAMOST/Data_All"
+
+
+
+dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
+
 
 # Choose labels
 cols = ['teff', 'logg', 'feh', 'alpha']
