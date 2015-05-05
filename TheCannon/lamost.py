@@ -156,9 +156,9 @@ def load_labels(label_file):
     print("Loading reference labels from file %s" %label_file)
     data = Table(label_file)
     data.sort('id')
-    label_names = data.keys()
+    label_names = data.keys()[1:] # ignore id
     nlabels = len(label_names)
     print('%s labels:' %nlabels)
     print(label_names)
-    labels = np.array([data[k] for k in label_names]).T
+    labels = np.array([data[k] for k in label_names], dtype=float).T
     return labels 

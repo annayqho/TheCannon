@@ -8,24 +8,26 @@ import pickle
 import csv
 
 # STEP 1: PREPARE DATA 
-tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
-test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
-dir_lab = "example_DR12/reference_labels.csv"
-dir_dat = "example_LAMOST/Data_All"
+if glob.glob('lamost_data.p'):
+    wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar = pickle.load(
+            open('lamost_data.p', 'r'))
 
-wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
-wl, test_flux, test_ivar = load_spectra(dir_dat, test_files)
-tr_label = load_labels(dir_lab)
+else:
+    tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
+    test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
+    dir_lab = "example_DR12/reference_labels.csv"
+    dir_dat = "example_LAMOST/Data_All"
+
+    wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
+    wl, test_flux, test_ivar = load_spectra(dir_dat, test_files)
+    tr_label = load_labels(dir_lab)
+    pickle.dump((wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar), 
+            open('lamost_data.p', 'w'))
 
 dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 
-
-# Choose labels
-cols = ['teff', 'logg', 'feh', 'alpha']
-dataset.choose_labels(cols)
-
 # set the headers for plotting
-dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]', '\alpha'])
+dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '\alpha'])
 
 # Plot SNR distributions and triangle plot of reference labels
 dataset.diagnostics_SNR()
