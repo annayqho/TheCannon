@@ -7,6 +7,11 @@ import numpy as np
 import pickle
 import random
 import csv
+from matplotlib import rc
+
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
 
 # STEP 1: PREPARE DATA 
 if glob.glob('lamost_data.p'):
@@ -170,7 +175,11 @@ coeffs_all = pickle.load(open("coeffs_all.p", "r"))
 model.diagnostics()
 
 # infer labels with the new model for the test_set
-dataset, label_errs = model.infer_labels(dataset)
+if glob.glob('test_labels.p'):
+    test_label = pickle.load(open('test_labels.p', 'r'))
+    dataset.test_label = test_label
+else:
+    dataset, label_errs = model.infer_labels(dataset)
 
 # Make plots
 dataset.dataset_postdiagnostics(dataset)
