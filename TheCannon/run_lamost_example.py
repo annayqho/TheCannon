@@ -34,27 +34,31 @@ dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
 
-# RUN CONTINUUM IDENTIFICATION CODE
+# STEP 2: CONTINUUM IDENTIFICATION
 
 # Pseudo-continuum normalization for the training spectra
-norm_tr_fluxes, norm_tr_ivars = dataset.continuum_normalize_q(
-        dataset.tr_fluxes, dataset.tr_ivars, q=0.90, delta_lambda=400)
-# or, if it's already done
-norm_tr_fluxes, norm_tr_ivars = pickle.load(open("pseudo_normed_spec.p", "r"))
-# pickle.dump((norm_tr_fluxes, norm_tr_ivars), open("pseudo_normed_spec.p", "w"))
+if glob.glob('pseudo_normed_spec.p', 'r'):
+    norm_tr_fluxes, norm_tr_ivars = pickle.load(open("pseudo_normed_spec.p", "r"))
+
+else:
+    norm_tr_fluxes, norm_tr_ivars = dataset.continuum_normalize_q(
+            dataset.tr_flux, dataset.tr_ivar, q=0.90, delta_lambda=400)
+    pickle.dump((norm_tr_fluxes, norm_tr_ivars), 
+            open("pseudo_normed_spec.p", "w"))
 
 # From the cont norm training spectra, identify continuum pixels
-# Identify the best 5% of continuum pixels
-contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
+if glob.glob('contmask.p', 'r'):
+    contmask = pickle.load(open("contmask.p", "r"))
+else:
+    # Identify the best 5% of continuum pixels
+    contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
 
-# Identify the best 5% of continuum pixels in each of the following
-# pixel regions 
-dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 1950], [1950, 2500], [2500,3000], [3000, len(dataset.wl)]]
-contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
-# or, if it's already done
-contmask = pickle.load(open("contmask.p", "r"))
-# since I changed the array size...
-contmask1 = contmask[0:3626]
+    # Identify the best 5% of continuum pixels in each of the following
+    # pixel regions 
+    dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 1950], [1950, 2500], [2500,3000], [3000, len(dataset.wl)]]
+    contmask1 = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
+    # since I changed the array size...
+    contmask = contmask1[0:3626]
 
 # Check it out...
 f_bar = np.zeros(len(dataset.wl))
