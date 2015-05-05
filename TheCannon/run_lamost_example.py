@@ -5,6 +5,7 @@ from cannon.model import CannonModel
 from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
 import numpy as np
 import pickle
+import random
 import csv
 
 # STEP 1: PREPARE DATA 
@@ -56,11 +57,23 @@ else:
     # Identify the best 5% of continuum pixels in each of the following
     # pixel regions 
     dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 1950], [1950, 2500], [2500,3000], [3000, len(dataset.wl)]]
-    contmask1 = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
+    contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
     # since I changed the array size...
-    contmask = contmask1[0:3626]
 
-# Check it out...
+dataset.set_continuum(contmask)
+
+
+# RUN CONTINUUM NORMALIZATION CODE
+
+if glob.glob('cont.p', 'r'):
+    tr_cont, test_cont = pickle.load(open("cont.p", "r"))
+else:
+    dataset.ranges = [[0,1723], [1863,len(dataset.wl)]] # split into two wings
+    tr_cont, test_cont = dataset.fit_continuum(deg=3, ffunc="sinusoid")
+    pickle.dump((tr_cont, test_cont), open("cont.p", "w"))
+
+
+# Check out the median flux overlaid with cont pix 
 f_bar = np.zeros(len(dataset.wl))
 sigma_f = np.zeros(len(dataset.wl))
 for wl in range(0,len(dataset.wl)):
@@ -74,44 +87,80 @@ sigma_f = np.ma.array(sigma_f, mask=bad)
 plot(dataset.wl, f_bar, alpha=0.7)
 fill_between(dataset.wl, (f_bar+sigma_f), (f_bar-sigma_f), alpha=0.2)
 scatter(dataset.wl[contmask], f_bar[contmask], c='r')
+xlim(3800,9100)
+ylim(0,1.1)
+xlabel("Wavelength (A)")
+ylabel("Median Flux")
+title("Median Flux Across Training Spectra Overlaid with Cont Pix")
+savefig("medflux_contpix.png")
 
-dataset.set_continuum(contmask1)
+# Residuals between raw flux and fitted continuum
+res = (dataset.tr_flux-tr_cont)*np.sqrt(dataset.tr_ivar)
+# sort by temperature...
+sorted_res = res[np.argsort(dataset.tr_label[:,2])]
+im = plt.imshow(res, cmap=plt.cm.bwr_r, interpolation='nearest', 
+        vmin = -80, vmax=10, aspect = 'auto', origin = 'lower',
+        extent=[0, len(dataset.wl), 0, nstars])
+xlabel("Pixel")
+ylabel("Training Object")
+title("Residuals in Continuum Fit to Raw Spectra")
+colorbar()
 
-# RUN CONTINUUM NORMALIZATION CODE
 
-dataset.ranges = [[0,1723], [1863,len(dataset.wl)]] # split into two wings
-tr_cont, test_cont = dataset.fit_continuum(deg=3, ffunc="sinusoid")
-# or, if it's already done
-pickle.dump((tr_cont, test_cont), open("cont.p", "w"))
-tr_cont, test_cont = pickle.load(open("cont.p", "r"))
+# Plot the cont fits for 100 random training stars
+pickstars = np.zeros(100)
+nstars = dataset.tr_flux.shape[0]
+for jj in range(100):
+    pickstars[jj] = random.randrange(0, nstars-1)
 
-# Check it out...
-jj = 50
-bad = np.var(norm_tr_ivars, axis=0) == 0
-flux = np.ma.array(dataset.tr_fluxes[jj,:], mask=bad)
-plot(dataset.wl, flux, alpha=0.7)
-scatter(dataset.wl[contmask], flux[contmask], c='r')
-cont = np.ma.array(tr_cont[jj,:], mask=bad)
-plot(dataset.wl, cont)
+for jj in pickstars:
+    #bad = np.var(norm_tr_ivars, axis=0) == 0
+    bad = norm_tr_ivars[jj,:] == 0 
+    flux = np.ma.array(dataset.tr_flux[jj,:], mask=bad)
+    plot(dataset.wl, flux, alpha=0.7)
+    scatter(dataset.wl[contmask], flux[contmask], c='r')
+    cont = np.ma.array(tr_cont[jj,:], mask=bad)
+    plot(dataset.wl, cont)
+    xlim(3800, 9100)
+    title("Sample Continuum Fit")
+    xlabel("Wavelength (A)")
+    ylabel("Raw Flux")
+    savefig('contfit_%s.png' %jj)
+    plt.close()
+
+f,ax = plt.subplots(2, sharex=True)
+meanres = np.mean(res, axis=0)
+mu = mean(meanres)
+sig = np.sqrt(var(meanres))
+c= ax[1].imshow(sorted_res, cmap = plt.cm.bwr_r, interpolation='nearest',
+     vmin = mu-3*sig, vmax= mu+sig, aspect='auto')
+colorbar(c, orientation='horizontal')
+ax[0].plot(flux, alpha=0.7)
+ax[0].plot(cont)
+xlim(0,3626)
+
+ax[0].hist(meanres, bins = 60, range=(mu-3*sig, mu+sig))
+ax[0].set_ylabel("Raw Flux")
+title("Sample Raw Spec with All Continuum Fit Residuals")
+c = ax[1].imshow(res, cmap = plt.cm.bwr_r, interpolation='nearest',
+        vmin = -80, vmax=10, aspect='auto')
+colorbar(c, orientation='horizontal')
+ax[1].set_ylabel("Training Objects")
+
 
 norm_tr_fluxes, norm_tr_ivars, norm_test_fluxes, norm_test_ivars = \
         dataset.continuum_normalize_f(cont=(tr_cont, test_cont))
 
-# Check it out...
-jj = 50
-bad = norm_tr_ivars[jj,:] == SMALL**2
-flux = np.ma.array(norm_tr_fluxes[jj,:], mask=bad)
-plot(dataset.wl, flux, alpha=0.7)
 
 # If you approve...
 
-dataset.tr_fluxes = norm_tr_fluxes
-dataset.tr_ivars = norm_tr_ivars
-dataset.test_fluxes = norm_test_fluxes
-dataset.test_ivars = norm_test_ivars
+dataset.tr_flux = norm_tr_fluxes
+dataset.tr_ivar = norm_tr_ivars
+dataset.test_flux = norm_test_fluxes
+dataset.test_ivar = norm_test_ivars
 
 # learn the model from the reference_set
-model = CannonModel(dataset, 2) # 2 = quadratic model
+model = CannonModel(dataset, 3) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
 
 # or...
@@ -122,7 +171,6 @@ model.diagnostics()
 
 # infer labels with the new model for the test_set
 dataset, label_errs = model.infer_labels(dataset)
-#dataset, covs = model.predict(dataset)
 
 # Make plots
 dataset.dataset_postdiagnostics(dataset)
