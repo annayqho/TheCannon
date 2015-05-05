@@ -1,11 +1,17 @@
 \documentclass[12pt, preprint]{aastex}
 %\usepackage{bm, graphicx, subfigure, amsmath, morefloats}
 \bibliographystyle{apj}
+\usepackage{caption}
+\usepackage{subcaption}
 
 % naming macros
 \newcommand{\tc}{\textsl{The~Cannon}} 
 \newcommand{\apogee}{\textsl{APOGEE}} 
 \newcommand{\lamost}{\textsl{LAMOST}}
+\newcommand{\segue}{\textsl{SEGUE}}
+\newcommand{\rave}{\textsl{RAVE}}
+\newcommand{\galah}{\textsl{GALAH}}
+\newcommand{\gaiaeso}{\textsl{Gaia-ESO}}
 
 % math and symbol macros
 \newcommand{\teff}{\mbox{$\rm T_{eff}$}}
@@ -16,49 +22,44 @@
 
 \begin{document}
 
-\title{\lamost\ labels on the \apogee\ scale: \\ The first spectroscopic survey cross-calibration using \tc}
+\title{Survey Cross-Calibration Using \tc: \\ \lamost\ Labels on the \apogee\ Scale}
 \author{A. Y. Q. ~Ho\altaffilmark{1},
 M.~Ness\altaffilmark{1},
 David~W.~Hogg\altaffilmark{1,2,3}, 
 H.-W.~Rix\altaffilmark{1},
 M.~Fouesneau\altaffilmark{1},
-C.~Chao\altaffilmark{4},
-F.~Yang\altaffilmark{4,5}
+C.~Liu\altaffilmark{4},
+F.~Yang\altaffilmark{4}
 }
 \altaffiltext{1}{Max-Planck-Institut f\"ur Astronomie, K\"onigstuhl 17, D-69117 Heidelberg, Germany}
 \altaffiltext{2}{Center for Cosmology and Particle Physics, Department of Phyics,
 New York University, 4 Washington Pl., room 424, New York, NY, 10003, USA}
 \altaffiltext{3}{Center for Data Science, New York University, 726 Broadway, 7th Floor, New York, NY 10003, USA}
 \altaffiltext{4}{Key Laboratory of Optical Astronomy, National Astronomical Observatories, Chinese Academy of Sciences, Datun Road 20A,Beijin 100012, China}
-\altaffiltext{5}{University of Chinese Academy of Sciences, Beijing 100049, China}
 
 \email{annaho@mpia.de}
 
 \begin{abstract}
 
-Using 11,061 objects observed with both the \apogee\ and \lamost\ stellar
-surveys, we demonstrate the ability of \tc\ to bring qualitatively 
-different stellar surveys onto a consistent stellar parameter and chemical 
-abundance scale. 
-\tc\ \citep{ness2015} is a data-driven method for determining stellar labels 
-(physical parameters and chemical abundances) from stellar spectra in the 
-context of vast spectroscopic surveys. 
-Unlike many other methods for label determination, \tc\ does not 
-explicitly rely on physics-based model spectra or line lists, and takes 
-advantage of all of the pixels (and therefore information) in the spectrum. 
-It works by fitting a flexible model that describes how the flux in each 
-pixel of any given continuum-normalized spectrum in the survey depends on 
-the labels. 
-For this demonstration, we use SDSS/DR12 data from the 
-SDSS-III/Apache Point Observatory Galactic Evolution Experiment (\apogee) 
-as well as data from the \lamost\ second data release (DR2) to illustrate the 
-success of \tc\ at different wavelength regions and resolution regimes. 
-By training the model on \apogee\ spectra and using it to obtain labels for 
-\lamost\ spectra, we obtain labels that are consistent
-with the \apogee\ labels for these objects, thus successfully putting spectra
-from \lamost\ onto the \apogee\ parameter scale. 
-The code used to generate the results in this paper is available for use by
-the community and can be found at this link (or downloaded in this way?)
+To capitalize on the new generation of large spectroscopic surveys, 
+it is essential to develop robust methods for cross-calibration: for putting 
+qualitatively surveys onto the same label (physical parameter and 
+chemical abundance) scale. In this work, we demonstrate that
+cross-calibration can be achieved using \tc\ \citep{ness2015}, a fast
+new data-driven approach to stellar label determination, given a
+comprehensive set of overlap objects between the surveys. 
+For our demonstration, we apply \tc\ to 11,057 objects observed with 
+both the \apogee\ DR12 and \lamost\ DR2 stellar surveys, and successfully
+calculate four \apogee-scale labels (\teff, \logg, \feh, \alphafe) for all of
+the \lamost\ spectra. We obtain values of
+\teff, \logg, and \feh\ at least as ``good" (scatter and bias comparison here)
+as those from the \lamost\ 
+pipeline, with negligible bias from \apogee\ values (numbers??). In addition, we
+successfully calculate the first reliable \alphafe\ values for \lamost\ 
+spectra. 
+The code used to produce the results as described in this paper was written in
+Python and is available online for public 
+use.\footnote{\url{www.github.com/annayqho/the-cannon}}
 
 \end{abstract}
 
@@ -76,65 +77,119 @@ surveys
 techniques: spectroscopic
 }
 
-\section{Introduction}
+\section{Introduction: \tc\ in the Context of Survey Cross-Calibration}
 
-\tc\ was conceived with the goal of consistently measuring stellar labels 
-(physical parameters and chemical abundances) for the hundreds of thousands of 
-stars in the Milky Way observed with state-of-the-art spectroscopic surveys. 
-The method is described in detail in \citep{ness2015} and we recapitulate the 
-two fundamental steps here. First, \tc\ uses a set of \emph{reference objects}
-in a survey to create a model. Reference objects are a subset of spectra for
-which corresponding stellar labels are known with high fidelity, for
-calibration reasons or otherwise. These objects are used as a
-\emph{training set} to fix a flexible generative model that describes 
-a probability density function for the flux in each pixel of a 
-continuum-normalized spectrum as a function of the ``known'' labels.
-In the second step, the model is assumes to hold for all the 
-other objects in the survey (known collectively as the \emph{test set}) and 
-is applied to infer their labels. 
+A new generation of large-scale spectroscopic surveys (e.g. \segue\ \citep{Beers}, \rave\ \citep{Steinmetz2006}, \gaiaeso\ \citep{Gilmore2012}, \galah\ \citep{Freeman2012}, \apogee\ \citep{Majewski2012}, \lamost\ \citep{Newberg2012}) has been systematically 
+measuring spectra for hundreds of thousands of stars in the Milky Way. In a few years,
+this number will be in the millions. 
+In the context of this unprecedented wealth of data, 
+it is essential to develop tools that can measure consistent stellar labels 
+(physical parameters and chemical abundances) from spectra: labels that
+depend only on the star and not on survey-dependent properties such
+as resolution and wavelength range. In other words, taking advantage of this data
+necessitates developing robust techniques for cross-calibration. 
 
-One of the limitations of this method is its reliance on the existence of a 
-training set that is both trustworthy and fully spans the label space.
-Major strengths of this method include speed, independence from physical 
-models and line lists, and weak degradation with decreasing signal-to-noise. 
-Perhaps most importantly, the method has the potential for bringing 
-qualitatively different surveys onto a consistent physical scale.
+In this work, we set out to cross-calibrate the \lamost\ and \apogee\ surveys
+using \tc. \tc\ is a data-driven method for measuring stellar labels in the context
+of vast spectroscopic surveys. 
+The method as applied to a single survey is described in detail in \citet{ness2015}; 
+we recapitulate the fundamental assumptions and steps here, in the context of survey cross-calibration. 
 
-An opportunity for a first cross-calibration test lies at the intersection
-of \apogee\ DR12 and \lamost\ DR2: 11,061 objects were observed in common
-between the two surveys. We use \apogee\ DR12 spectra as the 
-training set and \lamost\ DR2 spectra as the test set, 
-with the goal of bringing \lamost\ spectra onto the \apogee\ scale. 
-Cross-calibrating these two surveys provides an excellent opportunity to test
-the performance of \tc\ in both different wavelength and different resolution
-regimes: \apogee\ data is in the H-band (15200 to 16900\,$\mbox{\AA}$) at 
-resolution$R\,\sim\,22,500$ while \lamost\ data is in the window 
-3700-9000\,$\mbox{\AA}$ at resolution $R\,\sim\,1,000$. 
+\tc\ makes two assumptions: that the spectra of stars with identical labels look identical,
+and that spectra vary smoothly with label changes. In other words, the continuum-normalized flux at each pixel in the spectrum is a smooth function of the labels. The function
+that maps the flux in a pixel to the object's labels is called the ``spectral model." 
 
-The code used to produce the results as described in this paper was written in
-Python and is available online for public 
-use.\footnote{\url{www.github.com/annayqho/the-cannon}}
-Although the code is an implementation of the procedure outlined in 
-\citep{ness2015}, some changes have been made. A list of these changes 
+\tc\ proceeds in two steps: a ``training step" and then a ``test step." 
+Presume that we would like to cross-calibrate Survey A and Survey B by measuring
+labels for Survey A spectra that are on the Survey B scale.  
+In the training step, \tc\ uses a set of ``reference objects" - a subset of spectra for
+which corresponding stellar labels are ``known" and comprehensively
+span the label space - to fit for the spectral model at each 
+pixel independently. In the cross-calibration context, the training set would
+consist of objects measured in common between the two surveys: training
+spectra from Survey A and training labels from Survey B. 
+The spectral model would thus map Survey A spectra to Survey B labels. 
+In the test step, the spectral model is applied to each of the remaining objects
+(known collectively as the ``test set") to infer their labels. 
+In the cross-calibration context, the test set would consist of all the 
+non-training spectra from Survey A. 
+Because the model was trained on Survey B-scale labels, the inferred
+labels will all be on the Survey B scale. 
+
+The code used in this work is an implementation of the procedure outlined in 
+\citep{ness2015}. A list of the (subtle) changes made since then
 can be found in Appendix \ref{sec:appendix}.
 
-\section{Preparing for \tc: Selection and Pre-Processing of Data}
+\section{Data}
 
-\apogee\ DR12 data overview: SDSS-III/\apogee\ survey. APOGEE-1 survey 
-(Majewski et al. 2015) released as part of the 12th data release of the Sloan
-Digital Sky Survey (Alam et al. 2015, DR12). The pre-continuum normalized
-spectra have gone through the APOGEE data reduction pipeline 
-(Nidever et al. 2015). APOGEE survey (Majewski et al. 2012, 2015 in prep). 
-APOGEE, part of the SDSS-III (Eisenstein et al. 2011) is a high-res
-(R~22,500) high SNR (SNR~100) H-band (15200-16900\,$\mbox{\AA}$) spectroscpoic
+\subsection{\lamost\ Spectra}
+
+Our goal is to calculate \apogee-scale labels for \lamost\ spectra: 
+therefore, both the training and test objects consist of spectra from
+\lamost\ DR2. We use 11,057 objects observed in common between
+the two surveys: 803 for the training set and the rest for the test set. 
+
+\lamost\ is blah blah. 
+
+Before being fed to \tc, any spectroscopic data set must satisfy the criteria laid out in 
+\citet{ness2015}. More specifically, the spectra must be
+continuum-normalized in a consistent way that is independent of S/N, and need
+to be radial velocity shifted and sampled onto a common wavelength grid with
+a common line-spread function. Each pixel of each spectrum must be accompanied
+by a flux variance that takes sources like photon noise into account. 
+
+In order to satisfy these criteria, the displacement from the rest frame was
+calculated for each \lamost\ spectrum using the redshift value provided in 
+the header of each data file. The data was then resampled through interpolation
+onto a common, evenly spaced grid of spacing 0.85\,$\mbox{\AA}$. 
+Upper and lower cuts were applied to the data such that its lower and upper 
+wavelengths were 3900\,$\mbox{\AA}$ and 8800\,$\mbox{\AA}$ respectively.
+All of these operations were performed on the flux as well as inverse variance
+arrays. 
+
+\tc\ performs its own continuum normalization on raw spectra. 
+Continuum normalization consists of identifying continuum pixels from continuum
+normalized spectra, then applying a sinusoidal fit to those pixels in the raw spectra.
+The training spectra are first pseudo continuum normalized using a running median: 
+we take the 90th percentile from a running quantile window 400\,\AA\ wide. 
+From the grid of pseudo continuum normalized training spectra, we create two vectors: 
+the median flux across all the objects, and the variance in flux across all the objects. 
+We then apply a median and flux cut such that 5\% of pixels in each 100\,\AA\ window
+are selected as continuum. We then return to the raw spectra, and fit a third-order 
+sinusoid to the continuum pixels. A separate sinusoid is fit for the red and blue spectral
+wings. A sample training set spectrum with sinusoid continuum fit is shown in
+Figure \ref{fig:sample_spec}. 
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_typical_spec_snr134_withcont.png}
+\caption{A sample high-S/N LAMOST spectrum from the training set, 
+overlaid with the continuum fit from \tc}
+\label{fig:sample_spec}
+\end{figure}
+
+\subsection{\apogee\ Labels}
+
+We choose to put \lamost\ spectra onto the \apogee\ scale instead of the
+other way around because \apogee\ labels are presumed to be more precise
+due to their derivation from higher resolution spectra. Thus, our model is
+trained using labels from \apogee\ DR12. 
+
+\apogee\ is part of the SDSS-III (Eisenstein et al. 2011). 
+\apogee\ DR12 (Majewski et al. 2015) was released as part of the 12th data release of the Sloan
+Digital Sky Survey (Alam et al. 2015, DR12). 
+
+It is a high resolution
+($R\approx22,500$) high SNR ($SNR\approx100$) H-band (15200-16900\,$\mbox{\AA}$) spectroscopic
 survey of primarily red giants spanning the bulge, disk, and MW halo 
-(Zasowski et al. 2013). APOGEE'S ASPCAP pipeline provides stellar labels for
+(Zasowski et al. 2013). \apogee's ASPCAP pipeline provides stellar labels for
 these stars, which includes stellar parameters and multiple chemical 
 abundances in addition to numerous flags that warn of problems with spectra
 or fitting or label determination or both. It's based on chi-sq fitting of
 the data to 1D LTE models for seven labels (Teff, logg, blah blah; Garcia 
 Perez et al. 2015, in prep). 
-\subsection{Choosing a Training Set for Cross-Calibration}
+
+\section{\tc\ Training Step: \\ Use Reference Objects to Fit a Spectral Model}
 
 The two surveys have 11,061 objects in common. Of this overlap, a high 
 fidelity sample was selected by applying three cuts to \apogee\ objects: 
@@ -145,55 +200,64 @@ without a BAD STAR flag were selected. With these cuts, 1722 stars were
 selected to populate the training set with the remaining 9339 used as test
 objects. 
 
-\apogee\ spectra
-were used because labels are assumed to be higher for objects observed at
-higher SNR.  
-But need to represent and cover label space as well. Repeat with 
-various fractions of the 12,000 stars in common.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_first_order_coeffs.png}
+\caption{Coefficients of the spectral model indicate how sensitive each pixel in the spectrum is to each of the labels. See that sensitive regions correspond to known spectral lines.}
+\label{leading_coeffs}
+\end{figure}
 
-\subsection{Data Pre-Processing Steps}
+\section{\tc\ Test Step: \\ Use the Spectral Model to Infer Labels for Test Objects}
 
-Before being fed to \tc, any spectroscopic data set (whether used as the 
-training or the test set) must satisfy the criteria laid out in 
-\citep{ness2015}. More specifically, the spectra must be
-continuum-normalized in a consistent way that is independent of S/N, and need
-to be radial velocity shifted and sampled onto a common wavelength grid with
-a common line-spread function. Each pixel of each spectrum must be accompanied
-by a flux variance that takes sources like photon noise into account. 
+\begin{figure}
+\centering
+\includegraphics[scale=0.4]{poster_1to1_teff.png}
+\end{figure}
 
-These are the criteria that apply to any data set. All \lamost\ and \apogee\
-spectra arrived with flux, variance, and wavelength arrays. 
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_1to1_teff_hist.png}
+\end{figure}
 
-We now illustrate the 
-preparation of two different data sets for use by \tc: the \apogee\ training
-set and the \lamost\ test set. 
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_1to1_logg.png}
+\end{figure}
 
-\subsubsection{\apogee\ Data Pre-Processing}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_1to1_logg_hist.png}
+\end{figure}
 
-Similar to what's in the original method paper.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_1to1_feh.png}
+\end{figure}
 
-\subsubsection{\lamost\ Data Pre-Processing}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_1to1_feh_hist.png}
+\end{figure}
 
-For both test and training data, the stars were shifted back to the rest frame 
-by using the redshift value provided in the header of each star by LAMOST, 
-where wavelength shift = redshift*xdata in the data were then resampled on to 
-a common, evenly spaced grid (but this should to be corrected - change spacing 
-to evenly spaced in logarithm space not linear space) of 0.85\,$\mbox{\AA}$ 
-(which is the spacing at the lower wavelength limit of the data). Upper and 
-lower cuts were made to the data to span from 3900 to 8800\,$\mbox{\AA}$.
-This data, now radial velocity corrected and resampled on to a common grid, 
-All operations done to the flux were also performed 
-on the variance arrays. 
-\section{\tc}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_1to1_alpha.png}
+\end{figure}
 
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_1to1_alpha_hist.png}
+\end{figure}
 
-\subsection{Continuum Normalization}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_teff_logg_plane.png}
+\end{figure}
 
-After data has been shaped up and prepared for use by \tc\, \tc\ does its own
-continuum normalization. Find a certain fraction of pixels to use as continuum
-Fit a series of sines and cosines. Divide the spectra by this function. This 
-is different to what we did in the original \tc\ method paper \citep{ness2015}. 
-
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.4]{poster_feh_alpha_plane.png}
+\end{figure}
 
 \section{Discussion}
 
@@ -233,9 +297,70 @@ of \citep{ness2015} and this cross-calibration work:
 \begin{thebibliography}{24}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
+\bibitem[Beers et al.(2006)]{Beers} Beers, T.~C., Lee, Y., 
+Sivarani, T., et al.\ 2006, \memsai, 77, 1171 
+
+\bibitem[{{Freeman}(2012)}]{Freeman2012}
+{Freeman}, K.~C. 2012, in Astronomical Society of the Pacific Conference
+  Series, Vol. 458, Galactic Archaeology: Near-Field Cosmology and the
+  Formation of the Milky Way, ed. W.~{Aoki}, M.~{Ishigaki}, T.~{Suda},
+  T.~{Tsujimoto}, \& N.~{Arimoto}, 393
+
+\bibitem[{{Gilmore} {et~al.}(2012){Gilmore}, {Randich}, {Asplund}, {Binney},
+  {Bonifacio}, {Drew}, {Feltzing}, {Ferguson}, {Jeffries}, {Micela},
+  {Negueruela}, {Prusti}, {Rix}, {Vallenari}, {Alfaro}, {Allende-Prieto},
+  {Babusiaux}, {Bensby}, {Blomme}, {Bragaglia}, {Flaccomio}, {Fran{\c c}ois},
+  {Irwin}, {Koposov}, {Korn}, {Lanzafame}, {Pancino}, {Paunzen},
+  {Recio-Blanco}, {Sacco}, {Smiljanic}, {Van Eck}, \& {Walton}}]{Gilmore2012}
+{Gilmore}, G., {Randich}, S., {Asplund}, M., {Binney}, J., {Bonifacio}, P.,
+  {Drew}, J., {Feltzing}, S., {Ferguson}, A., {Jeffries}, R., {Micela}, G.,
+  {Negueruela}, I., {Prusti}, T., {Rix}, H.-W., {Vallenari}, A., {Alfaro}, E.,
+  {Allende-Prieto}, C., {Babusiaux}, C., {Bensby}, T., {Blomme}, R.,
+  {Bragaglia}, A., {Flaccomio}, E., {Fran{\c c}ois}, P., {Irwin}, M.,
+  {Koposov}, S., {Korn}, A., {Lanzafame}, A., {Pancino}, E., {Paunzen}, E.,
+  {Recio-Blanco}, A., {Sacco}, G., {Smiljanic}, R., {Van Eck}, S., \& {Walton},
+  N. 2012, The Messenger, 147, 25
+
+\bibitem[{{Majewski}(2012)}]{Majewski2012}
+{Majewski}, S.~R. 2012, in American Astronomical Society Meeting Abstracts,
+  Vol. 219, American Astronomical Society Meeting Abstracts 219, 205.06
+
 \bibitem[{{Ness}{ et~al.}(2015){Ness}, {Hogg}, {Rix}, {Ho}, \& 
   {Zasowski}}]{ness2015}
 {Ness}, M., {Hogg}, D.W., {Rix}, H.-W., {Ho}, A.Y.Q., \& {Zasowski}, G. 2015
+
+\bibitem[{{Newberg} {et~al.}(2012){Newberg}, {Carlin}, {Chen}, {Deng},
+  {L{\'e}pine}, {Liu}, {Yang}, {Yuan}, {Zhang}, {Zhang}, {Legue Working Group},
+  \& {Lamost-Plus Partnership}}]{Newberg2012}
+{Newberg}, H.~J., {Carlin}, J.~L., {Chen}, L., {Deng}, L., {L{\'e}pine}, S.,
+  {Liu}, X., {Yang}, F., {Yuan}, H.-B., {Zhang}, H., {Zhang}, Y., {Legue
+  Working Group}, \& {Lamost-Plus Partnership}. 2012, in Astronomical Society
+  of the Pacific Conference Series, Vol. 458, Galactic Archaeology: Near-Field
+  Cosmology and the Formation of the Milky Way, ed. W.~{Aoki}, M.~{Ishigaki},
+  T.~{Suda}, T.~{Tsujimoto}, \& N.~{Arimoto}, 405
+
+\bibitem[{{Steinmetz} {et~al.}(2006){Steinmetz}, {Zwitter}, {Siebert},
+  {Watson}, {Freeman}, {Munari}, {Campbell}, {Williams}, {Seabroke}, {Wyse},
+  {Parker}, {Bienaym{\'e}}, {Roeser}, {Gibson}, {Gilmore}, {Grebel}, {Helmi},
+  {Navarro}, {Burton}, {Cass}, {Dawe}, {Fiegert}, {Hartley}, {Russell},
+  {Saunders}, {Enke}, {Bailin}, {Binney}, {Bland-Hawthorn}, {Boeche}, {Dehnen},
+  {Eisenstein}, {Evans}, {Fiorucci}, {Fulbright}, {Gerhard}, {Jauregi}, {Kelz},
+  {Mijovi{\'c}}, {Minchev}, {Parmentier}, {Pe{\~n}arrubia}, {Quillen}, {Read},
+  {Ruchti}, {Scholz}, {Siviero}, {Smith}, {Sordo}, {Veltz}, {Vidrih}, {von
+  Berlepsch}, {Boyle}, \& {Schilbach}}]{Steinmetz2006}
+{Steinmetz}, M., {Zwitter}, T., {Siebert}, A., {Watson}, F.~G., {Freeman},
+  K.~C., {Munari}, U., {Campbell}, R., {Williams}, M., {Seabroke}, G.~M.,
+  {Wyse}, R.~F.~G., {Parker}, Q.~A., {Bienaym{\'e}}, O., {Roeser}, S.,
+  {Gibson}, B.~K., {Gilmore}, G., {Grebel}, E.~K., {Helmi}, A., {Navarro},
+  J.~F., {Burton}, D., {Cass}, C.~J.~P., {Dawe}, J.~A., {Fiegert}, K.,
+  {Hartley}, M., {Russell}, K.~S., {Saunders}, W., {Enke}, H., {Bailin}, J.,
+  {Binney}, J., {Bland-Hawthorn}, J., {Boeche}, C., {Dehnen}, W., {Eisenstein},
+  D.~J., {Evans}, N.~W., {Fiorucci}, M., {Fulbright}, J.~P., {Gerhard}, O.,
+  {Jauregi}, U., {Kelz}, A., {Mijovi{\'c}}, L., {Minchev}, I., {Parmentier},
+  G., {Pe{\~n}arrubia}, J., {Quillen}, A.~C., {Read}, M.~A., {Ruchti}, G.,
+  {Scholz}, R.-D., {Siviero}, A., {Smith}, M.~C., {Sordo}, R., {Veltz}, L.,
+  {Vidrih}, S., {von Berlepsch}, R., {Boyle}, B.~J., \& {Schilbach}, E. 2006,
+  \aj, 132, 1645
 
 \bibitem[{{ Zasowski} {et~al.}(2013){Zasowski}, {Johnson}, {Frinchaboy},
   {Majewski}, {Nidever}, {Rocha Pinto}, {Girardi}, {Andrews}, {Chojnowski},
