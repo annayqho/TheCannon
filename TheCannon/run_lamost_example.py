@@ -27,7 +27,7 @@ else:
 dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 
 # set the headers for plotting
-dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '\alpha'])
+dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]'])
 
 # Plot SNR distributions and triangle plot of reference labels
 dataset.diagnostics_SNR()
