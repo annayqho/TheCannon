@@ -48,7 +48,6 @@ def read_test(filename):
     bad = np.logical_or(np.isnan(test_ivar), np.isnan(test_flux)) 
     test_ivar[bad] = 0.
     test_flux[bad] = 0.
-    wl = data['lambda'][0] # assuming they're all the same... 
     return (test_flux, test_ivar, wl)
 
 if glob.glob('rave_test_data.p'):

@@ -1,9 +1,11 @@
 from __future__ import (absolute_import, division, print_function)
+from lamost import load_spectra, load_labels
 from cannon.dataset import Dataset
 from cannon.model import CannonModel
 from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
 import numpy as np
 import pickle
+import csv
 
 # STEP 1: PREPARE DATA 
 tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
@@ -11,7 +13,9 @@ test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
 dir_lab = "example_DR12/reference_labels.csv"
 dir_dat = "example_LAMOST/Data_All"
 
-
+wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
+wl, test_flux, test_ivar = load_spectra(dir_dat, test_files)
+tr_label = load_labels(dir_lab)
 
 dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 
