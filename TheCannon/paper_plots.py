@@ -5,10 +5,10 @@ from cannon.dataset import Dataset
 from cannon.helpers import Table
 from matplotlib import rc
 import matplotlib.gridspec as gridspec
+import pickle
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-
 
 test_SNR = pickle.load(open('test_SNR.p', 'r'))
 test_labels = pickle.load(open('test_labels.p', 'r'))
@@ -78,3 +78,53 @@ for i in range(0, len(names)):
     ax2.legend(fontsize=14)
     plt.show()
     plt.savefig('1to1_%s.png'%i)
+
+# first-order coeffs plot
+lams = pickle.load(open("wl.p", "r"))
+coeffs_all = pickle.load(open("coeffs_all.p", "r"))
+scatters = pickle.load(open("scatters.p", "r"))
+bad = scatters < 0.0002
+scatters = np.ma.array(scatters, mask=bad)
+lams = np.ma.array(lams, mask=bad)
+cut = 40
+
+lams = lams[cut:]
+scatters = scatters[cut:]
+
+nlabels = 4
+fig, axarr = plt.subplots(5, figsize=(8,8), sharex=True)
+#ax = plt.gca()
+#ax.xaxis.grid(True)
+plt.subplots_adjust(hspace=0.001)
+nbins = len(ax1.get_xticklabels())
+for i in range(1,5):
+    axarr[i].yaxis.set_major_locator(MaxNLocator(nbins=nbins, prune='upper'))
+plt.xlabel(r"Wavelength $\lambda (\AA)$", fontsize=14)
+plt.xlim(np.ma.min(lams), np.ma.max(lams))
+plt.tick_params(axis='x', labelsize=14)
+axarr[0].set_title(
+    "First-Order Fit Coefficients and Scatter from the Spectral Model",
+    fontsize=14)
+ax.locator_params(axis='x', nbins=10)
+
+for i in range(0,4):
+    ax = axarr[i]
+    lbl = r'$%s$'%names[i]
+    ax.set_ylabel(lbl, fontsize=14)
+    ax.tick_params(axis='y', labelsize=14)
+    ax.xaxis.grid(True)
+    y = np.ma.array(coeffs_all[:,i+1], mask=bad)
+    y = y[cut:]
+    ax.step(lams, y, where='mid', linewidth=0.5, c='k')
+    ax.locator_params(axis='y', nbins=4)
+
+ax = axarr[4] 
+ax.tick_params(axis='y', labelsize=14)
+ax.set_ylabel("scatter", fontsize=14)
+top = np.max(scatters[scatters < 0.8])
+stretch = np.std(scatters[scatters < 0.8])
+ax.set_ylim(0, top + stretch)
+ax.step(lams, scatters, where='mid', c='k', linewidth=0.7)
+ax.xaxis.grid(True)
+ax.locator_params(axis='y', nbins=4)
+fig.savefig('leading_coeffs.png')
