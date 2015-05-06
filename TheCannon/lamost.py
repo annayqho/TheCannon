@@ -55,11 +55,11 @@ def get_pixmask(file_in, wl, middle, flux, ivar):
     # LAMOST people: wings join together, 5800-6000 Angstroms
     wings = np.logical_and(wl > 5800, wl < 6000)
     # this is another 3-4% of the spectrum
-    ormask = (file_in[0].data[4] >0)
+    # ormask = (file_in[0].data[4] >0)
     # ormask = (file_in[0].data[4] > 0)[middle]
     # ^ problematic...this is over a third of the spectrum!
-    bad_pix_b = wings | ormask
-    # bad_pix_b = wings
+    # bad_pix_b = wings | ormask
+    bad_pix_b = wings
 
     spread = 3 # due to redshift
     skylines = np.array([4046, 4358, 5460, 5577, 6300, 6363, 6863])
