@@ -18,8 +18,22 @@ allfiles = np.loadtxt("example_LAMOST/lamost_sorted_by_ra.txt", dtype=str)
 dir_dat = "example_LAMOST/Data_All"
 tr_files = allfiles
 wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
-SNR_raw = tr_flux * np.sqrt(tr_ivar)
-SNR = np.median(SNR_raw[SNR_raw>0], axis=0)
+SNR_raw = tr_flux * tr_ivar**0.5
+bad = SNR_raw == 0
+SNR_raw = np.ma.array(SNR_raw, mask=bad)
+SNR = np.ma.median(SNR_raw, axis=1)
+cut = 130
+tr_files = allfiles[SNR>cut]
+outputf = open("example_LAMOST/tr_files.txt", "w")
+for tr_file in tr_files: 
+    outputf.write(tr_file + '\n')
+outputf.close()
+test_files = set(allfiles) - set(tr_files)
+test_files = np.array(test_files)
+outputf = open("example_LAMOST/test_files.txt", "w")
+for test_file in test_files:
+    outputf.write(test_file + '\n')
+outputf.close()
 
 # STEP 1: PREPARE DATA 
 if glob.glob('lamost_data.p'):
@@ -27,16 +41,18 @@ if glob.glob('lamost_data.p'):
             open('lamost_data.p', 'r'))
 
 else:
-    tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
-    test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
+    #tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
+    #test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
     dir_lab = "example_DR12/reference_labels.csv"
     dir_dat = "example_LAMOST/Data_All"
 
     wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
+    test_flux = tr_flux
+    test_ivar = tr_ivar
     wl, test_flux, test_ivar = load_spectra(dir_dat, test_files)
     tr_label = load_labels(dir_lab)
     pickle.dump((wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar), 
-            open('lamost_data.p', 'w'))
+            open('lamost_data_1to1.p', 'w'))
 
 dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 
@@ -65,13 +81,12 @@ if glob.glob('contmask.p', 'r'):
     contmask = pickle.load(open("contmask.p", "r"))
 else:
     # Identify the best 5% of continuum pixels
-    contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
+    # contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
 
     # Identify the best 5% of continuum pixels in each of the following
     # pixel regions 
     dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 1950], [1950, 2500], [2500,3000], [3000, len(dataset.wl)]]
     contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
-    # since I changed the array size...
 
 dataset.set_continuum(contmask)
 

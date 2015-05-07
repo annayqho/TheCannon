@@ -14,9 +14,8 @@ f = datain['FE_H']
 params = datain['PARAM']
 a = params[:,-1]
 
-# read the real list of training stars
+# read the list of all of the overlap stars
 
-ts_lamost = os.listdir("../example_LAMOST/Training_Data")
 lamost_sorted = np.loadtxt('../example_LAMOST/lamost_sorted_by_ra.txt', 
         dtype=str)
 apogee_sorted = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
@@ -25,16 +24,16 @@ apogee_sorted = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
 # inds...these are the indices, in lamost_sorted, of all the training stars
 # and thus these are the indices in apogee_sorted of all the training stars
 
-inds = []
-for star in ts_lamost:
-    inds.append(np.where(lamost_sorted==star)[0][0])
-inds = np.array(inds)
-ts_apogee = apogee_sorted[inds]
+#inds = []
+#for star in ts_lamost:
+#    inds.append(np.where(lamost_sorted==star)[0][0])
+#inds = np.array(inds)
+#ts_apogee = apogee_sorted[inds]
 
 # find the indices of the apogee training stars in the apstarid list
 
 inds = []
-for star in ts_apogee:
+for star in apogee_sorted:
     ID = star.split('v603-')[1]
     ID = ID.split('.fits')[0]
     inds.append(np.where(apstarid==ID)[0][0])
@@ -62,7 +61,7 @@ file_out.write(header)
 
 for i in range(nstars):
     print(i)
-    line = str(ts_lamost[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
+    line = str(lamost_sorted_by_ra[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
     file_out.write(line)
 
 file_out.flush()
