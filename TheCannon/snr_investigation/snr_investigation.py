@@ -7,6 +7,7 @@ wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar = pickle.load(
 # MAKE S/N AND NPIX ARRAYS FOR THE STARS
 tr_nstars = tr_flux.shape[0]
 test_nstars = test_flux.shape[0]
+npix = tr_flux.shape[1]
 
 tr_snr = tr_flux * np.sqrt(tr_ivar)
 bad1 = tr_snr == 0
@@ -16,15 +17,27 @@ test_snr = test_flux * np.sqrt(test_ivar)
 bad2 = test_snr == 0
 test_snr = np.ma.array(test_snr, mask=bad2)
 test_snr = np.ma.median(test_snr, axis=1)
+snr = np.concatenate((tr_snr, test_snr))
 
 tr_npix = np.zeros(tr_nstars)
 test_npix = np.zeros(test_nstars)
+spec_npix_tr = np.zeros(npix)
+spec_npix_test = np.zeros(npix)
+
 
 for jj in range(0, tr_nstars):
     tr_npix[jj] = np.count_nonzero(tr_ivar[jj,:])
 
 for jj in range(0, test_nstars):
     test_npix[jj] = np.count_nonzero(test_ivar[jj,:])
+
+for jj in range(0, npix):
+    spec_npix_tr[jj] = np.count_nonzero(tr_ivar_cut[:,jj]) 
+    spec_npix_test[jj] = np.count_nonzero(test_ivar_cut[:,jj])
+
+cut =200 
+tr_ivar_cut = tr_ivar[tr_snr>cut, :]
+test_ivar_cut = test_ivar[test_snr>cut,:]
 
 
 # plot f x sqrt(ivar) across the spectrum: should get a Gaussian around unity
