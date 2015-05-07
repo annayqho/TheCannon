@@ -12,6 +12,14 @@ from matplotlib import rc
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
+# STEP 0: CHOOSE TRAINING SET
+
+allfiles = np.loadtxt("example_LAMOST/lamost_sorted_by_ra.txt", dtype=str)
+dir_dat = "example_LAMOST/Data_All"
+tr_files = allfiles
+wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
+SNR_raw = tr_flux * np.sqrt(tr_ivar)
+SNR = np.median(SNR_raw[SNR_raw>0], axis=0)
 
 # STEP 1: PREPARE DATA 
 if glob.glob('lamost_data.p'):
