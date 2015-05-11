@@ -13,6 +13,8 @@ g = datain['LOGG']
 f = datain['FE_H']
 params = datain['PARAM']
 a = params[:,-1]
+badbits = 2**23
+good_all = np.bitwise_and(datain['aspcapflag',badbits]==0) 
 
 # read the list of all of the overlap stars
 
@@ -48,6 +50,7 @@ teff = t[inds]
 logg = g[inds]
 feh = f[inds]
 alpha = a[inds]
+good = good_all[inds] 
 
 # and now write the training file
 
@@ -60,9 +63,9 @@ header = 'id,teff,logg,feh,alpha\n'
 file_out.write(header)
 
 for i in range(nstars):
-    print(i)
-    line = str(lamost_sorted[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
-    file_out.write(line)
+    if good[i] == True:
+        line = str(lamost_sorted[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
+        file_out.write(line)
 
 file_out.flush()
 file_out.close()
