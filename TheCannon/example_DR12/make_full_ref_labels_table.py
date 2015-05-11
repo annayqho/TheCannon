@@ -61,7 +61,7 @@ file_out.write(header)
 
 for i in range(nstars):
     print(i)
-    line = str(lamost_sorted_by_ra[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
+    line = str(lamost_sorted[i])+','+str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+str(alpha[i])+'\n'
     file_out.write(line)
 
 file_out.flush()

@@ -34,6 +34,11 @@ outputf = open("example_LAMOST/test_files.txt", "w")
 for test_file in test_files:
     outputf.write(test_file + '\n')
 outputf.close()
+all_ids, all_tr_labels = load_labels(dir_lab)
+tr_labels = np.zeros((len(tr_files), all_tr_labels.shape[1]))
+for jj,tr_id in enumerate(tr_files):
+    tr_labels[jj,:] = all_tr_labels[all_ids==tr_id,:]
+pickle.dump(tr_labels, open('tr_labels.p', 'w'))
 
 # STEP 1: PREPARE DATA 
 if glob.glob('lamost_data.p'):
@@ -49,8 +54,9 @@ else:
     wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
     test_flux = tr_flux
     test_ivar = tr_ivar
-    wl, test_flux, test_ivar = load_spectra(dir_dat, test_files)
-    tr_label = load_labels(dir_lab)
+    #wl, test_flux, test_ivar = load_spectra(dir_dat, test_files)
+    tr_label = pickle.load(open('tr_labels.p', 'r'))
+
     pickle.dump((wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar), 
             open('lamost_data_1to1.p', 'w'))
 

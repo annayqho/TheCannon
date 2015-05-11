@@ -161,4 +161,4 @@ def load_labels(label_file):
     print('%s labels:' %nlabels)
     print(label_names)
     labels = np.array([data[k] for k in label_names], dtype=float).T
-    return labels 
+    return data['id'], labels 
