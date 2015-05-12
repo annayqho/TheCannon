@@ -1,0 +1,14 @@
+{'2M01255517-0830159',
+ '2M01261759+1707352',
+ '2M02042117+2555124',
+ '2M15193146-0002588'}
+
+This is where they should be, but they weren't there: 
+2M01261759+1707352
+wget --no-parent http://data.sdss3.org/sas/dr12/apogee/spectro/redux/r5/stars/l25_6d/v603/4202/aspcapStar-r5-v603-2M01261759+1707352.fits
+2M02042117+2555124
+wget --no-parent http://data.sdss3.org/sas/dr12/apogee/spectro/redux/r5/stars/l25_6d/v603/4610/aspcapStar-r5-v603-2M02042117+2555124.fits
+2M01255517-0830159
+wget --no-parent http://data.sdss3.org/sas/dr12/apogee/spectro/redux/r5/stars/l25_6d/v603/4286/aspcapStar-r5-v603-2M01255517-0830159.fits
+2M15193146-0002588
+wget --no-parent http://data.sdss3.org/sas/dr12/apogee/spectro/redux/r5/stars/l25_6d/v603/4534/aspcapStar-r5-v603-2M15193146-0002588.fits
