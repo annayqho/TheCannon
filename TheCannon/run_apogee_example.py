@@ -1,8 +1,8 @@
 from __future__ import (absolute_import, division, print_function)
 from apogee import load_spectra, load_labels
-from cannon.model import CannonModel
-from cannon.dataset import Dataset
-from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
+from model import CannonModel
+from dataset import Dataset
+from spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
 import numpy as np
 
 # (1) PREPARE DATA
