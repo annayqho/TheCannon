@@ -73,7 +73,7 @@ def fit_cont(fluxes, ivars, contmask, deg, ffunc):
             popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                        sigma=1./np.sqrt(yivar))
         elif ffunc=="chebyshev":
-            fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=3)
+            fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=deg)
 
         for element in pix:
             if ffunc=="sinusoid":
