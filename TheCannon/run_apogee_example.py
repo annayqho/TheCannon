@@ -1,24 +1,25 @@
-#from __future__ import (absolute_import, division, print_function)
+import numpy as np
 from TheCannon import apogee
-#from model import CannonModel
-from TheCannon import dataset import Dataset
-#from spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
-#import numpy as np
+from TheCannon import dataset
+from TheCannon import model 
 
 # (1) PREPARE DATA
 
 wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
-test_flux = tr_flux
+# doing a 1-to-1 test for simplicity
+test_flux = tr_flux 
 test_ivar = tr_ivar
 all_labels = apogee.load_labels("example_DR10/reference_labels.csv")
-teff_corr = all_labels[:,1]
+# choose labels and make a new array 
+teff_corr = all_labels[:,1] 
 logg_corr = all_labels[:,3]
 mh_corr = all_labels[:,5]
 tr_label = np.vstack((teff_corr, logg_corr, mh_corr)).T
-dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
+dataset = dataset.Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
+# apogee spectra come in three segments, corresponding to the three chips
 dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
-# optional: set headers for plotting
+# set LaTeX label names for making diagnostic plots
 dataset.set_label_names(['T_{eff}', '\log g', '[M/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels
@@ -27,6 +28,7 @@ dataset.diagnostics_ref_labels()
 
 # (2) IDENTIFY CONTINUUM PIXELS
 
+# pseudo continuum normalize the spectrum using a running quantile
 pseudo_tr_flux, pseudo_tr_ivar = dataset.continuum_normalize_training_q(
         q=0.90, delta_lambda=50)
 
@@ -34,12 +36,15 @@ pseudo_tr_flux, pseudo_tr_ivar = dataset.continuum_normalize_training_q(
 # identify the best 7% of continuum pix
 contmask = dataset.make_contmask(pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
 dataset.set_continuum(contmask)
+
+# fit a sinusoid through the continuum pixels
 cont = dataset.fit_continuum(3, "sinusoid")
 
-# (3) RUN CONTINUUM NORMALIZATION CODE
+# (3) CONTINUUM NORMALIZE
 norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
         dataset.continuum_normalize_f(cont)
 
+# replace with normalized values
 dataset.tr_flux = norm_tr_flux
 dataset.tr_ivar = norm_tr_ivar
 dataset.test_flux = norm_test_flux
@@ -48,19 +53,12 @@ dataset.test_ivar = norm_test_ivar
 # (4) TRAINING STEP
 
 # learn the model from the reference_set
-model = CannonModel(dataset, 2) # 2 = quadratic model
+model = model.CannonModel(dataset, 2) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
-
-# check the model
 model.diagnostics()
 
 # (5) TEST STEP
 
 # infer labels with the new model for the test_set
 dataset, label_errs = model.infer_labels(dataset)
-
-# Make plots
 dataset.dataset_postdiagnostics(dataset)
-
-cannon_set = model.draw_spectra(dataset)
-# model.spectral_diagnostics(dataset)
