@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import matplotlib.pyplot as plt
 from .helpers.triangle import corner
-from helpers import Table
+from .helpers import Table
 import sys
 from .find_continuum_pixels import find_contpix, find_contpix_regions
 from .continuum_normalization import fit_cont, fit_cont_regions, cont_norm, cont_norm_regions, cont_norm_q

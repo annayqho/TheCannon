@@ -1,16 +1,16 @@
-from __future__ import (absolute_import, division, print_function)
-from apogee import load_spectra, load_labels
-from model import CannonModel
-from dataset import Dataset
-from spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
-import numpy as np
+#from __future__ import (absolute_import, division, print_function)
+from TheCannon import apogee
+#from model import CannonModel
+from TheCannon import dataset import Dataset
+#from spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
+#import numpy as np
 
 # (1) PREPARE DATA
 
-wl, tr_flux, tr_ivar = load_spectra("example_DR10/Data")
+wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
 test_flux = tr_flux
 test_ivar = tr_ivar
-all_labels = load_labels("example_DR10/reference_labels.csv")
+all_labels = apogee.load_labels("example_DR10/reference_labels.csv")
 teff_corr = all_labels[:,1]
 logg_corr = all_labels[:,3]
 mh_corr = all_labels[:,5]
