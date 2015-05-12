@@ -1,21 +1,21 @@
 from __future__ import (absolute_import, division, print_function)
-from apogee import ApogeeDataset
+from apogee import load_spectra, load_labels
 from cannon.model import CannonModel
 from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
 import numpy as np
 
 ###### WORKFLOW
 
-# RUN APOGEE MUNGING CODE
-dataset = ApogeeDataset("example_MKN_Check/Data",
-                        "example_MKN_Check/Data",
-                        "example_MKN_Check/reference_labels.csv")
+# PREPARE DATA
 
-# Choose labels
-cols = ['teff_corr', 'logg_corr', 'mh_corr']
-dataset.choose_labels(cols)
+wl, tr_flux, tr_ivar = load_spectra("example_DR10/Data")
+test_flux = tr_flux
+test_ivar = tr_ivar
+tr_label = load_labels("example_DR10/reference_labels.csv")
+dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
+dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
-# set the headers for plotting
+# optional: set headers for plotting
 dataset.set_label_names_tex(['T_{eff}', '\log g', '[M/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels

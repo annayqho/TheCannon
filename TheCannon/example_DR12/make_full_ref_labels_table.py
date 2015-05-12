@@ -13,8 +13,29 @@ g = datain['LOGG']
 f = datain['FE_H']
 params = datain['PARAM']
 a = params[:,-1]
-badbits = 2**23
-good_all = np.bitwise_and(datain['aspcapflag',badbits]==0) 
+
+# ignore stars flagged as having unreliable Teff, logg, metallicity, alpha
+
+star_warn = 7
+star_bad = 23
+a_warn = 4
+a_bad = 20
+no_result = 31
+good_star = (np.bitwise_and(datain['aspcapflag'], 2**star_warn)==0) & \
+        (np.bitwise_and(datain['aspcapflag'], 2**star_bad)==0)
+good_a = (np.bitwise_and(datain['aspcapflag'], 2**a_warn)==0) & \ 
+       (np.bitwise_and(datain['aspcapflag'], 2**a_bad)==0)
+good = good_star & good_a & \
+       (np.bitwise_and(datain['aspcapflag'], 2**no_result) == 0)
+
+
+# unreliable Teff is flagged in datain['PARAMFLAG'][0]
+# unreliable logg is flagged in datain['PARAMFLAG'][1]
+# unreliable metals is flagged in datain['PARAMFLAG'][3]
+# unreliable alpha is flagged in datain['PARAMFLAG'[4]
+# but in principle, these should also be flagged in datain['ASPCAPFLAG']
+
+good_all = (np.bitwise_and(datain['aspcapflag'],badbits)==0) & (datain['teff_err'] > 0) & (datain['logg_err']>0) & (datain['fe_h_err'] > 0) 
 
 # read the list of all of the overlap stars
 
