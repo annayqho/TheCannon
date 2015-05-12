@@ -3,7 +3,7 @@ import numpy as np
 import scipy.optimize as opt
 import os
 import sys
-from helpers import Table
+from .helpers import Table
 import matplotlib.pyplot as plt
 
 # python 3 special

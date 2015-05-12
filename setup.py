@@ -1,11 +1,13 @@
 from setuptools import setup
 
 setup(name='TheCannon',
-        version='0.1.3',
+        version='0.2.9',
         description='Data-driven stellar parameters and abundances from spectra',
         url='http://github.com/annayqho/TheCannon',
         author='Anna Y. Q. Ho',
         author_email='annayqho@gmail.com',
         license='MIT',
-        packages=['TheCannon'],
-        zip_safe=False)
+        packages=[
+            'TheCannon', 'TheCannon.helpers', 'TheCannon.helpers.triangle',
+            'TheCannon.example_DR10', 'TheCannon.example_DR10.Data'],
+        )

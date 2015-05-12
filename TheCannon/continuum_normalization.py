@@ -157,7 +157,7 @@ def cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
     cont = np.zeros(fluxes.shape)
     nstars = fluxes.shape[0]
     for jj in range(nstars):
-        print "cont_norm_q(): working on star", jj
+        print("cont_norm_q(): working on star %s" %jj) 
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         for ll, lam in enumerate(wl):

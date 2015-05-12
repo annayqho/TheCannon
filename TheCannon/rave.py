@@ -44,5 +44,3 @@ def read_test(filename):
     test_flux[bad] = 0.
     return (test_flux, test_ivar, wl)
 
-def read_test_data():
-
