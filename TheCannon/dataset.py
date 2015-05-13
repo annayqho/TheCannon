@@ -227,12 +227,14 @@ class Dataset(object):
         ffunc: str
             type of fitting function, sinusoid or chebyshev
         """
+        print("Fitting Continuum...")
         if self.ranges == None:
             tr_cont = fit_cont(
                     self.tr_flux, self.tr_ivar, self.contmask, deg, ffunc)
             test_cont = fit_cont(
                     self.test_flux, self.test_ivar, self.contmask, deg, ffunc)
         else:
+            print("Fitting Continuum in %s Regions..." %len(self.ranges))
             tr_cont = fit_cont_regions(self.tr_flux, self.tr_ivar, 
                                        self.contmask, deg, self.ranges, ffunc)
             test_cont = fit_cont_regions(self.test_flux, self.test_ivar,

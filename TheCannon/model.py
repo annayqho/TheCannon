@@ -6,6 +6,7 @@ from .spectral_model import diagnostics as _diagnostics
 from .helpers.triangle import corner
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from copy import deepcopy
 
 plt.rc('text', usetex=True)
@@ -208,6 +209,7 @@ class CannonModel(object):
         scatters = np.ma.array(scatters, mask=bad)
         lams = np.ma.array(lams, mask=bad)
         fig, axarr = plt.subplots(nlabels+1, figsize=(8,8), sharex=True)
+        ax1 = axarr[0]
         plt.subplots_adjust(hspace=0.001)
         nbins = len(ax1.get_xticklabels())
         for i in range(1,nlabels+1):
@@ -222,7 +224,7 @@ class CannonModel(object):
         ax.locator_params(axis='x', nbins=10)
         for i in range(0,4):
             ax = axarr[i]
-            lbl = r'$%s$'%names[i]
+            lbl = r'$%s$'%label_names[i]
             ax.set_ylabel(lbl, fontsize=14)
             ax.tick_params(axis='y', labelsize=14)
             ax.xaxis.grid(True)

@@ -70,7 +70,6 @@ def fit_cont(fluxes, ivars, contmask, deg, ffunc):
     cont: numpy ndarray of shape (nstars, npixels)
         the continuum, parallel to fluxes
     """
-    print("order: %s" %deg)
     nstars = fluxes.shape[0]
     npixels = fluxes.shape[1]
     cont = np.zeros(fluxes.shape)
@@ -125,7 +124,6 @@ def fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
     cont: numpy ndarray of shape (nstars, npixels)
         the continuum, parallel to fluxes
     """
-    print("taking spectra in %s regions" %len(ranges))
     nstars = fluxes.shape[0]
     npixels = fluxes.shape[1]
     cont = np.zeros(fluxes.shape)
@@ -270,7 +268,6 @@ def cont_norm_regions(fluxes, ivars, cont, ranges):
     norm_ivars: numpy ndarray
         rescaled inverse variances
     """
-    print("taking spectra in %s regions" %len(ranges))
     nstars = fluxes.shape[0]
     norm_fluxes = np.zeros(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)

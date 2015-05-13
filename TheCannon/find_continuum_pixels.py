@@ -116,7 +116,6 @@ def find_contpix_regions(wl, fluxes, ivars, frac, ranges):
     contmask: numpy ndarray, boolean
         True indicates continuum pixel
     """
-    print("taking spectra in %s regions" %len(ranges))
     contmask = np.zeros(len(wl), dtype=bool)
     for chunk in ranges:
         start = chunk[0]
