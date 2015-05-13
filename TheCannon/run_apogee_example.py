@@ -1,7 +1,9 @@
 import numpy as np
+import glob
 from TheCannon import apogee
 from TheCannon import dataset
 from TheCannon import model 
+import pickle
 
 # (1) PREPARE DATA
 
@@ -29,8 +31,12 @@ dataset.diagnostics_ref_labels()
 # (2) IDENTIFY CONTINUUM PIXELS
 
 # pseudo continuum normalize the spectrum using a running quantile
-pseudo_tr_flux, pseudo_tr_ivar = dataset.continuum_normalize_training_q(
-        q=0.90, delta_lambda=50)
+if glob.glob('pseudo_spec.p'):
+    (pseudo_tr_flux, pseudo_tr_ivar) = pickle.load(open('pseudo_spec.p', 'r'))
+else:
+    pseudo_tr_flux, pseudo_tr_ivar = dataset.continuum_normalize_training_q(
+            q=0.90, delta_lambda=50)
+    pickle.dump((pseudo_tr_flux, pseudo_tr_ivar), open("pseudo_spec.p", 'w'))
 
 # in each region of the pseudo cont normed tr spectrum, 
 # identify the best 7% of continuum pix
