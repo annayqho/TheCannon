@@ -137,7 +137,6 @@ class Dataset(object):
         print("Plotting every label against every other")
         fig = corner(label_vals, labels=labels, show_titles=True,
                      title_args={"fontsize":12})
-        print("figname: %s" %figname)
         fig.savefig(figname)
         print("Saved fig %s" % figname)
         plt.close(fig)
