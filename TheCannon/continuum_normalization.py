@@ -83,9 +83,9 @@ def fit_cont(fluxes, ivars, contmask, deg, ffunc):
         yivar = ivar[contmask]
         yivar[yivar == 0] = SMALL**2   
         pcont_func = partial_func(cont_func, L=L, y=flux)
+        p0 = np.ones(deg*2) # one for cos, one for sin
+        L = max(x)-min(x)
         if ffunc=="sinusoid": 
-            p0 = np.ones(deg*2) # one for cos, one for sin
-            L = max(x)-min(x)
             popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                        sigma=1./np.sqrt(yivar))
         elif ffunc=="chebyshev":
