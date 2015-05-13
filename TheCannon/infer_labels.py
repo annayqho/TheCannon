@@ -38,14 +38,15 @@ def func(coeffs, *labels):
     
     Parameters
     ----------
-    coeffs: 
+    coeffs: numpy ndarray
+        the coefficients on each element of the label vector
 
-    *labels: 
+    *labels: numpy ndarray
+        label vector
 
     Returns
     -------
     dot product of coeffs vec and labels vec
-    
     """
     lvec = get_lvec(list(labels))
     return np.dot(coeffs, lvec)
@@ -61,15 +62,12 @@ def infer_labels(model, dataset):
         coeffs_all, covs, scatters, chis, chisqs, pivots
         result from :func:`train_model`
 
-    test_set: Dataset
+    dataset: Dataset
         dataset that needs label inference
 
     Returns
     -------
-    test_set: Dataset
-        same dataset as the input value with updated label_vals attribute
-
-    covs_all:
+    errs_all:
         covariance matrix of the fit
     """
     print("Inferring Labels...")
@@ -88,15 +86,8 @@ def infer_labels(model, dataset):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
-        #Cinv = ivar / (1 + ivar * scatters**2)
-        #bad = ivar == SMALL
-        #sig = np.zeros(ivar.shape)
-        #sig = np.ma.array(sig, mask=bad)
-        #ivar = np.ma.array(ivar, mask=bad)
-        #scatters = np.ma.array(scatters, mask=bad)
         sig = np.sqrt(1./ivar + scatters**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
-        #print(sig)
         try:
             labels, covs = opt.curve_fit(func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels),
@@ -112,11 +103,7 @@ def infer_labels(model, dataset):
             factor = (chi2 / dof)
             covs /= factor
         labels = labels + pivots
-        #MCM_rotate = np.dot(coeffs.T, Cinv[:,None] * coeffs)
         labels_all[jj,:] = labels
-        #MCM_rotate_all[jj, :, :] = MCM_rotate
         errs_all[jj,:] = covs.diagonal()
-        #covs_all[jj, :, :] = covs
-
     dataset.set_test_label_vals(labels_all)
-    return dataset, errs_all
+    return errs_all

@@ -66,5 +66,5 @@ model.diagnostics()
 # (5) TEST STEP
 
 # infer labels with the new model for the test_set
-dataset, label_errs = model.infer_labels(dataset)
+label_errs = model.infer_labels(dataset)
 dataset.dataset_postdiagnostics(dataset)

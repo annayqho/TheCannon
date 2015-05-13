@@ -20,6 +20,7 @@ class CannonModel(object):
         self._model = None
         self.order = order
 
+
     @property
     def model(self):
         """ return the model definition or raise an error if not trained """
@@ -28,9 +29,11 @@ class CannonModel(object):
         else:
             return self._model
 
+
     def train(self, *args, **kwargs):
         """ Train the model """
         self._model = _train_model(self.dataset)
+
 
     def diagnostics(self):
         """Run a set of diagnostics on the model.
@@ -43,13 +46,9 @@ class CannonModel(object):
 
         Histogram of the chi squareds of the fits.
         Dotted line corresponding to DOF = npixels - nlabels
-
-        Parameters
-        ----------
-        contpix: str
-            continuum pixel definition file
         """
         _model_diagnostics(self.dataset, self.model)
+
 
     def infer_labels(self, dataset):
         """
@@ -57,31 +56,27 @@ class CannonModel(object):
 
         Parameters
         ----------
-        test_set: Dataset
+        dataset: Dataset
             dataset that needs label inference
 
         Returns
         -------
-        test_set: Dataset
-            same dataset as the input value with updated label_vals attribute
-
-        covs_all:
-            covariance matrix of the fit
+        output of infer_labels
         """
         return infer_labels(self.model, dataset)
+
 
     def draw_spectra(self, dataset):
         """
         Parameters
         ----------
-        test_set: Dataset
+        dataset: Dataset
             dataset that needs label inference
 
         Returns
         -------
         cannon_set: Dataset
             same dataset as the input value with updated fluxes and variances
-
         """
         coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = self.model
         nstars = len(dataset.test_SNR)
@@ -96,10 +91,24 @@ class CannonModel(object):
         cannon_set = deepcopy(dataset)
         cannon_set.test_flux = cannon_fluxes
         cannon_set.test_ivar = cannon_ivars
-
         return cannon_set
 
     def split_array(self, array, num):
+        """ split an array into a certain number of segments
+
+        Parameters
+        ----------
+        array: numpy ndarray
+            array to be split
+
+        num: int
+            number of elements to split array into
+
+        Returns
+        ------
+        out: list 
+            split array
+        """
         avg = len(array) / float(num)
         out = []
         last = 0.0
@@ -125,10 +134,15 @@ class CannonModel(object):
 
         Parameters
         ----------
+        (optional) baseline_spec_plot_name: str
+            plot name
+        (optional) leading_coeffs_plot_name: str
+            plot name
+        (optional) chisq_dist_plot_name: str
+            plot name
         """
         dataset = self.dataset
         model = self.model
-
         contmask = dataset.contmask
         lams = dataset.wl
         label_names = dataset.get_plotting_labels()

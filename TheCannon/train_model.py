@@ -72,8 +72,10 @@ def do_one_regression(lams, fluxes, ivars, lvec):
         the common wavelength array
 
     fluxes: numpy ndarray, shape (nstars)
+        pixel intensities
 
     ivars: numpy ndarray, shape (nstars)
+        inverse variances associated with pixel intensities
 
     lvec = numpy ndarray 
         the label vector
@@ -120,11 +122,13 @@ def get_lvec(label_vals, pivots):
     Parameters
     ----------
     label_vals: numpy ndarray, shape (nstars, nlabels)
-    pivots: array corresponding to the mean of the label_vals
+        labels 
+    pivots: numpy ndarray
+        mean of the label_vals
 
     Returns
     -------
-    lvec_full: numpy ndarray
+    lvec: numpy ndarray
         label vector
     """
     nlabels = label_vals.shape[1]
@@ -144,28 +148,13 @@ def train_model(dataset):
 
     Parameters
     ----------
-    reference_set: Dataset
+    dataset: Dataset
+        reference objects
 
     Returns
     -------
-    model, which consists of:
-   
-    coeffs: ndarray, (npixels, nstars, 15)
-        the model coefficients
-
-    covs: ndarray
-        the covariance matrix
-
-    scatter:
-        scatter values
-
-    all_chisqs:
-
-    pivots:
-        the pivot values
-
-    lvec_full:
-        the label vector
+    model: model
+        best-fit Cannon model
     """
     print("Training model...")
     label_names = dataset.get_plotting_labels()
@@ -196,6 +185,19 @@ def train_model(dataset):
 
 
 def split_array(array, num):
+    """ split array into a number of chunks
+
+    Parameters
+    ----------
+    array: numpy ndarray
+        array to be split
+    num: int
+        number of chunks
+
+    Returns
+    ------
+    out: split array
+    """
     avg = len(array) / float(num)
     out = []
     last = 0.0

@@ -1,3 +1,5 @@
+""" The code for reading in APOGEE spectra and training labels """
+
 from __future__ import (absolute_import, division, print_function,)
 import numpy as np
 import scipy.optimize as opt
@@ -20,9 +22,7 @@ def get_pixmask(fluxes, flux_errs):
     """ Create and return a bad pixel mask for a spectrum
 
     Bad pixels are defined as follows: fluxes or errors are not finite, or 
-    reported errors are negative, or the standard deviation of the fluxes
-    across all the stars is zero (if that pixel is exactly the same, then
-    we're looking at the gaps in the spectrum.)
+    reported errors are <= 0
 
     Parameters
     ----------
@@ -40,18 +40,20 @@ def get_pixmask(fluxes, flux_errs):
     bad_flux = (~np.isfinite(fluxes)) 
     bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
     bad_pix = bad_err | bad_flux
-
     return bad_pix
+
 
 def load_spectra(data_dir):
     """
     Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
 
+    Parameters
+    ---------
+    data_dir: str
+        directory containing all of the data files
+
     Returns
     -------
-    IDs: list of length nstars
-        stellar IDs
-    
     wl: numpy ndarray of length npixels
         rest-frame wavelength vector
 
@@ -60,14 +62,11 @@ def load_spectra(data_dir):
 
     ivars: numpy ndarray of shape (nstars, npixels)
         inverse variances, parallel to fluxes
-        
-    SNRs: numpy ndarray of length nstars
     """
     print("Loading spectra from directory %s" %data_dir)
     files = list(sorted([data_dir + "/" + filename
              for filename in os.listdir(data_dir) if filename.endswith('fits')]))
     nstars = len(files)  
-    
     for jj, fits_file in enumerate(files):
         file_in = pyfits.open(fits_file)
         flux = np.array(file_in[1].data)
@@ -90,11 +89,23 @@ def load_spectra(data_dir):
         ivar = np.ma.filled(ivar, fill_value=0.)
         fluxes[jj,:] = flux
         ivars[jj,:] = ivar
-
     print("Spectra loaded")
     return wl, fluxes, ivars
 
+
 def load_labels(filename):
+    """ Extracts reference labels 
+
+    Parameters
+    ----------
+    filename: str
+        file containing the table of ref labels
+
+    Returns
+    -------
+    labels: numpy ndarray of shape (nstars, nlabels)
+        all reference labels for all reference objects
+    """
     print("Loading reference labels from file %s" %filename)
     data = Table(filename)
     data.sort('id')

@@ -15,15 +15,17 @@ def draw_spectra(model, dataset):
 
     Parameters
     ----------
-    model:
+    model: model object
+        the Cannon spectral model
 
-    test_set:
+    dataset: Dataset object
+        dataset that needs label inferences
 
     Returns
     -------
-    cannon_set
+    cannon_set: Dataset object
+        same dataset as input, but with updated fluxes and variances
     """
-    
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
     nstars = len(dataset.test_SNRs)
     cannon_fluxes = np.zeros(dataset.test_fluxes.shape)
@@ -46,26 +48,17 @@ def diagnostics(cannon_set, dataset, model):
 
     Parameters
     ----------
-    cannon_set:
+    cannon_set: Dataset
+        best-fit Cannon spectra
 
-    test_set:
+    dataset: Dataset
+        original spectra
 
-    model:
+    model: model
+        best-fit Cannon spectral model
     """
     #overlay_spectra(cannon_set, dataset, model)
     residuals(cannon_set, dataset)
-
-
-def triangle_pixels(cannon_set):
-    """ Make a triangle plot for the pixel fluxes, to see correlation
-    
-    Parameters
-    ----------
-    cannon_set
-    """
-    
-    fluxes = cannon_set.test_fluxes
-    corner(fluxes)
 
 
 def overlay_spectra(cannon_set, dataset, model):
@@ -73,14 +66,15 @@ def overlay_spectra(cannon_set, dataset, model):
 
     Parameters
     ----------
+    cannon_set: Dataset
+        best-fit Cannon spectra
 
-    cannon_set:
+    dataset: Dataset
+        original spectra
 
-    test_set:
-
-    model:
+    model: model
+        best-fit Cannon spectral model
     """
-    
     coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
     # Overplot original spectra with best-fit spectra
     res = dataset.test_fluxes-cannon_set.test_fluxes
@@ -155,9 +149,11 @@ def residuals(cannon_set, dataset):
 
     Parameters
     ----------
-    cannon_set:
+    cannon_set: Dataset
+        best-fit Cannon spectra
 
-    test_set:
+    dataset: Dataset
+        original spectra
     """
     print("Stacking spectrum fit residuals")
     res = dataset.test_fluxes - cannon_set.test_fluxes

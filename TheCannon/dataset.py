@@ -45,8 +45,10 @@ class Dataset(object):
 
         Parameters
         ----------
-        flux: 1D array of flux values
-        ivar: 1D array of ivar values
+        flux: numpy ndarray
+            pixel intensities
+        ivar: numpy ndarray
+            inverse variances corresponding to flux
 
         Returns
         -------
@@ -60,10 +62,23 @@ class Dataset(object):
 
 
     def set_label_names(self, names):
+        """ Set the label names for plotting
+
+        Parameters
+        ---------
+        names: array, list
+            the names of the labels
+        """
         self._label_names = names
 
 
     def get_plotting_labels(self):
+        """ Return the labels set for plotting
+
+        Returns
+        -------
+        the label names
+        """
         if self._label_names is None:
             print("No label names yet!")
             return None
@@ -110,12 +125,10 @@ class Dataset(object):
 
         Parameters
         ----------
+        label_vals: numpy ndarray 
+            values of the labels
         figname: str
             if provided, save the figure into the given file
-
-        labels: sequence
-            if provided, use this sequence as text labels for each label
-            dimension
         """
         labels = [r"$%s$" % l for l in self.get_plotting_labels()]
         print("Plotting every label against every other")
@@ -128,11 +141,22 @@ class Dataset(object):
 
 
     def make_contmask(self, fluxes, ivars, frac):
-        """ Use training spectra to find and return continuum pixels
+        """ Use spectra to find and return continuum pixels
 
         For spectra split into regions, performs cont pix identification
         separately for each region.
         
+        Parameters
+        ----------
+        fluxes: numpy ndarray
+            pixel intensities
+
+        ivars: numpy ndarray
+            inverse variances for pixel fluxes
+
+        frac: float
+            the fraction of pixels that should be identified as continuum
+
         Returns
         -------
         contmask: boolean mask of length npixels
@@ -147,15 +171,28 @@ class Dataset(object):
             contmask = find_contpix_regions(
                     self.wl, fluxes, ivars, frac, self.ranges)
         print("%s pixels returned as continuum" %sum(contmask))
-        #self.contmask = contmask
         return contmask
 
 
     def set_continuum(self, contmask):
+        """ Set the contmask attribute 
+
+        Parameters
+        ---------
+        contmask: boolean numpy ndarray
+            True corresponds to continuum pixels
+        """
         self.contmask = contmask
 
 
     def diagnostics_contmask(self, figname='contpix.png'):
+        """ Make and save diagnostic figure about the continuum pixels
+
+        Parameters
+        ----------
+        (optional) figname: str
+            name of the figure to be saved
+        """
         contmask = self.contmask
         f_bar = np.zeros(len(self.wl))
         sigma_f = np.zeros(len(self.wl))
@@ -179,6 +216,15 @@ class Dataset(object):
 
 
     def fit_continuum(self, deg, ffunc):
+        """ Fit a continuum to the continuum pixels
+
+        Parameters
+        ---------
+        deg: int
+            degree of the fitting function
+        ffunc: str
+            type of fitting function, sinusoid or chebyshev
+        """
         if self.ranges == None:
             tr_cont = fit_cont(
                     self.tr_flux, self.tr_ivar, self.contmask, deg, ffunc)
@@ -189,21 +235,45 @@ class Dataset(object):
                                        self.contmask, deg, self.ranges, ffunc)
             test_cont = fit_cont_regions(self.test_flux, self.test_ivar,
                                          self.contmask, deg, self.ranges, ffunc)
-            
         return tr_cont, test_cont
 
 
     def continuum_normalize_training_q(self, q, delta_lambda):
+        """ Continuum normalize the training set using a running quantile
+
+        Parameters
+        ---------
+        q: float
+            the quantile cut
+        delta_lambda: float
+            the width of the pixel range used to calculate the median
+        """
         print("Continuum normalizing the tr set using running quantile...")
         return cont_norm_q(
             self.wl, self.tr_flux, self.tr_ivar, q=q, delta_lambda=delta_lambda)
 
 
     def continuum_normalize_f(self, cont):
-        """ Continuum normalize spectra by fitting a function to continuum pix 
+        """ Continuum normalize spectra by dividing the spectrum by the continuum 
 
         For spectra split into regions, perform cont normalization
         separately for each region.
+
+        Parameters
+        ----------
+        cont: numpy ndarray
+           the continuum 
+
+        Returns
+        -------
+        norm_tr_flux: numpy ndarray
+            the normalized training objects' pixel intensities
+        norm_tr_ivar: numpy ndarray
+            the rescaled training objects' pixel inverse variances
+        norm_test_flux: numpy ndarray
+            the normalized test objects' pixel intensities
+        norm_test_ivar: numpy ndarray
+            the rescaled test objects' pixel inverse variances
         """
         tr_cont, test_cont = cont
         if self.ranges is None:
@@ -232,28 +302,30 @@ class Dataset(object):
 
         Parameters
         ----------
+        (optional) figname: str
+            name of the figure to be saved
         """
         # Find stars whose inferred labels lie >2-sig outside ref label space
         label_names = self.get_plotting_labels()
         nlabels = len(label_names)
         reference_labels = self.tr_label
         test_labels = self.test_label_vals
-        #test_IDs = np.array(self.test_IDs)
-        #mean = np.mean(reference_labels, 0)
-        #stdev = np.std(reference_labels, 0)
-        #lower = mean - 2 * stdev
-        #upper = mean + 2 * stdev
-        #for i in range(nlabels):
-        #    label_name = label_names[i]
-        #    test_vals = test_labels[:,i]
-        #    warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
-        #    filename = "flagged_stars_%s.txt" % i
-        #    with open(filename, 'w') as output:
-        #        for star in test_IDs[warning]:
-        #            output.write('{0:s}\n'.format(star))
-        #    print("Reference label %s" % label_name)
-        #    print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
-        #    print("Saved list %s" % filename)
+        test_IDs = np.array(self.test_IDs)
+        mean = np.mean(reference_labels, 0)
+        stdev = np.std(reference_labels, 0)
+        lower = mean - 2 * stdev
+        upper = mean + 2 * stdev
+        for i in range(nlabels):
+            label_name = label_names[i]
+            test_vals = test_labels[:,i]
+            warning = np.logical_or(test_vals < lower[i], test_vals > upper[i])
+            filename = "flagged_stars_%s.txt" % i
+            with open(filename, 'w') as output:
+                for star in test_IDs[warning]:
+                    output.write('{0:s}\n'.format(star))
+            print("Reference label %s" % label_name)
+            print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
+            print("Saved list %s" % filename)
     
         # Plot all survey labels against each other
         figname="survey_labels_triangle.png"
@@ -292,7 +364,10 @@ class Dataset(object):
 
 
     def set_test_label_vals(self, vals):
-        """ Set label vals from an array """
+        """ Set label vals from an array 
+
+        Parameters
+        ----------
+        vals: value of the labels
+        """
         self.test_label_vals = vals
-
-
