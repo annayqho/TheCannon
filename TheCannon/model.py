@@ -229,7 +229,6 @@ class CannonModel(object):
             ax.tick_params(axis='y', labelsize=14)
             ax.xaxis.grid(True)
             y = np.ma.array(coeffs_all[:,i+1], mask=bad)
-            y = y[cut:]
             ax.step(lams, y, where='mid', linewidth=0.5, c='k')
             ax.locator_params(axis='y', nbins=4)
         ax = axarr[4]
