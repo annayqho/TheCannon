@@ -29,7 +29,7 @@ def cont_func(x, p, L, y):
         function evaluated for the input x
     """
     N = int(len(p)/2)
-    n = np.linspace(0, N, N+1, dtype=int)
+    n = np.linspace(0, N, N+1)
     k = n*np.pi/L
     baseline = 0 #if you were fitting a flat spectrum...
     #baseline = y[x]

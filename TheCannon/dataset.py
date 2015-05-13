@@ -55,8 +55,7 @@ class Dataset(object):
         bad = ivar == 0
         flux = np.ma.array(flux, mask=bad)
         ivar = np.ma.array(ivar, mask=bad)
-        SNR = float(np.ma.median(flux*ivar**0.5).data)
-        SNR = np.median(flux*ivar**0.5)
+        SNR = float(np.ma.median(flux*ivar**0.5))
         return SNR  
 
 
