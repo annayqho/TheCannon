@@ -94,14 +94,16 @@ class Dataset(object):
         figname: (optional) string
             title of the saved SNR diagnostic plot
         """
-        print("Diagnostic for SNRs of reference and survey stars")
+        print("Diagnostic for SNRs of reference and survey objects")
         data = self.tr_SNR
-        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, label="Ref Stars")
+        plt.hist(data, bins=np.sqrt(len(data)), 
+                alpha=1.5, color='b', label="Ref Objects")
         data = self.test_SNR
-        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, label="Survey Stars")
+        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, color='r', 
+                label="Survey Objects")
         plt.legend(loc='upper right')
         plt.xscale('log')
-        plt.title("SNR Comparison Between Reference & Test Stars")
+        plt.title("SNR Comparison Between Reference & Survey Objects")
         plt.xlabel("log(Formal SNR)")
         plt.ylabel("Number of Objects")
         plt.savefig(figname)
