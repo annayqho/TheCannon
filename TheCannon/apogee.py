@@ -17,7 +17,7 @@ except ImportError:
     import pyfits
 
 def get_pixmask(fluxes, flux_errs):
-    """ Return a mask array of bad pixels for one object's spectrum
+    """ Create and return a bad pixel mask for a spectrum
 
     Bad pixels are defined as follows: fluxes or errors are not finite, or 
     reported errors are negative, or the standard deviation of the fluxes
@@ -65,7 +65,7 @@ def load_spectra(data_dir):
     """
     print("Loading spectra from directory %s" %data_dir)
     files = list(sorted([data_dir + "/" + filename
-             for filename in os.listdir(data_dir)]))
+             for filename in os.listdir(data_dir) if filename.endswith('fits')]))
     nstars = len(files)  
     
     for jj, fits_file in enumerate(files):
