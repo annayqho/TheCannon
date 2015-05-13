@@ -96,15 +96,16 @@ class Dataset(object):
         """
         print("Diagnostic for SNRs of reference and survey objects")
         data = self.tr_SNR
-        plt.hist(data, bins=np.sqrt(len(data)), 
-                alpha=1.5, color='b', label="Ref Objects")
+        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, color='b',
+                label="Ref Objects")
         data = self.test_SNR
-        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, color='r', 
+        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, facecolor='r', 
                 label="Survey Objects")
         plt.legend(loc='upper right')
-        plt.xscale('log')
-        plt.title("SNR Comparison Between Reference & Survey Objects")
-        plt.xlabel("log(Formal SNR)")
+        #plt.xscale('log')
+        plt.title("SNR Comparison Between Reference \& Survey Objects")
+        #plt.xlabel("log(Formal SNR)")
+        plt.xlabel("Formal SNR")
         plt.ylabel("Number of Objects")
         plt.savefig(figname)
         plt.close()
@@ -293,21 +294,9 @@ class Dataset(object):
         return norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar
 
 
-    def dataset_postdiagnostics(self, figname="survey_labels_triangle.png"):
-        """ Run diagnostic tests on the test set after labels have been inferred.
-
-        Tests result in the following output: one .txt file for each label 
-        listing all of the stars whose inferred labels lie >= 2 standard 
-        deviations outside the reference label space, a triangle plot showing 
-        all the survey labels plotted against each other, and 1-to-1 plots 
-        for all of the labels showing how they compare to each other. 
-
-        Parameters
-        ----------
-        (optional) figname: str
-            name of the figure to be saved
-        """
-        # Find stars whose inferred labels lie >2-sig outside ref label space
+    def diagnostics_test_step_flagstars(self):
+        """ list all stars whose inferred labels lie >= 2 standard deviations
+        outside the reference label space """
         label_names = self.get_plotting_labels()
         nlabels = len(label_names)
         reference_labels = self.tr_label
@@ -325,15 +314,27 @@ class Dataset(object):
             with open(filename, 'w') as output:
                 for star in test_IDs[warning]:
                     output.write('{0:s}\n'.format(star))
-            print("Reference label %s" % label_name)
-            print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
-            print("Saved list %s" % filename)
-    
-        # Plot all survey labels against each other
+        print("Reference label %s" % label_name)
+        print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
+        print("Saved list %s" % filename)
+
+
+    def diagnostics_survey_labels(self, figname="survey_labels_triangle.png"):
+        """ make a triangle plot for all the survey labels 
+        Parameters
+        ----------
+        (optional) figname: str
+            name of plot to be saved
+        """  
         figname="survey_labels_triangle.png"
         self.label_triangle_plot(self.test_label_vals, figname)
-    
-        # 1-1 plots of all labels
+   
+   
+    def diagnostics_1to1(self):
+        """ 1to1 plots of survey against training labels, color-coded by test SNR
+        
+        assumes your training set and test set are identical"""
+        snr = self.test_SNR
         for i in range(nlabels):
             name = self.get_plotting_labels()[i]
             orig = reference_labels[:,i]
@@ -341,23 +342,44 @@ class Dataset(object):
             # calculate bias and scatter
             scatter = np.round(np.std(orig-cannon),3)
             bias  = np.round(np.mean(orig-cannon),3)
+
             low = np.minimum(min(orig), min(cannon))
             high = np.maximum(max(orig), max(cannon))
-            fig, axarr = plt.subplots(2)
-            ax1 = axarr[0]
+
+            fig = plt.figure(figsize=(10,6))
+            gs = gridspec.GridSpec(1,2,width_ratios=[2,1], wspace=0.3)
+            ax1 = plt.subplot(gs[0])
+            ax2 = plt.subplot(gs[1])
             ax1.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
-            ax1.scatter(orig, cannon)
+            ax1.set_xlim(low, high)
+            ax1.set_ylim(low, high)
+            ax1.legend(fontsize=14)
+            pl = ax1.scatter(orig, cannon, marker='x', c=snr,
+                    vmin=50, vmax=200, alpha=0.7)
+            cb = plt.colorbar(pl, ax=ax1, orientation='horizontal')
+            cb.set_label('SNR from Test Set', fontsize=12)
             textstr = 'Scatter: %s \nBias: %s' %(scatter, bias)
-            ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=10,
-                    verticalalignment='top')
-            ax1.set_xlabel("Reference Value")
-            ax1.set_ylabel("Cannon Output Value")
+            ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes,
+                    fontsize=14, verticalalignment='top')
+            ax1.tick_params(axis='x', labelsize=14)
+            ax1.tick_params(axis='y', labelsize=14)
+            ax1.set_xlabel("Reference Value", fontsize=14)
+            ax1.set_ylabel("Cannon Test Value", fontsize=14)
             ax1.set_title("1-1 Plot of Label " + r"$%s$" % name)
-            ax2 = axarr[1]
-            ax2.hist(cannon-orig, range=[-0.5,0.5])
-            ax2.set_xlabel("Difference")
-            ax2.set_ylabel("Count")
-            ax2.set_title("Histogram of Output Minus Ref Labels")
+            diff = cannon-orig
+            npoints = len(diff)
+            mu = mean(diff)
+            sig = std(diff)
+            ax2.hist(diff, range=[-3*sig,3*sig], color='k', bins=np.sqrt(npoints),
+                    orientation='horizontal', alpha=0.3, histtype='stepfilled')
+            ax2.tick_params(axis='x', labelsize=14)
+            ax2.tick_params(axis='y', labelsize=14)
+            ax2.set_xlabel("Count", fontsize=14)
+            ax2.set_ylabel("Difference", fontsize=14)
+            ax2.axhline(y=0, c='k', lw=3, label='Difference=0')
+            ax2.set_title("Training Versus Test Labels for $%s$" %name,
+                    fontsize=14)
+            ax2.legend(fontsize=14)
             figname = "1to1_label_%s.png" % i
             plt.savefig(figname)
             print("Diagnostic for label output vs. input")

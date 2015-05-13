@@ -8,6 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
 LARGE = 200.
 SMALL = 1. / LARGE
 
@@ -93,6 +96,7 @@ class CannonModel(object):
         cannon_set.test_ivar = cannon_ivars
         return cannon_set
 
+
     def split_array(self, array, num):
         """ split an array into a certain number of segments
 
@@ -116,6 +120,7 @@ class CannonModel(object):
             out.append(array[int(last):int(last+avg)])
             last += avg
         return out
+
 
     def diagnostics(
             self, baseline_spec_plot_name = "baseline_spec_with_cont_pix",
@@ -177,55 +182,63 @@ class CannonModel(object):
                 ax = axarr[0]
                 ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
                         label=r'$\theta_0$' + "= the leading fit coefficient")
-                ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
-                ax.legend(loc='lower right', prop={'family':'serif', 'size':'small'})
+                ax.scatter(contpix_lambda, y, s=1, color='r',
+                        label="continuum pixels")
+                ax.legend(loc='lower right', 
+                        prop={'family':'serif', 'size':'small'})
                 ax.set_title("Baseline Spectrum with Continuum Pixels")
                 ax.set_ylabel(r'$\theta_0$')
                 ax = axarr[1]
                 ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
                      label=r'$\theta_0$' + "= the leading fit coefficient")
-                ax.scatter(contpix_lambda, y, s=1, color='r',label="continuum pixels")
+                ax.scatter(contpix_lambda, y, s=1, color='r',
+                        label="continuum pixels")
                 ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
-                ax.legend(loc='upper right', prop={'family':'serif', 'size':'small'})
+                ax.legend(loc='upper right', prop={'family':'serif', 
+                    'size':'small'})
                 ax.set_ylabel(r'$\theta_0$')
                 ax.set_ylim(0.95, 1.05)
-                print("Diagnostic plot: fitted 0th order spec, cont pix overlaid.")
+                print("Diagnostic plot: fitted 0th order spec w/ cont pix")
                 print("Saved as %s_%s.png" % (baseline_spec_plot_name, i))
                 plt.savefig(baseline_spec_plot_name + "_%s" %i)
                 plt.close()
 
         # Leading coefficients for each label & scatter
-        # Scale coefficients so that they can be overlaid on the same plot
-        c = ['r', 'g', 'b', 'k']
-        stds = np.array([np.std(coeffs_all[:, i + 1]) for i in range(nlabels)])
-        pivot_std = max(stds)
-        ratios = np.round(pivot_std / stds, -1)  # round to the nearest 10
-        ratios[ratios == 0] = 1
-        fig, axarr = plt.subplots(2, sharex=True)
-        plt.xlabel(r"Wavelength $\lambda (\AA)$")
+        bad = scatters < 0.0002
+        scatters = np.ma.array(scatters, mask=bad)
+        lams = np.ma.array(lams, mask=bad)
+        fig, axarr = plt.subplots(nlabels+1, figsize=(8,8), sharex=True)
+        plt.subplots_adjust(hspace=0.001)
+        nbins = len(ax1.get_xticklabels())
+        for i in range(1,nlabels+1):
+            axarr[i].yaxis.set_major_locator(
+                    MaxNLocator(nbins=nbins, prune='upper'))
+        plt.xlabel(r"Wavelength $\lambda (\AA)$", fontsize=14)
         plt.xlim(np.ma.min(lams), np.ma.max(lams))
-        ax = axarr[0]
-        ax.set_ylabel("Leading coefficient " + r"$\theta_i$")
-        ax.set_title("First-Order Fit Coefficients for Labels")
-
-        first_order = np.zeros((npixels, nlabels))
-        lbl = r'$\theta_{0:d}$=coeff for ${1:s}$ * ${2:d}$'
-        for i in range(nlabels):
-            coeffs = coeffs_all[:,i+1] * ratios[i]
-            first_order[:,i] = coeffs
-            ax.step(lams, coeffs, where='mid', linewidth=0.5, 
-                    label=lbl.format(i+1, label_names[i], int(ratios[i])), c=c[i])
-        box = ax.get_position()
-        ax.set_position(
-                [box.x0, box.y0 + box.height*0.1, box.width, box.height*0.9])
-        ax.legend(
-                bbox_to_anchor=(0., -.2, 1., .102), loc=3, ncol=3, 
-                mode="expand", prop={'family':'serif', 'size':'small'})
-        ax = axarr[1]
-        ax.set_ylabel("scatter")
-        ax.set_title("Scatter of Fit")
+        plt.tick_params(axis='x', labelsize=14)
+        axarr[0].set_title(
+                "First-Order Fit Coeffs and Scatter from the Spectral Model",
+                fontsize=14)
+        ax.locator_params(axis='x', nbins=10)
+        for i in range(0,4):
+            ax = axarr[i]
+            lbl = r'$%s$'%names[i]
+            ax.set_ylabel(lbl, fontsize=14)
+            ax.tick_params(axis='y', labelsize=14)
+            ax.xaxis.grid(True)
+            y = np.ma.array(coeffs_all[:,i+1], mask=bad)
+            y = y[cut:]
+            ax.step(lams, y, where='mid', linewidth=0.5, c='k')
+            ax.locator_params(axis='y', nbins=4)
+        ax = axarr[4]
+        ax.tick_params(axis='y', labelsize=14)
+        ax.set_ylabel("scatter", fontsize=14)
+        top = np.max(scatters[scatters < 0.8])
+        stretch = np.std(scatters[scatters < 0.8])
+        ax.set_ylim(0, top + stretch)
         ax.step(lams, scatters, where='mid', c='k', linewidth=0.7)
-        fig.tight_layout(pad=2.0, h_pad=4.0)
+        ax.xaxis.grid(True)
+        ax.locator_params(axis='y', nbins=4)
         print("Diagnostic plot: leading coeffs and scatters across wavelength.")
         print("Saved as %s" %leading_coeffs_plot_name)
         fig.savefig(leading_coeffs_plot_name)

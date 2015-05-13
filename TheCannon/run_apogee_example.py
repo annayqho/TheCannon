@@ -22,7 +22,7 @@ dataset = dataset.Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
 dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
 # set LaTeX label names for making diagnostic plots
-dataset.set_label_names(['T_{eff}', '\log g', '[M/H]'])
+dataset.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels
 dataset.diagnostics_SNR()
@@ -67,4 +67,6 @@ model.diagnostics()
 
 # infer labels with the new model for the test_set
 label_errs = model.infer_labels(dataset)
-dataset.dataset_postdiagnostics(dataset)
+dataset.diagnostics_test_step_flagstars()
+dataset.diagnostics_survey_labels()
+dataset.diagnostics_1to1()
