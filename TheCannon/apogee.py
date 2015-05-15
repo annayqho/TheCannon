@@ -90,7 +90,7 @@ def load_spectra(data_dir):
         fluxes[jj,:] = flux
         ivars[jj,:] = ivar
     print("Spectra loaded")
-    return wl, fluxes, ivars
+    return files, wl, fluxes, ivars
 
 
 def load_labels(filename):

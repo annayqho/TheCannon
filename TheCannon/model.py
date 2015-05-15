@@ -222,16 +222,18 @@ class CannonModel(object):
                 "First-Order Fit Coeffs and Scatter from the Spectral Model",
                 fontsize=14)
         ax.locator_params(axis='x', nbins=10)
-        for i in range(0,4):
+        first_order = np.zeros((len(coeffs_all[:,0]), nlabels))
+        for i in range(0, nlabels):
             ax = axarr[i]
             lbl = r'$%s$'%label_names[i]
             ax.set_ylabel(lbl, fontsize=14)
             ax.tick_params(axis='y', labelsize=14)
             ax.xaxis.grid(True)
             y = np.ma.array(coeffs_all[:,i+1], mask=bad)
+            first_order[:, i] = y
             ax.step(lams, y, where='mid', linewidth=0.5, c='k')
             ax.locator_params(axis='y', nbins=4)
-        ax = axarr[4]
+        ax = axarr[nlabels]
         ax.tick_params(axis='y', labelsize=14)
         ax.set_ylabel("scatter", fontsize=14)
         top = np.max(scatters[scatters < 0.8])

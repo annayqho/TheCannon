@@ -7,8 +7,9 @@ import pickle
 
 # (1) PREPARE DATA
 
-wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
+tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
 # doing a 1-to-1 test for simplicity
+test_ID = tr_ID
 test_flux = tr_flux 
 test_ivar = tr_ivar
 all_labels = apogee.load_labels("example_DR10/reference_labels.csv")
@@ -17,7 +18,7 @@ teff_corr = all_labels[:,1]
 logg_corr = all_labels[:,3]
 mh_corr = all_labels[:,5]
 tr_label = np.vstack((teff_corr, logg_corr, mh_corr)).T
-dataset = dataset.Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
+dataset = dataset.Dataset(wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 # apogee spectra come in three segments, corresponding to the three chips
 dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
@@ -40,11 +41,20 @@ else:
 
 # in each region of the pseudo cont normed tr spectrum, 
 # identify the best 7% of continuum pix
-contmask = dataset.make_contmask(pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
+if glob.glob('contmask.p'):
+    contmask = pickle.load(open('contmask.p', 'r'))
+else:
+    contmask = dataset.make_contmask(pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
+    pickle.dump(contmask, open('contmask.p', 'w'))
+
 dataset.set_continuum(contmask)
 
 # fit a sinusoid through the continuum pixels
-cont = dataset.fit_continuum(3, "sinusoid")
+if glob.glob('cont.p'):
+    cont = pickle.load(open('cont.p', 'r')) 
+else:
+    cont = dataset.fit_continuum(3, "sinusoid")
+    pickle.dump(cont, open('cont.p', 'w'))
 
 # (3) CONTINUUM NORMALIZE
 norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \

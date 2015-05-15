@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from .helpers.triangle import corner
 from .helpers import Table
 import sys
@@ -22,13 +23,15 @@ class Dataset(object):
     for making data "Cannonizable."
     """
 
-    def __init__(self, wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar):
+    def __init__(self, wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar):
         print("Loading dataset")
         print("This may take a while...")
         self.wl = wl
+        self.tr_ID = tr_ID
         self.tr_flux = tr_flux
         self.tr_ivar = tr_ivar
         self.tr_label = tr_label
+        self.test_ID = test_ID
         self.test_flux = test_flux
         self.test_ivar = test_ivar
         self.ranges = None
@@ -302,7 +305,7 @@ class Dataset(object):
         nlabels = len(label_names)
         reference_labels = self.tr_label
         test_labels = self.test_label_vals
-        test_IDs = np.array(self.test_IDs)
+        test_IDs = np.array(self.test_ID)
         mean = np.mean(reference_labels, 0)
         stdev = np.std(reference_labels, 0)
         lower = mean - 2 * stdev
@@ -315,9 +318,9 @@ class Dataset(object):
             with open(filename, 'w') as output:
                 for star in test_IDs[warning]:
                     output.write('{0:s}\n'.format(star))
-        print("Reference label %s" % label_name)
-        print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
-        print("Saved list %s" % filename)
+            print("Reference label %s" % label_name)
+            print("flagged %s stars beyond 2-sig of ref labels" % sum(warning))
+            print("Saved list %s" % filename)
 
 
     def diagnostics_survey_labels(self, figname="survey_labels_triangle.png"):
@@ -336,8 +339,13 @@ class Dataset(object):
         
         assumes your training set and test set are identical"""
         snr = self.test_SNR
+        label_names = self.get_plotting_labels()
+        nlabels = len(label_names)
+        reference_labels = self.tr_label
+        test_labels = self.test_label_vals
+
         for i in range(nlabels):
-            name = self.get_plotting_labels()[i]
+            name = label_names[i]
             orig = reference_labels[:,i]
             cannon = test_labels[:,i]
             # calculate bias and scatter
@@ -354,7 +362,7 @@ class Dataset(object):
             ax1.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
             ax1.set_xlim(low, high)
             ax1.set_ylim(low, high)
-            ax1.legend(fontsize=14)
+            ax1.legend(fontsize=14, loc='lower right')
             pl = ax1.scatter(orig, cannon, marker='x', c=snr,
                     vmin=50, vmax=200, alpha=0.7)
             cb = plt.colorbar(pl, ax=ax1, orientation='horizontal')
@@ -369,8 +377,8 @@ class Dataset(object):
             ax1.set_title("1-1 Plot of Label " + r"$%s$" % name)
             diff = cannon-orig
             npoints = len(diff)
-            mu = mean(diff)
-            sig = std(diff)
+            mu = np.mean(diff)
+            sig = np.std(diff)
             ax2.hist(diff, range=[-3*sig,3*sig], color='k', bins=np.sqrt(npoints),
                     orientation='horizontal', alpha=0.3, histtype='stepfilled')
             ax2.tick_params(axis='x', labelsize=14)
