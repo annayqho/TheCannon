@@ -1,0 +1,16 @@
+\begin{theindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter C
+  \item continuum\_normalize() (in module prep\_data), \hyperpage{7}
+
+  \indexspace
+  \bigletter G
+  \item get\_spectra() (in module prep\_data), \hyperpage{7}
+  \item get\_training\_labels() (in module prep\_data), \hyperpage{7}
+
+  \indexspace
+  \bigletter P
+  \item prep\_data (module), \hyperpage{7}
+
+\end{theindex}

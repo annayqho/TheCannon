@@ -1,0 +1,16 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [0][-]{chapter.2}{Getting Started}{}% 2
+\BOOKMARK [1][-]{section.2.1}{Step 1: Prepare Data \(prepdata.py\)}{chapter.2}% 3
+\BOOKMARK [1][-]{section.2.2}{Step 2: Construct Training Set}{chapter.2}% 4
+\BOOKMARK [1][-]{section.2.3}{Step 3: Construct Test Set}{chapter.2}% 5
+\BOOKMARK [1][-]{section.2.4}{Step 4: The Cannon Step 1 - Generate Model}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.5}{Step 5: The Cannon Step 2 - Infer Labels}{chapter.2}% 7
+\BOOKMARK [0][-]{chapter.3}{Using The Cannon}{}% 8
+\BOOKMARK [1][-]{section.3.1}{Prepare Data}{chapter.3}% 9
+\BOOKMARK [1][-]{section.3.2}{Construct Training Set}{chapter.3}% 10
+\BOOKMARK [1][-]{section.3.3}{Construct Test Set}{chapter.3}% 11
+\BOOKMARK [1][-]{section.3.4}{The Cannon Step 1: Generate Model}{chapter.3}% 12
+\BOOKMARK [1][-]{section.3.5}{The Cannon Step 2: Infer Labels}{chapter.3}% 13
+\BOOKMARK [0][-]{chapter.4}{Reference/API}{}% 14
+\BOOKMARK [0][-]{section*.6}{Python Module Index}{}% 15
+\BOOKMARK [0][-]{section*.7}{Index}{}% 16
