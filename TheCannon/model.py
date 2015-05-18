@@ -156,7 +156,7 @@ class CannonModel(object):
         npixels = len(lams)
         nlabels = len(pivots)
 
-        if contmask != None:
+        if contmask is not None:
             # Baseline spectrum with continuum
             baseline_spec = coeffs_all[:,0]
             bad = np.round(baseline_spec,5) == 0
