@@ -6,7 +6,7 @@ from .helpers.triangle import corner
 from .helpers import Table
 import sys
 from .find_continuum_pixels import find_contpix, find_contpix_regions
-from .continuum_normalization import fit_cont, fit_cont_regions, cont_norm, cont_norm_regions, cont_norm_q
+from .continuum_normalization import fit_cont, fit_cont_regions, cont_norm, cont_norm_regions, cont_norm_q, cont_norm_q_regions
 
 PY3 = sys.version_info[0] > 2
 
@@ -256,8 +256,14 @@ class Dataset(object):
             the width of the pixel range used to calculate the median
         """
         print("Continuum normalizing the tr set using running quantile...")
-        return cont_norm_q(
-            self.wl, self.tr_flux, self.tr_ivar, q=q, delta_lambda=delta_lambda)
+        if self.ranges is None:
+            return cont_norm_q(
+                    self.wl, self.tr_flux, self.tr_ivar, 
+                    q=q, delta_lambda=delta_lambda)
+        else:
+            return cont_norm_q_regions(
+                    self.wl, self.tr_flux, self.tr_ivar,
+                    q=q, delta_lambda=delta_lambda, ranges=self.ranges)
 
 
     def continuum_normalize_f(self, cont):
