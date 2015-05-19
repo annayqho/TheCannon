@@ -2,12 +2,13 @@
 *The Cannon*: Data-Driven Stellar Labels
 *****************************************
 
-Contents:
-
 .. toctree::
+   :caption: Table of Contents
    :maxdepth: 2
 
    includeme
+   intro
+
 
 Introduction
 ============
