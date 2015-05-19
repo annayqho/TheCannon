@@ -11,3 +11,4 @@ setup(name='TheCannon',
             'TheCannon', 'TheCannon.helpers', 'TheCannon.helpers.triangle',
             'TheCannon.example_DR10', 'TheCannon.example_DR10.Data'],
         )
+
