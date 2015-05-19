@@ -29,4 +29,4 @@ Projects
 --------
 
 * Cross-calibration of APOGEE and LAMOST: putting LAMOST spectra onto the 
-APOGEE parameter scale.
+  APOGEE parameter scale.
