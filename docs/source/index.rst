@@ -42,5 +42,5 @@ Table of Contents
    :maxdepth: 2
 
    input_requirements
-   reference
+   api 
 
