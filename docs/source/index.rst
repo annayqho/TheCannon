@@ -26,11 +26,6 @@ The code is open source and `available on github`_.
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
 .. _available on github: https://github.com/annayqho/TheCannon
 
-Documentation Table of Contents
-===============================
+The documentation is organized as follows:
 
-.. toctree::
-   :maxdepth: 2
-
-   input_requirements
-
+* :ref:`input_requirements`

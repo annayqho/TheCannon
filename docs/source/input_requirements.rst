@@ -27,12 +27,15 @@ Required input to ``TheCannon`` are as follows:
 
 These input spectra and labels 
 must satisfy the criteria laid out in `Ness et al. 2015`_. 
+The spirit of these requirements is that any differences between two
+spectra should, to the extent possible, be due to differences in label
+values rather than measurement procedure. 
 In particular, the spectra must:
 
-  * Come from the same dataset (measured in a consistent way)
+  * Come from the same dataset 
   * Be continuum normalized in a consistent way that is independent of
     signal-to-noise
-  * Radial velocity shifted
-  * Sampled onto a common wavelength grid with a common line-spread function
+  * Be radial velocity shifted
+  * Be sampled onto a common wavelength grid with a common line-spread function
 
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
