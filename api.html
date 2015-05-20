@@ -75,6 +75,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.find_continuum_pixels">Continuum Identification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.continuum_normalization">Continuum Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.train_model">Train Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
@@ -497,6 +498,148 @@ that comes in chunks</p>
 <p><strong>Returns</strong></p>
 <p><strong>&#8212;&#8212;</strong></p>
 <p class="last"><strong>the weighted median</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-TheCannon.train_model">
+<span id="train-model"></span><h2>Train Model<a class="headerlink" href="#module-TheCannon.train_model" title="Permalink to this headline">¶</a></h2>
+<p>This runs Step 1 of The Cannon:
+uses the training set to solve for the best-fit model.</p>
+<dl class="function">
+<dt id="TheCannon.train_model.do_one_regression">
+<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">do_one_regression</tt><big>(</big><em>lams</em>, <em>fluxes</em>, <em>ivars</em>, <em>lvec</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#do_one_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.do_one_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes to find the scatter associated with the best-fit model.</p>
+<p>This scatter is the deviation between the observed spectrum and the model.
+It is wavelength-independent, so we perform this at a single wavelength.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.train_model.do_one_regression_at_fixed_scatter">
+<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">do_one_regression_at_fixed_scatter</tt><big>(</big><em>lams</em>, <em>fluxes</em>, <em>ivars</em>, <em>lvec</em>, <em>scatter</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#do_one_regression_at_fixed_scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.do_one_regression_at_fixed_scatter" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lams: numpy ndarray, shape npixels</strong></p>
+<blockquote>
+<div><p>the common wavelength array</p>
+</div></blockquote>
+<p><strong>fluxes: numpy ndarray, shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>flux values for all pixels of all stars</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray, shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>inverse variance values for all pixels of all stars</p>
+</div></blockquote>
+<p><strong>lvec: numpy ndarray</strong></p>
+<blockquote>
+<div><p>the label vector</p>
+</div></blockquote>
+<p><strong>scatter: numpy ndarray, shape npixels</strong></p>
+<blockquote>
+<div><p>fitted scatter values</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<p><strong>&#8212;&#8212;</strong></p>
+<p><strong>coeff: ndarray</strong></p>
+<blockquote>
+<div><p>coefficients of the fit</p>
+</div></blockquote>
+<p><strong>lTCinvl: ndarray</strong></p>
+<blockquote>
+<div><p>inverse covariance matrix for fit coefficients</p>
+</div></blockquote>
+<p><strong>chi: float</strong></p>
+<blockquote>
+<div><p>chi-squared at best fit</p>
+</div></blockquote>
+<p><strong>logdet_Cinv: float</strong></p>
+<blockquote class="last">
+<div><p>inverse of the log determinant of the cov matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.train_model.get_lvec">
+<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">get_lvec</tt><big>(</big><em>label_vals</em>, <em>pivots</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#get_lvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.get_lvec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a label vector for an arbitrary number of labels
+Assumes that our model is quadratic in the labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>label_vals: numpy ndarray, shape (nstars, nlabels)</strong></p>
+<blockquote>
+<div><p>labels</p>
+</div></blockquote>
+<p><strong>pivots: numpy ndarray</strong></p>
+<blockquote>
+<div><p>mean of the label_vals</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">lvec: numpy ndarray</p>
+<blockquote class="last">
+<div><p>label vector</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.train_model.split_array">
+<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">split_array</tt><big>(</big><em>array</em>, <em>num</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#split_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.split_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>split array into a number of chunks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>array: numpy ndarray</strong></p>
+<blockquote>
+<div><p>array to be split</p>
+</div></blockquote>
+<p><strong>num: int</strong></p>
+<blockquote>
+<div><p>number of chunks</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<p><strong>&#8212;&#8212;</strong></p>
+<p class="last"><strong>out: split array</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.train_model.train_model">
+<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">train_model</tt><big>(</big><em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#train_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.train_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>This determines the coefficients of the model using the training data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>reference objects</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">model: model</p>
+<blockquote class="last">
+<div><p>best-fit Cannon model</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
