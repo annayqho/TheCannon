@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>TheCannon.dataset &mdash; TheCannon 0.3.4 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="TheCannon 0.3.4 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="../../index.html" class="icon icon-home"> TheCannon
+        
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#construct-a-dataset-object">Construct a Dataset Object</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.find_continuum_pixels">Continuum Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.continuum_normalization">Continuum Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.train_model">Train Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.spectral_model">Spectral Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.infer_labels">Infer Labels</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">TheCannon</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>TheCannon.dataset</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for TheCannon.dataset</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">as</span> <span class="nn">gridspec</span>
+<span class="kn">from</span> <span class="nn">.helpers.triangle</span> <span class="kn">import</span> <span class="n">corner</span>
+<span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="n">find_contpix</span><span class="p">,</span> <span class="n">find_contpix_regions</span>
+<span class="kn">from</span> <span class="nn">.continuum_normalization</span> <span class="kn">import</span> <span class="n">fit_cont</span><span class="p">,</span> <span class="n">fit_cont_regions</span><span class="p">,</span> <span class="n">cont_norm</span><span class="p">,</span> <span class="n">cont_norm_regions</span><span class="p">,</span> <span class="n">cont_norm_q</span><span class="p">,</span> <span class="n">cont_norm_q_regions</span>
+
+<span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
+
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="nb">basestring</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">basestring</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class to represent a Dataset of stellar spectra and labels.</span>
+
+<span class="sd">    Initialize this object after performing the munging necessary </span>
+<span class="sd">    for making data &quot;Cannonizable.&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Loading dataset&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;This may take a while...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">=</span> <span class="n">wl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_ID</span> <span class="o">=</span> <span class="n">tr_ID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">tr_flux</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">tr_ivar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">tr_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">test_ID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">test_flux</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">test_ivar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="c"># calculate SNR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_SNR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_SNR</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_SNR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_SNR</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)])</span>
+
+
+    <span class="k">def</span> <span class="nf">_SNR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate the SNR of a spectrum, ignoring bad pixels</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flux: numpy ndarray</span>
+<span class="sd">            pixel intensities</span>
+<span class="sd">        ivar: numpy ndarray</span>
+<span class="sd">            inverse variances corresponding to flux</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SNR: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bad</span> <span class="o">=</span> <span class="n">ivar</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+        <span class="n">ivar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ivar</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+        <span class="n">SNR</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">flux</span><span class="o">*</span><span class="n">ivar</span><span class="o">**</span><span class="mf">0.5</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">SNR</span>  
+
+
+<div class="viewcode-block" id="Dataset.set_label_names"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.set_label_names">[docs]</a>    <span class="k">def</span> <span class="nf">set_label_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the label names for plotting</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        names: array, list</span>
+<span class="sd">            the names of the labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span> <span class="o">=</span> <span class="n">names</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.get_plotting_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.get_plotting_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotting_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the labels set for plotting</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        the label names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;No label names yet!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span>
+ 
+</div>
+<div class="viewcode-block" id="Dataset.diagnostics_SNR"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_SNR">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_SNR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span> <span class="o">=</span> <span class="s">&quot;SNRdist.png&quot;</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; Plot SNR distributions of ref and test objects</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        figname: (optional) string</span>
+<span class="sd">            title of the saved SNR diagnostic plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic for SNRs of reference and survey objects&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_SNR</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;b&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s">&quot;Ref Objects&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_SNR</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> 
+                <span class="n">label</span><span class="o">=</span><span class="s">&quot;Survey Objects&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;upper right&#39;</span><span class="p">)</span>
+        <span class="c">#plt.xscale(&#39;log&#39;)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;SNR Comparison Between Reference \&amp; Survey Objects&quot;</span><span class="p">)</span>
+        <span class="c">#plt.xlabel(&quot;log(Formal SNR)&quot;)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&quot;Formal SNR&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&quot;Number of Objects&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved fig </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">figname</span><span class="p">)</span>
+
+    </div>
+<div class="viewcode-block" id="Dataset.diagnostics_ref_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_ref_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_ref_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s">&quot;ref_labels_triangle.png&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Plot all training labels against each other. </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        figname: (optional) string</span>
+<span class="sd">            title of the saved triangle plot for reference labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span><span class="p">,</span> <span class="n">figname</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.label_triangle_plot"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.label_triangle_plot">[docs]</a>    <span class="k">def</span> <span class="nf">label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_vals</span><span class="p">,</span> <span class="n">figname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a triangle plot for the selected labels</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label_vals: numpy ndarray </span>
+<span class="sd">            values of the labels</span>
+<span class="sd">        figname: str</span>
+<span class="sd">            if provided, save the figure into the given file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">r&quot;$</span><span class="si">%s</span><span class="s">$&quot;</span> <span class="o">%</span> <span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Plotting every label against every other&quot;</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="p">(</span><span class="n">label_vals</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">show_titles</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                     <span class="n">title_args</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;fontsize&quot;</span><span class="p">:</span><span class="mi">12</span><span class="p">})</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved fig </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">figname</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.make_contmask"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.make_contmask">[docs]</a>    <span class="k">def</span> <span class="nf">make_contmask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Use spectra to find and return continuum pixels</span>
+
+<span class="sd">        For spectra split into regions, performs cont pix identification</span>
+<span class="sd">        separately for each region.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fluxes: numpy ndarray</span>
+<span class="sd">            pixel intensities</span>
+
+<span class="sd">        ivars: numpy ndarray</span>
+<span class="sd">            inverse variances for pixel fluxes</span>
+
+<span class="sd">        frac: float</span>
+<span class="sd">            the fraction of pixels that should be identified as continuum</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        contmask: boolean mask of length npixels</span>
+<span class="sd">            True indicates that the pixel is continuum</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Finding continuum pixels...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;assuming continuous spectra&quot;</span><span class="p">)</span>
+            <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;taking spectra in </span><span class="si">%s</span><span class="s"> regions&quot;</span> <span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">))</span>
+            <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix_regions</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> pixels returned as continuum&quot;</span> <span class="o">%</span><span class="nb">sum</span><span class="p">(</span><span class="n">contmask</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">contmask</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.set_continuum"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.set_continuum">[docs]</a>    <span class="k">def</span> <span class="nf">set_continuum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contmask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the contmask attribute </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        contmask: boolean numpy ndarray</span>
+<span class="sd">            True corresponds to continuum pixels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span> <span class="o">=</span> <span class="n">contmask</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.diagnostics_contmask"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_contmask">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_contmask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s">&#39;contpix.png&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Make and save diagnostic figure about the continuum pixels</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        (optional) figname: str</span>
+<span class="sd">            name of the figure to be saved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">contmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span>
+        <span class="n">f_bar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">))</span>
+        <span class="n">sigma_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">wl</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">)):</span>
+            <span class="n">flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">[:,</span><span class="n">wl</span><span class="p">]</span>
+            <span class="n">ivar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">[:,</span><span class="n">wl</span><span class="p">]</span>
+            <span class="n">f_bar</span><span class="p">[</span><span class="n">wl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">flux</span><span class="p">[</span><span class="n">ivar</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">sigma_f</span><span class="p">[</span><span class="n">wl</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">flux</span><span class="p">[</span><span class="n">ivar</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">f_bar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f_bar</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+        <span class="n">sigma_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma_f</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">f_bar</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="p">(</span><span class="n">f_bar</span><span class="o">+</span><span class="n">sigma_f</span><span class="p">),</span> <span class="p">(</span><span class="n">f_bar</span><span class="o">-</span><span class="n">sigma_f</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">[</span><span class="n">contmask</span><span class="p">],</span> <span class="n">f_bar</span><span class="p">[</span><span class="n">contmask</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Cont Pix&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&quot;Wavelength (A)&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&quot;Median Flux Across Training Objects&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;Continuum Pix Found by The Cannon&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saving fig </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">figname</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.fit_continuum"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.fit_continuum">[docs]</a>    <span class="k">def</span> <span class="nf">fit_continuum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Fit a continuum to the continuum pixels</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        deg: int</span>
+<span class="sd">            degree of the fitting function</span>
+<span class="sd">        ffunc: str</span>
+<span class="sd">            type of fitting function, sinusoid or chebyshev</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Fitting Continuum...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tr_cont</span> <span class="o">=</span> <span class="n">fit_cont</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+            <span class="n">test_cont</span> <span class="o">=</span> <span class="n">fit_cont</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Fitting Continuum in </span><span class="si">%s</span><span class="s"> Regions...&quot;</span> <span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">))</span>
+            <span class="n">tr_cont</span> <span class="o">=</span> <span class="n">fit_cont_regions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> 
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+            <span class="n">test_cont</span> <span class="o">=</span> <span class="n">fit_cont_regions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tr_cont</span><span class="p">,</span> <span class="n">test_cont</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.continuum_normalize_training_q"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.continuum_normalize_training_q">[docs]</a>    <span class="k">def</span> <span class="nf">continuum_normalize_training_q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Continuum normalize the training set using a running quantile</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        q: float</span>
+<span class="sd">            the quantile cut</span>
+<span class="sd">        delta_lambda: float</span>
+<span class="sd">            the width of the pixel range used to calculate the median</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Continuum normalizing the tr set using running quantile...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cont_norm_q</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> 
+                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cont_norm_q_regions</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span>
+                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">,</span> <span class="n">ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.continuum_normalize_f"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.continuum_normalize_f">[docs]</a>    <span class="k">def</span> <span class="nf">continuum_normalize_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cont</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Continuum normalize spectra by dividing the spectrum by the continuum </span>
+
+<span class="sd">        For spectra split into regions, perform cont normalization</span>
+<span class="sd">        separately for each region.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cont: numpy ndarray</span>
+<span class="sd">           the continuum </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        norm_tr_flux: numpy ndarray</span>
+<span class="sd">            the normalized training objects&#39; pixel intensities</span>
+<span class="sd">        norm_tr_ivar: numpy ndarray</span>
+<span class="sd">            the rescaled training objects&#39; pixel inverse variances</span>
+<span class="sd">        norm_test_flux: numpy ndarray</span>
+<span class="sd">            the normalized test objects&#39; pixel intensities</span>
+<span class="sd">        norm_test_ivar: numpy ndarray</span>
+<span class="sd">            the rescaled test objects&#39; pixel inverse variances</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tr_cont</span><span class="p">,</span> <span class="n">test_cont</span> <span class="o">=</span> <span class="n">cont</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;assuming continuous spectra&quot;</span><span class="p">)</span>
+            <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span> <span class="o">=</span> <span class="n">cont_norm</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_cont</span><span class="p">)</span>
+            <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> <span class="n">cont_norm</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="n">test_cont</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;taking spectra in </span><span class="si">%s</span><span class="s"> regions&quot;</span> <span class="o">%</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">)))</span>
+            <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span> <span class="o">=</span> <span class="n">cont_norm_regions</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_cont</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">)</span>
+            <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> <span class="n">cont_norm_regions</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="n">test_cont</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.diagnostics_test_step_flagstars"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_test_step_flagstars">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_test_step_flagstars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; list all stars whose inferred labels lie &gt;= 2 standard deviations</span>
+<span class="sd">        outside the reference label space &quot;&quot;&quot;</span>
+        <span class="n">label_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
+        <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_names</span><span class="p">)</span>
+        <span class="n">reference_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span>
+        <span class="n">test_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span>
+        <span class="n">test_IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_ID</span><span class="p">)</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">reference_labels</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">stdev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">reference_labels</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stdev</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stdev</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nlabels</span><span class="p">):</span>
+            <span class="n">label_name</span> <span class="o">=</span> <span class="n">label_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">test_vals</span> <span class="o">=</span> <span class="n">test_labels</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">warning</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">test_vals</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">test_vals</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="s">&quot;flagged_stars_</span><span class="si">%s</span><span class="s">.txt&quot;</span> <span class="o">%</span> <span class="n">i</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">star</span> <span class="ow">in</span> <span class="n">test_IDs</span><span class="p">[</span><span class="n">warning</span><span class="p">]:</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;{0:s}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">star</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Reference label </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">label_name</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;flagged </span><span class="si">%s</span><span class="s"> stars beyond 2-sig of ref labels&quot;</span> <span class="o">%</span> <span class="nb">sum</span><span class="p">(</span><span class="n">warning</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved list </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.diagnostics_survey_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_survey_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_survey_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s">&quot;survey_labels_triangle.png&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; make a triangle plot for all the survey labels </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        (optional) figname: str</span>
+<span class="sd">            name of plot to be saved</span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="n">figname</span><span class="o">=</span><span class="s">&quot;survey_labels_triangle.png&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">,</span> <span class="n">figname</span><span class="p">)</span>
+   
+   </div>
+<div class="viewcode-block" id="Dataset.diagnostics_1to1"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_1to1">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_1to1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; 1to1 plots of survey against training labels, color-coded by test SNR</span>
+<span class="sd">        </span>
+<span class="sd">        assumes your training set and test set are identical&quot;&quot;&quot;</span>
+        <span class="n">snr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_SNR</span>
+        <span class="n">label_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
+        <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_names</span><span class="p">)</span>
+        <span class="n">reference_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span>
+        <span class="n">test_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nlabels</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">label_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">orig</span> <span class="o">=</span> <span class="n">reference_labels</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">cannon</span> <span class="o">=</span> <span class="n">test_labels</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
+            <span class="c"># calculate bias and scatter</span>
+            <span class="n">scatter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">orig</span><span class="o">-</span><span class="n">cannon</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">bias</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">orig</span><span class="o">-</span><span class="n">cannon</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span>
+
+            <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">orig</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">cannon</span><span class="p">))</span>
+            <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">orig</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">cannon</span><span class="p">))</span>
+
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+            <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+            <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">],</span> <span class="p">[</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">],</span> <span class="s">&#39;k-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;x=y&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s">&#39;lower right&#39;</span><span class="p">)</span>
+            <span class="n">pl</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">cannon</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">snr</span><span class="p">,</span>
+                    <span class="n">vmin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+            <span class="n">cb</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">pl</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s">&#39;horizontal&#39;</span><span class="p">)</span>
+            <span class="n">cb</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s">&#39;SNR from Test Set&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">textstr</span> <span class="o">=</span> <span class="s">&#39;Scatter: </span><span class="si">%s</span><span class="s"> </span><span class="se">\n</span><span class="s">Bias: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">scatter</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">textstr</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax1</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                    <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s">&#39;top&#39;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">&quot;Reference Value&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">&quot;Cannon Test Value&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;1-1 Plot of Label &quot;</span> <span class="o">+</span> <span class="s">r&quot;$</span><span class="si">%s</span><span class="s">$&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">cannon</span><span class="o">-</span><span class="n">orig</span>
+            <span class="n">npoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+            <span class="n">sig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="n">sig</span><span class="p">,</span><span class="mi">3</span><span class="o">*</span><span class="n">sig</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">npoints</span><span class="p">),</span>
+                    <span class="n">orientation</span><span class="o">=</span><span class="s">&#39;horizontal&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">&#39;stepfilled&#39;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">&quot;Count&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">&quot;Difference&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Difference=0&#39;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Training Versus Test Labels for $</span><span class="si">%s</span><span class="s">$&quot;</span> <span class="o">%</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">figname</span> <span class="o">=</span> <span class="s">&quot;1to1_label_</span><span class="si">%s</span><span class="s">.png&quot;</span> <span class="o">%</span> <span class="n">i</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic for label output vs. input&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved fig </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">figname</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.set_test_label_vals"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.set_test_label_vals">[docs]</a>    <span class="k">def</span> <span class="nf">set_test_label_vals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set label vals from an array </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        vals: value of the labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span> <span class="o">=</span> <span class="n">vals</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Anna Ho.
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.3.4',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
