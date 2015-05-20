@@ -1,7 +1,5 @@
 import numpy as np
 
-LARGE = 200.
-SMALL = 1. / LARGE
 
 def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
@@ -61,6 +59,8 @@ def find_contpix(wl, fluxes, ivars, target_frac):
         True corresponds to continuum pixels
     """
     print("Target frac: %s" %(target_frac))
+    LARGE = 200.
+    SMALL = 1. / LARGE
     bad1 = np.median(ivars, axis=0) == SMALL
     bad2 = np.var(ivars, axis=0) == 0
     bad = np.logical_and(bad1, bad2)
