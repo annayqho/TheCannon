@@ -79,7 +79,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.find_continuum_pixels">Continuum Identification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.continuum_normalization">Continuum Normalization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.train_model">Train Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.spectral_model">Spectral Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
@@ -953,112 +952,6 @@ Assumes that our model is quadratic in the labels</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">model: model</p>
 <blockquote class="last">
 <div><p>best-fit Cannon model</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-TheCannon.spectral_model">
-<span id="spectral-model"></span><h2>Spectral Model<a class="headerlink" href="#module-TheCannon.spectral_model" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="TheCannon.spectral_model.diagnostics">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">diagnostics</tt><big>(</big><em>cannon_set</em>, <em>dataset</em>, <em>model</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.diagnostics" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run diagnostics on the fitted spectra</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
-<blockquote>
-<div><p>best-fit Cannon spectra</p>
-</div></blockquote>
-<p><strong>dataset: Dataset</strong></p>
-<blockquote>
-<div><p>original spectra</p>
-</div></blockquote>
-<p><strong>model: model</strong></p>
-<blockquote class="last">
-<div><p>best-fit Cannon spectral model</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.spectral_model.draw_spectra">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">draw_spectra</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#draw_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.draw_spectra" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a set of spectra given the model and test set labels</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: model object</strong></p>
-<blockquote>
-<div><p>the Cannon spectral model</p>
-</div></blockquote>
-<p><strong>dataset: Dataset object</strong></p>
-<blockquote>
-<div><p>dataset that needs label inferences</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cannon_set: Dataset object</p>
-<blockquote class="last">
-<div><p>same dataset as input, but with updated fluxes and variances</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.spectral_model.overlay_spectra">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">overlay_spectra</tt><big>(</big><em>cannon_set</em>, <em>dataset</em>, <em>model</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#overlay_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.overlay_spectra" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run a series of diagnostics on the fitted spectra</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
-<blockquote>
-<div><p>best-fit Cannon spectra</p>
-</div></blockquote>
-<p><strong>dataset: Dataset</strong></p>
-<blockquote>
-<div><p>original spectra</p>
-</div></blockquote>
-<p><strong>model: model</strong></p>
-<blockquote class="last">
-<div><p>best-fit Cannon spectral model</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.spectral_model.residuals">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">residuals</tt><big>(</big><em>cannon_set</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.residuals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stack spectrum fit residuals, sort by each label. Include histogram of
-the RMS at each pixel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
-<blockquote>
-<div><p>best-fit Cannon spectra</p>
-</div></blockquote>
-<p><strong>dataset: Dataset</strong></p>
-<blockquote class="last">
-<div><p>original spectra</p>
 </div></blockquote>
 </td>
 </tr>
