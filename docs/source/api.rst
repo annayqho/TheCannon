@@ -4,6 +4,12 @@
 API
 ***
 
+Preparing APOGEE Data
+=====================
+
+.. automodule:: apogee
+   :members:
+
 Construct a Dataset Object
 ==========================
 
