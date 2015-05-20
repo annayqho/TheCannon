@@ -3,7 +3,5 @@
 API
 ===
 
-.. automodule:: dataset
+.. automodule:: continuum_normalization
    :members:
-   :inherited-members:
-   :show-inheritance:

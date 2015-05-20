@@ -112,6 +112,163 @@
             
   <div class="section" id="api">
 <span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-continuum_normalization"></span><dl class="function">
+<dt id="continuum_normalization.cont_func">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_func</tt><big>(</big><em>x</em>, <em>p</em>, <em>L</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the fitting function evaluated at input x for the continuum.
+The fitting function is a sinusoid, sum of sines and cosines</p>
+<dl class="docutils">
+<dt>x: float or np.array</dt>
+<dd>data, input to function</dd>
+<dt>p: ndarray</dt>
+<dd>coefficients of fitting function</dd>
+<dt>L: float</dt>
+<dd>width of x data</dd>
+<dt>y: float or np.array</dt>
+<dd>output data corresponding to input x</dd>
+</dl>
+<dl class="docutils">
+<dt>func: float</dt>
+<dd>function evaluated for the input x</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.cont_norm">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum-normalize a continuous segment of spectra.</p>
+<dl class="docutils">
+<dt>fluxes: numpy ndarray </dt>
+<dd>pixel intensities</dd>
+<dt>ivars: numpy ndarray </dt>
+<dd>inverse variances, parallel to fluxes</dd>
+<dt>contmask: boolean mask</dt>
+<dd>True indicates that pixel is continuum</dd>
+</dl>
+<dl class="docutils">
+<dt>norm_fluxes: numpy ndarray</dt>
+<dd>normalized pixel intensities</dd>
+<dt>norm_ivars: numpy ndarray</dt>
+<dd>rescaled inverse variances</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.cont_norm_q">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm_q</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform continuum normalization using a running quantile</p>
+<dl class="docutils">
+<dt>wl: numpy ndarray </dt>
+<dd>wavelength vector</dd>
+<dt>fluxes: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>pixel intensities</dd>
+<dt>ivars: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>inverse variances, parallel to fluxes</dd>
+<dt>q: float</dt>
+<dd>the desired quantile cut</dd>
+<dt>delta_lambda: int</dt>
+<dd>the number of pixels over which the median is calculated</dd>
+</dl>
+<dl class="docutils">
+<dt>norm_fluxes: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>normalized pixel intensities</dd>
+<dt>norm_ivars: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>rescaled pixel invariances</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.cont_norm_q_regions">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm_q_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm_q_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm_q_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform continuum normalization using running quantile, for spectrum
+that comes in chunks</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.cont_norm_regions">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform continuum normalization for spectra in chunks</p>
+<p>Useful for spectra that have gaps</p>
+<dl class="docutils">
+<dt>fluxes: numpy ndarray</dt>
+<dd>pixel intensities</dd>
+<dt>ivars: numpy ndarray</dt>
+<dd>inverse variances, parallel to fluxes</dd>
+<dt>cont: numpy ndarray</dt>
+<dd>the continuum</dd>
+<dt>ranges: list or np ndarray</dt>
+<dd>the chunks that the spectrum should be split into</dd>
+</dl>
+<dl class="docutils">
+<dt>norm_fluxes: numpy ndarray</dt>
+<dd>normalized pixel intensities</dd>
+<dt>norm_ivars: numpy ndarray</dt>
+<dd>rescaled inverse variances</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.fit_cont">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">fit_cont</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#fit_cont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.fit_cont" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit a continuum to a continuum pixels in a segment of spectra</p>
+<p>Functional form can be either sinusoid or chebyshev, with specified degree</p>
+<dl class="docutils">
+<dt>fluxes: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>training set or test set pixel intensities</dd>
+<dt>ivars: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>inverse variances, parallel to fluxes</dd>
+<dt>contmask: numpy ndarray of length (npixels)</dt>
+<dd>boolean pixel mask, True indicates that pixel is continuum</dd>
+<dt>deg: int</dt>
+<dd>degree of fitting function</dd>
+<dt>ffunc: str</dt>
+<dd>type of fitting function, chebyshev or sinusoid</dd>
+</dl>
+<dl class="docutils">
+<dt>cont: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>the continuum, parallel to fluxes</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.fit_cont_regions">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">fit_cont_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ranges</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#fit_cont_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.fit_cont_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run fit_cont, dealing with spectrum in regions or chunks</p>
+<p>This is useful if a spectrum has gaps.</p>
+<dl class="docutils">
+<dt>fluxes: ndarray of shape (nstars, npixels)</dt>
+<dd>training set or test set pixel intensities</dd>
+<dt>ivars: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>inverse variances, parallel to fluxes</dd>
+<dt>contmask: numpy ndarray of length (npixels)</dt>
+<dd>boolean pixel mask, True indicates that pixel is continuum</dd>
+<dt>deg: int</dt>
+<dd>degree of fitting function</dd>
+<dt>ffunc: str</dt>
+<dd>type of fitting function, chebyshev or sinusoid</dd>
+</dl>
+<dl class="docutils">
+<dt>cont: numpy ndarray of shape (nstars, npixels)</dt>
+<dd>the continuum, parallel to fluxes</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.weighted_median">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">weighted_median</tt><big>(</big><em>values</em>, <em>weights</em>, <em>quantile</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#weighted_median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.weighted_median" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a weighted median for values above a particular quantile cut</p>
+<p>Used in pseudo continuum normalization</p>
+<dl class="docutils">
+<dt>values: np ndarray of floats</dt>
+<dd>the values to take the median of</dd>
+<dt>weights: np ndarray of floats</dt>
+<dd>the weights associated with the values</dd>
+<dt>quantile: float</dt>
+<dd>the cut applied to the input data</dd>
+</dl>
+<p>the weighted median</p>
+</dd></dl>
+
 </div>
 
 
