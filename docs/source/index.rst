@@ -32,6 +32,6 @@ Documentation Table of Contents
 .. toctree::
    :maxdepth: 2
 
-   intro 
+   Introduction <intro> 
    input_requirements
 

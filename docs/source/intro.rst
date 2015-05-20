@@ -1,4 +1,1 @@
-Introduction
-============
-:doc:`intro`
-
+:doc:`index`
