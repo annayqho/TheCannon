@@ -47,6 +47,7 @@ of the following:
       pixel intensity values described above
 
 
+
 * **Input Training Spectra**: a block of continuum-normalized 
   pixel intensity (flux) values with shape [num_training_objects x num_pixels]
 
