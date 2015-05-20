@@ -75,6 +75,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-find_continuum_pixels">Continuum Identification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-continuum_normalization">Continuum Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-infer_labels">Infer Labels</a></li>
 </ul>
 </li>
 </ul>
@@ -496,6 +497,90 @@ that comes in chunks</p>
 <p><strong>Returns</strong></p>
 <p><strong>&#8212;&#8212;</strong></p>
 <p class="last"><strong>the weighted median</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-infer_labels">
+<span id="infer-labels"></span><h2>Infer Labels<a class="headerlink" href="#module-infer_labels" title="Permalink to this headline">¶</a></h2>
+<p>This runs Step 2 of The Cannon:
+uses the model to solve for the labels of the test set.</p>
+<dl class="function">
+<dt id="infer_labels.func">
+<tt class="descclassname">infer_labels.</tt><tt class="descname">func</tt><big>(</big><em>coeffs</em>, <em>*labels</em><big>)</big><a class="reference internal" href="_modules/infer_labels.html#func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#infer_labels.func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes the dot product of coefficients vec &amp; labels vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>coeffs: numpy ndarray</strong></p>
+<blockquote>
+<div><p>the coefficients on each element of the label vector</p>
+</div></blockquote>
+<p><strong>*labels: numpy ndarray</strong></p>
+<blockquote>
+<div><p>label vector</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dot product of coeffs vec and labels vec</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="infer_labels.get_lvec">
+<tt class="descclassname">infer_labels.</tt><tt class="descname">get_lvec</tt><big>(</big><em>labels</em><big>)</big><a class="reference internal" href="_modules/infer_labels.html#get_lvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#infer_labels.get_lvec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a label vector for an arbitrary number of labels
+Assumes that our model is quadratic in the labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>labels: numpy ndarray</strong></p>
+<blockquote>
+<div><p>pivoted label values for one star</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">lvec: numpy ndarray</p>
+<blockquote class="last">
+<div><p>label vector</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="infer_labels.infer_labels">
+<tt class="descclassname">infer_labels.</tt><tt class="descname">infer_labels</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/infer_labels.html#infer_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#infer_labels.infer_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the model to solve for labels of the test set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: tuple</strong></p>
+<blockquote>
+<div><p>coeffs_all, covs, scatters, chis, chisqs, pivots
+result from <tt class="xref py py-func docutils literal"><span class="pre">train_model()</span></tt></p>
+</div></blockquote>
+<p><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>dataset that needs label inference</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">errs_all:</p>
+<blockquote class="last">
+<div><p>covariance matrix of the fit</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>

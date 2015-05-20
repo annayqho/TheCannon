@@ -15,3 +15,9 @@ Continuum Normalization
 
 .. automodule:: continuum_normalization
    :members:
+
+Infer Labels
+============
+
+.. automodule:: infer_labels
+   :members:
