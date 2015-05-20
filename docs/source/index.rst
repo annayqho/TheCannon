@@ -25,7 +25,7 @@ which where the test set is identical to the training set, and
 the second an implementation of inferring APOGEE-scale labels for 
 LAMOST spectra. 
 
-The code is open source and `available on github`. 
+The code is open source and `available on github`_. 
 
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
 .. _available on github: https://github.com/annayqho/TheCannon
