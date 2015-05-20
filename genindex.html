@@ -73,9 +73,13 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#construct-a-dataset-object">Construct a Dataset Object</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.find_continuum_pixels">Continuum Identification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.continuum_normalization">Continuum Normalization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.train_model">Train Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.spectral_model">Spectral Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
@@ -123,6 +127,10 @@
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#W"><strong>W</strong></a>
@@ -143,14 +151,22 @@
   <dt><a href="api.html#TheCannon.continuum_normalization.cont_norm_q">cont_norm_q() (in module TheCannon.continuum_normalization)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.continuum_normalization.cont_norm_q_regions">cont_norm_q_regions() (in module TheCannon.continuum_normalization)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.continuum_normalization.cont_norm_regions">cont_norm_regions() (in module TheCannon.continuum_normalization)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.continuum_normalize_f">continuum_normalize_f() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.continuum_normalize_training_q">continuum_normalize_training_q() (TheCannon.dataset.Dataset method)</a>
   </dt>
 
   </dl></td>
@@ -160,13 +176,49 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api.html#TheCannon.train_model.do_one_regression">do_one_regression() (in module TheCannon.train_model)</a>
+  <dt><a href="api.html#TheCannon.dataset.Dataset">Dataset (class in TheCannon.dataset)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.spectral_model.diagnostics">diagnostics() (in module TheCannon.spectral_model)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_1to1">diagnostics_1to1() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_contmask">diagnostics_contmask() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_ref_labels">diagnostics_ref_labels() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_SNR">diagnostics_SNR() (TheCannon.dataset.Dataset method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_survey_labels">diagnostics_survey_labels() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_test_step_flagstars">diagnostics_test_step_flagstars() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.train_model.do_one_regression">do_one_regression() (in module TheCannon.train_model)</a>
+  </dt>
+
+      
   <dt><a href="api.html#TheCannon.train_model.do_one_regression_at_fixed_scatter">do_one_regression_at_fixed_scatter() (in module TheCannon.train_model)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.spectral_model.draw_spectra">draw_spectra() (in module TheCannon.spectral_model)</a>
   </dt>
 
   </dl></td>
@@ -187,14 +239,18 @@
   <dt><a href="api.html#TheCannon.find_continuum_pixels.find_contpix_regions">find_contpix_regions() (in module TheCannon.find_continuum_pixels)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.continuum_normalization.fit_cont">fit_cont() (in module TheCannon.continuum_normalization)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.continuum_normalization.fit_cont_regions">fit_cont_regions() (in module TheCannon.continuum_normalization)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.fit_continuum">fit_continuum() (TheCannon.dataset.Dataset method)</a>
   </dt>
 
       
@@ -218,6 +274,12 @@
 
       </dl></dd>
   </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.get_plotting_labels">get_plotting_labels() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+  </dl></td>
 </tr></table>
 
 <h2 id="I">I</h2>
@@ -230,15 +292,67 @@
   </dl></td>
 </tr></table>
 
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.label_triangle_plot">label_triangle_plot() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.make_contmask">make_contmask() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.spectral_model.overlay_spectra">overlay_spectra() (in module TheCannon.spectral_model)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.spectral_model.residuals">residuals() (in module TheCannon.spectral_model)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.set_continuum">set_continuum() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.set_label_names">set_label_names() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.dataset.Dataset.set_test_label_vals">set_test_label_vals() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+  </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.find_continuum_pixels.SMALL">SMALL (in module TheCannon.find_continuum_pixels)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.train_model.split_array">split_array() (in module TheCannon.train_model)</a>
   </dt>
@@ -263,6 +377,10 @@
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#module-TheCannon.spectral_model">TheCannon.spectral_model (module)</a>
+  </dt>
+
       
   <dt><a href="api.html#module-TheCannon.train_model">TheCannon.train_model (module)</a>
   </dt>

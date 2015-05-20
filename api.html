@@ -73,9 +73,13 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#construct-a-dataset-object">Construct a Dataset Object</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.find_continuum_pixels">Continuum Identification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.continuum_normalization">Continuum Normalization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.train_model">Train Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.spectral_model">Spectral Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
@@ -118,6 +122,316 @@
             
   <div class="section" id="api">
 <span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="construct-a-dataset-object">
+<h2>Construct a Dataset Object<a class="headerlink" href="#construct-a-dataset-object" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="TheCannon.dataset.Dataset">
+<em class="property">class </em><tt class="descclassname">TheCannon.dataset.</tt><tt class="descname">Dataset</tt><big>(</big><em>wl</em>, <em>tr_ID</em>, <em>tr_flux</em>, <em>tr_ivar</em>, <em>tr_label</em>, <em>test_ID</em>, <em>test_flux</em>, <em>test_ivar</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to represent a Dataset of stellar spectra and labels.</p>
+<p>Initialize this object after performing the munging necessary 
+for making data &#8220;Cannonizable.&#8221;</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_f</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_training_q</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">diagnostics_1to1</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">diagnostics_SNR</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">diagnostics_contmask</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">diagnostics_ref_labels</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">diagnostics_survey_labels</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">diagnostics_test_step_flagstars</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">fit_continuum</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_plotting_labels</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">label_triangle_plot</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">make_contmask</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_continuum</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_label_names</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_test_label_vals</span></tt></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.continuum_normalize_f">
+<tt class="descname">continuum_normalize_f</tt><big>(</big><em>cont</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.continuum_normalize_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.continuum_normalize_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum normalize spectra by dividing the spectrum by the continuum</p>
+<p>For spectra split into regions, perform cont normalization
+separately for each region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cont: numpy ndarray</strong></p>
+<blockquote>
+<div><p>the continuum</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_tr_flux: numpy ndarray</p>
+<blockquote>
+<div><p>the normalized training objects&#8217; pixel intensities</p>
+</div></blockquote>
+<p>norm_tr_ivar: numpy ndarray</p>
+<blockquote>
+<div><p>the rescaled training objects&#8217; pixel inverse variances</p>
+</div></blockquote>
+<p>norm_test_flux: numpy ndarray</p>
+<blockquote>
+<div><p>the normalized test objects&#8217; pixel intensities</p>
+</div></blockquote>
+<p>norm_test_ivar: numpy ndarray</p>
+<blockquote class="last">
+<div><p>the rescaled test objects&#8217; pixel inverse variances</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.continuum_normalize_training_q">
+<tt class="descname">continuum_normalize_training_q</tt><big>(</big><em>q</em>, <em>delta_lambda</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.continuum_normalize_training_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.continuum_normalize_training_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum normalize the training set using a running quantile</p>
+<dl class="docutils">
+<dt>q: float</dt>
+<dd>the quantile cut</dd>
+<dt>delta_lambda: float</dt>
+<dd>the width of the pixel range used to calculate the median</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_1to1">
+<tt class="descname">diagnostics_1to1</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_1to1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_1to1" title="Permalink to this definition">¶</a></dt>
+<dd><p>1to1 plots of survey against training labels, color-coded by test SNR</p>
+<p>assumes your training set and test set are identical</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_SNR">
+<tt class="descname">diagnostics_SNR</tt><big>(</big><em>figname='SNRdist.png'</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_SNR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_SNR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot SNR distributions of ref and test objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>figname: (optional) string</strong></p>
+<blockquote class="last">
+<div><p>title of the saved SNR diagnostic plot</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_contmask">
+<tt class="descname">diagnostics_contmask</tt><big>(</big><em>figname='contpix.png'</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_contmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_contmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make and save diagnostic figure about the continuum pixels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) figname: str</strong></p>
+<blockquote class="last">
+<div><p>name of the figure to be saved</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_ref_labels">
+<tt class="descname">diagnostics_ref_labels</tt><big>(</big><em>figname='ref_labels_triangle.png'</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_ref_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_ref_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot all training labels against each other.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>figname: (optional) string</strong></p>
+<blockquote class="last">
+<div><p>title of the saved triangle plot for reference labels</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_survey_labels">
+<tt class="descname">diagnostics_survey_labels</tt><big>(</big><em>figname='survey_labels_triangle.png'</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_survey_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_survey_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>make a triangle plot for all the survey labels 
+Parameters
+&#8212;&#8212;&#8212;-
+(optional) figname: str</p>
+<blockquote>
+<div>name of plot to be saved</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_test_step_flagstars">
+<tt class="descname">diagnostics_test_step_flagstars</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_test_step_flagstars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_test_step_flagstars" title="Permalink to this definition">¶</a></dt>
+<dd><p>list all stars whose inferred labels lie &gt;= 2 standard deviations
+outside the reference label space</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.fit_continuum">
+<tt class="descname">fit_continuum</tt><big>(</big><em>deg</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.fit_continuum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.fit_continuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit a continuum to the continuum pixels</p>
+<dl class="docutils">
+<dt>deg: int</dt>
+<dd>degree of the fitting function</dd>
+<dt>ffunc: str</dt>
+<dd>type of fitting function, sinusoid or chebyshev</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.get_plotting_labels">
+<tt class="descname">get_plotting_labels</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.get_plotting_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.get_plotting_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the labels set for plotting</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the label names</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.label_triangle_plot">
+<tt class="descname">label_triangle_plot</tt><big>(</big><em>label_vals</em>, <em>figname</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.label_triangle_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.label_triangle_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a triangle plot for the selected labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>label_vals: numpy ndarray</strong></p>
+<blockquote>
+<div><p>values of the labels</p>
+</div></blockquote>
+<p><strong>figname: str</strong></p>
+<blockquote class="last">
+<div><p>if provided, save the figure into the given file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.make_contmask">
+<tt class="descname">make_contmask</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>frac</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.make_contmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.make_contmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use spectra to find and return continuum pixels</p>
+<p>For spectra split into regions, performs cont pix identification
+separately for each region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: numpy ndarray</strong></p>
+<blockquote>
+<div><p>pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray</strong></p>
+<blockquote>
+<div><p>inverse variances for pixel fluxes</p>
+</div></blockquote>
+<p><strong>frac: float</strong></p>
+<blockquote>
+<div><p>the fraction of pixels that should be identified as continuum</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">contmask: boolean mask of length npixels</p>
+<blockquote class="last">
+<div><p>True indicates that the pixel is continuum</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.set_continuum">
+<tt class="descname">set_continuum</tt><big>(</big><em>contmask</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.set_continuum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.set_continuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the contmask attribute</p>
+<dl class="docutils">
+<dt>contmask: boolean numpy ndarray</dt>
+<dd>True corresponds to continuum pixels</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.set_label_names">
+<tt class="descname">set_label_names</tt><big>(</big><em>names</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.set_label_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.set_label_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the label names for plotting</p>
+<dl class="docutils">
+<dt>names: array, list</dt>
+<dd>the names of the labels</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.set_test_label_vals">
+<tt class="descname">set_test_label_vals</tt><big>(</big><em>vals</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.set_test_label_vals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.set_test_label_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set label vals from an array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vals: value of the labels</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-TheCannon.find_continuum_pixels">
 <span id="continuum-identification"></span><h2>Continuum Identification<a class="headerlink" href="#module-TheCannon.find_continuum_pixels" title="Permalink to this headline">¶</a></h2>
 <dl class="data">
@@ -639,6 +953,112 @@ Assumes that our model is quadratic in the labels</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">model: model</p>
 <blockquote class="last">
 <div><p>best-fit Cannon model</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-TheCannon.spectral_model">
+<span id="spectral-model"></span><h2>Spectral Model<a class="headerlink" href="#module-TheCannon.spectral_model" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="TheCannon.spectral_model.diagnostics">
+<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">diagnostics</tt><big>(</big><em>cannon_set</em>, <em>dataset</em>, <em>model</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run diagnostics on the fitted spectra</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
+<blockquote>
+<div><p>best-fit Cannon spectra</p>
+</div></blockquote>
+<p><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>original spectra</p>
+</div></blockquote>
+<p><strong>model: model</strong></p>
+<blockquote class="last">
+<div><p>best-fit Cannon spectral model</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.spectral_model.draw_spectra">
+<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">draw_spectra</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#draw_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.draw_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a set of spectra given the model and test set labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: model object</strong></p>
+<blockquote>
+<div><p>the Cannon spectral model</p>
+</div></blockquote>
+<p><strong>dataset: Dataset object</strong></p>
+<blockquote>
+<div><p>dataset that needs label inferences</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cannon_set: Dataset object</p>
+<blockquote class="last">
+<div><p>same dataset as input, but with updated fluxes and variances</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.spectral_model.overlay_spectra">
+<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">overlay_spectra</tt><big>(</big><em>cannon_set</em>, <em>dataset</em>, <em>model</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#overlay_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.overlay_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a series of diagnostics on the fitted spectra</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
+<blockquote>
+<div><p>best-fit Cannon spectra</p>
+</div></blockquote>
+<p><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>original spectra</p>
+</div></blockquote>
+<p><strong>model: model</strong></p>
+<blockquote class="last">
+<div><p>best-fit Cannon spectral model</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.spectral_model.residuals">
+<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">residuals</tt><big>(</big><em>cannon_set</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.residuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stack spectrum fit residuals, sort by each label. Include histogram of
+the RMS at each pixel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
+<blockquote>
+<div><p>best-fit Cannon spectra</p>
+</div></blockquote>
+<p><strong>dataset: Dataset</strong></p>
+<blockquote class="last">
+<div><p>original spectra</p>
 </div></blockquote>
 </td>
 </tr>

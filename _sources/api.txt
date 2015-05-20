@@ -4,6 +4,12 @@
 API
 ***
 
+Construct a Dataset Object
+==========================
+
+.. autoclass:: TheCannon.dataset.Dataset
+   :members:
+
 Continuum Identification
 ========================
 
@@ -20,6 +26,12 @@ Train Model
 ===========
 
 .. automodule:: TheCannon.train_model
+   :members:
+
+Spectral Model
+==============
+
+.. automodule:: TheCannon.spectral_model
    :members:
 
 Infer Labels
