@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction &mdash; TheCannon 0.3.4 documentation</title>
+  <title>Requirements for Input &mdash; TheCannon 0.3.4 documentation</title>
   
 
   
@@ -71,9 +71,7 @@
           
           
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#requirements-for-input">Requirements for Input</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#overview-of-thecannon">Overview of <tt class="docutils literal"><span class="pre">TheCannon</span></tt></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Requirements for Input</a></li>
 </ul>
 
           
@@ -98,7 +96,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Introduction</li>
+    <li>Requirements for Input</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -111,23 +109,7 @@
 </div>
           <div role="main" class="document">
             
-  <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> provides functionality for <em>The Cannon</em>,
-a data-driven approach to determining stellar labels (parameters
-and abundances) from stellar spectra in the context of large
-spectroscopic surveys.</p>
-<p>For a detailed overview of <em>The Cannon</em> and a description of its
-successful application to determining labels for APOGEE DR10 spectra,
-see <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>.</p>
-<p>This documentation includes two examples for implementation,
-the first a very simple implementation using APOGEE spectra in
-which where the test set is identical to the training set, and
-the second an implementation of inferring APOGEE-scale labels for
-LAMOST spectra.</p>
-<p>The code is open source and <a class="reference external" href="https://github.com/annayqho/TheCannon">available on github</a>.</p>
-</div>
-<div class="section" id="requirements-for-input">
+  <div class="section" id="requirements-for-input">
 <h1>Requirements for Input<a class="headerlink" href="#requirements-for-input" title="Permalink to this headline">¶</a></h1>
 <p>Required input to <tt class="docutils literal"><span class="pre">TheCannon</span></tt> are as follows:</p>
 <ul class="simple">
@@ -168,11 +150,6 @@ signal-to-noise</li>
 <li>Sampled onto a common wavelength grid with a common line-spread function</li>
 </ul>
 </div></blockquote>
-</div>
-<div class="section" id="overview-of-thecannon">
-<h1>Overview of <tt class="docutils literal"><span class="pre">TheCannon</span></tt><a class="headerlink" href="#overview-of-thecannon" title="Permalink to this headline">¶</a></h1>
-<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> provides some functionality to identify continuum and perform
-continuum normalization.</p>
 </div>
 
 
