@@ -2,13 +2,13 @@
 *The Cannon* (``TheCannon``)
 ****************************
 Stellar Labels from Large Spectroscopic Datasets
-================================================
+************************************************
 
 .. toctree::
    :maxdepth: 2
 
 Introduction
-------------
+============
 
 ``TheCannon`` provides functionality for *The Cannon*,
 a data-driven approach to determining stellar labels (parameters
@@ -29,3 +29,32 @@ The code is open source and `available on github`_.
 
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
 .. _available on github: https://github.com/annayqho/TheCannon
+
+Requirements for Input
+======================
+
+In order to use ``TheCannon``, the input spectra and training labels
+must satisfy the criteria laid out in `Ness et al. 2015`_. They consist
+of the following:
+
+* **Training Set**
+
+  * Training Spectra
+
+    * a block of continuum-normalized pixel intensity (flux) values with shape
+      [num_training_objects x num_pixels]
+    * a block of inverse variance values corresponding to the block of 
+      pixel intensity values described above
+
+
+* **Input Training Spectra**: a block of continuum-normalized 
+  pixel intensity (flux) values with shape [num_training_objects x num_pixels]
+
+  * Come from the same dataset (measured in a consistent way)
+  * Continuum normalized in a consistent way that is independent of
+    signal-to-noise
+  * Radial velocity shifted
+  * Sampled onto a common wavelength grid with a common line-spread function
+
+.. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
+
