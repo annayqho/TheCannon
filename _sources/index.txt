@@ -1,9 +1,8 @@
-*************
-*The Cannon*: 
-*************
-
-Stellar Parameters and Abundances from Spectroscopic Datasets
-=============================================================
+************
+*The Cannon* 
+************
+Stellar Labels from Large Spectroscopic Datasets
+================================================
 
 .. toctree::
    :maxdepth: 2
