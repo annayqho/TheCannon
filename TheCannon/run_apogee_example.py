@@ -18,7 +18,8 @@ teff_corr = all_labels[:,1]
 logg_corr = all_labels[:,3]
 mh_corr = all_labels[:,5]
 tr_label = np.vstack((teff_corr, logg_corr, mh_corr)).T
-dataset = dataset.Dataset(wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
+dataset = dataset.Dataset(
+        wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 # apogee spectra come in three segments, corresponding to the three chips
 dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
 

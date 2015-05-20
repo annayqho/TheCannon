@@ -42,4 +42,6 @@ Table of Contents
    :maxdepth: 2
 
    input_requirements
+   getting_started 
+   using_tc
    api 
