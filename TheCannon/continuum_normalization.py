@@ -3,8 +3,6 @@ from functools import partial
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 
-""" Performs continuum normalization on Cannon input spectra. """
-
 LARGE = 200.
 SMALL = 1. / LARGE
 
