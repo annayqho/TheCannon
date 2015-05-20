@@ -7,7 +7,7 @@ API
 Preparing APOGEE Data
 =====================
 
-.. automodule:: apogee
+.. automodule:: TheCannon.apogee
    :members:
 
 Construct a Dataset Object
