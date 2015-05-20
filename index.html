@@ -133,9 +133,7 @@ LAMOST spectra.</p>
 </div>
 <div class="section" id="requirements-for-input">
 <h3>Requirements for Input<a class="headerlink" href="#requirements-for-input" title="Permalink to this headline">¶</a></h3>
-<p>In order to use <tt class="docutils literal"><span class="pre">TheCannon</span></tt>, the input spectra and training labels
-must satisfy the criteria laid out in <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>. They consist
-of the following:</p>
+<p>Required input to <tt class="docutils literal"><span class="pre">TheCannon</span></tt> are as follows:</p>
 <ul class="simple">
 <li><strong>Training Set</strong><ul>
 <li>Training Spectra<ul>
@@ -145,18 +143,40 @@ of the following:</p>
 pixel intensity values described above</li>
 </ul>
 </li>
+<li>Training Labels<ul>
+<li>a block of training labels with shape [num_training_objects x num_labels]</li>
 </ul>
 </li>
-<li><strong>Input Training Spectra</strong>: a block of continuum-normalized
-pixel intensity (flux) values with shape [num_training_objects x num_pixels]<ul>
+</ul>
+</li>
+<li><strong>Test Set</strong><ul>
+<li>Test Spectra<ul>
+<li>a block of continuum-normalized pixel intensity (flux) values with shape
+[num_test_objects x num_pixels]</li>
+<li>a block of inverse variance values corresponding to the block of
+pixel intensity values described above</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>These input spectra and labels
+must satisfy the criteria laid out in <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>.
+In particular, the spectra must:</p>
+<blockquote>
+<div><ul class="simple">
 <li>Come from the same dataset (measured in a consistent way)</li>
-<li>Continuum normalized in a consistent way that is independent of
+<li>Be continuum normalized in a consistent way that is independent of
 signal-to-noise</li>
 <li>Radial velocity shifted</li>
 <li>Sampled onto a common wavelength grid with a common line-spread function</li>
 </ul>
-</li>
-</ul>
+</div></blockquote>
+</div>
+<div class="section" id="overview-of-thecannon">
+<h3>Overview of <tt class="docutils literal"><span class="pre">TheCannon</span></tt><a class="headerlink" href="#overview-of-thecannon" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> provides some functionality to identify continuum and perform
+continuum normalization.</p>
 </div>
 </div>
 </div>
