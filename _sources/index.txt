@@ -35,7 +35,11 @@ The code is open source and `available on github`_.
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
 .. _available on github: https://github.com/annayqho/TheCannon
 
+Hello?
+======
+
 .. autoclass:: dataset
+   :members:
 
 Table of Contents
 =================
