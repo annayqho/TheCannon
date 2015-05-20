@@ -30,8 +30,7 @@
   
 
   
-    <link rel="top" title="TheCannon 0.3.4 documentation" href="index.html"/>
-        <link rel="prev" title="The Cannon (TheCannon)" href="index.html"/> 
+    <link rel="top" title="TheCannon 0.3.4 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -70,10 +69,11 @@
         
           
           
-              <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Requirements for Input</a></li>
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Requirements for Input</a></li>
 </ul>
-
+</div>
           
         
       </div>
@@ -140,14 +140,17 @@ pixel intensity values described above</li>
 </ul>
 <p>These input spectra and labels
 must satisfy the criteria laid out in <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>.
+The spirit of these requirements is that any differences between two
+spectra should, to the extent possible, be due to differences in label
+values rather than measurement procedure.
 In particular, the spectra must:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Come from the same dataset (measured in a consistent way)</li>
+<li>Come from the same dataset</li>
 <li>Be continuum normalized in a consistent way that is independent of
 signal-to-noise</li>
-<li>Radial velocity shifted</li>
-<li>Sampled onto a common wavelength grid with a common line-spread function</li>
+<li>Be radial velocity shifted</li>
+<li>Be sampled onto a common wavelength grid with a common line-spread function</li>
 </ul>
 </div></blockquote>
 </div>
@@ -155,13 +158,6 @@ signal-to-noise</li>
 
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="index.html" class="btn btn-neutral" title="The Cannon (TheCannon)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
