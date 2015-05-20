@@ -38,7 +38,7 @@ The code is open source and `available on github`_.
 Hello?
 ======
 
-.. autoclass:: dataset
+.. autoclass:: Dataset
    :members:
 
 Table of Contents
