@@ -4,8 +4,6 @@
 Stellar Labels from Large Spectroscopic Datasets
 ************************************************
 
-.. _introduction:
-
 Introduction
 ============
 ``TheCannon`` provides functionality for *The Cannon*,

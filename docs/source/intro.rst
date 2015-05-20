@@ -1,1 +1,4 @@
-:ref:`introduction`
+Introduction
+============
+:doc:`intro`
+
