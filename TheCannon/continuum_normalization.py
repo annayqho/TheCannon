@@ -7,6 +7,7 @@ LARGE = 200.
 SMALL = 1. / LARGE
 
 def partial_func(func, *args, **kwargs):
+    """ something """
     def wrap(x, *p):
         return func(x, p, **kwargs)
     return wrap
