@@ -33,13 +33,3 @@ The documentation is organized as follows:
    :caption: Preparing Data for Input
 
    input_requirements
-
-* :ref:`input-requirements`
-
-.. _input-requirements:
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Preparing Data for Input 
-
-   input_requirements
