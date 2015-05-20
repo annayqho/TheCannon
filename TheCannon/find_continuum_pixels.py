@@ -3,8 +3,6 @@ import numpy as np
 LARGE = 200.
 SMALL = 1. / LARGE
 
-""" Finds and returns list of continuum pixels, as a mask. """
-
 def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
 
