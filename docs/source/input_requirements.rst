@@ -7,8 +7,6 @@ Stellar Labels from Large Spectroscopic Datasets
 .. toctree::
    :maxdepth: 2
 
-   input_requirements
-
 Introduction
 ============
 
