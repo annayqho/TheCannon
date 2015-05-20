@@ -7,17 +7,17 @@ API
 Continuum Identification
 ========================
 
-.. automodule:: find_continuum_pixels
+.. automodule:: TheCannon.find_continuum_pixels
    :members:
 
 Continuum Normalization
 =======================
 
-.. automodule:: continuum_normalization
+.. automodule:: TheCannon.continuum_normalization
    :members:
 
 Infer Labels
 ============
 
-.. automodule:: infer_labels
+.. automodule:: TheCannon.infer_labels
    :members:

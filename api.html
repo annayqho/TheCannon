@@ -73,9 +73,9 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-find_continuum_pixels">Continuum Identification</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-continuum_normalization">Continuum Normalization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-infer_labels">Infer Labels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.find_continuum_pixels">Continuum Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.continuum_normalization">Continuum Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
 </ul>
@@ -117,11 +117,17 @@
             
   <div class="section" id="api">
 <span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-find_continuum_pixels">
-<span id="continuum-identification"></span><h2>Continuum Identification<a class="headerlink" href="#module-find_continuum_pixels" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-TheCannon.find_continuum_pixels">
+<span id="continuum-identification"></span><h2>Continuum Identification<a class="headerlink" href="#module-TheCannon.find_continuum_pixels" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="TheCannon.find_continuum_pixels.SMALL">
+<tt class="descclassname">TheCannon.find_continuum_pixels.</tt><tt class="descname">SMALL</tt><em class="property"> = 0.005</em><a class="headerlink" href="#TheCannon.find_continuum_pixels.SMALL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds and returns list of continuum pixels, as a mask.</p>
+</dd></dl>
+
 <dl class="function">
-<dt id="find_continuum_pixels.find_contpix">
-<tt class="descclassname">find_continuum_pixels.</tt><tt class="descname">find_contpix</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>target_frac</em><big>)</big><a class="reference internal" href="_modules/find_continuum_pixels.html#find_contpix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#find_continuum_pixels.find_contpix" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.find_continuum_pixels.find_contpix">
+<tt class="descclassname">TheCannon.find_continuum_pixels.</tt><tt class="descname">find_contpix</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>target_frac</em><big>)</big><a class="reference internal" href="_modules/TheCannon/find_continuum_pixels.html#find_contpix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.find_continuum_pixels.find_contpix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find continuum pix in spec, meeting a set target fraction</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -156,8 +162,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="find_continuum_pixels.find_contpix_given_cuts">
-<tt class="descclassname">find_continuum_pixels.</tt><tt class="descname">find_contpix_given_cuts</tt><big>(</big><em>f_cut</em>, <em>sig_cut</em>, <em>wl</em>, <em>fluxes</em>, <em>ivars</em><big>)</big><a class="reference internal" href="_modules/find_continuum_pixels.html#find_contpix_given_cuts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#find_continuum_pixels.find_contpix_given_cuts" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.find_continuum_pixels.find_contpix_given_cuts">
+<tt class="descclassname">TheCannon.find_continuum_pixels.</tt><tt class="descname">find_contpix_given_cuts</tt><big>(</big><em>f_cut</em>, <em>sig_cut</em>, <em>wl</em>, <em>fluxes</em>, <em>ivars</em><big>)</big><a class="reference internal" href="_modules/TheCannon/find_continuum_pixels.html#find_contpix_given_cuts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.find_continuum_pixels.find_contpix_given_cuts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find and return continuum pixels given the flux and sigma cut</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -196,8 +202,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="find_continuum_pixels.find_contpix_regions">
-<tt class="descclassname">find_continuum_pixels.</tt><tt class="descname">find_contpix_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>frac</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/find_continuum_pixels.html#find_contpix_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#find_continuum_pixels.find_contpix_regions" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.find_continuum_pixels.find_contpix_regions">
+<tt class="descclassname">TheCannon.find_continuum_pixels.</tt><tt class="descname">find_contpix_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>frac</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/TheCannon/find_continuum_pixels.html#find_contpix_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.find_continuum_pixels.find_contpix_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find continuum pix in a spectrum split into chunks</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -236,11 +242,11 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-continuum_normalization">
-<span id="continuum-normalization"></span><h2>Continuum Normalization<a class="headerlink" href="#module-continuum_normalization" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-TheCannon.continuum_normalization">
+<span id="continuum-normalization"></span><h2>Continuum Normalization<a class="headerlink" href="#module-TheCannon.continuum_normalization" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="continuum_normalization.cont_func">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_func</tt><big>(</big><em>x</em>, <em>p</em>, <em>L</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_func" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.cont_func">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_func</tt><big>(</big><em>x</em>, <em>p</em>, <em>L</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_func" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the fitting function evaluated at input x for the continuum.
 The fitting function is a sinusoid, sum of sines and cosines</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -276,8 +282,8 @@ The fitting function is a sinusoid, sum of sines and cosines</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="continuum_normalization.cont_norm">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.cont_norm">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Continuum-normalize a continuous segment of spectra.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -312,8 +318,8 @@ The fitting function is a sinusoid, sum of sines and cosines</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="continuum_normalization.cont_norm_q">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm_q</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm_q" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.cont_norm_q">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_q</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_q" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform continuum normalization using a running quantile</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -346,15 +352,15 @@ The fitting function is a sinusoid, sum of sines and cosines</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="continuum_normalization.cont_norm_q_regions">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm_q_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm_q_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm_q_regions" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.cont_norm_q_regions">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_q_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_q_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_q_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform continuum normalization using running quantile, for spectrum
 that comes in chunks</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="continuum_normalization.cont_norm_regions">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm_regions" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.cont_norm_regions">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform continuum normalization for spectra in chunks</p>
 <p>Useful for spectra that have gaps</p>
 <dl class="docutils">
@@ -386,8 +392,8 @@ that comes in chunks</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="continuum_normalization.fit_cont">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">fit_cont</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#fit_cont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.fit_cont" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.fit_cont">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">fit_cont</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#fit_cont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.fit_cont" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit a continuum to a continuum pixels in a segment of spectra</p>
 <p>Functional form can be either sinusoid or chebyshev, with specified degree</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -427,8 +433,8 @@ that comes in chunks</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="continuum_normalization.fit_cont_regions">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">fit_cont_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ranges</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#fit_cont_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.fit_cont_regions" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.fit_cont_regions">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">fit_cont_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ranges</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#fit_cont_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.fit_cont_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run fit_cont, dealing with spectrum in regions or chunks</p>
 <p>This is useful if a spectrum has gaps.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -468,14 +474,8 @@ that comes in chunks</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="continuum_normalization.partial_func">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">partial_func</tt><big>(</big><em>func</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#partial_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.partial_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>something</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="continuum_normalization.weighted_median">
-<tt class="descclassname">continuum_normalization.</tt><tt class="descname">weighted_median</tt><big>(</big><em>values</em>, <em>weights</em>, <em>quantile</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#weighted_median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.weighted_median" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.continuum_normalization.weighted_median">
+<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">weighted_median</tt><big>(</big><em>values</em>, <em>weights</em>, <em>quantile</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#weighted_median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.weighted_median" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate a weighted median for values above a particular quantile cut</p>
 <p>Used in pseudo continuum normalization</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -504,13 +504,13 @@ that comes in chunks</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-infer_labels">
-<span id="infer-labels"></span><h2>Infer Labels<a class="headerlink" href="#module-infer_labels" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-TheCannon.infer_labels">
+<span id="infer-labels"></span><h2>Infer Labels<a class="headerlink" href="#module-TheCannon.infer_labels" title="Permalink to this headline">¶</a></h2>
 <p>This runs Step 2 of The Cannon:
 uses the model to solve for the labels of the test set.</p>
 <dl class="function">
-<dt id="infer_labels.func">
-<tt class="descclassname">infer_labels.</tt><tt class="descname">func</tt><big>(</big><em>coeffs</em>, <em>*labels</em><big>)</big><a class="reference internal" href="_modules/infer_labels.html#func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#infer_labels.func" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.infer_labels.func">
+<tt class="descclassname">TheCannon.infer_labels.</tt><tt class="descname">func</tt><big>(</big><em>coeffs</em>, <em>*labels</em><big>)</big><a class="reference internal" href="_modules/TheCannon/infer_labels.html#func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.infer_labels.func" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the dot product of coefficients vec &amp; labels vector</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -534,8 +534,8 @@ uses the model to solve for the labels of the test set.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="infer_labels.get_lvec">
-<tt class="descclassname">infer_labels.</tt><tt class="descname">get_lvec</tt><big>(</big><em>labels</em><big>)</big><a class="reference internal" href="_modules/infer_labels.html#get_lvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#infer_labels.get_lvec" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.infer_labels.get_lvec">
+<tt class="descclassname">TheCannon.infer_labels.</tt><tt class="descname">get_lvec</tt><big>(</big><em>labels</em><big>)</big><a class="reference internal" href="_modules/TheCannon/infer_labels.html#get_lvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.infer_labels.get_lvec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructs a label vector for an arbitrary number of labels
 Assumes that our model is quadratic in the labels</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -559,8 +559,8 @@ Assumes that our model is quadratic in the labels</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="infer_labels.infer_labels">
-<tt class="descclassname">infer_labels.</tt><tt class="descname">infer_labels</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/infer_labels.html#infer_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#infer_labels.infer_labels" title="Permalink to this definition">¶</a></dt>
+<dt id="TheCannon.infer_labels.infer_labels">
+<tt class="descclassname">TheCannon.infer_labels.</tt><tt class="descname">infer_labels</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/infer_labels.html#infer_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.infer_labels.infer_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses the model to solve for labels of the test set.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
