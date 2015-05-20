@@ -1,12 +1,3 @@
-****************************
-*The Cannon* (``TheCannon``)
-****************************
-Stellar Labels from Large Spectroscopic Datasets
-************************************************
-
-.. toctree::
-   :maxdepth: 2
-
 Introduction
 ============
 
