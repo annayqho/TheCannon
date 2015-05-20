@@ -28,6 +28,12 @@ Train Model
 .. automodule:: TheCannon.train_model
    :members:
 
+Spectral Model
+==============
+
+.. automodule:: TheCannon.spectral_model
+   :members:
+
 Infer Labels
 ============
 
