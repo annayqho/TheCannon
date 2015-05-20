@@ -28,9 +28,12 @@ The code is open source and `available on github`_.
 
 The documentation is organized as follows:
 
-* :ref:`input-requirements`
+:ref:`test`
 
-.. _input_requirements:
+.. _test:
+
+Title of section
+================
 
 .. toctree::
    :maxdepth: 2
