@@ -16,6 +16,12 @@ Continuum Normalization
 .. automodule:: continuum_normalization
    :members:
 
+Train Model
+===========
+
+.. automodule:: train_model
+   :members:
+
 Infer Labels
 ============
 
