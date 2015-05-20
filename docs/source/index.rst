@@ -30,6 +30,5 @@ The documentation is organized as follows:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Preparing Data for Input
 
    input_requirements
