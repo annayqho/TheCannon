@@ -72,7 +72,11 @@
           
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-find_continuum_pixels">Continuum Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-continuum_normalization">Continuum Normalization</a></li>
+</ul>
+</li>
 </ul>
 
           
@@ -112,69 +116,232 @@
             
   <div class="section" id="api">
 <span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-continuum_normalization"></span><dl class="function">
+<div class="section" id="module-find_continuum_pixels">
+<span id="continuum-identification"></span><h2>Continuum Identification<a class="headerlink" href="#module-find_continuum_pixels" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="find_continuum_pixels.find_contpix">
+<tt class="descclassname">find_continuum_pixels.</tt><tt class="descname">find_contpix</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>target_frac</em><big>)</big><a class="reference internal" href="_modules/find_continuum_pixels.html#find_contpix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#find_continuum_pixels.find_contpix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find continuum pix in spec, meeting a set target fraction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
+<blockquote>
+<div><p>rest-frame wavelength vector</p>
+</div></blockquote>
+<p><strong>fluxes: numpy ndarray</strong></p>
+<blockquote>
+<div><p>pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray</strong></p>
+<blockquote>
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+<p><strong>target_frac: float</strong></p>
+<blockquote>
+<div><p>the fraction of pixels in spectrum desired to be continuum</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">contmask: boolean numpy ndarray</p>
+<blockquote class="last">
+<div><p>True corresponds to continuum pixels</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="find_continuum_pixels.find_contpix_given_cuts">
+<tt class="descclassname">find_continuum_pixels.</tt><tt class="descname">find_contpix_given_cuts</tt><big>(</big><em>f_cut</em>, <em>sig_cut</em>, <em>wl</em>, <em>fluxes</em>, <em>ivars</em><big>)</big><a class="reference internal" href="_modules/find_continuum_pixels.html#find_contpix_given_cuts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#find_continuum_pixels.find_contpix_given_cuts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and return continuum pixels given the flux and sigma cut</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f_cut: float</strong></p>
+<blockquote>
+<div><p>the upper limit imposed on the quantity (fbar-1)</p>
+</div></blockquote>
+<p><strong>sig_cut: float</strong></p>
+<blockquote>
+<div><p>the upper limit imposed on the quantity (f_sig)</p>
+</div></blockquote>
+<p><strong>wl: numpy ndarray of length npixels</strong></p>
+<blockquote>
+<div><p>rest-frame wavelength vector</p>
+</div></blockquote>
+<p><strong>fluxes: numpy ndarray of shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray of shape nstars, npixels</strong></p>
+<blockquote>
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">contmask: boolean mask of length npixels</p>
+<blockquote class="last">
+<div><p>True indicates that the pixel is continuum</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="find_continuum_pixels.find_contpix_regions">
+<tt class="descclassname">find_continuum_pixels.</tt><tt class="descname">find_contpix_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>frac</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/find_continuum_pixels.html#find_contpix_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#find_continuum_pixels.find_contpix_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find continuum pix in a spectrum split into chunks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
+<blockquote>
+<div><p>rest-frame wavelength vector</p>
+</div></blockquote>
+<p><strong>fluxes: numpy ndarray</strong></p>
+<blockquote>
+<div><p>pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray</strong></p>
+<blockquote>
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+<p><strong>frac: float</strong></p>
+<blockquote>
+<div><p>fraction of pixels in spectrum to be found as continuum</p>
+</div></blockquote>
+<p><strong>ranges: list, array</strong></p>
+<blockquote>
+<div><p>starts and ends indicating location of chunks in array</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<p><strong>&#8212;&#8212;</strong></p>
+<p><strong>contmask: numpy ndarray, boolean</strong></p>
+<blockquote class="last">
+<div><p>True indicates continuum pixel</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-continuum_normalization">
+<span id="continuum-normalization"></span><h2>Continuum Normalization<a class="headerlink" href="#module-continuum_normalization" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
 <dt id="continuum_normalization.cont_func">
 <tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_func</tt><big>(</big><em>x</em>, <em>p</em>, <em>L</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_func" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the fitting function evaluated at input x for the continuum.
 The fitting function is a sinusoid, sum of sines and cosines</p>
-<dl class="docutils">
-<dt>x: float or np.array</dt>
-<dd>data, input to function</dd>
-<dt>p: ndarray</dt>
-<dd>coefficients of fitting function</dd>
-<dt>L: float</dt>
-<dd>width of x data</dd>
-<dt>y: float or np.array</dt>
-<dd>output data corresponding to input x</dd>
-</dl>
-<dl class="docutils">
-<dt>func: float</dt>
-<dd>function evaluated for the input x</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x: float or np.array</strong></p>
+<blockquote>
+<div><p>data, input to function</p>
+</div></blockquote>
+<p><strong>p: ndarray</strong></p>
+<blockquote>
+<div><p>coefficients of fitting function</p>
+</div></blockquote>
+<p><strong>L: float</strong></p>
+<blockquote>
+<div><p>width of x data</p>
+</div></blockquote>
+<p><strong>y: float or np.array</strong></p>
+<blockquote>
+<div><p>output data corresponding to input x</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">func: float</p>
+<blockquote class="last">
+<div><p>function evaluated for the input x</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="continuum_normalization.cont_norm">
 <tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Continuum-normalize a continuous segment of spectra.</p>
-<dl class="docutils">
-<dt>fluxes: numpy ndarray </dt>
-<dd>pixel intensities</dd>
-<dt>ivars: numpy ndarray </dt>
-<dd>inverse variances, parallel to fluxes</dd>
-<dt>contmask: boolean mask</dt>
-<dd>True indicates that pixel is continuum</dd>
-</dl>
-<dl class="docutils">
-<dt>norm_fluxes: numpy ndarray</dt>
-<dd>normalized pixel intensities</dd>
-<dt>norm_ivars: numpy ndarray</dt>
-<dd>rescaled inverse variances</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: numpy ndarray</strong></p>
+<blockquote>
+<div><p>pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray</strong></p>
+<blockquote>
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+<p><strong>contmask: boolean mask</strong></p>
+<blockquote>
+<div><p>True indicates that pixel is continuum</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_fluxes: numpy ndarray</p>
+<blockquote>
+<div><p>normalized pixel intensities</p>
+</div></blockquote>
+<p>norm_ivars: numpy ndarray</p>
+<blockquote class="last">
+<div><p>rescaled inverse variances</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="continuum_normalization.cont_norm_q">
 <tt class="descclassname">continuum_normalization.</tt><tt class="descname">cont_norm_q</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#cont_norm_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.cont_norm_q" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform continuum normalization using a running quantile</p>
-<dl class="docutils">
-<dt>wl: numpy ndarray </dt>
-<dd>wavelength vector</dd>
-<dt>fluxes: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>pixel intensities</dd>
-<dt>ivars: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>inverse variances, parallel to fluxes</dd>
-<dt>q: float</dt>
-<dd>the desired quantile cut</dd>
-<dt>delta_lambda: int</dt>
-<dd>the number of pixels over which the median is calculated</dd>
-</dl>
-<dl class="docutils">
-<dt>norm_fluxes: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>normalized pixel intensities</dd>
-<dt>norm_ivars: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>rescaled pixel invariances</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
+<blockquote>
+<div><p>wavelength vector</p>
+</div></blockquote>
+<p><strong>fluxes: numpy ndarray of shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+<p><strong>q: float</strong></p>
+<blockquote>
+<div><p>the desired quantile cut</p>
+</div></blockquote>
+<p><strong>delta_lambda: int</strong></p>
+<blockquote class="last">
+<div><p>the number of pixels over which the median is calculated</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -199,12 +366,22 @@ that comes in chunks</p>
 <dt>ranges: list or np ndarray</dt>
 <dd>the chunks that the spectrum should be split into</dd>
 </dl>
-<dl class="docutils">
-<dt>norm_fluxes: numpy ndarray</dt>
-<dd>normalized pixel intensities</dd>
-<dt>norm_ivars: numpy ndarray</dt>
-<dd>rescaled inverse variances</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_fluxes: numpy ndarray</p>
+<blockquote>
+<div><p>normalized pixel intensities</p>
+</div></blockquote>
+<p>norm_ivars: numpy ndarray</p>
+<blockquote class="last">
+<div><p>rescaled inverse variances</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -212,22 +389,40 @@ that comes in chunks</p>
 <tt class="descclassname">continuum_normalization.</tt><tt class="descname">fit_cont</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#fit_cont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.fit_cont" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit a continuum to a continuum pixels in a segment of spectra</p>
 <p>Functional form can be either sinusoid or chebyshev, with specified degree</p>
-<dl class="docutils">
-<dt>fluxes: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>training set or test set pixel intensities</dd>
-<dt>ivars: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>inverse variances, parallel to fluxes</dd>
-<dt>contmask: numpy ndarray of length (npixels)</dt>
-<dd>boolean pixel mask, True indicates that pixel is continuum</dd>
-<dt>deg: int</dt>
-<dd>degree of fitting function</dd>
-<dt>ffunc: str</dt>
-<dd>type of fitting function, chebyshev or sinusoid</dd>
-</dl>
-<dl class="docutils">
-<dt>cont: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>the continuum, parallel to fluxes</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: numpy ndarray of shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>training set or test set pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+<p><strong>contmask: numpy ndarray of length (npixels)</strong></p>
+<blockquote>
+<div><p>boolean pixel mask, True indicates that pixel is continuum</p>
+</div></blockquote>
+<p><strong>deg: int</strong></p>
+<blockquote>
+<div><p>degree of fitting function</p>
+</div></blockquote>
+<p><strong>ffunc: str</strong></p>
+<blockquote>
+<div><p>type of fitting function, chebyshev or sinusoid</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cont: numpy ndarray of shape (nstars, npixels)</p>
+<blockquote class="last">
+<div><p>the continuum, parallel to fluxes</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -235,22 +430,46 @@ that comes in chunks</p>
 <tt class="descclassname">continuum_normalization.</tt><tt class="descname">fit_cont_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ranges</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#fit_cont_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.fit_cont_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run fit_cont, dealing with spectrum in regions or chunks</p>
 <p>This is useful if a spectrum has gaps.</p>
-<dl class="docutils">
-<dt>fluxes: ndarray of shape (nstars, npixels)</dt>
-<dd>training set or test set pixel intensities</dd>
-<dt>ivars: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>inverse variances, parallel to fluxes</dd>
-<dt>contmask: numpy ndarray of length (npixels)</dt>
-<dd>boolean pixel mask, True indicates that pixel is continuum</dd>
-<dt>deg: int</dt>
-<dd>degree of fitting function</dd>
-<dt>ffunc: str</dt>
-<dd>type of fitting function, chebyshev or sinusoid</dd>
-</dl>
-<dl class="docutils">
-<dt>cont: numpy ndarray of shape (nstars, npixels)</dt>
-<dd>the continuum, parallel to fluxes</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray of shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>training set or test set pixel intensities</p>
+</div></blockquote>
+<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
+<blockquote>
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+<p><strong>contmask: numpy ndarray of length (npixels)</strong></p>
+<blockquote>
+<div><p>boolean pixel mask, True indicates that pixel is continuum</p>
+</div></blockquote>
+<p><strong>deg: int</strong></p>
+<blockquote>
+<div><p>degree of fitting function</p>
+</div></blockquote>
+<p><strong>ffunc: str</strong></p>
+<blockquote>
+<div><p>type of fitting function, chebyshev or sinusoid</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cont: numpy ndarray of shape (nstars, npixels)</p>
+<blockquote class="last">
+<div><p>the continuum, parallel to fluxes</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="continuum_normalization.partial_func">
+<tt class="descclassname">continuum_normalization.</tt><tt class="descname">partial_func</tt><big>(</big><em>func</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#partial_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.partial_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>something</p>
 </dd></dl>
 
 <dl class="function">
@@ -258,17 +477,32 @@ that comes in chunks</p>
 <tt class="descclassname">continuum_normalization.</tt><tt class="descname">weighted_median</tt><big>(</big><em>values</em>, <em>weights</em>, <em>quantile</em><big>)</big><a class="reference internal" href="_modules/continuum_normalization.html#weighted_median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#continuum_normalization.weighted_median" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate a weighted median for values above a particular quantile cut</p>
 <p>Used in pseudo continuum normalization</p>
-<dl class="docutils">
-<dt>values: np ndarray of floats</dt>
-<dd>the values to take the median of</dd>
-<dt>weights: np ndarray of floats</dt>
-<dd>the weights associated with the values</dd>
-<dt>quantile: float</dt>
-<dd>the cut applied to the input data</dd>
-</dl>
-<p>the weighted median</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>values: np ndarray of floats</strong></p>
+<blockquote>
+<div><p>the values to take the median of</p>
+</div></blockquote>
+<p><strong>weights: np ndarray of floats</strong></p>
+<blockquote>
+<div><p>the weights associated with the values</p>
+</div></blockquote>
+<p><strong>quantile: float</strong></p>
+<blockquote>
+<div><p>the cut applied to the input data</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<p><strong>&#8212;&#8212;</strong></p>
+<p class="last"><strong>the weighted median</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
+</div>
 </div>
 
 
