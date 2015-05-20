@@ -113,13 +113,6 @@
 <h1><em>The Cannon</em> (<tt class="docutils literal"><span class="pre">TheCannon</span></tt>)<a class="headerlink" href="#the-cannon-thecannon" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="stellar-labels-from-large-spectroscopic-datasets">
 <h2>Stellar Labels from Large Spectroscopic Datasets<a class="headerlink" href="#stellar-labels-from-large-spectroscopic-datasets" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h3>
 <p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> provides functionality for <em>The Cannon</em>,
 a data-driven approach to determining stellar labels (parameters
 and abundances) from stellar spectra in the context of large
@@ -133,53 +126,13 @@ which where the test set is identical to the training set, and
 the second an implementation of inferring APOGEE-scale labels for
 LAMOST spectra.</p>
 <p>The code is open source and <a class="reference external" href="https://github.com/annayqho/TheCannon">available on github</a>.</p>
+<div class="section" id="documentation-table-of-contents">
+<h3>Documentation Table of Contents<a class="headerlink" href="#documentation-table-of-contents" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
+</ul>
 </div>
-<div class="section" id="requirements-for-input">
-<h3>Requirements for Input<a class="headerlink" href="#requirements-for-input" title="Permalink to this headline">¶</a></h3>
-<p>Required input to <tt class="docutils literal"><span class="pre">TheCannon</span></tt> are as follows:</p>
-<ul class="simple">
-<li><strong>Training Set</strong><ul>
-<li>Training Spectra<ul>
-<li>a block of continuum-normalized pixel intensity (flux) values with shape
-[num_training_objects x num_pixels]</li>
-<li>a block of inverse variance values corresponding to the block of
-pixel intensity values described above</li>
-</ul>
-</li>
-<li>Training Labels<ul>
-<li>a block of training labels with shape [num_training_objects x num_labels]</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><strong>Test Set</strong><ul>
-<li>Test Spectra<ul>
-<li>a block of continuum-normalized pixel intensity (flux) values with shape
-[num_test_objects x num_pixels]</li>
-<li>a block of inverse variance values corresponding to the block of
-pixel intensity values described above</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>These input spectra and labels
-must satisfy the criteria laid out in <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>.
-In particular, the spectra must:</p>
-<blockquote>
-<div><ul class="simple">
-<li>Come from the same dataset (measured in a consistent way)</li>
-<li>Be continuum normalized in a consistent way that is independent of
-signal-to-noise</li>
-<li>Radial velocity shifted</li>
-<li>Sampled onto a common wavelength grid with a common line-spread function</li>
-</ul>
-</div></blockquote>
-</div>
-<div class="section" id="overview-of-thecannon">
-<h3>Overview of <tt class="docutils literal"><span class="pre">TheCannon</span></tt><a class="headerlink" href="#overview-of-thecannon" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> provides some functionality to identify continuum and perform
-continuum normalization.</p>
 </div>
 </div>
 </div>
