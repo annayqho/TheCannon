@@ -1,0 +1,9 @@
+.. _api:
+
+API
+===
+
+.. automodule:: dataset
+   :members:
+   :inherited-members:
+   :show-inheritance:
