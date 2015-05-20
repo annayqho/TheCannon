@@ -73,7 +73,7 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#preparing-apogee-data">Preparing APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.apogee">Preparing APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#construct-a-dataset-object">Construct a Dataset Object</a><ul class="simple">
 </ul>
 </li>
@@ -123,8 +123,93 @@
             
   <div class="section" id="api">
 <span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="preparing-apogee-data">
-<h2>Preparing APOGEE Data<a class="headerlink" href="#preparing-apogee-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-TheCannon.apogee">
+<span id="preparing-apogee-data"></span><h2>Preparing APOGEE Data<a class="headerlink" href="#module-TheCannon.apogee" title="Permalink to this headline">¶</a></h2>
+<p>The code for reading in APOGEE spectra and training labels</p>
+<dl class="function">
+<dt id="TheCannon.apogee.get_pixmask">
+<tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">get_pixmask</tt><big>(</big><em>fluxes</em>, <em>flux_errs</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#get_pixmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_pixmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and return a bad pixel mask for a spectrum</p>
+<p>Bad pixels are defined as follows: fluxes or errors are not finite, or 
+reported errors are &lt;= 0</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray</strong></p>
+<blockquote>
+<div><p>flux array</p>
+</div></blockquote>
+<p><strong>flux_errs: ndarray</strong></p>
+<blockquote>
+<div><p>measurement uncertainties on fluxes</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mask: ndarray, dtype=bool</p>
+<blockquote class="last">
+<div><p>array giving bad pixels as True values</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.load_labels">
+<tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">load_labels</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#load_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts reference labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename: str</strong></p>
+<blockquote>
+<div><p>file containing the table of ref labels</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">labels: numpy ndarray of shape (nstars, nlabels)</p>
+<blockquote class="last">
+<div><p>all reference labels for all reference objects</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.load_spectra">
+<tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">load_spectra</tt><big>(</big><em>data_dir</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#load_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files</p>
+<dl class="docutils">
+<dt>data_dir: str</dt>
+<dd>directory containing all of the data files</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: numpy ndarray of length npixels</p>
+<blockquote>
+<div><p>rest-frame wavelength vector</p>
+</div></blockquote>
+<p>fluxes: numpy ndarray of shape (nstars, npixels)</p>
+<blockquote>
+<div><p>training set or test set pixel intensities</p>
+</div></blockquote>
+<p>ivars: numpy ndarray of shape (nstars, npixels)</p>
+<blockquote class="last">
+<div><p>inverse variances, parallel to fluxes</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="construct-a-dataset-object">
 <h2>Construct a Dataset Object<a class="headerlink" href="#construct-a-dataset-object" title="Permalink to this headline">¶</a></h2>
