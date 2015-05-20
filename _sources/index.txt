@@ -17,5 +17,7 @@ spectroscopic surveys.
 
 For a detailed overview of *The Cannon* and a description of its
 successful application to determining labels for APOGEE DR10 spectra,
-see Ness et al. 2015, available on the `arXiv <arxiv.org/abs/1501.07604>`_. 
+see `Ness et al. 2015`_
+
+.. _Ness et al. 2015: arxiv.org/abs/1501.07604 
 
