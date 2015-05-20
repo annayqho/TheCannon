@@ -4,6 +4,10 @@
 Stellar Labels from Large Spectroscopic Datasets
 ************************************************
 
+.. _introduction:
+
+Introduction
+============
 ``TheCannon`` provides functionality for *The Cannon*,
 a data-driven approach to determining stellar labels (parameters
 and abundances) from stellar spectra in the context of large
@@ -30,4 +34,6 @@ Documentation Table of Contents
 .. toctree::
    :maxdepth: 2
 
+   intro 
    input_requirements
+
