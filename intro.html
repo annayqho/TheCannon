@@ -30,8 +30,7 @@
   
 
   
-    <link rel="top" title="TheCannon 0.3.4 documentation" href="index.html"/>
-        <link rel="prev" title="The Cannon: Stellar Parameters and Abundances from Spectroscopic Datasets" href="index.html"/> 
+    <link rel="top" title="TheCannon 0.3.4 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -70,11 +69,7 @@
         
           
           
-              <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction-to-the-cannon">Introduction to <em>The Cannon</em></a></li>
-</ul>
-</li>
+              <ul class="simple">
 </ul>
 
           
@@ -116,11 +111,10 @@
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>This is the software package used for <em>The Cannon</em>,
 a data-driven approach to determining stellar labels (parameters
-and abundances) for a vast set of stellar spectra. This version is tailored
-specifically for APOGEE spectra.</p>
-<p>A brief overview of <em>The Cannon</em> and the associated software package is below.
-For more details on the method and its successful application to APOGEE DR10
-spectra, see Ness et al. 2015.</p>
+and abundances) for a vast set of stellar spectra. Below is a
+brief overview; for details
+on the method and its successful application to inferring labels
+for APOGEE DR10 spectra, see Ness et al. 2015.</p>
 <div class="section" id="introduction-to-the-cannon">
 <h2>Introduction to <em>The Cannon</em><a class="headerlink" href="#introduction-to-the-cannon" title="Permalink to this headline">¶</a></h2>
 <p><em>The Cannon</em> has two fundamental steps that together constitute a
@@ -128,8 +122,9 @@ process of <em>label transfer.</em></p>
 <ol class="arabic simple">
 <li>The <em>Training Step</em>: <em>reference stars</em> are a subset of the
 survey for which labels are known with high fidelity,
-for calib reasons or otherwise. Using both the spectra and labels for
-these objects, <em>The Cannon</em> solves for a flexible model that describes
+for calibration reasons or otherwise. Using both the spectra and labels for
+these objects, <em>The Cannon</em> solves for a flexible model - called the
+<em>spectral model</em> - that describes
 how the flux in every pixel of any given continuum-normalized spectrum
 depends on labels.</li>
 <li>The <em>Test Step</em>: the model found in Step 1 is assumed to hold for all of
@@ -144,13 +139,6 @@ stars.</li>
 
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="index.html" class="btn btn-neutral" title="The Cannon: Stellar Parameters and Abundances from Spectroscopic Datasets" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
