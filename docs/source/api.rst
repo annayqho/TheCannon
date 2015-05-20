@@ -4,10 +4,10 @@
 API
 ***
 
-Preparing APOGEE Data for ``TheCannon``
-=======================================
+Continuum Identification
+========================
 
-.. automodule:: apogee
+.. automodule:: find_continuum_pixels
    :members:
 
 Continuum Normalization
