@@ -1,4 +1,4 @@
-""" Make a single model class to rule them all """
+""" Spectral model fitted for by The Cannon's training step """
 from .dataset import Dataset
 from .train_model import train_model as _train_model
 from .infer_labels import infer_labels
