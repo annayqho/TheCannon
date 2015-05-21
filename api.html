@@ -127,11 +127,11 @@
 <span id="api"></span><h1>Reference/API<a class="headerlink" href="#reference-api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-TheCannon.apogee">
 <span id="preparing-apogee-data"></span><h2>Preparing APOGEE Data<a class="headerlink" href="#module-TheCannon.apogee" title="Permalink to this headline">¶</a></h2>
-<p>The code for reading in APOGEE spectra and training labels</p>
+<p>Functions for reading in APOGEE spectra and training labels</p>
 <dl class="function">
 <dt id="TheCannon.apogee.get_pixmask">
 <tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">get_pixmask</tt><big>(</big><em>fluxes</em>, <em>flux_errs</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#get_pixmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_pixmask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create and return a bad pixel mask for a spectrum</p>
+<dd><p>Create and return a bad pixel mask for an APOGEE spectrum</p>
 <p>Bad pixels are defined as follows: fluxes or errors are not finite, or 
 reported errors are &lt;= 0</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -140,17 +140,17 @@ reported errors are &lt;= 0</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray</strong></p>
 <blockquote>
-<div><p>flux array</p>
+<div><p>Flux data values</p>
 </div></blockquote>
 <p><strong>flux_errs: ndarray</strong></p>
 <blockquote>
-<div><p>measurement uncertainties on fluxes</p>
+<div><p>Flux uncertainty data values</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mask: ndarray, dtype=bool</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mask: ndarray</p>
 <blockquote class="last">
-<div><p>array giving bad pixels as True values</p>
+<div><p>Bad pixel mask, value of True corresponds to bad pixels</p>
 </div></blockquote>
 </td>
 </tr>
@@ -185,16 +185,18 @@ reported errors are &lt;= 0</p>
 <dl class="function">
 <dt id="TheCannon.apogee.load_spectra">
 <tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">load_spectra</tt><big>(</big><em>data_dir</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#load_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_spectra" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files</p>
-<dl class="docutils">
-<dt>data_dir: str</dt>
-<dd>directory containing all of the data files</dd>
-</dl>
+<dd><p>Reads wavelength, flux, and flux uncertainty data from apogee fits files</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: numpy ndarray of length npixels</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_dir: str</strong></p>
+<blockquote>
+<div><p>directory containing all of the data files</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: numpy ndarray of length npixels</p>
 <blockquote>
 <div><p>rest-frame wavelength vector</p>
 </div></blockquote>
