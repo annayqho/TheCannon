@@ -20,15 +20,12 @@ Notable features include:
 * Continuum-normalize spectra using a running quantile
 * Continuum-normalize spectra using cuts on median and variance flux
 * Fit for the spectral model given training spectra and training labels
-* Specify the order of the spectral model
+* Specify the order of the polynomial spectral model
 * Infer labels for test spectra
 * Various optional diagnostic plots
 
-This documentation includes two examples for implementation, 
-the first a very simple implementation using APOGEE spectra in
-which where the test set is identical to the training set, and
-the second an implementation of inferring APOGEE-scale labels for 
-LAMOST spectra. 
+This documentation includes a very simple example for implementation 
+using APOGEE spectra in which the test set is identical to the training set
 
 The code is open source and `available on github`_. 
 
