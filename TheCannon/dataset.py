@@ -6,7 +6,7 @@ from .helpers.triangle import corner
 from .helpers import Table
 import sys
 from .find_continuum_pixels import _find_contpix, _find_contpix_regions
-from .continuum_normalization import fit_cont, fit_cont_regions, cont_norm, cont_norm_regions, cont_norm_q, cont_norm_q_regions
+from .continuum_normalization import _fit_cont, _fit_cont_regions, _cont_norm, _cont_norm_regions, _cont_norm_q, _cont_norm_q_regions
 
 PY3 = sys.version_info[0] > 2
 
@@ -235,15 +235,15 @@ class Dataset(object):
         """
         print("Fitting Continuum...")
         if self.ranges == None:
-            tr_cont = fit_cont(
+            tr_cont = _fit_cont(
                     self.tr_flux, self.tr_ivar, self.contmask, deg, ffunc)
-            test_cont = fit_cont(
+            test_cont = _fit_cont(
                     self.test_flux, self.test_ivar, self.contmask, deg, ffunc)
         else:
             print("Fitting Continuum in %s Regions..." %len(self.ranges))
-            tr_cont = fit_cont_regions(self.tr_flux, self.tr_ivar, 
+            tr_cont = _fit_cont_regions(self.tr_flux, self.tr_ivar, 
                                        self.contmask, deg, self.ranges, ffunc)
-            test_cont = fit_cont_regions(self.test_flux, self.test_ivar,
+            test_cont = _fit_cont_regions(self.test_flux, self.test_ivar,
                                          self.contmask, deg, self.ranges, ffunc)
         return tr_cont, test_cont
 
@@ -292,15 +292,15 @@ class Dataset(object):
         tr_cont, test_cont = cont
         if self.ranges is None:
             print("assuming continuous spectra")
-            norm_tr_flux, norm_tr_ivar = cont_norm(
+            norm_tr_flux, norm_tr_ivar = _cont_norm(
                     self.tr_flux, self.tr_ivar, tr_cont)
-            norm_test_flux, norm_test_ivar = cont_norm(
+            norm_test_flux, norm_test_ivar = _cont_norm(
                     self.test_flux, self.test_ivar, test_cont)
         else:
             print("taking spectra in %s regions" %(len(self.ranges)))
-            norm_tr_flux, norm_tr_ivar = cont_norm_regions(
+            norm_tr_flux, norm_tr_ivar = _cont_norm_regions(
                     self.tr_flux, self.tr_ivar, tr_cont, self.ranges)
-            norm_test_flux, norm_test_ivar = cont_norm_regions(
+            norm_test_flux, norm_test_ivar = _cont_norm_regions(
                     self.test_flux, self.test_ivar, test_cont, self.ranges)
         return norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar
 
