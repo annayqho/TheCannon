@@ -191,18 +191,19 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
-<span class="sd">        names: array, list</span>
-<span class="sd">            the names of the labels</span>
+<span class="sd">        names: ndarray or list</span>
+<span class="sd">            The names of the labels used for plotting, ex. in LaTeX syntax</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span> <span class="o">=</span> <span class="n">names</span>
 
 </div>
 <div class="viewcode-block" id="Dataset.get_plotting_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.get_plotting_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotting_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return the labels set for plotting</span>
+        <span class="sd">&quot;&quot;&quot; Return the label names used make plots </span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        the label names</span>
+<span class="sd">        label_names: ndarray</span>
+<span class="sd">            The label names</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;No label names yet!&quot;</span><span class="p">)</span>
@@ -212,12 +213,12 @@
  
 </div>
 <div class="viewcode-block" id="Dataset.diagnostics_SNR"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_SNR">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_SNR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span> <span class="o">=</span> <span class="s">&quot;SNRdist.png&quot;</span><span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot; Plot SNR distributions of ref and test objects</span>
+        <span class="sd">&quot;&quot;&quot; Plots SNR distributions of ref and test object spectra</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        figname: (optional) string</span>
-<span class="sd">            title of the saved SNR diagnostic plot</span>
+<span class="sd">        (optional) figname: string</span>
+<span class="sd">            Filename to use for the output saved plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic for SNRs of reference and survey objects&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_SNR</span>
@@ -238,12 +239,12 @@
 
     </div>
 <div class="viewcode-block" id="Dataset.diagnostics_ref_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_ref_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_ref_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s">&quot;ref_labels_triangle.png&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Plot all training labels against each other. </span>
+        <span class="sd">&quot;&quot;&quot; Plots all training labels against each other </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        figname: (optional) string</span>
-<span class="sd">            title of the saved triangle plot for reference labels</span>
+<span class="sd">        (optional) figname: string</span>
+<span class="sd">            Filename of the saved output plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span><span class="p">,</span> <span class="n">figname</span><span class="p">)</span>
 
@@ -268,26 +269,25 @@
 
 
 <div class="viewcode-block" id="Dataset.make_contmask"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.make_contmask">[docs]</a>    <span class="k">def</span> <span class="nf">make_contmask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Use spectra to find and return continuum pixels</span>
+        <span class="sd">&quot;&quot;&quot; Identify continuum pixels using training spectra</span>
 
-<span class="sd">        For spectra split into regions, performs cont pix identification</span>
-<span class="sd">        separately for each region.</span>
+<span class="sd">        Does this for each region of the spectrum if dataset.ranges is not None</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        fluxes: numpy ndarray</span>
-<span class="sd">            pixel intensities</span>
+<span class="sd">        fluxes: ndarray</span>
+<span class="sd">            Flux data values </span>
 
-<span class="sd">        ivars: numpy ndarray</span>
-<span class="sd">            inverse variances for pixel fluxes</span>
+<span class="sd">        ivars: ndarray</span>
+<span class="sd">            Inverse variances corresponding to flux data values</span>
 
 <span class="sd">        frac: float</span>
-<span class="sd">            the fraction of pixels that should be identified as continuum</span>
+<span class="sd">            The fraction of pixels that should be identified as continuum</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        contmask: boolean mask of length npixels</span>
-<span class="sd">            True indicates that the pixel is continuum</span>
+<span class="sd">        contmask: ndarray</span>
+<span class="sd">            Mask with True indicating that the pixel is continuum</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Finding continuum pixels...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -305,20 +305,20 @@
         <span class="sd">&quot;&quot;&quot; Set the contmask attribute </span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ---------</span>
-<span class="sd">        contmask: boolean numpy ndarray</span>
-<span class="sd">            True corresponds to continuum pixels</span>
+<span class="sd">        ----------</span>
+<span class="sd">        contmask: ndarray</span>
+<span class="sd">            Mask with True indicating that the pixel is continuum</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span> <span class="o">=</span> <span class="n">contmask</span>
 
 </div>
 <div class="viewcode-block" id="Dataset.diagnostics_contmask"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_contmask">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_contmask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s">&#39;contpix.png&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Make and save diagnostic figure about the continuum pixels</span>
+        <span class="sd">&quot;&quot;&quot; Plots continuum pixels against training spectra median flux values </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        (optional) figname: str</span>
-<span class="sd">            name of the figure to be saved</span>
+<span class="sd">            Filename of the output figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">contmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span>
         <span class="n">f_bar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">))</span>
@@ -346,11 +346,18 @@
         <span class="sd">&quot;&quot;&quot; Fit a continuum to the continuum pixels</span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ---------</span>
+<span class="sd">        ----------</span>
 <span class="sd">        deg: int</span>
-<span class="sd">            degree of the fitting function</span>
+<span class="sd">            Degree of the fitting function</span>
 <span class="sd">        ffunc: str</span>
-<span class="sd">            type of fitting function, sinusoid or chebyshev</span>
+<span class="sd">            Type of fitting function, &#39;sinusoid&#39; or &#39;chebyshev&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tr_cont: ndarray</span>
+<span class="sd">            Flux values corresponding to the fitted continuum of training objects</span>
+<span class="sd">        test_cont: ndarray</span>
+<span class="sd">            Flux values corresponding to the fitted continuum of test objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Fitting Continuum...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
@@ -425,8 +432,9 @@
 
 </div>
 <div class="viewcode-block" id="Dataset.diagnostics_test_step_flagstars"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_test_step_flagstars">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_test_step_flagstars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; list all stars whose inferred labels lie &gt;= 2 standard deviations</span>
-<span class="sd">        outside the reference label space &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Write files listing stars whose inferred labels lie outside 2 standard deviations from the reference label space </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">label_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
         <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_names</span><span class="p">)</span>
         <span class="n">reference_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span>
@@ -450,20 +458,18 @@
 
 </div>
 <div class="viewcode-block" id="Dataset.diagnostics_survey_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_survey_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_survey_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s">&quot;survey_labels_triangle.png&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; make a triangle plot for all the survey labels </span>
+        <span class="sd">&quot;&quot;&quot; Plot all survey labels against each other</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        (optional) figname: str</span>
-<span class="sd">            name of plot to be saved</span>
+<span class="sd">            Filename of saved output plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>  
-        <span class="n">figname</span><span class="o">=</span><span class="s">&quot;survey_labels_triangle.png&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">,</span> <span class="n">figname</span><span class="p">)</span>
    
    </div>
 <div class="viewcode-block" id="Dataset.diagnostics_1to1"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_1to1">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_1to1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; 1to1 plots of survey against training labels, color-coded by test SNR</span>
-<span class="sd">        </span>
-<span class="sd">        assumes your training set and test set are identical&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Plots survey labels vs. training labels, color-coded by survey SNR &quot;&quot;&quot;</span>
         <span class="n">snr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_SNR</span>
         <span class="n">label_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
         <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_names</span><span class="p">)</span>
@@ -523,11 +529,12 @@
 
 </div>
 <div class="viewcode-block" id="Dataset.set_test_label_vals"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.set_test_label_vals">[docs]</a>    <span class="k">def</span> <span class="nf">set_test_label_vals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vals</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set label vals from an array </span>
+        <span class="sd">&quot;&quot;&quot; Set test label values  </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        vals: value of the labels</span>
+<span class="sd">        vals: ndarray</span>
+<span class="sd">            Test label values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span> <span class="o">=</span> <span class="n">vals</span></div></div>
 </pre></div>
