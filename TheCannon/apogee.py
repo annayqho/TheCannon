@@ -47,7 +47,7 @@ def load_spectra(data_dir):
     """Extracts wavelength, flux, and flux uncertainty data from apogee fits files
 
     Parameters
-    ---------
+    ----------
     data_dir: str
         directory containing all of the data files
 
