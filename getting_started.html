@@ -127,68 +127,104 @@
 <p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> can be installed using <tt class="docutils literal"><span class="pre">pip</span></tt>:</p>
 <blockquote>
 <div>$ pip install TheCannon</div></blockquote>
-<p>Here is an overview of the basic workflow. All of this is described
-in more detail in other sections...</p>
-<p>First, you have to prepare the data for use in whatever way is
-required from the particularly spectroscopic survey and the training labels</p>
-<p>The basic input to <tt class="docutils literal"><span class="pre">TheCannon</span></tt> is the following: and write the list
-Read them in whatever way necessary.</p>
+<p>Here is an overview of the basic workflow using a simple illustration
+with APOGEE DR10 data in which the test set is identical to the training set.</p>
+<p>At some point all of this will be described in more detail in other sections...</p>
+<p>First, the data must be prepared for use according to the specifications
+laid out in the &#8220;Requirements for Input&#8221; section. <tt class="docutils literal"><span class="pre">TheCannon</span></tt> does have
+some built-in options for SNR-independent continuum normalization, so it&#8217;s
+okay if input data is not continuum normalized at this stage.</p>
+<p>Then a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object can be initialized:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Other optional setup things...:</p>
+<p>APOGEE data has gaps, and in this example we want to continuum normalize each
+section separately. So that <tt class="docutils literal"><span class="pre">TheCannon</span></tt> knows that operations should be
+performed for each section separately, we specify the ranges of each segment:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">set_label_names</span><span class="p">([</span><span class="s">&#39;T_{eff}&#39;</span><span class="p">,</span> <span class="s">&#39;\log g&#39;</span><span class="p">,</span> <span class="s">&#39;[Fe/H]&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>Some optional diagnostic plots</p>
+<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> comes with a series of optional built-in diagnostic plots.
+Some of these plots require reading in label names. The user can specify
+what the label names are, in LaTeX format.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">set_label_names</span><span class="p">([</span><span class="s">&#39;T_{eff}&#39;</span><span class="p">,</span> <span class="s">&#39;\log g&#39;</span><span class="p">,</span> <span class="s">&#39;[Fe/H]&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>At this stage, two diagnotic plots can be produced, one with the distribution
+of SNR in the training and test set (the training set should ideally have
+a higher SNR than the test set) and one using <tt class="docutils literal"><span class="pre">triangle.py</span></tt> to plot
+every label&#8217;s set of training values against every other.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_SNR</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> includes its own continuum normalization.</p>
+<p>If the data has not been continuum normalized, the user can use the continuum
+normalization functions built into <tt class="docutils literal"><span class="pre">TheCannon</span></tt>. First, the training set
+is pseudo-continuum normalized using a running quantile. In this case, the
+window size for calculating the median is set to 50 Angstroms and the quantile
+level is set to 90%.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">continuum_normalize_training_q</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">q</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
+</pre></div>
+</div>
+<p>Once the pseudo continuum has been calculated, continuum pixels are identified
+using a median and variance flux cut. In this case, we specify that we want
+7% of the pixels in the spectrum to be identified as continuum.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Have a look, and if you&#8217;re OK with it then</p>
+<p>Once a satisfactory set of continuum pixels has been identified, the dataset&#8217;s
+continuum can be established:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">set_continuum</span><span class="p">(</span><span class="n">contmask</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Then you can fit for the continuum using</p>
+<p>Once the dataset has a continuum mask, the continuum is fit for using either
+a sinusoid or chebyshev function. In this case, we use a sinusoid:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cont</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">fit_continuum</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s">&quot;sinusoid&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>And if you&#8217;re cool with how the continuum looks, then</p>
+<p>Once a satisfactory continuum has been fit, the normalized training and test
+spectra can be calculated:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> \
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">continuum_normalize_f</span><span class="p">(</span><span class="n">cont</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">continuum_normalize</span><span class="p">(</span><span class="n">cont</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>And if you&#8217;re cool with the new continuum, then</p>
+<p>If these normalized spectra look acceptable, then they can be set:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">norm_tr_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">norm_tr_ivar</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">norm_test_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">norm_test_ivar</span>
 </pre></div>
 </div>
-<p>Now, the data munging is over.</p>
-<p>Training step:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c"># 2 = quadratic model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span> <span class="c"># model.train would work equivalently.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="ow">or</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<p>Now, the data munging is over and we&#8217;re ready to run <tt class="docutils literal"><span class="pre">TheCannon</span></tt>!</p>
+<p>For the training step (fitting for the spectral model) all the user needs to
+specify is the polynomial order of the spectral model. In this case, we use
+a quadratic model: order = 2</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Optional:
-&gt;&gt;&gt; model.diagnostics()</p>
-<p>Test step:
-&gt;&gt;&gt; label_errs = model.infer_labels(dataset)</p>
-<p>Optional:
-&gt;&gt;&gt; dataset.diagnostics_test_step_flagstars()
-&gt;&gt;&gt; dataset.diagnostics_survey_labels()</p>
+<p>equivalently,
+&gt;&gt;&gt; model.train()</p>
+<p>At this stage, more optional diagnostic plots can be produced to examine
+the spectral model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If the model fitting worked, then we can proceed to the test step. This
+command automatically updates the dataset with the fitted-for test labels,
+and returned the corresponding covariance matrix.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">label_errs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">infer_labels</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And a final set of diagnostic plots:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_test_step_flagstars</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_survey_labels</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>If the test step = the training step, then you can do this:
 &gt;&gt;&gt; dataset.diagnostics_1to1()</p>
 </div>
