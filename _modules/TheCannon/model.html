@@ -79,9 +79,13 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.find_continuum_pixels">Identify Cont Pixels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.continuum_normalization">Continuum Normalize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.train_model">Train Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
 </ul>
@@ -122,7 +126,7 @@
           <div role="main" class="document">
             
   <h1>Source code for TheCannon.model</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; Make a single model class to rule them all &quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot; Spectral model fitted for by The Cannon&#39;s training step &quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">.train_model</span> <span class="kn">import</span> <span class="n">train_model</span> <span class="k">as</span> <span class="n">_train_model</span>
 <span class="kn">from</span> <span class="nn">.infer_labels</span> <span class="kn">import</span> <span class="n">infer_labels</span>
@@ -159,22 +163,12 @@
 
 </div>
 <div class="viewcode-block" id="CannonModel.train"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Train the model &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Run training step: solve for best-fit spectral model &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">_train_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
 
 </div>
     <span class="k">def</span> <span class="nf">diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run a set of diagnostics on the model.</span>
-
-<span class="sd">        Plot the 0th order coefficients as the baseline spectrum.</span>
-<span class="sd">        Overplot the continuum pixels.</span>
-
-<span class="sd">        Plot each label&#39;s leading coefficient as a function of wavelength.</span>
-<span class="sd">        Color-code by label.</span>
-
-<span class="sd">        Histogram of the chi squareds of the fits.</span>
-<span class="sd">        Dotted line corresponding to DOF = npixels - nlabels</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Produce a set of diagnostics plots about the model. &quot;&quot;&quot;</span>
         <span class="n">_model_diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
 
@@ -196,15 +190,18 @@
 </div>
 <div class="viewcode-block" id="CannonModel.draw_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.draw_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">draw_spectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new dataset whose test flux and ivar values correspond to the</span>
+<span class="sd">        fitted-for test spectra</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        dataset: Dataset</span>
-<span class="sd">            dataset that needs label inference</span>
+<span class="sd">            Dataset that needs label inference</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        cannon_set: Dataset</span>
-<span class="sd">            same dataset as the input value with updated fluxes and variances</span>
+<span class="sd">            Dataset with best-fit fluxes and variances as test_flux and test_ivar</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">coeffs_all</span><span class="p">,</span> <span class="n">covs</span><span class="p">,</span> <span class="n">scatters</span><span class="p">,</span> <span class="n">red_chisqs</span><span class="p">,</span> <span class="n">pivots</span><span class="p">,</span> <span class="n">label_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
         <span class="n">nstars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">test_SNR</span><span class="p">)</span>
@@ -251,25 +248,16 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">baseline_spec_plot_name</span> <span class="o">=</span> <span class="s">&quot;baseline_spec_with_cont_pix&quot;</span><span class="p">,</span>
             <span class="n">leading_coeffs_plot_name</span> <span class="o">=</span> <span class="s">&quot;leading_coeffs.png&quot;</span><span class="p">,</span>
             <span class="n">chisq_dist_plot_name</span> <span class="o">=</span> <span class="s">&quot;modelfit_chisqs.png&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run a set of diagnostics on the model.</span>
-
-<span class="sd">        Plot the 0th order coefficients as the baseline spectrum.</span>
-<span class="sd">        Overplot the continuum pixels.</span>
-
-<span class="sd">        Plot each label&#39;s leading coefficient as a function of wavelength.</span>
-<span class="sd">        Color-code by label.</span>
-
-<span class="sd">        Histogram of the chi squareds of the fits.</span>
-<span class="sd">        Dotted line corresponding to DOF = npixels - nlabels</span>
+        <span class="sd">&quot;&quot;&quot; Produce a set of diagnostic plots for the model </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        (optional) baseline_spec_plot_name: str</span>
-<span class="sd">            plot name</span>
+<span class="sd">            Filename of output saved plot</span>
 <span class="sd">        (optional) leading_coeffs_plot_name: str</span>
-<span class="sd">            plot name</span>
+<span class="sd">            Filename of output saved plot</span>
 <span class="sd">        (optional) chisq_dist_plot_name: str</span>
-<span class="sd">            plot name</span>
+<span class="sd">            Filename of output saved plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
         <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>

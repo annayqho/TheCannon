@@ -79,9 +79,13 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.find_continuum_pixels">Identify Cont Pixels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.continuum_normalization">Continuum Normalize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.train_model">Train Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
 </ul>
@@ -127,9 +131,9 @@
 <span class="n">LARGE</span> <span class="o">=</span> <span class="mf">200.</span>
 <span class="n">SMALL</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">LARGE</span>
 
-<span class="sd">&quot;&quot;&quot; Finds and returns list of continuum pixels, as a mask. &quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot; Functionality for identifying continuum pixels, not touched by user &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="find_contpix_given_cuts"><a class="viewcode-back" href="../../api.html#TheCannon.find_continuum_pixels.find_contpix_given_cuts">[docs]</a><span class="k">def</span> <span class="nf">find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Find and return continuum pixels given the flux and sigma cut</span>
 
 <span class="sd">    Parameters</span>
@@ -163,8 +167,8 @@
     <span class="n">contmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">contmask</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">contmask</span>
 
-</div>
-<div class="viewcode-block" id="find_contpix"><a class="viewcode-back" href="../../api.html#TheCannon.find_continuum_pixels.find_contpix">[docs]</a><span class="k">def</span> <span class="nf">find_contpix</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">target_frac</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_find_contpix</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">target_frac</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Find continuum pix in spec, meeting a set target fraction</span>
 
 <span class="sd">    Parameters</span>
@@ -194,7 +198,7 @@
     <span class="n">f_cut</span> <span class="o">=</span> <span class="mf">0.0001</span>
     <span class="n">stepsize</span> <span class="o">=</span> <span class="mf">0.0001</span>
     <span class="n">sig_cut</span> <span class="o">=</span> <span class="mf">0.0001</span>
-    <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">)</span>
+    <span class="n">contmask</span> <span class="o">=</span> <span class="n">_find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">npixels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">frac</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">contmask</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">npixels</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -202,7 +206,7 @@
     <span class="k">while</span> <span class="p">(</span><span class="n">frac</span> <span class="o">&lt;</span> <span class="n">target_frac</span><span class="p">):</span> 
         <span class="n">f_cut</span> <span class="o">+=</span> <span class="n">stepsize</span>
         <span class="n">sig_cut</span> <span class="o">+=</span> <span class="n">stepsize</span>
-        <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">)</span>
+        <span class="n">contmask</span> <span class="o">=</span> <span class="n">_find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">npixels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">frac</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">contmask</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">npixels</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -214,8 +218,8 @@
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;Cuts: f_cut </span><span class="si">%s</span><span class="s">, sig_cut </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">contmask</span>
 
-</div>
-<div class="viewcode-block" id="find_contpix_regions"><a class="viewcode-back" href="../../api.html#TheCannon.find_continuum_pixels.find_contpix_regions">[docs]</a><span class="k">def</span> <span class="nf">find_contpix_regions</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_find_contpix_regions</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Find continuum pix in a spectrum split into chunks</span>
 
 <span class="sd">    Parameters</span>
@@ -244,9 +248,9 @@
     <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_contpix</span><span class="p">(</span>
+        <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">_find_contpix</span><span class="p">(</span>
                 <span class="n">wl</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">frac</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">contmask</span></div>
+    <span class="k">return</span> <span class="n">contmask</span>
 </pre></div>
 
           </div>
