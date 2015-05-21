@@ -44,8 +44,7 @@ def get_pixmask(fluxes, flux_errs):
 
 
 def load_spectra(data_dir):
-    """
-    Extracts wavelength, flux, and flux uncertainty data from apogee fits files
+    """Extracts wavelength, flux, and flux uncertainty data from apogee fits files
 
     Parameters
     ---------
