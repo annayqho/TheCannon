@@ -28,8 +28,8 @@ Continuum Normalization
 .. automodule:: TheCannon.continuum_normalization
    :members:
 
-Train Model
-===========
+Training Step: Train Model
+==========================
 
 .. automodule:: TheCannon.train_model
    :members:
