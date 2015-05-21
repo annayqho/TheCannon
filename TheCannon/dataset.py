@@ -17,11 +17,7 @@ else:
 
 
 class Dataset(object):
-    """A class to represent a Dataset of stellar spectra and labels.
-
-    Initialize this object after performing the munging necessary 
-    for making data "Cannonizable."
-    """
+    """ A class to represent Cannon input: a dataset of spectra and labels """
 
     def __init__(self, wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar):
         print("Loading dataset")
@@ -123,10 +119,10 @@ class Dataset(object):
         figname: (optional) string
             title of the saved triangle plot for reference labels
         """
-        self.label_triangle_plot(self.tr_label, figname)
+        self._label_triangle_plot(self.tr_label, figname)
 
 
-    def label_triangle_plot(self, label_vals, figname):
+    def _label_triangle_plot(self, label_vals, figname):
         """Make a triangle plot for the selected labels
 
         Parameters
@@ -337,7 +333,7 @@ class Dataset(object):
             name of plot to be saved
         """  
         figname="survey_labels_triangle.png"
-        self.label_triangle_plot(self.test_label_vals, figname)
+        self._label_triangle_plot(self.test_label_vals, figname)
    
    
     def diagnostics_1to1(self):
