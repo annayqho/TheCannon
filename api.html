@@ -75,14 +75,13 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_tc.html">Using <tt class="docutils literal"><span class="pre">TheCannon</span></tt></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.apogee">Handing APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#handling-a-dataset">Handling a Dataset</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.apogee">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.continuum_normalization">Continuum Normalization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.train_model">Training Step: Train Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.spectral_model">Spectral Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.infer_labels">Infer Labels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model">Model</a><ul class="simple">
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -125,7 +124,7 @@
   <div class="section" id="reference-api">
 <span id="api"></span><h1>Reference/API<a class="headerlink" href="#reference-api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-TheCannon.apogee">
-<span id="handing-apogee-data"></span><h2>Handing APOGEE Data<a class="headerlink" href="#module-TheCannon.apogee" title="Permalink to this headline">¶</a></h2>
+<span id="apogee-data"></span><h2>APOGEE Data<a class="headerlink" href="#module-TheCannon.apogee" title="Permalink to this headline">¶</a></h2>
 <p>Functions for reading in APOGEE spectra and training labels</p>
 <dl class="function">
 <dt id="TheCannon.apogee.get_pixmask">
@@ -214,8 +213,8 @@ reported errors are &lt;= 0</p>
 </dd></dl>
 
 </div>
-<div class="section" id="handling-a-dataset">
-<h2>Handling a Dataset<a class="headerlink" href="#handling-a-dataset" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="TheCannon.dataset.Dataset">
 <em class="property">class </em><tt class="descclassname">TheCannon.dataset.</tt><tt class="descname">Dataset</tt><big>(</big><em>wl</em>, <em>tr_ID</em>, <em>tr_flux</em>, <em>tr_ivar</em>, <em>tr_label</em>, <em>test_ID</em>, <em>test_flux</em>, <em>test_ivar</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
@@ -553,38 +552,78 @@ reported errors are &lt;= 0</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-TheCannon.continuum_normalization">
-<span id="continuum-normalization"></span><h2>Continuum Normalization<a class="headerlink" href="#module-TheCannon.continuum_normalization" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_func">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_func</tt><big>(</big><em>x</em>, <em>p</em>, <em>L</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the fitting function evaluated at input x for the continuum.
-The fitting function is a sinusoid, sum of sines and cosines</p>
+<div class="section" id="model">
+<h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="TheCannon.model.CannonModel">
+<em class="property">class </em><tt class="descclassname">TheCannon.model.</tt><tt class="descname">CannonModel</tt><big>(</big><em>dataset</em>, <em>order</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model</span></tt></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">diagnostics</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">draw_spectra</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">fit</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">infer_labels</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">predict</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">split_array</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">train</span></tt></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.diagnostics">
+<tt class="descname">diagnostics</tt><big>(</big><em>baseline_spec_plot_name='baseline_spec_with_cont_pix'</em>, <em>leading_coeffs_plot_name='leading_coeffs.png'</em>, <em>chisq_dist_plot_name='modelfit_chisqs.png'</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a set of diagnostics on the model.</p>
+<p>Plot the 0th order coefficients as the baseline spectrum.
+Overplot the continuum pixels.</p>
+<p>Plot each label&#8217;s leading coefficient as a function of wavelength.
+Color-code by label.</p>
+<p>Histogram of the chi squareds of the fits.
+Dotted line corresponding to DOF = npixels - nlabels</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x: float or np.array</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) baseline_spec_plot_name: str</strong></p>
 <blockquote>
-<div><p>data, input to function</p>
+<div><p>plot name</p>
 </div></blockquote>
-<p><strong>p: ndarray</strong></p>
+<p><strong>(optional) leading_coeffs_plot_name: str</strong></p>
 <blockquote>
-<div><p>coefficients of fitting function</p>
+<div><p>plot name</p>
 </div></blockquote>
-<p><strong>L: float</strong></p>
-<blockquote>
-<div><p>width of x data</p>
-</div></blockquote>
-<p><strong>y: float or np.array</strong></p>
-<blockquote>
-<div><p>output data corresponding to input x</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">func: float</p>
+<p><strong>(optional) chisq_dist_plot_name: str</strong></p>
 <blockquote class="last">
-<div><p>function evaluated for the input x</p>
+<div><p>plot name</p>
 </div></blockquote>
 </td>
 </tr>
@@ -592,285 +631,22 @@ The fitting function is a sinusoid, sum of sines and cosines</p>
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Continuum-normalize a continuous segment of spectra.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: numpy ndarray</strong></p>
-<blockquote>
-<div><p>pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>contmask: boolean mask</strong></p>
-<blockquote>
-<div><p>True indicates that pixel is continuum</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_fluxes: numpy ndarray</p>
-<blockquote>
-<div><p>normalized pixel intensities</p>
-</div></blockquote>
-<p>norm_ivars: numpy ndarray</p>
-<blockquote class="last">
-<div><p>rescaled inverse variances</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm_q">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_q</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_q" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform continuum normalization using a running quantile</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
-<blockquote>
-<div><p>wavelength vector</p>
-</div></blockquote>
-<p><strong>fluxes: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>q: float</strong></p>
-<blockquote>
-<div><p>the desired quantile cut</p>
-</div></blockquote>
-<p><strong>delta_lambda: int</strong></p>
-<blockquote class="last">
-<div><p>the number of pixels over which the median is calculated</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm_q_regions">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_q_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_q_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_q_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform continuum normalization using running quantile, for spectrum
-that comes in chunks</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm_regions">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform continuum normalization for spectra in chunks</p>
-<p>Useful for spectra that have gaps</p>
-<dl class="docutils">
-<dt>fluxes: numpy ndarray</dt>
-<dd>pixel intensities</dd>
-<dt>ivars: numpy ndarray</dt>
-<dd>inverse variances, parallel to fluxes</dd>
-<dt>cont: numpy ndarray</dt>
-<dd>the continuum</dd>
-<dt>ranges: list or np ndarray</dt>
-<dd>the chunks that the spectrum should be split into</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_fluxes: numpy ndarray</p>
-<blockquote>
-<div><p>normalized pixel intensities</p>
-</div></blockquote>
-<p>norm_ivars: numpy ndarray</p>
-<blockquote class="last">
-<div><p>rescaled inverse variances</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.fit_cont">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">fit_cont</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#fit_cont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.fit_cont" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fit a continuum to a continuum pixels in a segment of spectra</p>
-<p>Functional form can be either sinusoid or chebyshev, with specified degree</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>training set or test set pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>contmask: numpy ndarray of length (npixels)</strong></p>
-<blockquote>
-<div><p>boolean pixel mask, True indicates that pixel is continuum</p>
-</div></blockquote>
-<p><strong>deg: int</strong></p>
-<blockquote>
-<div><p>degree of fitting function</p>
-</div></blockquote>
-<p><strong>ffunc: str</strong></p>
-<blockquote>
-<div><p>type of fitting function, chebyshev or sinusoid</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cont: numpy ndarray of shape (nstars, npixels)</p>
-<blockquote class="last">
-<div><p>the continuum, parallel to fluxes</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.fit_cont_regions">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">fit_cont_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ranges</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#fit_cont_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.fit_cont_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run fit_cont, dealing with spectrum in regions or chunks</p>
-<p>This is useful if a spectrum has gaps.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>training set or test set pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>contmask: numpy ndarray of length (npixels)</strong></p>
-<blockquote>
-<div><p>boolean pixel mask, True indicates that pixel is continuum</p>
-</div></blockquote>
-<p><strong>deg: int</strong></p>
-<blockquote>
-<div><p>degree of fitting function</p>
-</div></blockquote>
-<p><strong>ffunc: str</strong></p>
-<blockquote>
-<div><p>type of fitting function, chebyshev or sinusoid</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cont: numpy ndarray of shape (nstars, npixels)</p>
-<blockquote class="last">
-<div><p>the continuum, parallel to fluxes</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.weighted_median">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">weighted_median</tt><big>(</big><em>values</em>, <em>weights</em>, <em>quantile</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#weighted_median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.weighted_median" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate a weighted median for values above a particular quantile cut</p>
-<p>Used in pseudo continuum normalization</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>values: np ndarray of floats</strong></p>
-<blockquote>
-<div><p>the values to take the median of</p>
-</div></blockquote>
-<p><strong>weights: np ndarray of floats</strong></p>
-<blockquote>
-<div><p>the weights associated with the values</p>
-</div></blockquote>
-<p><strong>quantile: float</strong></p>
-<blockquote>
-<div><p>the cut applied to the input data</p>
-</div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>&#8212;&#8212;</strong></p>
-<p class="last"><strong>the weighted median</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-TheCannon.train_model">
-<span id="training-step-train-model"></span><h2>Training Step: Train Model<a class="headerlink" href="#module-TheCannon.train_model" title="Permalink to this headline">¶</a></h2>
-<p>This runs Step 1 of The Cannon:
-uses the training set to solve for the best-fit model.</p>
-<dl class="function">
-<dt id="TheCannon.train_model.do_one_regression">
-<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">do_one_regression</tt><big>(</big><em>lams</em>, <em>fluxes</em>, <em>ivars</em>, <em>lvec</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#do_one_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.do_one_regression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Optimizes to find the scatter associated with the best-fit model.</p>
-<p>This scatter is the deviation between the observed spectrum and the model.
-It is wavelength-independent, so we perform this at a single wavelength.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.train_model.do_one_regression_at_fixed_scatter">
-<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">do_one_regression_at_fixed_scatter</tt><big>(</big><em>lams</em>, <em>fluxes</em>, <em>ivars</em>, <em>lvec</em>, <em>scatter</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#do_one_regression_at_fixed_scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.do_one_regression_at_fixed_scatter" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.draw_spectra">
+<tt class="descname">draw_spectra</tt><big>(</big><em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.draw_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.draw_spectra" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lams: numpy ndarray, shape npixels</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
 <blockquote>
-<div><p>the common wavelength array</p>
+<div><p>dataset that needs label inference</p>
 </div></blockquote>
-<p><strong>fluxes: numpy ndarray, shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>flux values for all pixels of all stars</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray, shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>inverse variance values for all pixels of all stars</p>
-</div></blockquote>
-<p><strong>lvec: numpy ndarray</strong></p>
-<blockquote>
-<div><p>the label vector</p>
-</div></blockquote>
-<p><strong>scatter: numpy ndarray, shape npixels</strong></p>
-<blockquote>
-<div><p>fitted scatter values</p>
-</div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>&#8212;&#8212;</strong></p>
-<p><strong>coeff: ndarray</strong></p>
-<blockquote>
-<div><p>coefficients of the fit</p>
-</div></blockquote>
-<p><strong>lTCinvl: ndarray</strong></p>
-<blockquote>
-<div><p>inverse covariance matrix for fit coefficients</p>
-</div></blockquote>
-<p><strong>chi: float</strong></p>
-<blockquote>
-<div><p>chi-squared at best fit</p>
-</div></blockquote>
-<p><strong>logdet_Cinv: float</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cannon_set: Dataset</p>
 <blockquote class="last">
-<div><p>inverse of the log determinant of the cov matrix</p>
+<div><p>same dataset as the input value with updated fluxes and variances</p>
 </div></blockquote>
 </td>
 </tr>
@@ -878,39 +654,64 @@ It is wavelength-independent, so we perform this at a single wavelength.</p>
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="TheCannon.train_model.get_lvec">
-<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">get_lvec</tt><big>(</big><em>label_vals</em>, <em>pivots</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#get_lvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.get_lvec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs a label vector for an arbitrary number of labels
-Assumes that our model is quadratic in the labels</p>
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.fit">
+<tt class="descname">fit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#TheCannon.model.CannonModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.infer_labels">
+<tt class="descname">infer_labels</tt><big>(</big><em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.infer_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.infer_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the model to solve for labels of the test set.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>label_vals: numpy ndarray, shape (nstars, nlabels)</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
 <blockquote>
-<div><p>labels</p>
-</div></blockquote>
-<p><strong>pivots: numpy ndarray</strong></p>
-<blockquote>
-<div><p>mean of the label_vals</p>
+<div><p>dataset that needs label inference</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">lvec: numpy ndarray</p>
-<blockquote class="last">
-<div><p>label vector</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">output of infer_labels</p>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="TheCannon.train_model.split_array">
-<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">split_array</tt><big>(</big><em>array</em>, <em>num</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#split_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.split_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>split array into a number of chunks</p>
+<dl class="attribute">
+<dt id="TheCannon.model.CannonModel.model">
+<tt class="descname">model</tt><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the model definition or raise an error if not trained</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.predict">
+<tt class="descname">predict</tt><big>(</big><em>dataset</em><big>)</big><a class="headerlink" href="#TheCannon.model.CannonModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the model to solve for labels of the test set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>dataset that needs label inference</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">output of infer_labels</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.split_array">
+<tt class="descname">split_array</tt><big>(</big><em>array</em>, <em>num</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.split_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.split_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>split an array into a certain number of segments</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -921,34 +722,13 @@ Assumes that our model is quadratic in the labels</p>
 </div></blockquote>
 <p><strong>num: int</strong></p>
 <blockquote>
-<div><p>number of chunks</p>
+<div><p>number of elements to split array into</p>
 </div></blockquote>
 <p><strong>Returns</strong></p>
 <p><strong>&#8212;&#8212;</strong></p>
-<p class="last"><strong>out: split array</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.train_model.train_model">
-<tt class="descclassname">TheCannon.train_model.</tt><tt class="descname">train_model</tt><big>(</big><em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/train_model.html#train_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.train_model.train_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>This determines the coefficients of the model using the training data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
-<blockquote>
-<div><p>reference objects</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">model: model</p>
+<p><strong>out: list</strong></p>
 <blockquote class="last">
-<div><p>best-fit Cannon model</p>
+<div><p>split array</p>
 </div></blockquote>
 </td>
 </tr>
@@ -956,194 +736,12 @@ Assumes that our model is quadratic in the labels</p>
 </table>
 </dd></dl>
 
-</div>
-<div class="section" id="module-TheCannon.spectral_model">
-<span id="spectral-model"></span><h2>Spectral Model<a class="headerlink" href="#module-TheCannon.spectral_model" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="TheCannon.spectral_model.diagnostics">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">diagnostics</tt><big>(</big><em>cannon_set</em>, <em>dataset</em>, <em>model</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.diagnostics" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run diagnostics on the fitted spectra</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
-<blockquote>
-<div><p>best-fit Cannon spectra</p>
-</div></blockquote>
-<p><strong>dataset: Dataset</strong></p>
-<blockquote>
-<div><p>original spectra</p>
-</div></blockquote>
-<p><strong>model: model</strong></p>
-<blockquote class="last">
-<div><p>best-fit Cannon spectral model</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.train">
+<tt class="descname">train</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the model</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="TheCannon.spectral_model.draw_spectra">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">draw_spectra</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#draw_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.draw_spectra" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a set of spectra given the model and test set labels</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: model object</strong></p>
-<blockquote>
-<div><p>the Cannon spectral model</p>
-</div></blockquote>
-<p><strong>dataset: Dataset object</strong></p>
-<blockquote>
-<div><p>dataset that needs label inferences</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cannon_set: Dataset object</p>
-<blockquote class="last">
-<div><p>same dataset as input, but with updated fluxes and variances</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.spectral_model.overlay_spectra">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">overlay_spectra</tt><big>(</big><em>cannon_set</em>, <em>dataset</em>, <em>model</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#overlay_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.overlay_spectra" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run a series of diagnostics on the fitted spectra</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
-<blockquote>
-<div><p>best-fit Cannon spectra</p>
-</div></blockquote>
-<p><strong>dataset: Dataset</strong></p>
-<blockquote>
-<div><p>original spectra</p>
-</div></blockquote>
-<p><strong>model: model</strong></p>
-<blockquote class="last">
-<div><p>best-fit Cannon spectral model</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.spectral_model.residuals">
-<tt class="descclassname">TheCannon.spectral_model.</tt><tt class="descname">residuals</tt><big>(</big><em>cannon_set</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/spectral_model.html#residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.spectral_model.residuals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stack spectrum fit residuals, sort by each label. Include histogram of
-the RMS at each pixel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cannon_set: Dataset</strong></p>
-<blockquote>
-<div><p>best-fit Cannon spectra</p>
-</div></blockquote>
-<p><strong>dataset: Dataset</strong></p>
-<blockquote class="last">
-<div><p>original spectra</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-TheCannon.infer_labels">
-<span id="infer-labels"></span><h2>Infer Labels<a class="headerlink" href="#module-TheCannon.infer_labels" title="Permalink to this headline">¶</a></h2>
-<p>This runs Step 2 of The Cannon:
-uses the model to solve for the labels of the test set.</p>
-<dl class="function">
-<dt id="TheCannon.infer_labels.func">
-<tt class="descclassname">TheCannon.infer_labels.</tt><tt class="descname">func</tt><big>(</big><em>coeffs</em>, <em>*labels</em><big>)</big><a class="reference internal" href="_modules/TheCannon/infer_labels.html#func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.infer_labels.func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes the dot product of coefficients vec &amp; labels vector</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>coeffs: numpy ndarray</strong></p>
-<blockquote>
-<div><p>the coefficients on each element of the label vector</p>
-</div></blockquote>
-<p><strong>*labels: numpy ndarray</strong></p>
-<blockquote>
-<div><p>label vector</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dot product of coeffs vec and labels vec</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.infer_labels.get_lvec">
-<tt class="descclassname">TheCannon.infer_labels.</tt><tt class="descname">get_lvec</tt><big>(</big><em>labels</em><big>)</big><a class="reference internal" href="_modules/TheCannon/infer_labels.html#get_lvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.infer_labels.get_lvec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs a label vector for an arbitrary number of labels
-Assumes that our model is quadratic in the labels</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>labels: numpy ndarray</strong></p>
-<blockquote>
-<div><p>pivoted label values for one star</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">lvec: numpy ndarray</p>
-<blockquote class="last">
-<div><p>label vector</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.infer_labels.infer_labels">
-<tt class="descclassname">TheCannon.infer_labels.</tt><tt class="descname">infer_labels</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/infer_labels.html#infer_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.infer_labels.infer_labels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uses the model to solve for labels of the test set.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: tuple</strong></p>
-<blockquote>
-<div><p>coeffs_all, covs, scatters, chis, chisqs, pivots
-result from <tt class="xref py py-func docutils literal"><span class="pre">train_model()</span></tt></p>
-</div></blockquote>
-<p><strong>dataset: Dataset</strong></p>
-<blockquote>
-<div><p>dataset that needs label inference</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">errs_all:</p>
-<blockquote class="last">
-<div><p>covariance matrix of the fit</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </div>
