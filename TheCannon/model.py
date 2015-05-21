@@ -35,22 +35,12 @@ class CannonModel(object):
 
 
     def train(self, *args, **kwargs):
-        """ Train the model """
+        """ Run training step: solve for best-fit spectral model """
         self._model = _train_model(self.dataset)
 
 
     def diagnostics(self):
-        """Run a set of diagnostics on the model.
-
-        Plot the 0th order coefficients as the baseline spectrum.
-        Overplot the continuum pixels.
-
-        Plot each label's leading coefficient as a function of wavelength.
-        Color-code by label.
-
-        Histogram of the chi squareds of the fits.
-        Dotted line corresponding to DOF = npixels - nlabels
-        """
+        """ Produce a set of diagnostics plots about the model. """
         _model_diagnostics(self.dataset, self.model)
 
 
@@ -72,15 +62,18 @@ class CannonModel(object):
 
     def draw_spectra(self, dataset):
         """
+        Create a new dataset whose test flux and ivar values correspond to the
+        fitted-for test spectra
+
         Parameters
         ----------
         dataset: Dataset
-            dataset that needs label inference
+            Dataset that needs label inference
 
         Returns
         -------
         cannon_set: Dataset
-            same dataset as the input value with updated fluxes and variances
+            Dataset with best-fit fluxes and variances as test_flux and test_ivar
         """
         coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = self.model
         nstars = len(dataset.test_SNR)
@@ -127,25 +120,16 @@ class CannonModel(object):
             self, baseline_spec_plot_name = "baseline_spec_with_cont_pix",
             leading_coeffs_plot_name = "leading_coeffs.png",
             chisq_dist_plot_name = "modelfit_chisqs.png"):
-        """Run a set of diagnostics on the model.
-
-        Plot the 0th order coefficients as the baseline spectrum.
-        Overplot the continuum pixels.
-
-        Plot each label's leading coefficient as a function of wavelength.
-        Color-code by label.
-
-        Histogram of the chi squareds of the fits.
-        Dotted line corresponding to DOF = npixels - nlabels
+        """ Produce a set of diagnostic plots for the model 
 
         Parameters
         ----------
         (optional) baseline_spec_plot_name: str
-            plot name
+            Filename of output saved plot
         (optional) leading_coeffs_plot_name: str
-            plot name
+            Filename of output saved plot
         (optional) chisq_dist_plot_name: str
-            plot name
+            Filename of output saved plot
         """
         dataset = self.dataset
         model = self.model
