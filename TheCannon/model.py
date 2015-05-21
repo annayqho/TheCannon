@@ -1,7 +1,7 @@
 """ Spectral model fitted for by The Cannon's training step """
 from .dataset import Dataset
-from .train_model import train_model as _train_model
-from .infer_labels import infer_labels
+from .train_model import _train_model 
+from .infer_labels import _infer_labels
 from .spectral_model import diagnostics as _diagnostics
 from .helpers.triangle import corner
 import numpy as np
@@ -57,7 +57,7 @@ class CannonModel(object):
         -------
         output of infer_labels
         """
-        return infer_labels(self.model, dataset)
+        return _infer_labels(self.model, dataset)
 
 
     def draw_spectra(self, dataset):
@@ -253,5 +253,5 @@ class CannonModel(object):
         plt.close()
 
     # convenient namings to match existing packages
-    predict = infer_labels
+    predict = _infer_labels
     fit = train
