@@ -3,7 +3,7 @@ import numpy as np
 LARGE = 200.
 SMALL = 1. / LARGE
 
-def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
+def _find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
 
     Parameters
@@ -38,7 +38,7 @@ def find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     return contmask
 
 
-def find_contpix(wl, fluxes, ivars, target_frac):
+def _find_contpix(wl, fluxes, ivars, target_frac):
     """ Find continuum pix in spec, meeting a set target fraction
 
     Parameters
@@ -68,7 +68,7 @@ def find_contpix(wl, fluxes, ivars, target_frac):
     f_cut = 0.0001
     stepsize = 0.0001
     sig_cut = 0.0001
-    contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
+    contmask = _find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
     if npixels > 0:
         frac = sum(contmask)/float(npixels)
     else:
@@ -76,7 +76,7 @@ def find_contpix(wl, fluxes, ivars, target_frac):
     while (frac < target_frac): 
         f_cut += stepsize
         sig_cut += stepsize
-        contmask = find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
+        contmask = _find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars)
         if npixels > 0:
             frac = sum(contmask)/float(npixels)
         else:
@@ -89,7 +89,7 @@ def find_contpix(wl, fluxes, ivars, target_frac):
     return contmask
 
 
-def find_contpix_regions(wl, fluxes, ivars, frac, ranges):
+def _find_contpix_regions(wl, fluxes, ivars, frac, ranges):
     """ Find continuum pix in a spectrum split into chunks
 
     Parameters
@@ -118,6 +118,6 @@ def find_contpix_regions(wl, fluxes, ivars, frac, ranges):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        contmask[start:stop] = find_contpix(
+        contmask[start:stop] = _find_contpix(
                 wl[start:stop], fluxes[:,start:stop], ivars[:,start:stop], frac)
     return contmask

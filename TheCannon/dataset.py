@@ -5,7 +5,7 @@ import matplotlib.gridspec as gridspec
 from .helpers.triangle import corner
 from .helpers import Table
 import sys
-from .find_continuum_pixels import find_contpix, find_contpix_regions
+from .find_continuum_pixels import _find_contpix, _find_contpix_regions
 from .continuum_normalization import fit_cont, fit_cont_regions, cont_norm, cont_norm_regions, cont_norm_q, cont_norm_q_regions
 
 PY3 = sys.version_info[0] > 2
@@ -166,10 +166,10 @@ class Dataset(object):
         print("Finding continuum pixels...")
         if self.ranges is None:
             print("assuming continuous spectra")
-            contmask = find_contpix(self.wl, fluxes, ivars, frac)
+            contmask = _find_contpix(self.wl, fluxes, ivars, frac)
         else:
             print("taking spectra in %s regions" %len(self.ranges))
-            contmask = find_contpix_regions(
+            contmask = _find_contpix_regions(
                     self.wl, fluxes, ivars, frac, self.ranges)
         print("%s pixels returned as continuum" %sum(contmask))
         return contmask
