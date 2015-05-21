@@ -64,7 +64,7 @@ class Dataset(object):
         """ Set the label names for plotting
 
         Parameters
-        ---------
+        ----------
         names: ndarray or list
             The names of the labels used for plotting, ex. in LaTeX syntax
         """
