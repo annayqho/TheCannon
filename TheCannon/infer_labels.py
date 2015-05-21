@@ -59,16 +59,15 @@ def _infer_labels(model, dataset):
     Parameters
     ----------
     model: tuple
-        coeffs_all, covs, scatters, chis, chisqs, pivots
-        result from :func:`train_model`
+        Coeffs_all, covs, scatters, chis, chisqs, pivots
 
     dataset: Dataset
-        dataset that needs label inference
+        Dataset that needs label inference
 
     Returns
     -------
     errs_all:
-        covariance matrix of the fit
+        Covariance matrix of the fit
     """
     print("Inferring Labels...")
     coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model

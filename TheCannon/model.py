@@ -1,4 +1,3 @@
-""" Spectral model fitted for by The Cannon's training step """
 from .dataset import Dataset
 from .train_model import _train_model 
 from .infer_labels import _infer_labels
@@ -27,7 +26,7 @@ class CannonModel(object):
 
     @property
     def model(self):
-        """ return the model definition or raise an error if not trained """
+        """ Return the model definition or raise an error if not trained """
         if self._model is None:
             raise RuntimeError('Model not trained')
         else:
@@ -46,16 +45,17 @@ class CannonModel(object):
 
     def infer_labels(self, dataset):
         """
-        Uses the model to solve for labels of the test set.
+        Uses the model to solve for labels of the test set, updates Dataset
 
         Parameters
         ----------
         dataset: Dataset
-            dataset that needs label inference
+            Dataset that needs label inference
 
         Returns
         -------
-        output of infer_labels
+        errs_all: ndarray
+            Covariance matrix of the fit
         """
         return _infer_labels(self.model, dataset)
 
@@ -91,7 +91,7 @@ class CannonModel(object):
         return cannon_set
 
 
-    def split_array(self, array, num):
+    def _split_array(self, array, num):
         """ split an array into a certain number of segments
 
         Parameters
@@ -153,7 +153,7 @@ class CannonModel(object):
 
             # Split into ten segments
             nseg = 10
-            lams_seg = self.split_array(lams.compressed(), nseg)
+            lams_seg = self._split_array(lams.compressed(), nseg)
             xmins = [] 
             xmaxs = [] 
             for seg in lams_seg:
