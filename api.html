@@ -161,20 +161,20 @@ reported errors are &lt;= 0</p>
 <dl class="function">
 <dt id="TheCannon.apogee.load_labels">
 <tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">load_labels</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#load_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_labels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts reference labels</p>
+<dd><p>Extracts reference labels from a file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename: str</strong></p>
 <blockquote>
-<div><p>file containing the table of ref labels</p>
+<div><p>Name of the file containing the table of reference labels</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">labels: numpy ndarray of shape (nstars, nlabels)</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">labels: ndarray</p>
 <blockquote class="last">
-<div><p>all reference labels for all reference objects</p>
+<div><p>Reference label values for all reference objects</p>
 </div></blockquote>
 </td>
 </tr>
@@ -192,21 +192,21 @@ reported errors are &lt;= 0</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_dir: str</strong></p>
 <blockquote>
-<div><p>directory containing all of the data files</p>
+<div><p>Name of the directory containing all of the data files</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: numpy ndarray of length npixels</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: ndarray</p>
 <blockquote>
-<div><p>rest-frame wavelength vector</p>
+<div><p>Rest-frame wavelength vector</p>
 </div></blockquote>
-<p>fluxes: numpy ndarray of shape (nstars, npixels)</p>
+<p>fluxes: ndarray</p>
 <blockquote>
-<div><p>training set or test set pixel intensities</p>
+<div><p>Flux data values</p>
 </div></blockquote>
-<p>ivars: numpy ndarray of shape (nstars, npixels)</p>
+<p>ivars: ndarray</p>
 <blockquote class="last">
-<div><p>inverse variances, parallel to fluxes</p>
+<div><p>Inverse variance values corresponding to flux values</p>
 </div></blockquote>
 </td>
 </tr>

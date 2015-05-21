@@ -175,18 +175,18 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data_dir: str</span>
-<span class="sd">        directory containing all of the data files</span>
+<span class="sd">        Name of the directory containing all of the data files</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    wl: numpy ndarray of length npixels</span>
-<span class="sd">        rest-frame wavelength vector</span>
+<span class="sd">    wl: ndarray</span>
+<span class="sd">        Rest-frame wavelength vector</span>
 
-<span class="sd">    fluxes: numpy ndarray of shape (nstars, npixels)</span>
-<span class="sd">        training set or test set pixel intensities</span>
+<span class="sd">    fluxes: ndarray</span>
+<span class="sd">        Flux data values</span>
 
-<span class="sd">    ivars: numpy ndarray of shape (nstars, npixels)</span>
-<span class="sd">        inverse variances, parallel to fluxes</span>
+<span class="sd">    ivars: ndarray</span>
+<span class="sd">        Inverse variance values corresponding to flux values</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;Loading spectra from directory </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">data_dir</span><span class="p">)</span>
     <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span>
@@ -219,17 +219,17 @@
 
 </div>
 <div class="viewcode-block" id="load_labels"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.load_labels">[docs]</a><span class="k">def</span> <span class="nf">load_labels</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Extracts reference labels </span>
+    <span class="sd">&quot;&quot;&quot; Extracts reference labels from a file</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    filename: str</span>
-<span class="sd">        file containing the table of ref labels</span>
+<span class="sd">        Name of the file containing the table of reference labels</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    labels: numpy ndarray of shape (nstars, nlabels)</span>
-<span class="sd">        all reference labels for all reference objects</span>
+<span class="sd">    labels: ndarray</span>
+<span class="sd">        Reference label values for all reference objects</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;Loading reference labels from file </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
