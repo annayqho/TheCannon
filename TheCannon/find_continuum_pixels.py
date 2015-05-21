@@ -3,8 +3,6 @@ import numpy as np
 LARGE = 200.
 SMALL = 1. / LARGE
 
-""" Functionality for identifying continuum pixels, not touched by user """
-
 def _find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     """ Find and return continuum pixels given the flux and sigma cut
 

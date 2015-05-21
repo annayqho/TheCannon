@@ -9,7 +9,7 @@ import numpy as np
 LARGE = 200.
 SMALL = 1. / LARGE
 
-def get_lvec(labels):
+def _get_lvec(labels):
     """
     Constructs a label vector for an arbitrary number of labels
     Assumes that our model is quadratic in the labels
@@ -33,7 +33,7 @@ def get_lvec(labels):
     return lvec
 
 
-def func(coeffs, *labels):
+def _func(coeffs, *labels):
     """ Takes the dot product of coefficients vec & labels vector 
     
     Parameters
@@ -48,11 +48,11 @@ def func(coeffs, *labels):
     -------
     dot product of coeffs vec and labels vec
     """
-    lvec = get_lvec(list(labels))
+    lvec = _get_lvec(list(labels))
     return np.dot(coeffs, lvec)
 
 
-def infer_labels(model, dataset):
+def _infer_labels(model, dataset):
     """
     Uses the model to solve for labels of the test set.
 
@@ -89,14 +89,14 @@ def infer_labels(model, dataset):
         sig = np.sqrt(1./ivar + scatters**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
         try:
-            labels, covs = opt.curve_fit(func, coeffs, flux_piv,
+            labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels),
                                          sigma=sig, absolute_sigma=True)
         except TypeError:  # old scipy version
-            labels, covs = opt.curve_fit(func, coeffs, flux_piv,
+            labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels), sigma=sig)
             # rescale covariance matrix
-            chi = (flux_piv-func(coeffs, *labels)) / sig
+            chi = (flux_piv-_func(coeffs, *labels)) / sig
             chi2 = (chi**2).sum()
             # FIXME: dof does not seem to be right to me (MF)
             dof = len(flux_piv) - nlabels

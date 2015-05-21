@@ -16,14 +16,8 @@ Dataset
 .. autoclass:: TheCannon.dataset.Dataset
    :members:
 
-Identify Cont Pixels
-====================
-
 .. automodule:: TheCannon.find_continuum_pixels
    :members:
-
-Continuum Normalize
-===================
 
 .. automodule:: TheCannon.continuum_normalization
    :members:

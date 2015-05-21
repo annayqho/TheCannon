@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from .helpers.compatibility import range, map
 from .helpers.triangle import corner
 
-def do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
+def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
     Parameters
     ----------
@@ -59,7 +59,7 @@ def do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     return (coeff, lTCinvl, chi, logdet_Cinv)
 
 
-def do_one_regression(lams, fluxes, ivars, lvec):
+def _do_one_regression(lams, fluxes, ivars, lvec):
     """
     Optimizes to find the scatter associated with the best-fit model.
 
@@ -89,18 +89,18 @@ def do_one_regression(lams, fluxes, ivars, lvec):
     chis_eval = np.zeros_like(ln_scatter_vals)
     for jj, ln_scatter_val in enumerate(ln_scatter_vals):
         coeff, lTCinvl, chi, logdet_Cinv = \
-            do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
+            _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
                                                scatter=np.exp(ln_scatter_val))
         chis_eval[jj] = np.sum(chi*chi) - logdet_Cinv
     if np.any(np.isnan(chis_eval)):
         best_scatter = np.exp(ln_scatter_vals[-1])
-        _r = do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
+        _r = _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
                                                 scatter=best_scatter)
         return _r + (best_scatter, )
     lowest = np.argmin(chis_eval)
     if (lowest == 0) or (lowest == len(ln_scatter_vals) - 1):
         best_scatter = np.exp(ln_scatter_vals[lowest])
-        _r = do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
+        _r = _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
                                                 scatter=best_scatter)
         return _r + (best_scatter, )
     ln_scatter_vals_short = ln_scatter_vals[np.array(
@@ -109,12 +109,12 @@ def do_one_regression(lams, fluxes, ivars, lvec):
     z = np.polyfit(ln_scatter_vals_short, chis_eval_short, 2)
     fit_pder = np.polyder(z)
     best_scatter = np.exp(np.roots(fit_pder)[0])
-    _r = do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
+    _r = _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
                                             scatter=best_scatter)
     return _r + (best_scatter, )
 
 
-def get_lvec(label_vals, pivots):
+def _get_lvec(label_vals, pivots):
     """
     Constructs a label vector for an arbitrary number of labels
     Assumes that our model is quadratic in the labels
@@ -142,7 +142,7 @@ def get_lvec(label_vals, pivots):
     return lvec
 
 
-def train_model(dataset):
+def _train_model(dataset):
     """
     This determines the coefficients of the model using the training data
 
@@ -164,14 +164,14 @@ def train_model(dataset):
     fluxes = dataset.tr_flux
     ivars = dataset.tr_ivar
     pivots = np.mean(label_vals, axis=0)
-    lvec = get_lvec(label_vals, pivots)
+    lvec = _get_lvec(label_vals, pivots)
     lvec_full = np.array([lvec,] * npixels)
 
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
     ivars = ivars.swapaxes(0,1)
     # one per pix
-    blob = list(map(do_one_regression, lams, fluxes, ivars, lvec_full))
+    blob = list(map(_do_one_regression, lams, fluxes, ivars, lvec_full))
     coeffs = np.array([b[0] for b in blob])
     covs = np.array([np.linalg.inv(b[1]) for b in blob])
     chis = np.array([b[2] for b in blob])
@@ -184,7 +184,7 @@ def train_model(dataset):
     return model
 
 
-def split_array(array, num):
+def _split_array(array, num):
     """ split array into a number of chunks
 
     Parameters

@@ -6,14 +6,14 @@ import scipy.optimize as opt
 LARGE = 200.
 SMALL = 1. / LARGE
 
-def partial_func(func, *args, **kwargs):
+def _partial_func(func, *args, **kwargs):
     """ something """
     def wrap(x, *p):
         return func(x, p, **kwargs)
     return wrap
 
 
-def cont_func(x, p, L, y):
+def _cont_func(x, p, L, y):
     """ Return the fitting function evaluated at input x for the continuum.
     The fitting function is a sinusoid, sum of sines and cosines
 
@@ -42,7 +42,7 @@ def cont_func(x, p, L, y):
     return func
 
 
-def fit_cont(fluxes, ivars, contmask, deg, ffunc):
+def _fit_cont(fluxes, ivars, contmask, deg, ffunc):
     """ Fit a continuum to a continuum pixels in a segment of spectra
 
     Functional form can be either sinusoid or chebyshev, with specified degree
@@ -83,20 +83,20 @@ def fit_cont(fluxes, ivars, contmask, deg, ffunc):
         if ffunc=="sinusoid": 
             p0 = np.ones(deg*2) # one for cos, one for sin
             L = max(x)-min(x)
-            pcont_func = partial_func(cont_func, L=L, y=flux)
+            pcont_func = _partial_func(_cont_func, L=L, y=flux)
             popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                        sigma=1./np.sqrt(yivar))
         elif ffunc=="chebyshev":
             fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=deg)
         for element in pix:
             if ffunc=="sinusoid":
-                cont[jj,element] = cont_func(element, popt, L=L, y=flux)
+                cont[jj,element] = _cont_func(element, popt, L=L, y=flux)
             elif ffunc=="chebyshev":
                 cont[element] = fit(element)
     return cont
 
 
-def fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
+def _fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
     """ Run fit_cont, dealing with spectrum in regions or chunks
 
     This is useful if a spectrum has gaps.
@@ -130,18 +130,18 @@ def fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
         start = chunk[0]
         stop = chunk[1]
         if ffunc=="chebyshev":
-            output = fit_cont(fluxes[:,start:stop],
+            output = _fit_cont(fluxes[:,start:stop],
                               ivars[:,start:stop],
                               contmask[start:stop], deg=deg, ffunc="chebyshev")
         elif ffunc=="sinusoid":
-            output = fit_cont(fluxes[:,start:stop],
+            output = _fit_cont(fluxes[:,start:stop],
                               ivars[:,start:stop],
                               contmask[start:stop], deg=deg, ffunc="sinusoid")
         cont[:,start:stop] = output
     return cont
 
 
-def weighted_median(values, weights, quantile):
+def _weighted_median(values, weights, quantile):
     """ Calculate a weighted median for values above a particular quantile cut
 
     Used in pseudo continuum normalization
@@ -170,7 +170,7 @@ def weighted_median(values, weights, quantile):
     return values[indx]
 
 
-def cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
+def _cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
     """ Perform continuum normalization using a running quantile
 
     Parameters
@@ -206,14 +206,14 @@ def cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
             indx = (np.where(abs(wl-lam) < delta_lambda))[0]
             flux_cut = flux[indx]
             ivar_cut = ivar[indx]
-            cont[jj,ll] = weighted_median(flux_cut, ivar_cut, q)
+            cont[jj,ll] = _weighted_median(flux_cut, ivar_cut, q)
     for jj in range(nstars):
         norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
         norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
     return norm_fluxes, norm_ivars
 
 
-def cont_norm_q_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
+def _cont_norm_q_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
     """ Perform continuum normalization using running quantile, for spectrum
     that comes in chunks
     """
@@ -225,7 +225,7 @@ def cont_norm_q_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        output = cont_norm_q(wl, fluxes[:,start:stop],
+        output = _cont_norm_q(wl, fluxes[:,start:stop],
                              ivars[:,start:stop],
                              q, delta_lambda)
         norm_fluxes[:,start:stop] = output[0]
@@ -233,7 +233,7 @@ def cont_norm_q_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
     return norm_fluxes, norm_ivars
 
 
-def cont_norm(fluxes, ivars, cont):
+def _cont_norm(fluxes, ivars, cont):
     """ Continuum-normalize a continuous segment of spectra.
 
     Parameters
@@ -264,7 +264,7 @@ def cont_norm(fluxes, ivars, cont):
     return norm_fluxes, norm_ivars 
 
 
-def cont_norm_regions(fluxes, ivars, cont, ranges):
+def _cont_norm_regions(fluxes, ivars, cont, ranges):
     """ Perform continuum normalization for spectra in chunks
 
     Useful for spectra that have gaps
@@ -293,7 +293,7 @@ def cont_norm_regions(fluxes, ivars, cont, ranges):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        output = cont_norm(fluxes[:,start:stop],
+        output = _cont_norm(fluxes[:,start:stop],
                            ivars[:,start:stop],
                            cont[:,start:stop])
         norm_fluxes[:,start:stop] = output[0]
