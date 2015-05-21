@@ -4,7 +4,6 @@
 Reference/API
 *************
 
-
 Preparing APOGEE Data
 =====================
 

@@ -44,23 +44,23 @@ def get_pixmask(fluxes, flux_errs):
 
 
 def load_spectra(data_dir):
-    """ Extracts wavelength, flux, and flux uncertainty data from apogee fits files
+    """ Reads wavelength, flux, and flux uncertainty data from apogee fits files
 
     Parameters
     ----------
     data_dir: str
-        directory containing all of the data files
+        Name of the directory containing all of the data files
 
     Returns
     -------
-    wl: numpy ndarray of length npixels
-        rest-frame wavelength vector
+    wl: ndarray
+        Rest-frame wavelength vector
 
-    fluxes: numpy ndarray of shape (nstars, npixels)
-        training set or test set pixel intensities
+    fluxes: ndarray
+        Flux data values
 
-    ivars: numpy ndarray of shape (nstars, npixels)
-        inverse variances, parallel to fluxes
+    ivars: ndarray
+        Inverse variance values corresponding to flux values
     """
     print("Loading spectra from directory %s" %data_dir)
     files = list(sorted([data_dir + "/" + filename
@@ -93,17 +93,17 @@ def load_spectra(data_dir):
 
 
 def load_labels(filename):
-    """ Extracts reference labels 
+    """ Extracts reference labels from a file
 
     Parameters
     ----------
     filename: str
-        file containing the table of ref labels
+        Name of the file containing the table of reference labels
 
     Returns
     -------
-    labels: numpy ndarray of shape (nstars, nlabels)
-        all reference labels for all reference objects
+    labels: ndarray
+        Reference label values for all reference objects
     """
     print("Loading reference labels from file %s" %filename)
     data = Table(filename)
