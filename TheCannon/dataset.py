@@ -245,11 +245,11 @@ class Dataset(object):
         """ Continuum normalize the training set using a running quantile
 
         Parameters
-        ---------
+        ----------
         q: float
-            the quantile cut
+            The quantile cut
         delta_lambda: float
-            the width of the pixel range used to calculate the median
+            The width of the pixel range used to calculate the median
         """
         print("Continuum normalizing the tr set using running quantile...")
         if self.ranges is None:
@@ -262,27 +262,25 @@ class Dataset(object):
                     q=q, delta_lambda=delta_lambda, ranges=self.ranges)
 
 
-    def continuum_normalize_f(self, cont):
-        """ Continuum normalize spectra by dividing the spectrum by the continuum 
-
-        For spectra split into regions, perform cont normalization
-        separately for each region.
+    def continuum_normalize(self, cont):
+        """ 
+        Continuum normalize spectra, in chunks if spectrum has regions 
 
         Parameters
         ----------
-        cont: numpy ndarray
-           the continuum 
+        cont: ndarray
+           Flux values corresponding to the continuum 
 
         Returns
         -------
-        norm_tr_flux: numpy ndarray
-            the normalized training objects' pixel intensities
-        norm_tr_ivar: numpy ndarray
-            the rescaled training objects' pixel inverse variances
-        norm_test_flux: numpy ndarray
-            the normalized test objects' pixel intensities
+        norm_tr_flux: ndarray
+            Normalized flux values for the training objects
+        norm_tr_ivar: ndarray
+            Rescaled inverse variance values for the training objects
+        norm_test_flux: ndarray
+            Normalized flux values for the test objects
         norm_test_ivar: numpy ndarray
-            the rescaled test objects' pixel inverse variances
+            Rescaled inverse variance values for the test objects
         """
         tr_cont, test_cont = cont
         if self.ranges is None:
