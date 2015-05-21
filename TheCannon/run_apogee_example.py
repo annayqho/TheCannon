@@ -50,6 +50,8 @@ else:
 
 dataset.set_continuum(contmask)
 
+dataset.diagnostics_contmask()
+
 # fit a sinusoid through the continuum pixels
 if glob.glob('cont.p'):
     cont = pickle.load(open('cont.p', 'r')) 

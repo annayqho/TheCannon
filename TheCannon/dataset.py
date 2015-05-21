@@ -65,18 +65,19 @@ class Dataset(object):
 
         Parameters
         ---------
-        names: array, list
-            the names of the labels
+        names: ndarray or list
+            The names of the labels used for plotting, ex. in LaTeX syntax
         """
         self._label_names = names
 
 
     def get_plotting_labels(self):
-        """ Return the labels set for plotting
+        """ Return the label names used make plots 
 
         Returns
         -------
-        the label names
+        label_names: ndarray
+            The label names
         """
         if self._label_names is None:
             print("No label names yet!")
@@ -86,12 +87,12 @@ class Dataset(object):
  
 
     def diagnostics_SNR(self, figname = "SNRdist.png"): 
-        """ Plot SNR distributions of ref and test objects
+        """ Plots SNR distributions of ref and test object spectra
 
         Parameters
         ----------
-        figname: (optional) string
-            title of the saved SNR diagnostic plot
+        (optional) figname: string
+            Filename to use for the output saved plot
         """
         print("Diagnostic for SNRs of reference and survey objects")
         data = self.tr_SNR
@@ -112,12 +113,12 @@ class Dataset(object):
 
     
     def diagnostics_ref_labels(self, figname="ref_labels_triangle.png"):
-        """ Plot all training labels against each other. 
+        """ Plots all training labels against each other 
         
         Parameters
         ----------
-        figname: (optional) string
-            title of the saved triangle plot for reference labels
+        (optional) figname: string
+            Filename of the saved output plot
         """
         self._label_triangle_plot(self.tr_label, figname)
 
@@ -142,26 +143,25 @@ class Dataset(object):
 
 
     def make_contmask(self, fluxes, ivars, frac):
-        """ Use spectra to find and return continuum pixels
+        """ Identify continuum pixels using training spectra
 
-        For spectra split into regions, performs cont pix identification
-        separately for each region.
+        Does this for each region of the spectrum if dataset.ranges is not None
         
         Parameters
         ----------
-        fluxes: numpy ndarray
-            pixel intensities
+        fluxes: ndarray
+            Flux data values 
 
-        ivars: numpy ndarray
-            inverse variances for pixel fluxes
+        ivars: ndarray
+            Inverse variances corresponding to flux data values
 
         frac: float
-            the fraction of pixels that should be identified as continuum
+            The fraction of pixels that should be identified as continuum
 
         Returns
         -------
-        contmask: boolean mask of length npixels
-            True indicates that the pixel is continuum
+        contmask: ndarray
+            Mask with True indicating that the pixel is continuum
         """
         print("Finding continuum pixels...")
         if self.ranges is None:
@@ -179,20 +179,20 @@ class Dataset(object):
         """ Set the contmask attribute 
 
         Parameters
-        ---------
-        contmask: boolean numpy ndarray
-            True corresponds to continuum pixels
+        ----------
+        contmask: ndarray
+            Mask with True indicating that the pixel is continuum
         """
         self.contmask = contmask
 
 
     def diagnostics_contmask(self, figname='contpix.png'):
-        """ Make and save diagnostic figure about the continuum pixels
+        """ Plots continuum pixels against training spectra median flux values 
 
         Parameters
         ----------
         (optional) figname: str
-            name of the figure to be saved
+            Filename of the output figure
         """
         contmask = self.contmask
         f_bar = np.zeros(len(self.wl))
@@ -220,11 +220,18 @@ class Dataset(object):
         """ Fit a continuum to the continuum pixels
 
         Parameters
-        ---------
+        ----------
         deg: int
-            degree of the fitting function
+            Degree of the fitting function
         ffunc: str
-            type of fitting function, sinusoid or chebyshev
+            Type of fitting function, 'sinusoid' or 'chebyshev'
+
+        Returns
+        -------
+        tr_cont: ndarray
+            Flux values corresponding to the fitted continuum of training objects
+        test_cont: ndarray
+            Flux values corresponding to the fitted continuum of test objects
         """
         print("Fitting Continuum...")
         if self.ranges == None:
@@ -299,8 +306,9 @@ class Dataset(object):
 
 
     def diagnostics_test_step_flagstars(self):
-        """ list all stars whose inferred labels lie >= 2 standard deviations
-        outside the reference label space """
+        """ 
+        Write files listing stars whose inferred labels lie outside 2 standard deviations from the reference label space 
+        """
         label_names = self.get_plotting_labels()
         nlabels = len(label_names)
         reference_labels = self.tr_label
@@ -324,20 +332,18 @@ class Dataset(object):
 
 
     def diagnostics_survey_labels(self, figname="survey_labels_triangle.png"):
-        """ make a triangle plot for all the survey labels 
+        """ Plot all survey labels against each other
+
         Parameters
         ----------
         (optional) figname: str
-            name of plot to be saved
+            Filename of saved output plot
         """  
-        figname="survey_labels_triangle.png"
         self._label_triangle_plot(self.test_label_vals, figname)
    
    
     def diagnostics_1to1(self):
-        """ 1to1 plots of survey against training labels, color-coded by test SNR
-        
-        assumes your training set and test set are identical"""
+        """ Plots survey labels vs. training labels, color-coded by survey SNR """
         snr = self.test_SNR
         label_names = self.get_plotting_labels()
         nlabels = len(label_names)
@@ -397,10 +403,11 @@ class Dataset(object):
 
 
     def set_test_label_vals(self, vals):
-        """ Set label vals from an array 
+        """ Set test label values  
 
         Parameters
         ----------
-        vals: value of the labels
+        vals: ndarray
+            Test label values
         """
         self.test_label_vals = vals
