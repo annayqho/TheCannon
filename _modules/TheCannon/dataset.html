@@ -131,7 +131,7 @@
 <span class="kn">from</span> <span class="nn">.helpers.triangle</span> <span class="kn">import</span> <span class="n">corner</span>
 <span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="n">find_contpix</span><span class="p">,</span> <span class="n">find_contpix_regions</span>
+<span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="n">_find_contpix</span><span class="p">,</span> <span class="n">_find_contpix_regions</span>
 <span class="kn">from</span> <span class="nn">.continuum_normalization</span> <span class="kn">import</span> <span class="n">fit_cont</span><span class="p">,</span> <span class="n">fit_cont_regions</span><span class="p">,</span> <span class="n">cont_norm</span><span class="p">,</span> <span class="n">cont_norm_regions</span><span class="p">,</span> <span class="n">cont_norm_q</span><span class="p">,</span> <span class="n">cont_norm_q_regions</span>
 
 <span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
@@ -292,10 +292,10 @@
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Finding continuum pixels...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;assuming continuous spectra&quot;</span><span class="p">)</span>
-            <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">)</span>
+            <span class="n">contmask</span> <span class="o">=</span> <span class="n">_find_contpix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;taking spectra in </span><span class="si">%s</span><span class="s"> regions&quot;</span> <span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">))</span>
-            <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix_regions</span><span class="p">(</span>
+            <span class="n">contmask</span> <span class="o">=</span> <span class="n">_find_contpix_regions</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">)</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> pixels returned as continuum&quot;</span> <span class="o">%</span><span class="nb">sum</span><span class="p">(</span><span class="n">contmask</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">contmask</span>
