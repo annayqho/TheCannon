@@ -28,12 +28,6 @@ Model
 .. autoclass:: TheCannon.model.CannonModel
    :members:
 
-Train Model
-===========
-
 .. automodule:: TheCannon.train_model
-
-Infer Labels
-============
 
 .. automodule:: TheCannon.infer_labels
