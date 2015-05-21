@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>find_continuum_pixels &mdash; TheCannon 0.3.4 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="TheCannon 0.3.4 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="../index.html" class="icon icon-home"> TheCannon
+        
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../input_requirements.html">Requirements for Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using_tc.html">Using <tt class="docutils literal"><span class="pre">TheCannon</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Reference/API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#dataset">Dataset</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#model">Model</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">TheCannon</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      
+    <li>find_continuum_pixels</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for find_continuum_pixels</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">LARGE</span> <span class="o">=</span> <span class="mf">200.</span>
+<span class="n">SMALL</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">LARGE</span>
+
+<div class="viewcode-block" id="find_contpix_given_cuts"><a class="viewcode-back" href="../api.html#find_continuum_pixels.find_contpix_given_cuts">[docs]</a><span class="k">def</span> <span class="nf">find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Find and return continuum pixels given the flux and sigma cut</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f_cut: float</span>
+<span class="sd">        the upper limit imposed on the quantity (fbar-1)</span>
+<span class="sd">    sig_cut: float</span>
+<span class="sd">        the upper limit imposed on the quantity (f_sig)</span>
+<span class="sd">    wl: numpy ndarray of length npixels</span>
+<span class="sd">        rest-frame wavelength vector</span>
+<span class="sd">    fluxes: numpy ndarray of shape (nstars, npixels)</span>
+<span class="sd">        pixel intensities</span>
+<span class="sd">    ivars: numpy ndarray of shape nstars, npixels</span>
+<span class="sd">        inverse variances, parallel to fluxes</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contmask: boolean mask of length npixels</span>
+<span class="sd">        True indicates that the pixel is continuum</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bad1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.</span>
+    <span class="n">bad2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.</span>
+    <span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">bad1</span><span class="p">,</span> <span class="n">bad2</span><span class="p">)</span>
+    <span class="n">f_bar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">sigma_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">f_bar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f_bar</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+    <span class="n">sigma_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma_f</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+    <span class="n">cont1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f_bar</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">f_cut</span>
+    <span class="n">cont2</span> <span class="o">=</span> <span class="n">sigma_f</span> <span class="o">&lt;=</span> <span class="n">sig_cut</span>
+    <span class="n">contmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">cont1</span><span class="p">,</span> <span class="n">cont2</span><span class="p">)</span>
+    <span class="n">contmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">contmask</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">contmask</span>
+
+</div>
+<div class="viewcode-block" id="find_contpix"><a class="viewcode-back" href="../api.html#find_continuum_pixels.find_contpix">[docs]</a><span class="k">def</span> <span class="nf">find_contpix</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">target_frac</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Find continuum pix in spec, meeting a set target fraction</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wl: numpy ndarray</span>
+<span class="sd">        rest-frame wavelength vector</span>
+
+<span class="sd">    fluxes: numpy ndarray</span>
+<span class="sd">        pixel intensities</span>
+<span class="sd">    </span>
+<span class="sd">    ivars: numpy ndarray</span>
+<span class="sd">        inverse variances, parallel to fluxes</span>
+
+<span class="sd">    target_frac: float</span>
+<span class="sd">        the fraction of pixels in spectrum desired to be continuum</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contmask: boolean numpy ndarray</span>
+<span class="sd">        True corresponds to continuum pixels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Target frac: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">target_frac</span><span class="p">))</span>
+    <span class="n">bad1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">ivars</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">SMALL</span>
+    <span class="n">bad2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">ivars</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">bad1</span><span class="p">,</span> <span class="n">bad2</span><span class="p">)</span>
+    <span class="n">npixels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span><span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">bad</span><span class="p">)</span>
+    <span class="n">f_cut</span> <span class="o">=</span> <span class="mf">0.0001</span>
+    <span class="n">stepsize</span> <span class="o">=</span> <span class="mf">0.0001</span>
+    <span class="n">sig_cut</span> <span class="o">=</span> <span class="mf">0.0001</span>
+    <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">npixels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">contmask</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">npixels</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">frac</span> <span class="o">&lt;</span> <span class="n">target_frac</span><span class="p">):</span> 
+        <span class="n">f_cut</span> <span class="o">+=</span> <span class="n">stepsize</span>
+        <span class="n">sig_cut</span> <span class="o">+=</span> <span class="n">stepsize</span>
+        <span class="n">contmask</span> <span class="o">=</span> <span class="n">find_contpix_given_cuts</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">npixels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">frac</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">contmask</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">npixels</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frac</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">frac</span> <span class="o">&gt;</span> <span class="mf">0.10</span><span class="o">*</span><span class="n">npixels</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Warning: Over 10</span><span class="si">% o</span><span class="s">f pixels identified as continuum.&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> out of </span><span class="si">%s</span><span class="s"> pixels identified as continuum&quot;</span> <span class="o">%</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">contmask</span><span class="p">),</span> 
+                                                          <span class="n">npixels</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Cuts: f_cut </span><span class="si">%s</span><span class="s">, sig_cut </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">f_cut</span><span class="p">,</span> <span class="n">sig_cut</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">contmask</span>
+
+</div>
+<div class="viewcode-block" id="find_contpix_regions"><a class="viewcode-back" href="../api.html#find_continuum_pixels.find_contpix_regions">[docs]</a><span class="k">def</span> <span class="nf">find_contpix_regions</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Find continuum pix in a spectrum split into chunks</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wl: numpy ndarray</span>
+<span class="sd">        rest-frame wavelength vector</span>
+
+<span class="sd">    fluxes: numpy ndarray</span>
+<span class="sd">        pixel intensities</span>
+
+<span class="sd">    ivars: numpy ndarray</span>
+<span class="sd">        inverse variances, parallel to fluxes</span>
+
+<span class="sd">    frac: float</span>
+<span class="sd">        fraction of pixels in spectrum to be found as continuum</span>
+
+<span class="sd">    ranges: list, array</span>
+<span class="sd">        starts and ends indicating location of chunks in array</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ------</span>
+<span class="sd">    contmask: numpy ndarray, boolean</span>
+<span class="sd">        True indicates continuum pixel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">contmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wl</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_contpix</span><span class="p">(</span>
+                <span class="n">wl</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">frac</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">contmask</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Anna Ho.
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.3.4',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

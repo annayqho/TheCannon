@@ -122,7 +122,6 @@
           <div role="main" class="document">
             
   <h1>Source code for TheCannon.model</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; Spectral model fitted for by The Cannon&#39;s training step &quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">.train_model</span> <span class="kn">import</span> <span class="n">_train_model</span> 
 <span class="kn">from</span> <span class="nn">.infer_labels</span> <span class="kn">import</span> <span class="n">_infer_labels</span>
@@ -151,7 +150,7 @@
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="CannonModel.model"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.model">[docs]</a>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; return the model definition or raise an error if not trained &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Return the model definition or raise an error if not trained &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Model not trained&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -170,16 +169,17 @@
 
 <div class="viewcode-block" id="CannonModel.infer_labels"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.infer_labels">[docs]</a>    <span class="k">def</span> <span class="nf">infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uses the model to solve for labels of the test set.</span>
+<span class="sd">        Uses the model to solve for labels of the test set, updates Dataset</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        dataset: Dataset</span>
-<span class="sd">            dataset that needs label inference</span>
+<span class="sd">            Dataset that needs label inference</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        output of infer_labels</span>
+<span class="sd">        errs_all: ndarray</span>
+<span class="sd">            Covariance matrix of the fit</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
 
@@ -215,7 +215,7 @@
         <span class="k">return</span> <span class="n">cannon_set</span>
 
 </div>
-<div class="viewcode-block" id="CannonModel.split_array"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.split_array">[docs]</a>    <span class="k">def</span> <span class="nf">split_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_split_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; split an array into a certain number of segments</span>
 
 <span class="sd">        Parameters</span>
@@ -239,7 +239,7 @@
             <span class="n">last</span> <span class="o">+=</span> <span class="n">avg</span>
         <span class="k">return</span> <span class="n">out</span>
 
-</div>
+
 <div class="viewcode-block" id="CannonModel.diagnostics"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.diagnostics">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">baseline_spec_plot_name</span> <span class="o">=</span> <span class="s">&quot;baseline_spec_with_cont_pix&quot;</span><span class="p">,</span>
             <span class="n">leading_coeffs_plot_name</span> <span class="o">=</span> <span class="s">&quot;leading_coeffs.png&quot;</span><span class="p">,</span>
@@ -277,7 +277,7 @@
 
             <span class="c"># Split into ten segments</span>
             <span class="n">nseg</span> <span class="o">=</span> <span class="mi">10</span>
-            <span class="n">lams_seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_array</span><span class="p">(</span><span class="n">lams</span><span class="o">.</span><span class="n">compressed</span><span class="p">(),</span> <span class="n">nseg</span><span class="p">)</span>
+            <span class="n">lams_seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_array</span><span class="p">(</span><span class="n">lams</span><span class="o">.</span><span class="n">compressed</span><span class="p">(),</span> <span class="n">nseg</span><span class="p">)</span>
             <span class="n">xmins</span> <span class="o">=</span> <span class="p">[]</span> 
             <span class="n">xmaxs</span> <span class="o">=</span> <span class="p">[]</span> 
             <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">lams_seg</span><span class="p">:</span>

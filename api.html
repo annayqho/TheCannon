@@ -597,10 +597,7 @@ reported errors are &lt;= 0</p>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">predict</span></tt></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">split_array</span></tt></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">train</span></tt></td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">train</span></tt></td>
 <td></td>
 </tr>
 </tbody>
@@ -665,18 +662,21 @@ fitted-for test spectra</p>
 <dl class="method">
 <dt id="TheCannon.model.CannonModel.infer_labels">
 <tt class="descname">infer_labels</tt><big>(</big><em>dataset</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.infer_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.infer_labels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uses the model to solve for labels of the test set.</p>
+<dd><p>Uses the model to solve for labels of the test set, updates Dataset</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
 <blockquote>
-<div><p>dataset that needs label inference</p>
+<div><p>Dataset that needs label inference</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">output of infer_labels</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">errs_all: ndarray</p>
+<blockquote class="last">
+<div><p>Covariance matrix of the fit</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -686,7 +686,7 @@ fitted-for test spectra</p>
 <dl class="attribute">
 <dt id="TheCannon.model.CannonModel.model">
 <tt class="descname">model</tt><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.model" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the model definition or raise an error if not trained</p>
+<dd><p>Return the model definition or raise an error if not trained</p>
 </dd></dl>
 
 <dl class="method">
@@ -699,46 +699,17 @@ fitted-for test spectra</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: tuple</strong></p>
 <blockquote>
-<div><p>coeffs_all, covs, scatters, chis, chisqs, pivots
-result from <tt class="xref py py-func docutils literal"><span class="pre">train_model()</span></tt></p>
+<div><p>Coeffs_all, covs, scatters, chis, chisqs, pivots</p>
 </div></blockquote>
 <p><strong>dataset: Dataset</strong></p>
 <blockquote>
-<div><p>dataset that needs label inference</p>
+<div><p>Dataset that needs label inference</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">errs_all:</p>
 <blockquote class="last">
-<div><p>covariance matrix of the fit</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="TheCannon.model.CannonModel.split_array">
-<tt class="descname">split_array</tt><big>(</big><em>array</em>, <em>num</em><big>)</big><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.split_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.split_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>split an array into a certain number of segments</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>array: numpy ndarray</strong></p>
-<blockquote>
-<div><p>array to be split</p>
-</div></blockquote>
-<p><strong>num: int</strong></p>
-<blockquote>
-<div><p>number of elements to split array into</p>
-</div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>&#8212;&#8212;</strong></p>
-<p><strong>out: list</strong></p>
-<blockquote class="last">
-<div><p>split array</p>
+<div><p>Covariance matrix of the fit</p>
 </div></blockquote>
 </td>
 </tr>
