@@ -2,6 +2,4 @@
 Using ``TheCannon``
 *******************
 
-Detailed usage explanations...
-
-
+Working on it...
