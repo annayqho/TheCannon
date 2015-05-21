@@ -4,22 +4,16 @@
 Reference/API
 *************
 
-Preparing APOGEE Data
-=====================
+Handing APOGEE Data
+===================
 
 .. automodule:: TheCannon.apogee
    :members:
 
-Construct a Dataset Object
-==========================
+Handling a Dataset
+==================
 
 .. autoclass:: TheCannon.dataset.Dataset
-   :members:
-
-Continuum Identification
-========================
-
-.. automodule:: TheCannon.find_continuum_pixels
    :members:
 
 Continuum Normalization
