@@ -220,9 +220,7 @@ reported errors are &lt;= 0</p>
 <dl class="class">
 <dt id="TheCannon.dataset.Dataset">
 <em class="property">class </em><tt class="descclassname">TheCannon.dataset.</tt><tt class="descname">Dataset</tt><big>(</big><em>wl</em>, <em>tr_ID</em>, <em>tr_flux</em>, <em>tr_ivar</em>, <em>tr_label</em>, <em>test_ID</em>, <em>test_flux</em>, <em>test_ivar</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class to represent a Dataset of stellar spectra and labels.</p>
-<p>Initialize this object after performing the munging necessary 
-for making data &#8220;Cannonizable.&#8221;</p>
+<dd><p>A class to represent Cannon input: a dataset of spectra and labels</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -230,7 +228,7 @@ for making data &#8220;Cannonizable.&#8221;</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_f</span></tt></td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">continuum_normalize</span></tt></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_training_q</span></tt></td>
@@ -260,54 +258,49 @@ for making data &#8220;Cannonizable.&#8221;</p>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_plotting_labels</span></tt></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">label_triangle_plot</span></tt></td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">make_contmask</span></tt></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">make_contmask</span></tt></td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_continuum</span></tt></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_continuum</span></tt></td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_label_names</span></tt></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_label_names</span></tt></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_test_label_vals</span></tt></td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_test_label_vals</span></tt></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
-<dt id="TheCannon.dataset.Dataset.continuum_normalize_f">
-<tt class="descname">continuum_normalize_f</tt><big>(</big><em>cont</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.continuum_normalize_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.continuum_normalize_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Continuum normalize spectra by dividing the spectrum by the continuum</p>
-<p>For spectra split into regions, perform cont normalization
-separately for each region.</p>
+<dt id="TheCannon.dataset.Dataset.continuum_normalize">
+<tt class="descname">continuum_normalize</tt><big>(</big><em>cont</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.continuum_normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.continuum_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum normalize spectra, in chunks if spectrum has regions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cont: numpy ndarray</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cont: ndarray</strong></p>
 <blockquote>
-<div><p>the continuum</p>
+<div><p>Flux values corresponding to the continuum</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_tr_flux: numpy ndarray</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_tr_flux: ndarray</p>
 <blockquote>
-<div><p>the normalized training objects&#8217; pixel intensities</p>
+<div><p>Normalized flux values for the training objects</p>
 </div></blockquote>
-<p>norm_tr_ivar: numpy ndarray</p>
+<p>norm_tr_ivar: ndarray</p>
 <blockquote>
-<div><p>the rescaled training objects&#8217; pixel inverse variances</p>
+<div><p>Rescaled inverse variance values for the training objects</p>
 </div></blockquote>
-<p>norm_test_flux: numpy ndarray</p>
+<p>norm_test_flux: ndarray</p>
 <blockquote>
-<div><p>the normalized test objects&#8217; pixel intensities</p>
+<div><p>Normalized flux values for the test objects</p>
 </div></blockquote>
 <p>norm_test_ivar: numpy ndarray</p>
 <blockquote class="last">
-<div><p>the rescaled test objects&#8217; pixel inverse variances</p>
+<div><p>Rescaled inverse variance values for the test objects</p>
 </div></blockquote>
 </td>
 </tr>
@@ -427,28 +420,6 @@ outside the reference label space</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the label names</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="TheCannon.dataset.Dataset.label_triangle_plot">
-<tt class="descname">label_triangle_plot</tt><big>(</big><em>label_vals</em>, <em>figname</em><big>)</big><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.label_triangle_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.label_triangle_plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Make a triangle plot for the selected labels</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>label_vals: numpy ndarray</strong></p>
-<blockquote>
-<div><p>values of the labels</p>
-</div></blockquote>
-<p><strong>figname: str</strong></p>
-<blockquote class="last">
-<div><p>if provided, save the figure into the given file</p>
-</div></blockquote>
-</td>
 </tr>
 </tbody>
 </table>
