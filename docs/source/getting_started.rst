@@ -2,7 +2,9 @@
 Getting Started
 ***************
 
-Well, first you have to install the thing.
+``TheCannon`` can be installed using ``pip``:
+
+``pip install TheCannon``
 
 Here is an overview of the basic workflow. All of this is described
 in more detail in other sections...
