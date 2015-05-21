@@ -91,6 +91,7 @@ a quadratic model: order = 2
 >>> model.fit() 
 
 equivalently,
+
 >>> model.train()
 
 At this stage, more optional diagnostic plots can be produced to examine
