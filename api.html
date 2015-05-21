@@ -79,13 +79,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.find_continuum_pixels">Identify Cont Pixels</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.continuum_normalization">Continuum Normalize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model">Model</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.train_model">Train Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.infer_labels">Infer Labels</a></li>
 </ul>
 </li>
 </ul>
@@ -555,278 +551,13 @@ reported errors are &lt;= 0</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-TheCannon.find_continuum_pixels">
-<span id="identify-cont-pixels"></span><h2>Identify Cont Pixels<a class="headerlink" href="#module-TheCannon.find_continuum_pixels" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
+<span class="target" id="module-TheCannon.find_continuum_pixels"></span><dl class="data">
 <dt id="TheCannon.find_continuum_pixels.SMALL">
 <tt class="descclassname">TheCannon.find_continuum_pixels.</tt><tt class="descname">SMALL</tt><em class="property"> = 0.005</em><a class="headerlink" href="#TheCannon.find_continuum_pixels.SMALL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Functionality for identifying continuum pixels, not touched by user</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-TheCannon.continuum_normalization">
-<span id="continuum-normalize"></span><h2>Continuum Normalize<a class="headerlink" href="#module-TheCannon.continuum_normalization" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_func">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_func</tt><big>(</big><em>x</em>, <em>p</em>, <em>L</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the fitting function evaluated at input x for the continuum.
-The fitting function is a sinusoid, sum of sines and cosines</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x: float or np.array</strong></p>
-<blockquote>
-<div><p>data, input to function</p>
-</div></blockquote>
-<p><strong>p: ndarray</strong></p>
-<blockquote>
-<div><p>coefficients of fitting function</p>
-</div></blockquote>
-<p><strong>L: float</strong></p>
-<blockquote>
-<div><p>width of x data</p>
-</div></blockquote>
-<p><strong>y: float or np.array</strong></p>
-<blockquote>
-<div><p>output data corresponding to input x</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">func: float</p>
-<blockquote class="last">
-<div><p>function evaluated for the input x</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Continuum-normalize a continuous segment of spectra.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: numpy ndarray</strong></p>
-<blockquote>
-<div><p>pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>contmask: boolean mask</strong></p>
-<blockquote>
-<div><p>True indicates that pixel is continuum</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_fluxes: numpy ndarray</p>
-<blockquote>
-<div><p>normalized pixel intensities</p>
-</div></blockquote>
-<p>norm_ivars: numpy ndarray</p>
-<blockquote class="last">
-<div><p>rescaled inverse variances</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm_q">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_q</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_q" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform continuum normalization using a running quantile</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
-<blockquote>
-<div><p>wavelength vector</p>
-</div></blockquote>
-<p><strong>fluxes: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>q: float</strong></p>
-<blockquote>
-<div><p>the desired quantile cut</p>
-</div></blockquote>
-<p><strong>delta_lambda: int</strong></p>
-<blockquote class="last">
-<div><p>the number of pixels over which the median is calculated</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm_q_regions">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_q_regions</tt><big>(</big><em>wl</em>, <em>fluxes</em>, <em>ivars</em>, <em>q</em>, <em>delta_lambda</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_q_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_q_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform continuum normalization using running quantile, for spectrum
-that comes in chunks</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.cont_norm_regions">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">cont_norm_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>cont</em>, <em>ranges</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#cont_norm_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.cont_norm_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform continuum normalization for spectra in chunks</p>
-<p>Useful for spectra that have gaps</p>
-<dl class="docutils">
-<dt>fluxes: numpy ndarray</dt>
-<dd>pixel intensities</dd>
-<dt>ivars: numpy ndarray</dt>
-<dd>inverse variances, parallel to fluxes</dd>
-<dt>cont: numpy ndarray</dt>
-<dd>the continuum</dd>
-<dt>ranges: list or np ndarray</dt>
-<dd>the chunks that the spectrum should be split into</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_fluxes: numpy ndarray</p>
-<blockquote>
-<div><p>normalized pixel intensities</p>
-</div></blockquote>
-<p>norm_ivars: numpy ndarray</p>
-<blockquote class="last">
-<div><p>rescaled inverse variances</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.fit_cont">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">fit_cont</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#fit_cont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.fit_cont" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fit a continuum to a continuum pixels in a segment of spectra</p>
-<p>Functional form can be either sinusoid or chebyshev, with specified degree</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>training set or test set pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>contmask: numpy ndarray of length (npixels)</strong></p>
-<blockquote>
-<div><p>boolean pixel mask, True indicates that pixel is continuum</p>
-</div></blockquote>
-<p><strong>deg: int</strong></p>
-<blockquote>
-<div><p>degree of fitting function</p>
-</div></blockquote>
-<p><strong>ffunc: str</strong></p>
-<blockquote>
-<div><p>type of fitting function, chebyshev or sinusoid</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cont: numpy ndarray of shape (nstars, npixels)</p>
-<blockquote class="last">
-<div><p>the continuum, parallel to fluxes</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.fit_cont_regions">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">fit_cont_regions</tt><big>(</big><em>fluxes</em>, <em>ivars</em>, <em>contmask</em>, <em>deg</em>, <em>ranges</em>, <em>ffunc</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#fit_cont_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.fit_cont_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run fit_cont, dealing with spectrum in regions or chunks</p>
-<p>This is useful if a spectrum has gaps.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>training set or test set pixel intensities</p>
-</div></blockquote>
-<p><strong>ivars: numpy ndarray of shape (nstars, npixels)</strong></p>
-<blockquote>
-<div><p>inverse variances, parallel to fluxes</p>
-</div></blockquote>
-<p><strong>contmask: numpy ndarray of length (npixels)</strong></p>
-<blockquote>
-<div><p>boolean pixel mask, True indicates that pixel is continuum</p>
-</div></blockquote>
-<p><strong>deg: int</strong></p>
-<blockquote>
-<div><p>degree of fitting function</p>
-</div></blockquote>
-<p><strong>ffunc: str</strong></p>
-<blockquote>
-<div><p>type of fitting function, chebyshev or sinusoid</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cont: numpy ndarray of shape (nstars, npixels)</p>
-<blockquote class="last">
-<div><p>the continuum, parallel to fluxes</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="TheCannon.continuum_normalization.weighted_median">
-<tt class="descclassname">TheCannon.continuum_normalization.</tt><tt class="descname">weighted_median</tt><big>(</big><em>values</em>, <em>weights</em>, <em>quantile</em><big>)</big><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#weighted_median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.weighted_median" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate a weighted median for values above a particular quantile cut</p>
-<p>Used in pseudo continuum normalization</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>values: np ndarray of floats</strong></p>
-<blockquote>
-<div><p>the values to take the median of</p>
-</div></blockquote>
-<p><strong>weights: np ndarray of floats</strong></p>
-<blockquote>
-<div><p>the weights associated with the values</p>
-</div></blockquote>
-<p><strong>quantile: float</strong></p>
-<blockquote>
-<div><p>the cut applied to the input data</p>
-</div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>&#8212;&#8212;</strong></p>
-<p class="last"><strong>the weighted median</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
+<span class="target" id="module-TheCannon.continuum_normalization"></span></div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -960,19 +691,27 @@ fitted-for test spectra</p>
 
 <dl class="method">
 <dt id="TheCannon.model.CannonModel.predict">
-<tt class="descname">predict</tt><big>(</big><em>dataset</em><big>)</big><a class="headerlink" href="#TheCannon.model.CannonModel.predict" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">predict</tt><big>(</big><em>model</em>, <em>dataset</em><big>)</big><a class="headerlink" href="#TheCannon.model.CannonModel.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses the model to solve for labels of the test set.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: tuple</strong></p>
+<blockquote>
+<div><p>coeffs_all, covs, scatters, chis, chisqs, pivots
+result from <tt class="xref py py-func docutils literal"><span class="pre">train_model()</span></tt></p>
+</div></blockquote>
+<p><strong>dataset: Dataset</strong></p>
 <blockquote>
 <div><p>dataset that needs label inference</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">output of infer_labels</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">errs_all:</p>
+<blockquote class="last">
+<div><p>covariance matrix of the fit</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -1015,15 +754,9 @@ fitted-for test spectra</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-TheCannon.train_model">
-<span id="train-model"></span><h2>Train Model<a class="headerlink" href="#module-TheCannon.train_model" title="Permalink to this headline">¶</a></h2>
-<p>This runs Step 1 of The Cannon:
+<span class="target" id="module-TheCannon.train_model"></span><p>This runs Step 1 of The Cannon:
 uses the training set to solve for the best-fit model.</p>
-</div>
-<div class="section" id="module-TheCannon.infer_labels">
-<span id="infer-labels"></span><h2>Infer Labels<a class="headerlink" href="#module-TheCannon.infer_labels" title="Permalink to this headline">¶</a></h2>
-<p>This runs Step 2 of The Cannon:
+<span class="target" id="module-TheCannon.infer_labels"></span><p>This runs Step 2 of The Cannon:
 uses the model to solve for the labels of the test set.</p>
 </div>
 </div>
