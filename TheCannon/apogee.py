@@ -1,4 +1,4 @@
-""" The code for reading in APOGEE spectra and training labels """
+""" Functions for reading in APOGEE spectra and training labels """
 
 from __future__ import (absolute_import, division, print_function,)
 import numpy as np
@@ -19,7 +19,7 @@ except ImportError:
     import pyfits
 
 def get_pixmask(fluxes, flux_errs):
-    """ Create and return a bad pixel mask for a spectrum
+    """ Create and return a bad pixel mask for an APOGEE spectrum
 
     Bad pixels are defined as follows: fluxes or errors are not finite, or 
     reported errors are <= 0
@@ -27,15 +27,15 @@ def get_pixmask(fluxes, flux_errs):
     Parameters
     ----------
     fluxes: ndarray
-        flux array
+        Flux data values 
 
     flux_errs: ndarray
-        measurement uncertainties on fluxes
+        Flux uncertainty data values 
 
     Returns
     -------
-    mask: ndarray, dtype=bool
-        array giving bad pixels as True values
+    mask: ndarray
+        Bad pixel mask, value of True corresponds to bad pixels
     """
     bad_flux = (~np.isfinite(fluxes)) 
     bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
@@ -45,7 +45,7 @@ def get_pixmask(fluxes, flux_errs):
 
 def load_spectra(data_dir):
     """
-    Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
+    Extracts wavelength, flux, and flux uncertainty data from apogee fits files
 
     Parameters
     ---------
