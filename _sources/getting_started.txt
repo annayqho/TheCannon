@@ -4,7 +4,7 @@ Getting Started
 
 ``TheCannon`` can be installed using ``pip``:
 
-``pip install TheCannon``
+    $ pip install TheCannon
 
 Here is an overview of the basic workflow. All of this is described
 in more detail in other sections...
