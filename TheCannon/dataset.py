@@ -260,11 +260,11 @@ class Dataset(object):
         """
         print("Continuum normalizing the tr set using running quantile...")
         if self.ranges is None:
-            return cont_norm_q(
+            return _cont_norm_q(
                     self.wl, self.tr_flux, self.tr_ivar, 
                     q=q, delta_lambda=delta_lambda)
         else:
-            return cont_norm_q_regions(
+            return _cont_norm_q_regions(
                     self.wl, self.tr_flux, self.tr_ivar,
                     q=q, delta_lambda=delta_lambda, ranges=self.ranges)
 
