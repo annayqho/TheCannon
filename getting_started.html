@@ -31,7 +31,7 @@
 
   
     <link rel="top" title="TheCannon 0.3.4 documentation" href="index.html"/>
-        <link rel="next" title="Using TheCannon" href="using_tc.html"/>
+        <link rel="next" title="Reference/API" href="api.html"/>
         <link rel="prev" title="Requirements for Input" href="input_requirements.html"/> 
 
   
@@ -74,7 +74,6 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_tc.html">Using <tt class="docutils literal"><span class="pre">TheCannon</span></tt></a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.apogee">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a><ul class="simple">
@@ -168,13 +167,14 @@ separately.</p>
 in this example, we only want effective temperature, metallicity, and surface
 gravity. The output from the <tt class="docutils literal"><span class="pre">apogee.load_labels</span></tt> step shows which column
 corresponds to which label, so we select them as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">teff_corr</span> <span class="o">=</span> <span class="n">all_labels</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">logg_corr</span> <span class="o">=</span> <span class="n">all_labels</span><span class="p">[:,</span><span class="mi">4</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mh_corr</span> <span class="o">=</span> <span class="n">all_labels</span><span class="p">[:,</span><span class="mi">6</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">teff</span> <span class="o">=</span> <span class="n">all_labels</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logg</span> <span class="o">=</span> <span class="n">all_labels</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mh</span> <span class="o">=</span> <span class="n">all_labels</span><span class="p">[:,</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>and then repackage them to suit the requirements in &#8220;Requirements for Input:&#8221;</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">teff_corr</span><span class="p">,</span> <span class="n">logg_corr</span><span class="p">,</span> <span class="n">mh_corr</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">teff</span><span class="p">,</span> <span class="n">logg</span><span class="p">,</span> <span class="n">mh</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
 </div>
 <p>Now, all the input data has been packaged properly, and we can begin running
@@ -270,7 +270,8 @@ spectra can be calculated:</p>
 <p>For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model.
 In this case, we use a quadratic model: order = 2</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -294,8 +295,8 @@ and returned the corresponding covariance matrix.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_survey_labels</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>If the test step = the training step, as in this example, then one final
-diagnostic plot can be produced:</p>
+<p>If the test set is simply equivalent to the training set,
+as in this example, then one final diagnostic plot can be produced:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -307,7 +308,7 @@ diagnostic plot can be produced:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="using_tc.html" class="btn btn-neutral float-right" title="Using TheCannon" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="api.html" class="btn btn-neutral float-right" title="Reference/API" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="input_requirements.html" class="btn btn-neutral" title="Requirements for Input" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>

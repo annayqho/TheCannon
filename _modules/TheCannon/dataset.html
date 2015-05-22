@@ -123,13 +123,14 @@
   <h1>Source code for TheCannon.dataset</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">as</span> <span class="nn">gridspec</span>
 <span class="kn">from</span> <span class="nn">.helpers.triangle</span> <span class="kn">import</span> <span class="n">corner</span>
 <span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">Table</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="n">_find_contpix</span><span class="p">,</span> <span class="n">_find_contpix_regions</span>
 <span class="kn">from</span> <span class="nn">.continuum_normalization</span> <span class="kn">import</span> <span class="n">_fit_cont</span><span class="p">,</span> <span class="n">_fit_cont_regions</span><span class="p">,</span> <span class="n">_cont_norm</span><span class="p">,</span> <span class="n">_cont_norm_regions</span><span class="p">,</span> <span class="n">_cont_norm_q</span><span class="p">,</span> <span class="n">_cont_norm_q_regions</span>
+<span class="kn">from</span> <span class="nn">.spectral_model</span> <span class="kn">import</span> <span class="n">overlay_spectra</span>
 
 <span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
 
@@ -533,7 +534,12 @@
 <span class="sd">        vals: ndarray</span>
 <span class="sd">            Test label values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span> <span class="o">=</span> <span class="n">vals</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span> <span class="o">=</span> <span class="n">vals</span>
+
+    </div>
+<div class="viewcode-block" id="Dataset.diagnostics_best_fit_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_best_fit_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_best_fit_spectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Plot results of best-fit spectra for ten random test objects &quot;&quot;&quot;</span>
+        <span class="n">overlay_spectra</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> </div></div>
 </pre></div>
 
           </div>

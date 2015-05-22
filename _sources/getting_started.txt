@@ -50,13 +50,14 @@ in this example, we only want effective temperature, metallicity, and surface
 gravity. The output from the ``apogee.load_labels`` step shows which column
 corresponds to which label, so we select them as follows:
 
->>> teff_corr = all_labels[:,2]
->>> logg_corr = all_labels[:,4]
->>> mh_corr = all_labels[:,6]
+>>> teff = all_labels[:,1]
+>>> logg = all_labels[:,3]
+>>> mh = all_labels[:,5]
 
 and then repackage them to suit the requirements in "Requirements for Input:"
 
->>> tr_label = np.vstack((teff_corr, logg_corr, mh_corr)).T
+>>> import numpy as np
+>>> tr_label = np.vstack((teff, logg, mh)).T
 
 Now, all the input data has been packaged properly, and we can begin running
 ``TheCannon.``
@@ -158,6 +159,7 @@ For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model. 
 In this case, we use a quadratic model: order = 2
 
+>>> from TheCannon import model
 >>> model = model.CannonModel(dataset, 2) 
 >>> model.fit() 
 
@@ -181,7 +183,7 @@ A set of diagnostic output:
 >>> dataset.diagnostics_test_step_flagstars()
 >>> dataset.diagnostics_survey_labels()
 
-If the test step = the training step, as in this example, then one final
-diagnostic plot can be produced:  
+If the test set is simply equivalent to the training set, 
+as in this example, then one final diagnostic plot can be produced:  
 
 >>> dataset.diagnostics_1to1()
