@@ -14,9 +14,8 @@ and unzip it using the command
 
     $ tar -zxvf example_DR10.tar.gz
 
-At some point all of this will be described in more detail in other sections...
-
-First, the data must be prepared for use according to the specifications
+Before the data can be run through ``TheCannon``, it must be prepared
+according to the specifications
 laid out in the "Requirements for Input" section. ``TheCannon`` does have
 some built-in options for SNR-independent continuum normalization, so it's 
 okay if input data is not continuum normalized at this stage. 
