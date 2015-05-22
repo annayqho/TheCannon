@@ -11,22 +11,25 @@ LARGE = 200.
 SMALL = 1. / LARGE
 
 def draw_spectra(model, dataset):
-    """ Generate a set of spectra given the model and test set labels 
+    """ Generate best-fit spectra for all the test objects  
 
     Parameters
     ----------
-    model: model object
-        the Cannon spectral model
+    model: CannonModel
+        The Cannon spectral model
 
-    dataset: Dataset object
-        dataset that needs label inferences
+    dataset: Dataset 
+        Dataset that needs label inference
 
     Returns
     -------
-    cannon_set: Dataset object
-        same dataset as input, but with updated fluxes and variances
+    best_fluxes: ndarray 
+        The best-fit test fluxes
+
+    best_ivars:
+        The best-fit test inverse variances
     """
-    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model
+    coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = model.model
     nstars = len(dataset.test_SNRs)
     cannon_fluxes = np.zeros(dataset.test_fluxes.shape)
     cannon_ivars = np.zeros(dataset.test_ivars.shape)
@@ -36,32 +39,10 @@ def draw_spectra(model, dataset):
         cannon_fluxes[i,:] = spec_fit
         bad = dataset.test_ivars[i,:] == SMALL
         cannon_ivars[i,:][~bad] = 1. / scatters[~bad] ** 2
-    cannon_set = deepcopy(dataset)
-    cannon_set.test_fluxes = cannon_fluxes
-    cannon_set.test_ivars = cannon_ivars
-
-    return cannon_set
+    return cannon_fluxes, cannon_ivars
 
 
-def diagnostics(cannon_set, dataset, model):
-    """ Run diagnostics on the fitted spectra
-
-    Parameters
-    ----------
-    cannon_set: Dataset
-        best-fit Cannon spectra
-
-    dataset: Dataset
-        original spectra
-
-    model: model
-        best-fit Cannon spectral model
-    """
-    #overlay_spectra(cannon_set, dataset, model)
-    residuals(cannon_set, dataset)
-
-
-def overlay_spectra(cannon_set, dataset, model):
+def overlay_spectra(model):
     """ Run a series of diagnostics on the fitted spectra 
 
     Parameters
@@ -75,40 +56,34 @@ def overlay_spectra(cannon_set, dataset, model):
     model: model
         best-fit Cannon spectral model
     """
-    coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
+    best_flux, best_ivar = self.draw_spectra(model)
+
     # Overplot original spectra with best-fit spectra
-    res = dataset.test_fluxes-cannon_set.test_fluxes
-    bad_ivar = np.std(res, axis=0) <= 1e-5
-    os.system("mkdir SpectrumFits")
     print("Overplotting spectra for ten random stars")
+    res = dataset.test_flux-best_flux
     lambdas = dataset.wl
     npix = len(lambdas)
-    nstars = cannon_set.test_fluxes.shape[0]
+    nstars = best_flux.shape[0]
     pickstars = []
     for i in range(10):
         pickstars.append(random.randrange(0, nstars-1))
     for i in pickstars:
         print("Star %s" % i)
-        ID = cannon_set.test_IDs[i]
-        spec_orig = dataset.test_fluxes[i,:]
-        bad_flux = (spec_orig == 0) | (spec_orig == 1)  # unique to star
-        bad = (bad_ivar | bad_flux)
+        ID = dataset.test_ID[i]
+        spec_orig = dataset.test_flux[i,:]
+        bad = ivar == SMALL**2
         lambdas = np.ma.array(lambdas, mask=bad, dtype=float)
         npix = len(lambdas.compressed())
-        spec_orig = np.ma.array(dataset.test_fluxes[i,:], mask=bad)
-        spec_fit = np.ma.array(cannon_set.test_fluxes[i,:], mask=bad)
-        ivars_orig = np.ma.array(dataset.test_ivars[i,:], mask=bad)
-        ivars_fit = np.ma.array(cannon_set.test_ivars[i,:], mask=bad)
-        #fig, axarr = plt.subplots(2)
-        #ax1 = axarr[0]
-        #ax1.scatter(lambdas, spec_orig, label="Orig Spec",
-        #            c=1. / np.sqrt(ivars_orig))
+        spec_orig = np.ma.array(dataset.test_flux[i,:], mask=bad)
+        spec_fit = np.ma.array(best_flux[i,:], mask=bad)
+        ivars_orig = np.ma.array(dataset.test_ivar[i,:], mask=bad)
+        ivars_fit = np.ma.array(cannon_set.test_ivar[i,:], mask=bad)
         red_chisq = np.sum(chisqs[:,i], axis=0) / (npix - coeffs_all.shape[1])
         red_chisq = np.round(red_chisq, 2)
         fig,axarr = plt.subplots(2)
         ax1 = axarr[0]
-        im = ax1.scatter(lambdas, spec_orig, label="Orig Spec",
-                         c=1 / np.sqrt(ivars_orig))
+        # im = ax1.scatter(lambdas, spec_orig, label="Orig Spec",
+        #                  c=1 / np.sqrt(ivars_orig), marker='x')
         ax1.scatter(lambdas, spec_fit, label="Cannon Spec", c='r')
         ax1.errorbar(lambdas, spec_fit, yerr=1/np.sqrt(ivars_fit), fmt='ro')
         ax1.set_xlabel(r"Wavelength $\lambda (\AA)$")
@@ -137,9 +112,9 @@ def overlay_spectra(cannon_set, dataset, model):
         ax2.set_ylim(ylims)
         ax2.set_xlabel("Orig Fluxes")
         ax2.set_ylabel("Fitted Fluxes")
-        filename = "Star%s.png" % i
+        filename = "best_fit_spec_Star%s.png" % i
         print("Saved as %s" % filename)
-        fig.savefig("SpectrumFits/" + filename)
+        fig.savefig(filename)
         plt.close(fig)
 
 

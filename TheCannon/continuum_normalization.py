@@ -92,7 +92,7 @@ def _fit_cont(fluxes, ivars, contmask, deg, ffunc):
             if ffunc=="sinusoid":
                 cont[jj,element] = _cont_func(element, popt, L=L, y=flux)
             elif ffunc=="chebyshev":
-                cont[element] = fit(element)
+                cont[jj,element] = fit(element)
     return cont
 
 

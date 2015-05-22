@@ -7,6 +7,7 @@ from .helpers.triangle import corner
 from .helpers import Table
 from .find_continuum_pixels import _find_contpix, _find_contpix_regions
 from .continuum_normalization import _fit_cont, _fit_cont_regions, _cont_norm, _cont_norm_regions, _cont_norm_q, _cont_norm_q_regions
+from .spectral_model import overlay_spectra
 
 PY3 = sys.version_info[0] > 2
 
@@ -411,3 +412,8 @@ class Dataset(object):
             Test label values
         """
         self.test_label_vals = vals
+
+    
+    def diagnostics_best_fit_spectra(model):
+        """ Plot results of best-fit spectra for ten random test objects """
+        overlay_spectra(model) 

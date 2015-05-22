@@ -1,7 +1,6 @@
 from .dataset import Dataset
 from .train_model import _train_model 
 from .infer_labels import _infer_labels
-from .spectral_model import diagnostics as _diagnostics
 from .helpers.triangle import corner
 import numpy as np
 import matplotlib.pyplot as plt
