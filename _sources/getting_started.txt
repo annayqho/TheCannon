@@ -23,7 +23,7 @@ This file contains the following:
 Before the data can be run through ``TheCannon``, it must be prepared
 according to the specifications laid out in the "Requirements for Input"
 section. One of the requirements is for data to be continuum normalized
-in a way that is SNR-independent. ``TheCannon`` does have built-in 
+in a SNR-independent way. ``TheCannon`` does have built-in 
 options for continuum normalizing spectra, and we illustrate that here.
 
 Here are the steps for reading in the data. In practice, the user would
@@ -183,4 +183,5 @@ A set of diagnostic output:
 
 If the test step = the training step, as in this example, then one final
 diagnostic plot can be produced:  
+
 >>> dataset.diagnostics_1to1()

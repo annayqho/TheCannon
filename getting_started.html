@@ -143,7 +143,7 @@ and unzip it using the command</p>
 <p>Before the data can be run through <tt class="docutils literal"><span class="pre">TheCannon</span></tt>, it must be prepared
 according to the specifications laid out in the &#8220;Requirements for Input&#8221;
 section. One of the requirements is for data to be continuum normalized
-in a way that is SNR-independent. <tt class="docutils literal"><span class="pre">TheCannon</span></tt> does have built-in
+in a SNR-independent way. <tt class="docutils literal"><span class="pre">TheCannon</span></tt> does have built-in
 options for continuum normalizing spectra, and we illustrate that here.</p>
 <p>Here are the steps for reading in the data. In practice, the user would
 write his own code; for this example, we provide the module <tt class="docutils literal"><span class="pre">apogee.py</span></tt>.
@@ -295,8 +295,10 @@ and returned the corresponding covariance matrix.</p>
 </pre></div>
 </div>
 <p>If the test step = the training step, as in this example, then one final
-diagnostic plot can be produced:
-&gt;&gt;&gt; dataset.diagnostics_1to1()</p>
+diagnostic plot can be produced:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 
 
