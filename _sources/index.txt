@@ -15,17 +15,16 @@ For a detailed overview of *The Cannon* and a description of its
 successful application to determining labels for APOGEE DR10 spectra,
 see `Ness et al. 2015`_. 
 
-Notable features include:
+Features include:
 
-* Continuum-normalize spectra using a running quantile
-* Continuum-normalize spectra using cuts on median and variance flux
-* Fit for the spectral model given training spectra and training labels
-* Specify the order of the polynomial spectral model
-* Infer labels for test spectra
-* Various optional diagnostic plots
+* Diagnostic output to help the user monitor and evaluate the process 
+* SNR-independent continuum normalization 
+* Training step: fit for the spectral model given training spectra and labels,
+  with the polynomial order for the spectral model decided by the user
+* Test step: infer labels for the test spectra
 
 This documentation includes a very simple example for implementation 
-using APOGEE spectra in which the test set is identical to the training set
+using APOGEE spectra in which the test set is identical to the training set. 
 
 The code is open source and `available on github`_. 
 
@@ -40,5 +39,4 @@ Table of Contents
 
    input_requirements
    getting_started 
-   using_tc
    api 

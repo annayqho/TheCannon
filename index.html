@@ -73,7 +73,6 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_tc.html">Using <tt class="docutils literal"><span class="pre">TheCannon</span></tt></a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.apogee">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a><ul class="simple">
@@ -134,17 +133,16 @@ spectroscopic surveys.</p>
 <p>For a detailed overview of <em>The Cannon</em> and a description of its
 successful application to determining labels for APOGEE DR10 spectra,
 see <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>.</p>
-<p>Notable features include:</p>
+<p>Features include:</p>
 <ul class="simple">
-<li>Continuum-normalize spectra using a running quantile</li>
-<li>Continuum-normalize spectra using cuts on median and variance flux</li>
-<li>Fit for the spectral model given training spectra and training labels</li>
-<li>Specify the order of the polynomial spectral model</li>
-<li>Infer labels for test spectra</li>
-<li>Various optional diagnostic plots</li>
+<li>Diagnostic output to help the user monitor and evaluate the process</li>
+<li>SNR-independent continuum normalization</li>
+<li>Training step: fit for the spectral model given training spectra and labels,
+with the polynomial order for the spectral model decided by the user</li>
+<li>Test step: infer labels for the test spectra</li>
 </ul>
 <p>This documentation includes a very simple example for implementation
-using APOGEE spectra in which the test set is identical to the training set</p>
+using APOGEE spectra in which the test set is identical to the training set.</p>
 <p>The code is open source and <a class="reference external" href="https://github.com/annayqho/TheCannon">available on github</a>.</p>
 </div>
 <div class="section" id="table-of-contents">
@@ -153,7 +151,6 @@ using APOGEE spectra in which the test set is identical to the training set</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_tc.html">Using <tt class="docutils literal"><span class="pre">TheCannon</span></tt></a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.apogee">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a></li>
