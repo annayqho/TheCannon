@@ -414,6 +414,6 @@ class Dataset(object):
         self.test_label_vals = vals
 
     
-    def diagnostics_best_fit_spectra(model):
+    def diagnostics_best_fit_spectra(self, model):
         """ Plot results of best-fit spectra for ten random test objects """
-        overlay_spectra(model) 
+        overlay_spectra(model, self) 

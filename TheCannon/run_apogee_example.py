@@ -18,8 +18,7 @@ teff_corr = all_labels[:,1]
 logg_corr = all_labels[:,3]
 mh_corr = all_labels[:,5]
 tr_label = np.vstack((teff_corr, logg_corr, mh_corr)).T
-dataset = dataset.Dataset(
-        wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
+dataset = dataset.Dataset(wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 # apogee spectra come in three segments, corresponding to the three chips
 dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
@@ -50,8 +49,6 @@ else:
 
 dataset.set_continuum(contmask)
 
-dataset.diagnostics_contmask()
-
 # fit a sinusoid through the continuum pixels
 if glob.glob('cont.p'):
     cont = pickle.load(open('cont.p', 'r')) 
@@ -61,7 +58,7 @@ else:
 
 # (3) CONTINUUM NORMALIZE
 norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
-        dataset.continuum_normalize_f(cont)
+        dataset.continuum_normalize(cont)
 
 # replace with normalized values
 dataset.tr_flux = norm_tr_flux
@@ -83,3 +80,5 @@ label_errs = model.infer_labels(dataset)
 dataset.diagnostics_test_step_flagstars()
 dataset.diagnostics_survey_labels()
 dataset.diagnostics_1to1()
+
+dataset.diagnostics_best_fit_spectra(model)
