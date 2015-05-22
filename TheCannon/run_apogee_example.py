@@ -80,5 +80,3 @@ label_errs = model.infer_labels(dataset)
 dataset.diagnostics_test_step_flagstars()
 dataset.diagnostics_survey_labels()
 dataset.diagnostics_1to1()
-
-dataset.diagnostics_best_fit_spectra(model)
