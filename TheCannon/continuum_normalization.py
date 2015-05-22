@@ -225,7 +225,7 @@ def _cont_norm_q_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        output = _cont_norm_q(wl, fluxes[:,start:stop],
+        output = _cont_norm_q(wl[start:stop], fluxes[:,start:stop],
                              ivars[:,start:stop],
                              q, delta_lambda)
         norm_fluxes[:,start:stop] = output[0]

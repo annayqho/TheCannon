@@ -8,6 +8,11 @@ Getting Started
 
 Here is an overview of the basic workflow using a simple illustration 
 with APOGEE DR10 data in which the test set is identical to the training set.
+To run this example, download the file ``example_DR10.tar.gz`` by clicking 
+:download:`here <example_DR10.tar.gz>`
+and unzip it using the command
+
+    $ tar -zxvf example_DR10.tar.gz
 
 At some point all of this will be described in more detail in other sections...
 
