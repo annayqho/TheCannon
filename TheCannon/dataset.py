@@ -1,10 +1,10 @@
 from __future__ import (absolute_import, division, print_function)
 import numpy as np
+import sys
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from .helpers.triangle import corner
 from .helpers import Table
-import sys
 from .find_continuum_pixels import _find_contpix, _find_contpix_regions
 from .continuum_normalization import _fit_cont, _fit_cont_regions, _cont_norm, _cont_norm_regions, _cont_norm_q, _cont_norm_q_regions
 
