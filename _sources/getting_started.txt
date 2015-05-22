@@ -8,10 +8,14 @@ Getting Started
 
 Here is an overview of the basic workflow using a simple illustration 
 with APOGEE DR10 data in which the test set is identical to the training set.
+To run this example, download the file ``example_DR10.tar.gz`` by clicking 
+:download:`here <example_DR10.tar.gz>`
+and unzip it using the command
 
-At some point all of this will be described in more detail in other sections...
+    $ tar -zxvf example_DR10.tar.gz
 
-First, the data must be prepared for use according to the specifications
+Before the data can be run through ``TheCannon``, it must be prepared
+according to the specifications
 laid out in the "Requirements for Input" section. ``TheCannon`` does have
 some built-in options for SNR-independent continuum normalization, so it's 
 okay if input data is not continuum normalized at this stage. 
