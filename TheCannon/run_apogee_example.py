@@ -14,9 +14,9 @@ test_flux = tr_flux
 test_ivar = tr_ivar
 all_labels = apogee.load_labels("example_DR10/reference_labels.csv")
 # choose labels and make a new array 
-teff_corr = all_labels[:,1] 
-logg_corr = all_labels[:,3]
-mh_corr = all_labels[:,5]
+teff_corr = all_labels[:,2] 
+logg_corr = all_labels[:,4]
+mh_corr = all_labels[:,6]
 tr_label = np.vstack((teff_corr, logg_corr, mh_corr)).T
 dataset = dataset.Dataset(wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 # apogee spectra come in three segments, corresponding to the three chips

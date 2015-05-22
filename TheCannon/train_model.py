@@ -1,6 +1,3 @@
-"""This runs Step 1 of The Cannon:
-    uses the training set to solve for the best-fit model."""
-
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 import numpy as np
 import matplotlib.pyplot as plt

@@ -26,7 +26,8 @@ Features include:
 This documentation includes a very simple example for implementation 
 using APOGEE spectra in which the test set is identical to the training set. 
 
-The code is open source and `available on github`_. 
+The code is open source and `available on github`_. It is compatible with
+Python 2 and 3, numpy versions 1.7-1.9 and scipy versions 0.13-0.15. 
 
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
 .. _available on github: https://github.com/annayqho/TheCannon

@@ -1,6 +1,3 @@
-"""This runs Step 2 of The Cannon:
-    uses the model to solve for the labels of the test set."""
-
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 
 from scipy import optimize as opt
