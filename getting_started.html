@@ -134,6 +134,16 @@ To run this example, download the file <tt class="docutils literal"><span class=
 and unzip it using the command</p>
 <blockquote>
 <div>$ tar -zxvf example_DR10.tar.gz</div></blockquote>
+<p>This file contains the following:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Data</span></tt>: a folder with .fits data files</li>
+<li><tt class="docutils literal"><span class="pre">reference_labels.csv</span></tt>: a table with reference label values for the training step</li>
+<li><tt class="docutils literal"><span class="pre">Results</span></tt>: a folder with all of the diagnostic output plots that <tt class="docutils literal"><span class="pre">TheCannon</span></tt> produces in this example</li>
+</ul>
+<p>reference spectra and labels for the training step. To
+keep things simple for now, we use the reference spectra for the test step
+as well, so that <tt class="docutils literal"><span class="pre">TheCannon</span></tt> is simply regenerating labels for all of the
+training objects.</p>
 <p>Before the data can be run through <tt class="docutils literal"><span class="pre">TheCannon</span></tt>, it must be prepared
 according to the specifications
 laid out in the &#8220;Requirements for Input&#8221; section. <tt class="docutils literal"><span class="pre">TheCannon</span></tt> does have

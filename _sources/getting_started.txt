@@ -14,6 +14,17 @@ and unzip it using the command
 
     $ tar -zxvf example_DR10.tar.gz
 
+This file contains the following:
+
+* ``Data``: a folder with .fits data files
+* ``reference_labels.csv``: a table with reference label values for the training step
+* ``Results``: a folder with all of the diagnostic output plots that ``TheCannon`` produces in this example
+
+reference spectra and labels for the training step. To
+keep things simple for now, we use the reference spectra for the test step
+as well, so that ``TheCannon`` is simply regenerating labels for all of the
+training objects.
+
 Before the data can be run through ``TheCannon``, it must be prepared
 according to the specifications
 laid out in the "Requirements for Input" section. ``TheCannon`` does have
