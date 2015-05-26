@@ -7,7 +7,7 @@
 # an MxL block of test set pixel vals and corresponding ivars
 
 def read_wl():
-    filename = ('2013K1_parameters.save')
+    filename = readsave('2013K1_parameters.save')
     items = inputf.items()
     data = items[0][1]
     wl = data['lambda'][0] # assuming they're all the same... 
