@@ -1,5 +1,4 @@
 #from __future__ import (absolute_import, division, print_function)
-#from lamost import load_spectra, load_labels
 #from cannon.dataset import Dataset
 #from cannon.model import CannonModel
 #from cannon.spectral_model import draw_spectra, diagnostics, triangle_pixels, overlay_spectra, residuals
@@ -12,58 +11,23 @@
 #plt.rc('text', usetex=True)
 #plt.rc('font', family='serif')
 
-# STEP 0: CHOOSE TRAINING SET
-
-import numpy as np
-import glob 
-from lamost import load_spectra, load_labels
+# STEP 1: DATA MUNGING
+import glob
 allfiles = glob.glob("example_LAMOST/Data_All/*fits")
-tr_files = 
+allfiles = np.char.lstrip(allfiles, 'example_LAMOST/Data_All/')
+tr_ID = np.loadtxt("tr_files.txt", dtype=str)
+test_ID = np.setdiff1d(allfiles, tr_ID)
 
-wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
-SNR_raw = tr_flux * tr_ivar**0.5
-bad = SNR_raw == 0
-SNR_raw = np.ma.array(SNR_raw, mask=bad)
-SNR = np.ma.median(SNR_raw, axis=1)
-cut = 130
-tr_files = allfiles[SNR>cut]
-outputf = open("example_LAMOST/tr_files.txt", "w")
-for tr_file in tr_files: 
-    outputf.write(tr_file + '\n')
-outputf.close()
-test_files = set(allfiles) - set(tr_files)
-test_files = np.array(test_files)
-outputf = open("example_LAMOST/test_files.txt", "w")
-for test_file in test_files:
-    outputf.write(test_file + '\n')
-outputf.close()
-all_ids, all_tr_labels = load_labels(dir_lab)
-tr_labels = np.zeros((len(tr_files), all_tr_labels.shape[1]))
-for jj,tr_id in enumerate(tr_files):
-    tr_labels[jj,:] = all_tr_labels[all_ids==tr_id,:]
-pickle.dump(tr_labels, open('tr_labels.p', 'w'))
+from lamost import load_spectra, load_labels
+dir_dat = "example_LAMOST/Data_All"
+wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_ID)
+label_file = "reference_labels.csv"
+tr_label = load_labels(label_file, tr_ID)
+wl, test_flux, test_ivar = load_spectra(dir_dat, test_ID)
 
-# STEP 1: PREPARE DATA 
-if glob.glob('lamost_data.p'):
-    wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar = pickle.load(
-            open('lamost_data.p', 'r'))
-
-else:
-    #tr_files = np.genfromtxt("example_LAMOST/Training_Data.txt", dtype=str)
-    #test_files = np.loadtxt("example_LAMOST/Test_Data.txt", dtype=str)
-    dir_lab = "example_DR12/reference_labels.csv"
-    dir_dat = "example_LAMOST/Data_All"
-
-    wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_files)
-    test_flux = tr_flux
-    test_ivar = tr_ivar
-    #wl, test_flux, test_ivar = load_spectra(dir_dat, test_files)
-    tr_label = pickle.load(open('tr_labels.p', 'r'))
-
-    pickle.dump((wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar), 
-            open('lamost_data_1to1.p', 'w'))
-
-dataset = Dataset(wl, tr_flux, tr_ivar, tr_label, test_flux, test_ivar)
+from TheCannon import dataset
+dataset = dataset.Dataset(
+        wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 
 # set the headers for plotting
 dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]'])
@@ -71,7 +35,6 @@ dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]'])
 # Plot SNR distributions and triangle plot of reference labels
 dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
-
 
 # STEP 2: CONTINUUM IDENTIFICATION
 

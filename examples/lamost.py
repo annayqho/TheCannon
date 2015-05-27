@@ -6,8 +6,6 @@ import scipy.optimize as opt
 from scipy import interpolate 
 import os
 import sys
-from cannon.helpers import Table
-from cannon.dataset import Dataset
 import matplotlib.pyplot as plt
 
 # python 3 special
@@ -146,18 +144,19 @@ def load_spectra(data_dir, filenames):
     return grid, fluxes, ivars
 
 
-def load_labels(label_file):
+def load_labels(label_file, tr_files):
     """ Extracts training labels from file.
 
     Assumes that first row is # then label names, first col is # then 
     filenames, remaining values are floats and user wants all the labels.
     """
     print("Loading reference labels from file %s" %label_file)
-    data = Table(label_file)
-    data.sort('id')
-    label_names = data.keys()[1:] # ignore id
-    nlabels = len(label_names)
-    print('%s labels:' %nlabels)
-    print(label_names)
-    labels = np.array([data[k] for k in label_names], dtype=float).T
-    return data['id'], labels 
+    ids = np.loadtxt(
+        label_file, usecols=(0,), delimiter=',', dtype=str)
+    all_tr_label_val = np.loadtxt(
+        label_file, usecols=(1,2,3,4), delimiter=',', dtype=str)
+    tr_labels = np.zeros((len(tr_files), all_tr_label_val.shape[1]))
+    for jj,tr_id in enumerate(tr_files):
+        tr_labels[jj,:] = all_tr_label_val[ids==tr_id,:]
+    tr_labels = tr_labels[np.argsort(tr_files)]
+    return tr_labels
