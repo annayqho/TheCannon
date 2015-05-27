@@ -141,7 +141,7 @@ def load_spectra(data_dir, filenames):
         ivars[jj,:] = ivar_rs
 
     print("Spectra loaded")
-    return grid, fluxes, ivars
+    return files, grid, fluxes, ivars
 
 
 def load_labels(label_file, tr_files):

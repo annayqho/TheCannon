@@ -20,14 +20,20 @@ test_ID = np.setdiff1d(allfiles, tr_ID)
 
 from lamost import load_spectra, load_labels
 dir_dat = "example_LAMOST/Data_All"
-wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_ID)
+tr_IDs, wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_ID)
 label_file = "reference_labels.csv"
 tr_label = load_labels(label_file, tr_ID)
-wl, test_flux, test_ivar = load_spectra(dir_dat, test_ID)
+test_IDs, wl, test_flux, test_ivar = load_spectra(dir_dat, test_ID)
+
+good = np.logical_and(dataset.tr_label[:,0] > 0, dataset.tr_label[:,2]>-5)
+tr_ID = tr_IDs[good]
+tr_flux = dataset.tr_flux[good]
+tr_ivar = dataset.tr_ivar[good]
+tr_label = dataset.tr_label[good]
 
 from TheCannon import dataset
 dataset = dataset.Dataset(
-        wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
+        wl, tr_IDs, tr_flux, tr_ivar, tr_label, test_IDs, test_flux, test_ivar)
 
 # set the headers for plotting
 dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]'])
@@ -40,12 +46,13 @@ dataset.diagnostics_ref_labels()
 
 # Pseudo-continuum normalization for the training spectra
 if glob.glob('pseudo_normed_spec.p', 'r'):
-    norm_tr_fluxes, norm_tr_ivars = pickle.load(open("pseudo_normed_spec.p", "r"))
+    (pseudo_tr_flux, pseudo_tr_ivar) = pickle.load(
+            open("pseudo_normed_spec.p", "r"))
 
 else:
-    norm_tr_fluxes, norm_tr_ivars = dataset.continuum_normalize_q(
-            dataset.tr_flux, dataset.tr_ivar, q=0.90, delta_lambda=400)
-    pickle.dump((norm_tr_fluxes, norm_tr_ivars), 
+    pseudo_tr_flux, pseudo_tr_ivar = dataset.continuum_normalize_training_q(
+            q=0.90, delta_lambda=400)
+    pickle.dump((pseudo_tr_flux, pseudo_tr_ivar), 
             open("pseudo_normed_spec.p", "w"))
 
 # From the cont norm training spectra, identify continuum pixels
