@@ -10,7 +10,7 @@ have been made. A list of these changes will be outlined in Ho et al.
 
 Documentation for The Cannon can be found here_. 
 
-.. _here: annayqho.github.io/TheCannon/
+.. _here: https://annayqho.github.io/TheCannon/
 
 Authors
 -------
