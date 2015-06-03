@@ -62,13 +62,13 @@ def _do_one_regression(lams, fluxes, ivars, lvec):
 
     Input
     -----
-    lams: numpy ndarray, shape (npixels)
+    lams: numpy ndarray
         the common wavelength array
 
-    fluxes: numpy ndarray, shape (nstars)
+    fluxes: numpy ndarray
         pixel intensities
 
-    ivars: numpy ndarray, shape (nstars)
+    ivars: numpy ndarray
         inverse variances associated with pixel intensities
 
     lvec = numpy ndarray 
