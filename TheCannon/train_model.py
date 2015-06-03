@@ -8,20 +8,20 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
     Parameters
     ----------
-    lams: numpy ndarray, shape npixels
+    lams: numpy ndarray
         the common wavelength array
 
-    fluxes: numpy ndarray, shape (nstars, npixels)
-        flux values for all pixels of all stars
+    fluxes: numpy ndarray
+        flux values for all stars at one pixel
         
-    ivars: numpy ndarray, shape (nstars, npixels)
-        inverse variance values for all pixels of all stars
+    ivars: numpy ndarray
+        inverse variance values for all stars at one pixel
 
     lvec: numpy ndarray
         the label vector
 
-    scatter: numpy ndarray, shape npixels
-        fitted scatter values
+    scatter: float
+        fixed scatter value
 
     Returns
     ------
