@@ -160,3 +160,39 @@ def load_labels(label_file, tr_files):
         tr_labels[jj,:] = all_tr_label_val[ids==tr_id,:]
     tr_labels = tr_labels[np.argsort(tr_files)]
     return tr_labels
+
+
+def make_tr_file_list(frac_cut=0.94, snr_cut=100):
+    """ make a list of training objects, given cuts
+
+    Parameters
+    ----------
+    frac_cut: float
+        the fraction of pix in the spectrum that must be good
+
+    snr_cut: float
+        the snr that the spec
+
+    Returns
+    -------
+    tr_files: np array
+        list of file names of training objects
+    """
+    allfiles = np.array(glob.glob("example_LAMOST/Data_All/*fits"))
+    allfiles = np.char.lstrip(allfiles, 'example_LAMOST/Data_All/')
+    dir_dat = "example_LAMOST/Data_All"
+    ID, wl, flux, ivar = load_spectra(dir_dat, allfiles)
+    npix = np.array([np.count_nonzero(ivar[jj,:]) for jj in range(0,11057)])
+    good_frac = npix/3626.
+    SNR_raw = flux * ivar**0.5
+    bad = SNR_raw == 0
+    SNR_raw = np.ma.array(SNR_raw, mask=bad)
+    SNR = np.ma.median(SNR_raw, axis=1)
+    good = np.logical_and(good_frac > frac_cut, SNR>snr_cut)
+    tr_files = ID[good] #945 spectra 
+    outputf = open("tr_files.txt", "w")
+    for tr_file in tr_files:
+        outputf.write(tr_file + '\n')
+    outputf.close()
+    return tr_files
+

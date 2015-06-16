@@ -80,6 +80,7 @@ def get_starmask(ids, labels, aspcapflag, paramflag):
 
     return cuts | aspcapflag_bad | paramflag_bad 
 
+
 def make_apogee_label_file():
     hdulist = pyfits.open("allStar-v603.fits")
     datain = hdulist[1].data
@@ -179,6 +180,7 @@ def load_labels(filename):
     print(label_names)
     labels = np.array([data[k] for k in label_names], dtype=float).T
     return labels 
+
 
 if  __name__ =='__main__':
     make_apogee_label_file()
