@@ -5,7 +5,6 @@ import numpy as np
 import scipy.optimize as opt
 import os
 import sys
-from .helpers import Table
 import matplotlib.pyplot as plt
 
 # python 3 special
@@ -41,6 +40,72 @@ def get_pixmask(fluxes, flux_errs):
     bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
     bad_pix = bad_err | bad_flux
     return bad_pix
+
+
+def get_starmask(ids, labels, aspcapflag, paramflag):
+    """ Identifies which APOGEE objects have unreliable physical parameters,
+    as laid out in Holzman et al 2015 and on the APOGEE DR12 website
+
+    Parameters
+    ----------
+    data: np array
+        all APOGEE DR12 IDs and labels
+
+    Returns
+    -------
+    bad: np array
+        mask where 1 corresponds to a star with unreliable parameters
+    """
+    # teff outside range (4000,6000) K and logg < 0
+    teff = labels[0,:]
+    bad_teff = np.logical_or(teff < 4000, teff > 6000)
+    logg = labels[1,:]
+    bad_logg = logg < 0
+    cuts = bad_teff | bad_logg
+
+    # STAR_WARN flag set (TEFF, LOGG, CHI2, COLORTE, ROTATION, SN)
+    # M_H_WARN, ALPHAFE_WARN not included in the above, so do them separately
+    star_warn = np.bitwise_and(aspcapflag, 2**7) != 0
+    star_bad = np.bitwise_and(aspcapflag, 2**23) != 0
+    feh_warn = np.bitwise_and(aspcapflag, 2**3) != 0
+    alpha_warn = np.bitwise_and(aspcapflag, 2**4) != 0
+    aspcapflag_bad = star_warn | star_bad | feh_warn | alpha_warn
+
+    # separate element flags
+    teff_flag = paramflag[:,0] != 0
+    logg_flag = paramflag[:,1] != 0
+    feh_flag = paramflag[:,3] != 0
+    alpha_flag = paramflag[:,4] != 0
+    paramflag_bad = teff_flag | logg_flag | feh_flag | alpha_flag
+
+    return cuts | aspcapflag_bad | paramflag_bad 
+
+def make_apogee_label_file():
+    hdulist = pyfits.open("allStar-v603.fits")
+    datain = hdulist[1].data
+    apstarid= datain['APSTAR_ID']
+    aspcapflag = datain['ASPCAPFLAG']
+    paramflag =datain['PARAMFLAG']
+    nstars = len(apstarid)
+    ids = np.array([element.split('.')[-1] for element in apstarid])
+    t = np.array(datain['TEFF'], dtype=float)
+    g = np.array(datain['LOGG'], dtype=float)
+    # according to Holzman et al 2015, the most reliable values
+    f = np.array(datain['PARAM_M_H'], dtype=float)
+    a = np.array(datain['PARAM_ALPHA_M'], dtype=float)
+    labels = np.vstack((t, g, f, a))
+
+    # 1 if object would be an unsuitable training object
+    star_mask = get_starmask(ids, labels, aspcapflag, paramflag)
+
+    outputf = open("apogee_dr12_labels.csv", "w")
+    header = "id,teff,logg,feh,alpha,bad\n"
+    outputf.write(header)
+    for i in range(nstars):
+        line = str(ids[i])+','+str(t[i])+','+str(g[i])+','+str(f[i])+','+\
+                ','+str(a[i])+','+str(star_mask[i])+'\n'
+        outputf.write(line)
+    outputf.close()
 
 
 def load_spectra(data_dir):
@@ -114,3 +179,6 @@ def load_labels(filename):
     print(label_names)
     labels = np.array([data[k] for k in label_names], dtype=float).T
     return labels 
+
+if  __name__ =='__main__':
+    make_apogee_label_file()

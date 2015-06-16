@@ -14,6 +14,8 @@ f = datain['FE_H']
 params = datain['PARAM']
 a = params[:,-1]
 
+# SHOULD BE: TEFF, LOGG, PARAM_M_H, PARAM_ALPHA_M
+
 # ignore stars flagged as having unreliable Teff, logg, metallicity, alpha
 
 star_warn = 7

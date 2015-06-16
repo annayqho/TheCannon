@@ -14,8 +14,7 @@ def _partial_func(func, *args, **kwargs):
 
 
 def _cont_func(x, p, L, y):
-    """ Return the fitting function evaluated at input x for the continuum.
-    The fitting function is a sinusoid, sum of sines and cosines
+    """ Return the sinusoid cont func evaluated at input x for the continuum.
 
     Parameters
     ----------
