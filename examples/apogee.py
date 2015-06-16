@@ -81,34 +81,6 @@ def get_starmask(ids, labels, aspcapflag, paramflag):
     return cuts | aspcapflag_bad | paramflag_bad 
 
 
-def make_apogee_label_file():
-    hdulist = pyfits.open("allStar-v603.fits")
-    datain = hdulist[1].data
-    apstarid= datain['APSTAR_ID']
-    aspcapflag = datain['ASPCAPFLAG']
-    paramflag =datain['PARAMFLAG']
-    nstars = len(apstarid)
-    ids = np.array([element.split('.')[-1] for element in apstarid])
-    t = np.array(datain['TEFF'], dtype=float)
-    g = np.array(datain['LOGG'], dtype=float)
-    # according to Holzman et al 2015, the most reliable values
-    f = np.array(datain['PARAM_M_H'], dtype=float)
-    a = np.array(datain['PARAM_ALPHA_M'], dtype=float)
-    labels = np.vstack((t, g, f, a))
-
-    # 1 if object would be an unsuitable training object
-    star_mask = get_starmask(ids, labels, aspcapflag, paramflag)
-
-    outputf = open("apogee_dr12_labels.csv", "w")
-    header = "id,teff,logg,feh,alpha,bad\n"
-    outputf.write(header)
-    for i in range(nstars):
-        line = str(ids[i])+','+str(t[i])+','+str(g[i])+','+str(f[i])+','+\
-                ','+str(a[i])+','+str(star_mask[i])+'\n'
-        outputf.write(line)
-    outputf.close()
-
-
 def load_spectra(data_dir):
     """ Reads wavelength, flux, and flux uncertainty data from apogee fits files
 

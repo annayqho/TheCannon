@@ -1,12 +1,14 @@
 """ Code for LAMOST data munging """
 
 from __future__ import (absolute_import, division, print_function,)
+from apogee import get_starmask
 import numpy as np
 import scipy.optimize as opt
 from scipy import interpolate 
 import os
 import sys
 import matplotlib.pyplot as plt
+import glob
 
 # python 3 special
 PY3 = sys.version_info[0] > 2
@@ -105,14 +107,6 @@ def load_spectra(data_dir, filenames):
         grid_all = np.array(file_in[0].data[2])
         if jj == 0:
             # all stars do NOT start out on the same wavelength grid
-            # grid_all = np.array(file_in[0].data[2])
-            # some spectra will end up with different pixels
-            # because of the wavelength correction. so do this to ensure
-            # that the interpolation never extrapolates...
-            # values determined by experimentation, may change later
-            # middle = np.logical_and(grid_all > 3705, grid_all < 9091)
-            # only lost 10 pixels here
-            # now, add on 200 pixels at the beginning to save the Ca H&K
             middle = np.logical_and(grid_all > 3905, grid_all < 9000)
             grid = grid_all[middle]
             npixels = len(grid) 
@@ -162,6 +156,63 @@ def load_labels(label_file, tr_files):
     return tr_labels
 
 
+def is_badstar(star_id):
+    ids = np.loadtxt(
+        "apogee_dr12_labels.csv", usecols=(0,), delimiter=',', dtype=str)
+    bad = np.loadtxt(
+        "apogee_dr12_labels.csv", usecols=(6,), delimiter=',', dtype=str)
+    return bad[ids==star_id]
+
+
+def make_apogee_label_file():
+    """ only for the 11,057 overlap objects """
+
+    lamost_key = np.loadtxt('lamost_sorted_by_ra.txt',dtype=str)
+    apogee_key = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
+    apogee_key_short = np.array([(item.split('v603-')[-1]).split('.fits')[0] 
+                                for item in apogee_key])
+    nstars = len(lamost_key)
+
+    hdulist = pyfits.open("allStar-v603.fits")
+    datain = hdulist[1].data
+    apstarid= datain['APSTAR_ID']
+    aspcapflag = datain['ASPCAPFLAG']
+    paramflag =datain['PARAMFLAG']
+    apogee_id = np.array([element.split('.')[-1] for element in apstarid])
+    t = np.array(datain['TEFF'], dtype=float)
+    g = np.array(datain['LOGG'], dtype=float)
+    # according to Holzman et al 2015, the most reliable values
+    f = np.array(datain['PARAM_M_H'], dtype=float)
+    a = np.array(datain['PARAM_ALPHA_M'], dtype=float)
+    vscat = np.array(datain['VSCATTER'])
+    SNR = np.array(datain['SNR'])
+    labels = np.vstack((t, g, f, a))
+
+    # 1 if object would be an unsuitable training object
+    mask = get_starmask(apogee_id, labels, aspcapflag, paramflag)
+
+    # we only want the objects that are in apogee_key
+    inds = np.array([np.where(apogee_id==ID)[0][0] for ID in apogee_key_short]) 
+    teff = t[inds]
+    logg = g[inds]
+    feh = f[inds]
+    alpha = a[inds]
+    snr = SNR[inds]
+    vscatter = vscat[inds]
+    starflags = mask[inds]
+
+    outputf = open("apogee_dr12_labels.csv", "w")
+    header = "#lamost_id,apogee_id,teff,logg,feh,alpha,snr,vscatter,starflag\n"
+    outputf.write(header)
+    for i in range(nstars):
+        line = lamost_key[i]+','+apogee_key[i]+','+\
+               str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+\
+               str(alpha[i])+','+str(snr[i])+','+str(vscatter[i])+','+\
+               str(starflags[i])+'\n'
+        outputf.write(line)
+    outputf.close()
+
+
 def make_tr_file_list(frac_cut=0.94, snr_cut=100):
     """ make a list of training objects, given cuts
 
@@ -178,17 +229,22 @@ def make_tr_file_list(frac_cut=0.94, snr_cut=100):
     tr_files: np array
         list of file names of training objects
     """
-    allfiles = np.array(glob.glob("example_LAMOST/Data_All/*fits"))
-    allfiles = np.char.lstrip(allfiles, 'example_LAMOST/Data_All/')
+    allfiles = np.loadtxt(
+            "apogee_dr12_labels.csv", delimiter=',', usecols=(0,), dtype=str)
+    starflags = np.loadtxt(
+            "apogee_dr12_labels.csv", delimiter=',', usecols=(8,), dtype=str)
+    nstars = len(allfiles)
     dir_dat = "example_LAMOST/Data_All"
     ID, wl, flux, ivar = load_spectra(dir_dat, allfiles)
-    npix = np.array([np.count_nonzero(ivar[jj,:]) for jj in range(0,11057)])
-    good_frac = npix/3626.
+    npix = np.float(flux.shape[1])
+    ngoodpix = np.array([np.count_nonzero(ivar[jj,:]) for jj in range(nstars)])
+    good_frac = ngoodpix/npix
     SNR_raw = flux * ivar**0.5
     bad = SNR_raw == 0
     SNR_raw = np.ma.array(SNR_raw, mask=bad)
-    SNR = np.ma.median(SNR_raw, axis=1)
-    good = np.logical_and(good_frac > frac_cut, SNR>snr_cut)
+    SNR = np.ma.median(SNR_raw, axis=1).filled()
+    good_cut = np.logical_and(good_frac > frac_cut, SNR>snr_cut)
+    good = np.logical_and(good_cut, starflags=="False")
     tr_files = ID[good] #945 spectra 
     outputf = open("tr_files.txt", "w")
     for tr_file in tr_files:
@@ -196,3 +252,6 @@ def make_tr_file_list(frac_cut=0.94, snr_cut=100):
     outputf.close()
     return tr_files
 
+
+if __name__ == '__main__':
+    make_apogee_label_file()
