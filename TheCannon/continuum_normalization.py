@@ -6,6 +6,7 @@ import scipy.optimize as opt
 LARGE = 200.
 SMALL = 1. / LARGE
 
+
 def _partial_func(func, *args, **kwargs):
     """ something """
     def wrap(x, *p):
@@ -13,7 +14,135 @@ def _partial_func(func, *args, **kwargs):
     return wrap
 
 
-def _cont_func(x, p, L, y):
+def gaussian_weight(wl_i, wl_0, L):
+    """ The weight of a pixel i given a Gaussian centered on pixel 0 
+
+    Parameters
+    ----------
+    lambdai: float
+        the pixel of interest
+    lambda0: float
+        the center of the Gaussian
+    L: float
+        the width of the Gaussian
+
+    Returns
+    -------
+    the weight of pixel i
+    """
+    return np.exp[-0.5*(wl_i-wl_0)**2/L**2]
+
+
+def smoothed_spectrum_single_pix(wl_0, wl, flux, ivar, L):
+    """ Returns the weighted mean flux for a particular pixel
+
+    Parameters
+    ----------
+    wl_0: float
+        the wavelength of the center of the Gaussian
+    wl: numpy ndarray
+        wavelengths of pixels in spectrum
+    flux: numpy ndarray 
+        flux values of spectrum
+    ivar: numpy ndarray
+        ivar values of spectrum
+    L: float
+        the width of the Gaussian
+    
+    Returns
+    -------
+    the smoothed mean flux value
+    """
+    num = 0
+    den = 0
+    for ii in range(0, npix):
+        weight = gaussian_weight(wl_ii, wl_0, L)
+        num += weight*ivar_ii*flux_ii
+        den += weight*ivar_ii
+    return num/den
+
+
+def smoothed_spectrum(wl, flux, ivar, L):
+    """ Returns the weighted mean spectrum
+
+    Parameters
+    ----------
+    wl: numpy ndarray
+        wavelengths
+    flux: numpy ndarray
+        flux values of spectrum
+    ivar: numpy ndarray
+        inverse variances corresponding to flux values
+    L: float
+        width of Gaussian used to assign weights
+
+    Returns
+    -------
+    smoothed_flux: numpy ndarray
+        smoothed flux values, the mean spectrum
+    """
+    npix = len(wl)
+    smoothed_flux = np.zeros(npix)
+    for ii in range(npix):
+        smoothed_flux[ii] = smoothed_spectrum_single_pix(wl[ii], wl, flux, ivar, L)
+    return smoothed_flux
+
+
+def smoothed_spectra(wl, fluxes, ivars, L):
+    """ Returns the weighted mean block of spectra
+
+    Parameters
+    ----------
+    wl: numpy ndarray
+        wavelength vector
+    flux: numpy ndarray
+        block of flux values 
+    ivar: numpy ndarray
+        block of ivar values
+    L: float
+        width of Gaussian used to assign weights
+
+    Returns
+    -------
+    smoothed_fluxes: numpy ndarray
+        block of smoothed flux values, mean spectra
+    """
+    nstars = flux.shape[0]
+    smoothed_fluxes = np.zeros(fluxes.shape)
+    for ii in range(nstars):
+        flux = fluxes[ii,:]
+        ivar = ivars[ii,:]
+        smoothed_fluxes[ii,:] = smoothed_spectrum(wl, flux, ivar, L)
+    return smoothed_fluxes
+
+
+def cont_norm_gaussian_smoothing(dataset, L):
+    """ Continuum normalize by dividing by a Gaussian-weighted smoothed spectrum
+
+    Parameters
+    ----------
+    dataset: Dataset
+        the dataset to continuum normalize
+    L: float
+        the width of the Gaussian used for weighting
+
+    Returns
+    -------
+    dataset: Dataset
+        updated dataset
+    """
+    smoothed_tr_fluxes = smoothed_spectra(
+            dataset.wl, dataset.tr_flux, dataset.test_ivar, L)
+    smoothed_test_fluxes = smoothed_spectra(
+            dataset.wl, dataset.test_flux, dataset.test_ivar, L)
+    norm_tr_fluxes = dataset.tr_flux / smoothed_tr_fluxes 
+    norm_test_fluxes = dataset.test_flux / smoothed_test_fluxes
+    dataset.tr_flux = norm_tr_fluxes
+    dataset.test_flux = norm_test_fluxes
+    return dataset
+
+
+def _cont_sinusoid(x, p, L, y):
     """ Return the sinusoid cont func evaluated at input x for the continuum.
 
     Parameters
@@ -82,14 +211,14 @@ def _fit_cont(fluxes, ivars, contmask, deg, ffunc):
         if ffunc=="sinusoid": 
             p0 = np.ones(deg*2) # one for cos, one for sin
             L = max(x)-min(x)
-            pcont_func = _partial_func(_cont_func, L=L, y=flux)
+            pcont_func = _partial_func(_cont_sinusoid, L=L, y=flux)
             popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                        sigma=1./np.sqrt(yivar))
         elif ffunc=="chebyshev":
             fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=deg)
         for element in pix:
             if ffunc=="sinusoid":
-                cont[jj,element] = _cont_func(element, popt, L=L, y=flux)
+                cont[jj,element] = _cont_sinusoid(element, popt, L=L, y=flux)
             elif ffunc=="chebyshev":
                 cont[jj,element] = fit(element)
     return cont
