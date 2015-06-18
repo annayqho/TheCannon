@@ -132,13 +132,19 @@ class Dataset(object):
     def smooth_spectra(wl, fluxes, ivars):
         """ Bins down a block of spectra """
         output = np.asarray(
-                [smooth_spectrum(
-                    wl, flux, ivar) for flux,ivar in zip(fluxes, ivars)])
+                [smooth_spectrum(wl, flux, ivar) for flux,ivar in zip(fluxes, ivars)])
+        return output 
 
 
     def smooth_dataset(self):
         """ Bins down all of the spectra and updates the dataset """
-        
+        output = smooth_spectra(self.wl, self.tr_flux, self.tr_ivar)
+        self.wl = output[:,0,:]
+        self.tr_flux = output[:,1,:]
+        self.tr_ivar = output[:,2,:]
+        output = smooth_spectra(self.wl, self.test_flux, self.test_ivar)
+        self.test_flux = output[:,1,:]
+        self.test_ivar = output[:,2,:]
  
 
     def diagnostics_SNR(self, figname = "SNRdist.png"): 
