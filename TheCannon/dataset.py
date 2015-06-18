@@ -85,6 +85,60 @@ class Dataset(object):
             return None
         else:
             return self._label_names
+
+
+    def bin_flux(flux, ivar):
+        """ bin two neighboring flux values """
+        if np.sum(ivar)==0:
+            return np.sum(flux)/2.
+        return np.average(flux, weights=ivar)
+
+
+    def smooth_spectrum(wl, flux, ivar):
+        """ Bins down one spectrum 
+        
+        Parameters
+        ----------
+        wl: numpy ndarray
+            wavelengths
+        flux: numpy ndarray
+            flux values
+        ivar: numpy ndarray
+            inverse variances associated with fluxes
+
+        Returns
+        -------
+        wl: numpy ndarray
+            updated binned pixel wavelengths
+        flux: numpy ndarray
+            updated binned flux values
+        ivar: numpy ndarray
+            updated binned inverse variances
+        """
+        # if odd, discard the last point
+        if len(wl)%2 == 1:
+            wl = np.delete(wl, -1)
+            flux = np.delete(flux, -1)
+            ivar = np.delete(ivar, -1)
+        wl = wl.reshape(-1,2)
+        ivar = ivar.reshape(-1,2)
+        flux = flux.reshape(-1,2)
+        wl_binned = np.mean(wl, axis=1)
+        ivar_binned = np.sqrt(np.sum(ivar**2, axis=1))
+        flux_binned = np.array([bin_flux(f,w) for f,w in zip(flux, ivar)])
+        return wl_binned, flux_binned, ivar_binned
+
+
+    def smooth_spectra(wl, fluxes, ivars):
+        """ Bins down a block of spectra """
+        output = np.asarray(
+                [smooth_spectrum(
+                    wl, flux, ivar) for flux,ivar in zip(fluxes, ivars)])
+
+
+    def smooth_dataset(self):
+        """ Bins down all of the spectra and updates the dataset """
+        
  
 
     def diagnostics_SNR(self, figname = "SNRdist.png"): 
