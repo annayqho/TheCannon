@@ -1,5 +1,6 @@
 import numpy as np
 from functools import partial
+from multiprocessing import Pool
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 
@@ -30,7 +31,7 @@ def gaussian_weight(wl_i, wl_0, L):
     -------
     the weight of pixel i
     """
-    return np.exp[-0.5*(wl_i-wl_0)**2/L**2]
+    return np.exp(-0.5*(wl_i-wl_0)**2/L**2)
 
 
 def smoothed_spectrum_single_pix(wl_0, wl, flux, ivar, L):
@@ -53,13 +54,9 @@ def smoothed_spectrum_single_pix(wl_0, wl, flux, ivar, L):
     -------
     the smoothed mean flux value
     """
-    num = 0
-    den = 0
-    for ii in range(0, npix):
-        weight = gaussian_weight(wl_ii, wl_0, L)
-        num += weight*ivar_ii*flux_ii
-        den += weight*ivar_ii
-    return num/den
+    gw = np.asarray([gaussian_weight(wl_i, wl_0, L) for wl_i in wl])
+    w = gw*ivar
+    return np.average(flux, weights=w)
 
 
 def smoothed_spectrum(wl, flux, ivar, L):
@@ -81,10 +78,8 @@ def smoothed_spectrum(wl, flux, ivar, L):
     smoothed_flux: numpy ndarray
         smoothed flux values, the mean spectrum
     """
-    npix = len(wl)
-    smoothed_flux = np.zeros(npix)
-    for ii in range(npix):
-        smoothed_flux[ii] = smoothed_spectrum_single_pix(wl[ii], wl, flux, ivar, L)
+    smoothed_flux = np.asarray(
+            [smoothed_spectrum_single_pix(pix, wl, flux, ivar, L) for pix in wl])
     return smoothed_flux
 
 
@@ -107,9 +102,10 @@ def smoothed_spectra(wl, fluxes, ivars, L):
     smoothed_fluxes: numpy ndarray
         block of smoothed flux values, mean spectra
     """
-    nstars = flux.shape[0]
+    nstars = fluxes.shape[0]
     smoothed_fluxes = np.zeros(fluxes.shape)
     for ii in range(nstars):
+        print("Smoothing..." + str(ii))
         flux = fluxes[ii,:]
         ivar = ivars[ii,:]
         smoothed_fluxes[ii,:] = smoothed_spectrum(wl, flux, ivar, L)
@@ -131,6 +127,7 @@ def cont_norm_gaussian_smoothing(dataset, L):
     dataset: Dataset
         updated dataset
     """
+    print("Gaussian smoothing the entire dataset...")
     smoothed_tr_fluxes = smoothed_spectra(
             dataset.wl, dataset.tr_flux, dataset.test_ivar, L)
     smoothed_test_fluxes = smoothed_spectra(
@@ -287,7 +284,6 @@ def _weighted_median(values, weights, quantile):
     ------
     the weighted median
     """
-
     sindx = np.argsort(values)
     cvalues = 1. * np.cumsum(weights[sindx])
     cvalues = cvalues / cvalues[-1]

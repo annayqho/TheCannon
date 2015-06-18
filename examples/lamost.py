@@ -119,7 +119,8 @@ def load_spectra(data_dir, filenames):
         ivar = np.array((file_in[0].data[1]))
         # identify bad pixels PRIOR to shifting, so that the sky lines
         # don't move around
-        badpix = get_pixmask(file_in, grid_all, middle, flux, ivar)
+        # badpix = get_pixmask(file_in, grid_all, middle, flux, ivar)
+        badpix = ivar == 0.
         flux = np.ma.array(flux, mask=badpix)
         ivar = np.ma.array(ivar, mask=badpix)
         SNRs[jj] = np.ma.median(flux*ivar**0.5)

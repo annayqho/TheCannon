@@ -22,12 +22,6 @@ label_file = "reference_labels.csv"
 tr_label = load_labels(label_file, tr_ID)
 test_IDs, wl, test_flux, test_ivar = load_spectra(dir_dat, test_ID)
 
-good = np.logical_and(tr_label[:,0] > 0, tr_label[:,2]>-5)
-tr_IDs = tr_IDs[good]
-tr_flux = tr_flux[good]
-tr_ivar = tr_ivar[good]
-tr_label = tr_label[good]
-
 dataset = dataset.Dataset(
         wl, tr_IDs, tr_flux, tr_ivar, tr_label, test_IDs, test_flux, test_ivar)
 
