@@ -210,10 +210,11 @@ The first should be called <tt class="docutils literal"><span class="pre">SNRdis
 <img alt="_images/ref_labels_triangle.png" src="_images/ref_labels_triangle.png" />
 <p>Again, <tt class="docutils literal"><span class="pre">TheCannon</span></tt> requires incoming spectra to be continuum normalized
 in a way that is independent of signal to noise. If the data does not satisfy
-this criteria already, the user can use the continuum
+this criteria already, the user can use the continuum identification and
 normalization functions built into <tt class="docutils literal"><span class="pre">TheCannon</span></tt>.</p>
-<p>First, the training set
-is pseudo-continuum normalized using a running quantile. In this case, the
+<p>First, continuum pixels are identified from a pseudo-continuum normalized
+version of the training set spectra. Pseudo-continuum normalization is
+performed using a running quantile. In this case, the
 window size for calculating the median is set to 50 Angstroms and the quantile
 level is set to 90%. APOGEE spectra come in three chunks, and we want to
 perform continuum normalization for each chunk separately. For <tt class="docutils literal"><span class="pre">TheCannon</span></tt>
@@ -239,10 +240,24 @@ not. &#8220;True&#8221; continuum pixels are identified using a median and varia
 cut across the training objects: in other words, continuum pixels are those
 that consistently have values close to 1 in all of the training spectra. The
 user specifies what fraction of pixels to identify as continuum, and the
-flux and variance cuts are determined appropriately.</p>
+flux and variance cuts are determined appropriately. If the <tt class="docutils literal"><span class="pre">dataset.ranges</span></tt>
+attribute is set, then continuum pixels are identified separately for each
+region (in this case, three regions). This enables the user to control how
+evenly spread the pixels are.</p>
 <p>In this case, we choose 7% of the pixels in the spectrum as continuum, but the
 best value should be determined through experimentation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>At this stage, the user should plot spectra overlaid with the identified
+continuum pixels to ensure that they look reasonable and that they roughly
+evenly cover the spectrum. Large gaps in continuum pixels could result in
+poor continuum normalization in those regions. If the continuum pixels
+do not look evenly sampled enough, the range can be changed and the process
+repeated. For this example, we change it as foollows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5500</span><span class="p">],</span> <span class="p">[</span><span class="mi">5500</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -289,6 +304,14 @@ the spectral model:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">()</span>
 </pre></div>
 </div>
+<p>The first is a series of plots showing the full baseline (first-order) model
+spectrum with continuum pixels overplotted.</p>
+<img alt="contpix.gif" src="contpix.gif" />
+<p>The second is a plot of the leading coefficients and scatter of the model
+as a function of wavelength</p>
+<img alt="leading_coeffs.png" src="leading_coeffs.png" />
+<p>The third is a histogram of the reduced chi squareds of the model fit.</p>
+<img alt="modelfit_chisqs.png" src="modelfit_chisqs.png" />
 <p>If the model fitting worked, then we can proceed to the test step. This
 command automatically updates the dataset with the fitted-for test labels,
 and returned the corresponding covariance matrix.</p>
