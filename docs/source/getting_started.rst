@@ -89,6 +89,7 @@ every label's set of training values against every other.
 
 The output is saved to the directory that ``TheCannon`` is being run in. 
 This is what they should look like:
+testing
 
 .. image:: images/SNRdist.png
 
