@@ -199,16 +199,16 @@ the spectral model:
 The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted. 
 
-.. image:: contpix.gif
+.. image:: images/contpix.gif
 
 The second is a plot of the leading coefficients and scatter of the model
 as a function of wavelength
 
-.. image:: leading_coeffs.png
+.. image:: images/leading_coeffs.png
 
 The third is a histogram of the reduced chi squareds of the model fit. 
 
-.. image:: modelfit_chisqs.png
+.. image:: images/modelfit_chisqs.png
 
 If the model fitting worked, then we can proceed to the test step. This 
 command automatically updates the dataset with the fitted-for test labels,
