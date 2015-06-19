@@ -306,7 +306,6 @@ the spectral model:</p>
 </div>
 <p>The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted.</p>
-<p>testing</p>
 <img alt="_images/contpix.gif" src="_images/contpix.gif" />
 <p>The second is a plot of the leading coefficients and scatter of the model
 as a function of wavelength</p>
@@ -324,11 +323,18 @@ and returned the corresponding covariance matrix.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_survey_labels</span><span class="p">()</span>
 </pre></div>
 </div>
+<p>The first generates one text file for each label, called <tt class="docutils literal"><span class="pre">flagged_stars.txt</span></tt>.
+The second generates a triangle plot of the survey (Cannon) labels,
+shown below.</p>
+<img alt="_images/survey_labels_triangle.png" src="_images/survey_labels_triangle.png" />
 <p>If the test set is simply equivalent to the training set,
 as in this example, then one final diagnostic plot can be produced:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="1to1_label_0.png" src="1to1_label_0.png" />
+<img alt="1to1_label_1.png" src="1to1_label_1.png" />
+<img alt="1to1_label_2.png" src="1to1_label_2.png" />
 </div>
 
 

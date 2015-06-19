@@ -199,8 +199,6 @@ the spectral model:
 The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted. 
 
-testing
-
 .. image:: images/contpix.gif
 
 The second is a plot of the leading coefficients and scatter of the model
@@ -223,7 +221,19 @@ A set of diagnostic output:
 >>> dataset.diagnostics_test_step_flagstars()
 >>> dataset.diagnostics_survey_labels()
 
+The first generates one text file for each label, called ``flagged_stars.txt``. 
+The second generates a triangle plot of the survey (Cannon) labels,
+shown below.
+
+.. image:: images/survey_labels_triangle.png
+
 If the test set is simply equivalent to the training set, 
 as in this example, then one final diagnostic plot can be produced:  
 
 >>> dataset.diagnostics_1to1()
+
+.. image:: 1to1_label_0.png
+
+.. image:: 1to1_label_1.png
+
+.. image:: 1to1_label_2.png
