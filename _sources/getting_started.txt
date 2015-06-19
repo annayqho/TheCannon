@@ -199,6 +199,8 @@ the spectral model:
 The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted. 
 
+testing
+
 .. image:: images/contpix.gif
 
 The second is a plot of the leading coefficients and scatter of the model
