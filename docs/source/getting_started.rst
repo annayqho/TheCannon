@@ -88,18 +88,22 @@ every label's set of training values against every other.
     >>> dataset.diagnostics_ref_labels()
 
 The output is saved to the directory that ``TheCannon`` is being run in. 
-This is what they should look like:
-testing
+The first should be called ``SNRdist.png`` and look as follows:
 
 .. image:: images/SNRdist.png
 
+The second should be called ``ref_labels_triangle.png`` and look as follows:
+
+.. image:: images/ref_labels_triangle.png
+
 Again, ``TheCannon`` requires incoming spectra to be continuum normalized
 in a way that is independent of signal to noise. If the data does not satisfy
-this criteria already, the user can use the continuum
+this criteria already, the user can use the continuum identification and
 normalization functions built into ``TheCannon``. 
 
-First, the training set
-is pseudo-continuum normalized using a running quantile. In this case, the
+First, continuum pixels are identified from a pseudo-continuum normalized
+version of the training set spectra. Pseudo-continuum normalization is
+performed using a running quantile. In this case, the
 window size for calculating the median is set to 50 Angstroms and the quantile
 level is set to 90\%. APOGEE spectra come in three chunks, and we want to
 perform continuum normalization for each chunk separately. For ``TheCannon``
@@ -126,11 +130,25 @@ not. "True" continuum pixels are identified using a median and variance flux
 cut across the training objects: in other words, continuum pixels are those
 that consistently have values close to 1 in all of the training spectra. The
 user specifies what fraction of pixels to identify as continuum, and the
-flux and variance cuts are determined appropriately.
+flux and variance cuts are determined appropriately. If the ``dataset.ranges``
+attribute is set, then continuum pixels are identified separately for each
+region (in this case, three regions). This enables the user to control how
+evenly spread the pixels are.
 
 In this case, we choose 7% of the pixels in the spectrum as continuum, but the
 best value should be determined through experimentation.
 
+    >>> contmask = dataset.make_contmask(
+    >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
+
+At this stage, the user should plot spectra overlaid with the identified
+continuum pixels to ensure that they look reasonable and that they roughly
+evenly cover the spectrum. Large gaps in continuum pixels could result in
+poor continuum normalization in those regions. If the continuum pixels
+do not look evenly sampled enough, the range can be changed and the process
+repeated. For this example, we change it as foollows:
+
+    >>> dataset.ranges = [[371,3192], [3697,5500], [5500,5997], [6461,8255]]
     >>> contmask = dataset.make_contmask(
     >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
 
@@ -178,6 +196,20 @@ the spectral model:
 
 >>> model.diagnostics()
 
+The first is a series of plots showing the full baseline (first-order) model
+spectrum with continuum pixels overplotted. 
+
+.. image:: images/contpix.gif
+
+The second is a plot of the leading coefficients and scatter of the model
+as a function of wavelength
+
+.. image:: images/leading_coeffs.png
+
+The third is a histogram of the reduced chi squareds of the model fit. 
+
+.. image:: images/modelfit_chisqs.png
+
 If the model fitting worked, then we can proceed to the test step. This 
 command automatically updates the dataset with the fitted-for test labels,
 and returned the corresponding covariance matrix.
@@ -189,7 +221,19 @@ A set of diagnostic output:
 >>> dataset.diagnostics_test_step_flagstars()
 >>> dataset.diagnostics_survey_labels()
 
+The first generates one text file for each label, called ``flagged_stars.txt``. 
+The second generates a triangle plot of the survey (Cannon) labels,
+shown below.
+
+.. image:: images/survey_labels_triangle.png
+
 If the test set is simply equivalent to the training set, 
 as in this example, then one final diagnostic plot can be produced:  
 
 >>> dataset.diagnostics_1to1()
+
+.. image:: images/1to1_label_0.png
+
+.. image:: images/1to1_label_1.png
+
+.. image:: images/1to1_label_2.png

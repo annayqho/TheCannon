@@ -235,7 +235,9 @@ class CannonModel(object):
         fig = corner(first_order, labels=labels, show_titles=True,
                      title_args = {"fontsize":12})
         filename = "leading_coeffs_triangle.png"
+        print("Diagnostic plot: triangle plot of leading coefficients")
         fig.savefig(filename)
+        print("Saved as %s" %filename)
         plt.close(fig)
 
         # Histogram of the chi squareds of ind. stars
