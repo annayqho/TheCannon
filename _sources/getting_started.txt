@@ -36,7 +36,9 @@ all appropriately before feeding it into ``TheCannon``.
 >>> tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
 >>> all_labels = apogee.load_labels("example_DR10/reference_labels.csv")
 
-For simplicity, the test set is set as equal to the training set, so that
+There should be 548 spectra with 8575 pixels each. 
+
+For simplicity, we set the test set is set as equal to the training set, so that
 ``TheCannon`` is simply re-determining labels for the reference objects. In
 practice, the test IDs, fluxes, and inverse variances would be read in 
 separately.
@@ -85,7 +87,11 @@ every label's set of training values against every other.
     >>> dataset.diagnostics_SNR()
     >>> dataset.diagnostics_ref_labels()
 
-The output is saved to the directory that ``TheCannon`` is being run in.
+The output is saved to the directory that ``TheCannon`` is being run in. 
+This is what they should look like:
+testing
+
+.. image:: images/SNRdist.png
 
 Again, ``TheCannon`` requires incoming spectra to be continuum normalized
 in a way that is independent of signal to noise. If the data does not satisfy

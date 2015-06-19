@@ -154,7 +154,8 @@ all appropriately before feeding it into <tt class="docutils literal"><span clas
 <span class="gp">&gt;&gt;&gt; </span><span class="n">all_labels</span> <span class="o">=</span> <span class="n">apogee</span><span class="o">.</span><span class="n">load_labels</span><span class="p">(</span><span class="s">&quot;example_DR10/reference_labels.csv&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>For simplicity, the test set is set as equal to the training set, so that
+<p>There should be 548 spectra with 8575 pixels each.</p>
+<p>For simplicity, we set the test set is set as equal to the training set, so that
 <tt class="docutils literal"><span class="pre">TheCannon</span></tt> is simply re-determining labels for the reference objects. In
 practice, the test IDs, fluxes, and inverse variances would be read in
 separately.</p>
@@ -202,7 +203,10 @@ every label&#8217;s set of training values against every other.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The output is saved to the directory that <tt class="docutils literal"><span class="pre">TheCannon</span></tt> is being run in.</p>
+<p>The output is saved to the directory that <tt class="docutils literal"><span class="pre">TheCannon</span></tt> is being run in.
+This is what they should look like:
+testing</p>
+<img alt="_images/SNRdist.png" src="_images/SNRdist.png" />
 <p>Again, <tt class="docutils literal"><span class="pre">TheCannon</span></tt> requires incoming spectra to be continuum normalized
 in a way that is independent of signal to noise. If the data does not satisfy
 this criteria already, the user can use the continuum
