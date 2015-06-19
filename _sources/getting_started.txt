@@ -88,10 +88,13 @@ every label's set of training values against every other.
     >>> dataset.diagnostics_ref_labels()
 
 The output is saved to the directory that ``TheCannon`` is being run in. 
-This is what they should look like:
-testing
+The first should be called ``SNRdist.png`` and look as follows:
 
 .. image:: images/SNRdist.png
+
+The second should be called ``ref_labels_triangle.png`` and look as follows:
+
+.. image:: images/ref_labels_triangle.png
 
 Again, ``TheCannon`` requires incoming spectra to be continuum normalized
 in a way that is independent of signal to noise. If the data does not satisfy
