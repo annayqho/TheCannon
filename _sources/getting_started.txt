@@ -232,8 +232,8 @@ as in this example, then one final diagnostic plot can be produced:
 
 >>> dataset.diagnostics_1to1()
 
-.. image:: 1to1_label_0.png
+.. image:: images/1to1_label_0.png
 
-.. image:: 1to1_label_1.png
+.. image:: images/1to1_label_1.png
 
-.. image:: 1to1_label_2.png
+.. image:: images/1to1_label_2.png
