@@ -1,7 +1,6 @@
 """ Code for LAMOST data munging """
 
 from __future__ import (absolute_import, division, print_function,)
-from apogee import get_starmask
 import numpy as np
 import scipy.optimize as opt
 from scipy import interpolate 
@@ -146,13 +145,17 @@ def load_labels(label_file, tr_files):
     filenames, remaining values are floats and user wants all the labels.
     """
     print("Loading reference labels from file %s" %label_file)
-    ids = np.loadtxt(
+    lamost_ids = np.loadtxt(
         label_file, usecols=(0,), delimiter=',', dtype=str)
+    apogee_ids = np.loadtxt(
+        label_file, usecols=(1,), delimiter=',', dtype=str)
+    starflags = np.loadtxt(
+        label_file, usecols=(8,), delimiter=',', dtype=str)
     all_tr_label_val = np.loadtxt(
-        label_file, usecols=(1,2,3,4), delimiter=',', dtype=str)
+        label_file, usecols=(2,3,4,5,6,7), delimiter=',', dtype=str)
     tr_labels = np.zeros((len(tr_files), all_tr_label_val.shape[1]))
     for jj,tr_id in enumerate(tr_files):
-        tr_labels[jj,:] = all_tr_label_val[ids==tr_id,:]
+        tr_labels[jj,:] = all_tr_label_val[lamost_ids==tr_id,:]
     tr_labels = tr_labels[np.argsort(tr_files)]
     return tr_labels
 
@@ -163,6 +166,45 @@ def is_badstar(star_id):
     bad = np.loadtxt(
         "apogee_dr12_labels.csv", usecols=(6,), delimiter=',', dtype=str)
     return bad[ids==star_id]
+
+
+def get_starmask(ids, labels, aspcapflag, paramflag):
+    """ Identifies which APOGEE objects have unreliable physical parameters,
+    as laid out in Holzman et al 2015 and on the APOGEE DR12 website
+
+    Parameters
+    ----------
+    data: np array
+        all APOGEE DR12 IDs and labels
+
+    Returns
+    -------
+    bad: np array
+        mask where 1 corresponds to a star with unreliable parameters
+    """
+    # teff outside range (4000,6000) K and logg < 0
+    teff = labels[0,:]
+    bad_teff = np.logical_or(teff < 4000, teff > 6000)
+    logg = labels[1,:]
+    bad_logg = logg < 0
+    cuts = bad_teff | bad_logg
+
+    # STAR_WARN flag set (TEFF, LOGG, CHI2, COLORTE, ROTATION, SN)
+    # M_H_WARN, ALPHAFE_WARN not included in the above, so do them separately
+    star_warn = np.bitwise_and(aspcapflag, 2**7) != 0
+    star_bad = np.bitwise_and(aspcapflag, 2**23) != 0
+    feh_warn = np.bitwise_and(aspcapflag, 2**3) != 0
+    alpha_warn = np.bitwise_and(aspcapflag, 2**4) != 0
+    aspcapflag_bad = star_warn | star_bad | feh_warn | alpha_warn
+
+    # separate element flags
+    teff_flag = paramflag[:,0] != 0
+    logg_flag = paramflag[:,1] != 0
+    feh_flag = paramflag[:,3] != 0
+    alpha_flag = paramflag[:,4] != 0
+    paramflag_bad = teff_flag | logg_flag | feh_flag | alpha_flag
+
+    return cuts | aspcapflag_bad | paramflag_bad 
 
 
 def make_apogee_label_file():
@@ -182,9 +224,13 @@ def make_apogee_label_file():
     apogee_id = np.array([element.split('.')[-1] for element in apstarid])
     t = np.array(datain['TEFF'], dtype=float)
     g = np.array(datain['LOGG'], dtype=float)
-    # according to Holzman et al 2015, the most reliable values
+    # according to Holtzman et al 2015, the most reliable values
     f = np.array(datain['PARAM_M_H'], dtype=float)
     a = np.array(datain['PARAM_ALPHA_M'], dtype=float)
+    mg = np.array(datain['MG_H'], dtype=float)
+    mg_flag = np.array(datain['MG_H_FLAG'], dtype=float)
+    ca = np.array(datain['CA_H'], dtype=float)
+    ca_flag = np.array(datain['CA_H_FLAG'], dtype=float)
     vscat = np.array(datain['VSCATTER'])
     SNR = np.array(datain['SNR'])
     labels = np.vstack((t, g, f, a))
@@ -245,6 +291,7 @@ def make_tr_file_list(frac_cut=0.94, snr_cut=100):
     SNR_raw = np.ma.array(SNR_raw, mask=bad)
     SNR = np.ma.median(SNR_raw, axis=1).filled()
     good_cut = np.logical_and(good_frac > frac_cut, SNR>snr_cut)
+    starflags = starflags[np.argsort(allfiles)]
     good = np.logical_and(good_cut, starflags=="False")
     tr_files = ID[good] #945 spectra 
     outputf = open("tr_files.txt", "w")

@@ -15,7 +15,24 @@ def _partial_func(func, *args, **kwargs):
     return wrap
 
 
-def gaussian_weight(wl_i, wl_0, L):
+def gaussian_weight_matrix(wl, L):
+    """ Matrix of Gaussian weights 
+
+    Parameters
+    ----------
+    wl: numpy ndarray
+        pixel wavelength values
+    L: float
+        width of Gaussian
+
+    Return
+    ------
+    Weight matrix
+    """
+    return np.exp(-0.5*(wl[:,None]-wl[None,:])**2/L**2)
+
+
+def gaussian_weight_single_pix(wl_i, wl_0, L):
     """ The weight of a pixel i given a Gaussian centered on pixel 0 
 
     Parameters

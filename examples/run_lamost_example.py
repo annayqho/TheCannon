@@ -3,9 +3,9 @@ import pickle
 import random
 import glob
 from matplotlib import rc
-from cannon.model import CannonModel
 from lamost import load_spectra, load_labels
 from TheCannon import dataset
+from TheCannon import model
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
@@ -13,13 +13,21 @@ plt.rc('font', family='serif')
 # STEP 1: DATA MUNGING
 allfiles = glob.glob("example_LAMOST/Data_All/*fits")
 allfiles = np.char.lstrip(allfiles, 'example_LAMOST/Data_All/')
+# or...tr_ID = np.loadtxt("badstars.txt", dtype=str)
 tr_ID = np.loadtxt("tr_files.txt", dtype=str)
 test_ID = np.setdiff1d(allfiles, tr_ID)
 
 dir_dat = "example_LAMOST/Data_All"
 tr_IDs, wl, tr_flux, tr_ivar = load_spectra(dir_dat, tr_ID)
-label_file = "reference_labels.csv"
-tr_label = load_labels(label_file, tr_ID)
+
+label_file = "apogee_dr12_labels.csv"
+all_labels = load_labels(label_file, tr_ID)
+teff = all_labels[:,0]
+logg = all_labels[:,1]
+mh = all_labels[:,2]
+alpha = all_labels[:,3]
+tr_label = np.vstack((teff, logg, mh, alpha)).T
+
 test_IDs, wl, test_flux, test_ivar = load_spectra(dir_dat, test_ID)
 
 dataset = dataset.Dataset(
@@ -34,29 +42,6 @@ dataset.diagnostics_ref_labels()
 
 # STEP 2: CONTINUUM IDENTIFICATION
 
-# Pseudo-continuum normalization for the training spectra
-if glob.glob('pseudo_normed_spec.p'):
-    (pseudo_flux, pseudo_ivar) = pickle.load(open("pseudo_normed_spec.p", "r"))
-
-else:
-    pseudo_flux, pseudo_ivar = dataset.continuum_normalize_training_q(
-            q=0.90, delta_lambda=400)
-    pickle.dump((pseudo_flux, pseudo_ivar), open("pseudo_normed_spec.p", "w"))
-
-# From the cont norm training spectra, identify continuum pixels
-if glob.glob('contmask.p', 'r'):
-    contmask = pickle.load(open("contmask.p", "r"))
-else:
-    # Identify the best 5% of continuum pixels
-    # contmask = dataset.make_contmask(norm_tr_fluxes, norm_tr_ivars, frac=0.05)
-
-    # Identify the best 5% of continuum pixels in each of the following
-    # pixel regions 
-    dataset.ranges = [[0,50], [50,100], [100,400], [400,600], [600,1722], [1863, 1950], [1950, 2500], [2500,3000], [3000, len(dataset.wl)]]
-    contmask = dataset.make_contmask(pseudo_tr_flux, pseudo_tr_ivar, frac=0.05)
-    pickle.dump(contmask, open("contmask.p", "w"))
-
-dataset.set_continuum(contmask)
 
 
 # RUN CONTINUUM NORMALIZATION CODE
