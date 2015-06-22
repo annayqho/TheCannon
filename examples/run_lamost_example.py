@@ -40,26 +40,15 @@ dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]'])
 dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
-# STEP 2: CONTINUUM IDENTIFICATION
+# STEP 2: CONTINUUM NORMALIZATION 
 
-
-
-# RUN CONTINUUM NORMALIZATION CODE
-dataset.ranges = [[0,1723], [1863,len(dataset.wl)]] # split into two wings
-
-if glob.glob('cont.p', 'r'):
-    cont = pickle.load(open("cont.p", "r"))
-else:
-    cont = dataset.fit_continuum(deg=3, ffunc="sinusoid")
-    pickle.dump((cont), open("cont.p", "w"))
-
-norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
-        dataset.continuum_normalize(cont)
-
-dataset.tr_flux = norm_tr_flux
-dataset.tr_ivar = norm_tr_ivar
-dataset.test_flux = norm_test_flux
-dataset.test_ivar = norm_test_ivar
+w = gaussian_weight_matrix(dataset.wl, L=50)
+val = (dataset.tr_ivar * dataset.tr_flux).T
+cont = (np.dot(w,val) / np.dot(w,dataset.tr_ivar.T)).T
+norm_flux = dataset.tr_flux / cont
+dataset.tr_flux = norm_flux
+norm_ivar = cont**2 * dataset.tr_ivar
+dataset.tr_ivar = norm_ivar
 
 # learn the model from the reference_set
 from TheCannon import model
