@@ -1,6 +1,5 @@
 import numpy as np
 import pickle
-import random
 import glob
 from matplotlib import rc
 from lamost import load_spectra, load_labels
@@ -13,7 +12,6 @@ plt.rc('font', family='serif')
 # STEP 1: DATA MUNGING
 allfiles = glob.glob("example_LAMOST/Data_All/*fits")
 allfiles = np.char.lstrip(allfiles, 'example_LAMOST/Data_All/')
-# or...tr_ID = np.loadtxt("badstars.txt", dtype=str)
 tr_ID = np.loadtxt("tr_files.txt", dtype=str)
 test_ID = np.setdiff1d(allfiles, tr_ID)
 
@@ -41,14 +39,7 @@ dataset.diagnostics_SNR()
 dataset.diagnostics_ref_labels()
 
 # STEP 2: CONTINUUM NORMALIZATION 
-
-w = gaussian_weight_matrix(dataset.wl, L=50)
-val = (dataset.tr_ivar * dataset.tr_flux).T
-cont = (np.dot(w,val) / np.dot(w,dataset.tr_ivar.T)).T
-norm_flux = dataset.tr_flux / cont
-dataset.tr_flux = norm_flux
-norm_ivar = cont**2 * dataset.tr_ivar
-dataset.tr_ivar = norm_ivar
+dataset.continuum_normalize_gaussian_smoothing(L=50)
 
 # learn the model from the reference_set
 from TheCannon import model
@@ -70,7 +61,5 @@ else:
     label_errs = model.infer_labels(dataset)
 
 # Make plots
-dataset.dataset_postdiagnostics(dataset)
-
-cannon_set = draw_spectra(model.model, dataset)
-diagnostics(cannon_set, dataset, model.model)
+dataset.diagnostics_1to1()
+dataset.survey_label_triangle()

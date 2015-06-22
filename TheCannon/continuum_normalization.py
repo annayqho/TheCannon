@@ -32,131 +32,7 @@ def gaussian_weight_matrix(wl, L):
     return np.exp(-0.5*(wl[:,None]-wl[None,:])**2/L**2)
 
 
-def gaussian_weight_single_pix(wl_i, wl_0, L):
-    """ The weight of a pixel i given a Gaussian centered on pixel 0 
-
-    Parameters
-    ----------
-    lambdai: float
-        the pixel of interest
-    lambda0: float
-        the center of the Gaussian
-    L: float
-        the width of the Gaussian
-
-    Returns
-    -------
-    the weight of pixel i
-    """
-    return np.exp(-0.5*(wl_i-wl_0)**2/L**2)
-
-
-def smoothed_spectrum_single_pix(wl_0, wl, flux, ivar, L):
-    """ Returns the weighted mean flux for a particular pixel
-
-    Parameters
-    ----------
-    wl_0: float
-        the wavelength of the center of the Gaussian
-    wl: numpy ndarray
-        wavelengths of pixels in spectrum
-    flux: numpy ndarray 
-        flux values of spectrum
-    ivar: numpy ndarray
-        ivar values of spectrum
-    L: float
-        the width of the Gaussian
-    
-    Returns
-    -------
-    the smoothed mean flux value
-    """
-    gw = np.asarray([gaussian_weight(wl_i, wl_0, L) for wl_i in wl])
-    w = gw*ivar
-    return np.average(flux, weights=w)
-
-
-def smoothed_spectrum(wl, flux, ivar, L):
-    """ Returns the weighted mean spectrum
-
-    Parameters
-    ----------
-    wl: numpy ndarray
-        wavelengths
-    flux: numpy ndarray
-        flux values of spectrum
-    ivar: numpy ndarray
-        inverse variances corresponding to flux values
-    L: float
-        width of Gaussian used to assign weights
-
-    Returns
-    -------
-    smoothed_flux: numpy ndarray
-        smoothed flux values, the mean spectrum
-    """
-    smoothed_flux = np.asarray(
-            [smoothed_spectrum_single_pix(pix, wl, flux, ivar, L) for pix in wl])
-    return smoothed_flux
-
-
-def smoothed_spectra(wl, fluxes, ivars, L):
-    """ Returns the weighted mean block of spectra
-
-    Parameters
-    ----------
-    wl: numpy ndarray
-        wavelength vector
-    flux: numpy ndarray
-        block of flux values 
-    ivar: numpy ndarray
-        block of ivar values
-    L: float
-        width of Gaussian used to assign weights
-
-    Returns
-    -------
-    smoothed_fluxes: numpy ndarray
-        block of smoothed flux values, mean spectra
-    """
-    nstars = fluxes.shape[0]
-    smoothed_fluxes = np.zeros(fluxes.shape)
-    for ii in range(nstars):
-        print("Smoothing..." + str(ii))
-        flux = fluxes[ii,:]
-        ivar = ivars[ii,:]
-        smoothed_fluxes[ii,:] = smoothed_spectrum(wl, flux, ivar, L)
-    return smoothed_fluxes
-
-
-def cont_norm_gaussian_smoothing(dataset, L):
-    """ Continuum normalize by dividing by a Gaussian-weighted smoothed spectrum
-
-    Parameters
-    ----------
-    dataset: Dataset
-        the dataset to continuum normalize
-    L: float
-        the width of the Gaussian used for weighting
-
-    Returns
-    -------
-    dataset: Dataset
-        updated dataset
-    """
-    print("Gaussian smoothing the entire dataset...")
-    smoothed_tr_fluxes = smoothed_spectra(
-            dataset.wl, dataset.tr_flux, dataset.test_ivar, L)
-    smoothed_test_fluxes = smoothed_spectra(
-            dataset.wl, dataset.test_flux, dataset.test_ivar, L)
-    norm_tr_fluxes = dataset.tr_flux / smoothed_tr_fluxes 
-    norm_test_fluxes = dataset.test_flux / smoothed_test_fluxes
-    dataset.tr_flux = norm_tr_fluxes
-    dataset.test_flux = norm_test_fluxes
-    return dataset
-
-
-def _cont_sinusoid(x, p, L, y):
+def _sinusoid(x, p, L, y):
     """ Return the sinusoid cont func evaluated at input x for the continuum.
 
     Parameters
@@ -184,7 +60,87 @@ def _cont_sinusoid(x, p, L, y):
     return func
 
 
-def _fit_cont(fluxes, ivars, contmask, deg, ffunc):
+def _weighted_median(values, weights, quantile):
+    """ Calculate a weighted median for values above a particular quantile cut
+
+    Used in pseudo continuum normalization
+
+    Parameters
+    ----------
+    values: np ndarray of floats
+        the values to take the median of
+    weights: np ndarray of floats
+        the weights associated with the values
+    quantile: float
+        the cut applied to the input data
+
+    Returns
+    ------
+    the weighted median
+    """
+    sindx = np.argsort(values)
+    cvalues = 1. * np.cumsum(weights[sindx])
+    cvalues = cvalues / cvalues[-1]
+    foo = sindx[cvalues > quantile]
+    if len(foo) == 0:
+        return values[0]
+    indx = foo[0]
+    return values[indx]
+
+
+def _find_cont_gaussian_smooth(wl, fluxes, ivars, w):
+    """ Returns the weighted mean block of spectra
+
+    Parameters
+    ----------
+    wl: numpy ndarray
+        wavelength vector
+    flux: numpy ndarray
+        block of flux values 
+    ivar: numpy ndarray
+        block of ivar values
+    L: float
+        width of Gaussian used to assign weights
+
+    Returns
+    -------
+    smoothed_fluxes: numpy ndarray
+        block of smoothed flux values, mean spectra
+    """
+    val = (ivars * fluxes).T
+    return (np.dot(w,val) / np.dot(w,dataset.tr_ivar.T)).T
+
+
+def _cont_norm_gaussian_smooth(dataset, L):
+    """ Continuum normalize by dividing by a Gaussian-weighted smoothed spectrum
+
+    Parameters
+    ----------
+    dataset: Dataset
+        the dataset to continuum normalize
+    L: float
+        the width of the Gaussian used for weighting
+
+    Returns
+    -------
+    dataset: Dataset
+        updated dataset
+    """
+    print("Gaussian smoothing the entire dataset...")
+    w = gaussian_weight_matrix(dataset.wl, L)
+
+    cont = _find_cont_gaussian_smooth(
+            dataset.wl, dataset.tr_flux, dataset.tr_ivar, L)
+    norm_tr_flux, norm_tr_ivar = _cont_norm(
+            dataset.tr_flux, dataset.tr_ivar, cont)
+    cont = _find_cont_gaussian_smooth(
+            dataset.wl, dataset.test_flux, dataset.test_ivar, L)
+    norm_test_flux, norm_test_ivar = _cont_norm(
+            dataset.test_flux, dataset.test_ivar, cont)
+    return norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar 
+
+
+def _find_cont_fitfunc(fluxes, ivars, contmask, deg, ffunc):
     """ Fit a continuum to a continuum pixels in a segment of spectra
 
     Functional form can be either sinusoid or chebyshev, with specified degree
@@ -238,7 +194,7 @@ def _fit_cont(fluxes, ivars, contmask, deg, ffunc):
     return cont
 
 
-def _fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
+def _find_cont_fitfunc_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
     """ Run fit_cont, dealing with spectrum in regions or chunks
 
     This is useful if a spectrum has gaps.
@@ -272,46 +228,18 @@ def _fit_cont_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
         start = chunk[0]
         stop = chunk[1]
         if ffunc=="chebyshev":
-            output = _fit_cont(fluxes[:,start:stop],
+            output = _find_cont_fitfunc(fluxes[:,start:stop],
                               ivars[:,start:stop],
                               contmask[start:stop], deg=deg, ffunc="chebyshev")
         elif ffunc=="sinusoid":
-            output = _fit_cont(fluxes[:,start:stop],
+            output = _find_cont_fitfunc(fluxes[:,start:stop],
                               ivars[:,start:stop],
                               contmask[start:stop], deg=deg, ffunc="sinusoid")
         cont[:,start:stop] = output
     return cont
 
 
-def _weighted_median(values, weights, quantile):
-    """ Calculate a weighted median for values above a particular quantile cut
-
-    Used in pseudo continuum normalization
-
-    Parameters
-    ----------
-    values: np ndarray of floats
-        the values to take the median of
-    weights: np ndarray of floats
-        the weights associated with the values
-    quantile: float
-        the cut applied to the input data
-
-    Returns
-    ------
-    the weighted median
-    """
-    sindx = np.argsort(values)
-    cvalues = 1. * np.cumsum(weights[sindx])
-    cvalues = cvalues / cvalues[-1]
-    foo = sindx[cvalues > quantile]
-    if len(foo) == 0:
-        return values[0]
-    indx = foo[0]
-    return values[indx]
-
-
-def _cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
+def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda):
     """ Perform continuum normalization using a running quantile
 
     Parameters
@@ -335,8 +263,6 @@ def _cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
         rescaled pixel invariances
     """
     print("contnorm.py: continuum norm using running quantile")
-    norm_fluxes = np.zeros(fluxes.shape)
-    norm_ivars = np.zeros(ivars.shape)
     cont = np.zeros(fluxes.shape)
     nstars = fluxes.shape[0]
     for jj in range(nstars):
@@ -348,13 +274,19 @@ def _cont_norm_q(wl, fluxes, ivars, q, delta_lambda):
             flux_cut = flux[indx]
             ivar_cut = ivar[indx]
             cont[jj,ll] = _weighted_median(flux_cut, ivar_cut, q)
-    for jj in range(nstars):
-        norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
-        norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
+    return cont
+
+
+def _cont_norm_running_quantile(wl, fluxes, ivars, q, delta_lambda):
+    cont = _find_cont_running_quantile
+    norm_fluxes = np.ones(fluxes.shape)
+    norm_ivars = np.zeros(ivars.shape)
+    norm_fluxes[cont!=0] = fluxes[cont!=0] / cont[cont!=0]
+    norm_ivars = cont**2 * ivars
     return norm_fluxes, norm_ivars
 
 
-def _cont_norm_q_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
+def _cont_norm_running_quantile_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
     """ Perform continuum normalization using running quantile, for spectrum
     that comes in chunks
     """
@@ -366,9 +298,9 @@ def _cont_norm_q_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
     for chunk in ranges:
         start = chunk[0]
         stop = chunk[1]
-        output = _cont_norm_q(wl[start:stop], fluxes[:,start:stop],
-                             ivars[:,start:stop],
-                             q, delta_lambda)
+        output = _cont_norm_running_quantile(
+                wl[start:stop], fluxes[:,start:stop],
+                ivars[:,start:stop], q, delta_lambda)
         norm_fluxes[:,start:stop] = output[0]
         norm_ivars[:,start:stop] = output[1]
     return norm_fluxes, norm_ivars
@@ -394,14 +326,10 @@ def _cont_norm(fluxes, ivars, cont):
         rescaled inverse variances
     """
     nstars = fluxes.shape[0]
-    norm_fluxes = np.zeros(fluxes.shape)
+    norm_fluxes = np.ones(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
-    for jj in range(nstars):
-        bad = (ivars[jj,:] == 0)
-        norm_fluxes[jj,:] = fluxes[jj,:]/cont[jj,:]
-        norm_ivars[jj,:] = cont[jj,:]**2 * ivars[jj,:]
-        norm_fluxes[jj,:][bad] = 1.
-        norm_ivars[jj,:][bad] = SMALL**2
+    norm_fluxes[cont!=0] = fluxes[cont!=0]/cont[cont!=0]
+    norm_ivars = cont**2 * ivars
     return norm_fluxes, norm_ivars 
 
 

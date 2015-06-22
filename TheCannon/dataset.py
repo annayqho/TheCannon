@@ -366,12 +366,22 @@ class Dataset(object):
         return norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar
 
 
-    def continuum_normalize_gaussian_smoothing(self):
-        """ Divide spectra by Gaussian-smoothed version of themselves """
-        mg_width = 400
-        normed_dataset = cont_norm_gaussian_smoothing(self, 2*mg_width)
-        self.tr_flux = normed_dataset.tr_flux
-        self.test_flux = normed_dataset.test_flux
+    def continuum_normalize_gaussian_smoothing(self, L):
+    """ Continuum normalize by dividing by a Gaussian-weighted smoothed spectrum
+
+    Parameters
+    ----------
+    dataset: Dataset
+        the dataset to continuum normalize
+    L: float
+        the width of the Gaussian used for weighting
+    """
+    norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
+            _cont_norm_gaussian_smoothing(self, L)
+    self.tr_flux = norm_tr_flux
+    self.tr_ivar = norm_tr_ivar
+    self.test_flux = norm_test_flux
+    self.test_ivar = norm_test_ivar
 
 
     def diagnostics_test_step_flagstars(self):
