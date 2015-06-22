@@ -42,8 +42,7 @@ dataset.diagnostics_ref_labels()
 dataset.continuum_normalize_gaussian_smoothing(L=50)
 
 # learn the model from the reference_set
-from TheCannon import model
-model = model.CannonModel(dataset, 2) # 2 = quadratic model
+model = model.CannonModel(2) # 2 = quadratic model
 model.fit() # model.train would work equivalently.
 pickle.dump(coeffs_all, open("coeffs_all.p", "w"))
 
@@ -51,7 +50,7 @@ pickle.dump(coeffs_all, open("coeffs_all.p", "w"))
 coeffs_all = pickle.load(open("coeffs_all.p", "r"))
 
 # check the model
-model.diagnostics()
+model.diagnostics(dataset)
 
 # infer labels with the new model for the test_set
 if glob.glob('test_labels.p'):

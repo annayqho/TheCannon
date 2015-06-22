@@ -14,12 +14,10 @@ LARGE = 200.
 SMALL = 1. / LARGE
 
 class CannonModel(object):
-    def __init__(self, dataset, order):
-        if not isinstance(dataset, Dataset):
-            txt = 'Expecting a Dataset instance, got {0}'
-            raise TypeError(txt.format(type(dataset)))
-        self.dataset = dataset
-        self._model = None
+    def __init__(self, order):
+        self.coeffs = None
+        self.scatters = None
+        self.chisqs
         self.order = order
 
 
@@ -116,7 +114,8 @@ class CannonModel(object):
 
 
     def diagnostics(
-            self, baseline_spec_plot_name = "baseline_spec_with_cont_pix",
+            self, dataset,
+            baseline_spec_plot_name = "baseline_spec_with_cont_pix",
             leading_coeffs_plot_name = "leading_coeffs.png",
             chisq_dist_plot_name = "modelfit_chisqs.png"):
         """ Produce a set of diagnostic plots for the model 
@@ -130,14 +129,14 @@ class CannonModel(object):
         (optional) chisq_dist_plot_name: str
             Filename of output saved plot
         """
-        dataset = self.dataset
-        model = self.model
         contmask = dataset.contmask
         lams = dataset.wl
         label_names = dataset.get_plotting_labels()
-        coeffs_all, covs, scatters, chisqs, pivots, label_vector = model
         npixels = len(lams)
         nlabels = len(pivots)
+        chisqs = model.chisqs
+        coeffs = model.coeffs
+        scatters = model.scatters
 
         if contmask is not None:
             # Baseline spectrum with continuum

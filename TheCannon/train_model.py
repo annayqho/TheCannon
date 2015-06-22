@@ -173,7 +173,9 @@ def _train_model(dataset):
 
     # Calc chi sq
     all_chisqs = chis*chis
-    model = coeffs, covs, scatters, all_chisqs, pivots, lvec_full
+    model.coeffs = coeffs
+    model.scatters = scatters
+    model.chisq = all_chisqs
     print("Done training model")
     return model
 

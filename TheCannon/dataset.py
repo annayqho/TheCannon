@@ -367,21 +367,21 @@ class Dataset(object):
 
 
     def continuum_normalize_gaussian_smoothing(self, L):
-    """ Continuum normalize by dividing by a Gaussian-weighted smoothed spectrum
+        """ Continuum normalize using a Gaussian-weighted smoothed spectrum
 
-    Parameters
-    ----------
-    dataset: Dataset
-        the dataset to continuum normalize
-    L: float
-        the width of the Gaussian used for weighting
-    """
-    norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
-            _cont_norm_gaussian_smoothing(self, L)
-    self.tr_flux = norm_tr_flux
-    self.tr_ivar = norm_tr_ivar
-    self.test_flux = norm_test_flux
-    self.test_ivar = norm_test_ivar
+        Parameters
+        ----------
+        dataset: Dataset
+            the dataset to continuum normalize
+        L: float
+            the width of the Gaussian used for weighting
+        """
+        norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
+                _cont_norm_gaussian_smoothing(self, L)
+        self.tr_flux = norm_tr_flux
+        self.tr_ivar = norm_tr_ivar
+        self.test_flux = norm_test_flux
+        self.test_ivar = norm_test_ivar
 
 
     def diagnostics_test_step_flagstars(self):
