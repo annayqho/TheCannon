@@ -28,22 +28,22 @@ tr_label = np.vstack((teff, logg, mh, alpha)).T
 
 test_IDs, wl, test_flux, test_ivar = load_spectra(dir_dat, test_ID)
 
-dataset = dataset.Dataset(
+data = dataset.Dataset(
         wl, tr_IDs, tr_flux, tr_ivar, tr_label, test_IDs, test_flux, test_ivar)
 
 # set the headers for plotting
-dataset.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]'])
+data.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]'])
 
 # Plot SNR distributions and triangle plot of reference labels
-dataset.diagnostics_SNR()
-dataset.diagnostics_ref_labels()
+data.diagnostics_SNR()
+data.diagnostics_ref_labels()
 
 # STEP 2: CONTINUUM NORMALIZATION 
-dataset.continuum_normalize_gaussian_smoothing(L=50)
+data.continuum_normalize_gaussian_smoothing(L=50)
 
 # learn the model from the reference_set
 model = model.CannonModel(2) # 2 = quadratic model
-model.fit() # model.train would work equivalently.
+model.fit(dataset) # model.train would work equivalently.
 pickle.dump(coeffs_all, open("coeffs_all.p", "w"))
 
 # or...
@@ -55,10 +55,10 @@ model.diagnostics(dataset)
 # infer labels with the new model for the test_set
 if glob.glob('test_labels.p'):
     test_label = pickle.load(open('test_labels.p', 'r'))
-    dataset.test_label = test_label
+    data.test_label = test_label
 else:
-    label_errs = model.infer_labels(dataset)
+    model.infer_labels(data)
 
 # Make plots
-dataset.diagnostics_1to1()
-dataset.survey_label_triangle()
+data.diagnostics_1to1()
+data.survey_label_triangle()
