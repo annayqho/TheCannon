@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 from .helpers.compatibility import range, map
 from .helpers.triangle import corner
 
+LARGE = 200.
+SMALL = 1./200.
+
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
     Parameters
@@ -136,7 +139,19 @@ def _get_lvec(label_vals, pivots):
     return lvec
 
 
-def _train_model(dataset):
+def _prep_data(dataset):
+    """ Prepare the data for The Cannon. Set all 0 ivar to SMALL
+
+    Parameters
+    ----------
+    dataset: Dataset object
+    """
+    dataset.tr_ivar[dataset.tr_ivar == 0] = SMALL
+    dataset.test_ivar[dataset.test_ivar == 0] = SMALL
+    return dataset
+
+
+def _train_model(data):
     """
     This determines the coefficients of the model using the training data
 
@@ -150,6 +165,7 @@ def _train_model(dataset):
     model: model
         best-fit Cannon model
     """
+    dataset = _prep_data(data)
     print("Training model...")
     label_names = dataset.get_plotting_labels()
     label_vals = dataset.tr_label
@@ -173,11 +189,8 @@ def _train_model(dataset):
 
     # Calc chi sq
     all_chisqs = chis*chis
-    model.coeffs = coeffs
-    model.scatters = scatters
-    model.chisq = all_chisqs
     print("Done training model")
-    return model
+    return coeffs, scatters, all_chisqs, pivots
 
 
 def _split_array(array, num):

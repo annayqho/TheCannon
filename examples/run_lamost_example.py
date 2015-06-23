@@ -41,6 +41,9 @@ data.diagnostics_ref_labels()
 # STEP 2: CONTINUUM NORMALIZATION 
 data.continuum_normalize_gaussian_smoothing(L=50)
 
+# add PS1 colors
+# add another column to the tr_flux, tr_ivar, test_flux, test_ivar
+
 # learn the model from the reference_set
 model = model.CannonModel(2) # 2 = quadratic model
 model.fit(dataset) # model.train would work equivalently.

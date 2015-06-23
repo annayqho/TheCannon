@@ -17,22 +17,23 @@ class CannonModel(object):
     def __init__(self, order):
         self.coeffs = None
         self.scatters = None
-        self.chisqs
+        self.chisqs = None
+        self.pivots = None
         self.order = order
 
 
     @property
     def model(self):
         """ Return the model definition or raise an error if not trained """
-        if self._model is None:
+        if self.coeffs is None:
             raise RuntimeError('Model not trained')
         else:
-            return self._model
+            return self.coeffs
 
 
-    def train(self, *args, **kwargs):
+    def train(self, data):
         """ Run training step: solve for best-fit spectral model """
-        self._model = _train_model(self.dataset)
+        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(data)
 
 
     def diagnostics(self):
@@ -54,7 +55,7 @@ class CannonModel(object):
         errs_all: ndarray
             Covariance matrix of the fit
         """
-        return _infer_labels(self.model, dataset)
+        return _infer_labels(self, dataset)
 
 
     def draw_spectra(self, dataset):
@@ -88,34 +89,57 @@ class CannonModel(object):
         return cannon_set
 
 
-    def _split_array(self, array, num):
-        """ split an array into a certain number of segments
+    def plot_contpix(x, y, contpix_x, contpix_y, figname):
+        """ Plot baseline spec with continuum pix overlaid 
 
         Parameters
         ----------
-        array: numpy ndarray
-            array to be split
-
-        num: int
-            number of elements to split array into
-
-        Returns
-        ------
-        out: list 
-            split array
         """
-        avg = len(array) / float(num)
-        out = []
-        last = 0.0
-        while last < len(array):
-            out.append(array[int(last):int(last+avg)])
-            last += avg
-        return out
+        fig, axarr = plt.subplots(2, sharex=True)
+        plt.xlabel(r"Wavelength $\lambda (\AA)$")
+        plt.xlim(min(x), max(x))
+        ax = axarr[0]
+        ax.step(x, y, where='mid', c='k', linewidth=0.3,
+                label=r'$\theta_0$' + "= the leading fit coefficient")
+        ax.scatter(contpix_x, contpix_y, s=1, color='r',
+                label="continuum pixels")
+        ax.legend(loc='lower right', 
+                prop={'family':'serif', 'size':'small'})
+        ax.set_title("Baseline Spectrum with Continuum Pixels")
+        ax.set_ylabel(r'$\theta_0$')
+        ax = axarr[1]
+        ax.step(x, y, where='mid', c='k', linewidth=0.3,
+             label=r'$\theta_0$' + "= the leading fit coefficient")
+        ax.scatter(contpix_x, contpix_y, s=1, color='r',
+                label="continuum pixels")
+        ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
+        ax.legend(loc='upper right', prop={'family':'serif', 
+            'size':'small'})
+        ax.set_ylabel(r'$\theta_0$')
+        ax.set_ylim(0.95, 1.05)
+        print("Diagnostic plot: fitted 0th order spec w/ cont pix")
+        print("Saved as %s_%s.png" % (baseline_spec_plot_name, i))
+        plt.savefig(baseline_spec_plot_name + "_%s" %i)
+        plt.close()
+
+
+    def diagnostics_contpix(self, dataset, fig = "baseline_spec_with_cont_pix"):
+        """ Call plot_contpix once for each tenth of the spectrum """
+        if dataset.contmask is None:
+            print("No contmask set")
+        else:
+            coeffs_all = model.coeffs
+            wl = dataset.wl
+            baseline_spec = coeffs_all[:,0]
+            contmask = dataset.contmask
+            contpix_x = wl[contmask]
+            contpix_y = baseline_spec[contmask]
+
+
 
 
     def diagnostics(
             self, dataset,
-            baseline_spec_plot_name = "baseline_spec_with_cont_pix",
             leading_coeffs_plot_name = "leading_coeffs.png",
             chisq_dist_plot_name = "modelfit_chisqs.png"):
         """ Produce a set of diagnostic plots for the model 
@@ -129,62 +153,12 @@ class CannonModel(object):
         (optional) chisq_dist_plot_name: str
             Filename of output saved plot
         """
-        contmask = dataset.contmask
-        lams = dataset.wl
         label_names = dataset.get_plotting_labels()
         npixels = len(lams)
         nlabels = len(pivots)
         chisqs = model.chisqs
         coeffs = model.coeffs
         scatters = model.scatters
-
-        if contmask is not None:
-            # Baseline spectrum with continuum
-            baseline_spec = coeffs_all[:,0]
-            bad = np.round(baseline_spec,5) == 0
-            baseline_spec = np.ma.array(baseline_spec, mask=bad)
-            lams = np.ma.array(lams, mask=bad)
-
-            # Continuum pixels
-            contpix_lambda = lams[contmask]
-            y = baseline_spec[contmask]
-
-            # Split into ten segments
-            nseg = 10
-            lams_seg = self._split_array(lams.compressed(), nseg)
-            xmins = [] 
-            xmaxs = [] 
-            for seg in lams_seg:
-                xmins.append(seg[0])
-                xmaxs.append(seg[-1])
-
-            for i in range(nseg):
-                fig, axarr = plt.subplots(2, sharex=True)
-                plt.xlabel(r"Wavelength $\lambda (\AA)$")
-                plt.xlim(xmins[i], xmaxs[i])
-                ax = axarr[0]
-                ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
-                        label=r'$\theta_0$' + "= the leading fit coefficient")
-                ax.scatter(contpix_lambda, y, s=1, color='r',
-                        label="continuum pixels")
-                ax.legend(loc='lower right', 
-                        prop={'family':'serif', 'size':'small'})
-                ax.set_title("Baseline Spectrum with Continuum Pixels")
-                ax.set_ylabel(r'$\theta_0$')
-                ax = axarr[1]
-                ax.step(lams, baseline_spec, where='mid', c='k', linewidth=0.3,
-                     label=r'$\theta_0$' + "= the leading fit coefficient")
-                ax.scatter(contpix_lambda, y, s=1, color='r',
-                        label="continuum pixels")
-                ax.set_title("Baseline Spectrum with Continuum Pixels, Zoomed")
-                ax.legend(loc='upper right', prop={'family':'serif', 
-                    'size':'small'})
-                ax.set_ylabel(r'$\theta_0$')
-                ax.set_ylim(0.95, 1.05)
-                print("Diagnostic plot: fitted 0th order spec w/ cont pix")
-                print("Saved as %s_%s.png" % (baseline_spec_plot_name, i))
-                plt.savefig(baseline_spec_plot_name + "_%s" %i)
-                plt.close()
 
         # Leading coefficients for each label & scatter
         bad = scatters < 0.0002

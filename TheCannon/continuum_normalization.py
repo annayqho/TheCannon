@@ -108,7 +108,7 @@ def _find_cont_gaussian_smooth(wl, fluxes, ivars, w):
         block of smoothed flux values, mean spectra
     """
     val = (ivars * fluxes).T
-    return (np.dot(w,val) / np.dot(w,dataset.tr_ivar.T)).T
+    return (np.dot(w,val) / np.dot(w,ivars.T)).T
 
 
 def _cont_norm_gaussian_smooth(dataset, L):
@@ -129,12 +129,14 @@ def _cont_norm_gaussian_smooth(dataset, L):
     print("Gaussian smoothing the entire dataset...")
     w = gaussian_weight_matrix(dataset.wl, L)
 
+    print("Gaussian smoothing the training set")
     cont = _find_cont_gaussian_smooth(
-            dataset.wl, dataset.tr_flux, dataset.tr_ivar, L)
+            dataset.wl, dataset.tr_flux, dataset.tr_ivar, w)
     norm_tr_flux, norm_tr_ivar = _cont_norm(
             dataset.tr_flux, dataset.tr_ivar, cont)
+    print("Gaussian smoothing the test set")
     cont = _find_cont_gaussian_smooth(
-            dataset.wl, dataset.test_flux, dataset.test_ivar, L)
+            dataset.wl, dataset.test_flux, dataset.test_ivar, w)
     norm_test_flux, norm_test_ivar = _cont_norm(
             dataset.test_flux, dataset.test_ivar, cont)
     return norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar 
@@ -369,6 +371,5 @@ def _cont_norm_regions(fluxes, ivars, cont, ranges):
         norm_ivars[:,start:stop] = output[1]
     for jj in range(nstars):
         bad = (norm_ivars[jj,:] == 0.)
-        norm_fluxes[jj,:][bad] = 0.
-        norm_ivars[jj,:][bad] = SMALL**2
+        norm_fluxes[jj,:][bad] = 1.
     return norm_fluxes, norm_ivars

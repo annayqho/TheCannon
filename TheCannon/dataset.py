@@ -6,7 +6,7 @@ import matplotlib.gridspec as gridspec
 from .helpers.triangle import corner
 from .helpers import Table
 from .find_continuum_pixels import * 
-from .continuum_normalization import *
+from .continuum_normalization import _cont_norm_gaussian_smooth 
 from .spectral_model import overlay_spectra
 
 PY3 = sys.version_info[0] > 2
