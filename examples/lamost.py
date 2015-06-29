@@ -99,8 +99,8 @@ def load_spectra(data_dir, filenames):
     files = list(sorted(filenames))
     files = np.array(files)
     nstars = len(files)
-
     npix = np.zeros(nstars)
+
     for jj, fits_file in enumerate(files):
         file_in = pyfits.open("%s/%s" %(data_dir, fits_file))
         grid_all = np.array(file_in[0].data[2])
@@ -280,20 +280,22 @@ def make_tr_file_list(frac_cut=0.94, snr_cut=100):
             "apogee_dr12_labels.csv", delimiter=',', usecols=(0,), dtype=str)
     starflags = np.loadtxt(
             "apogee_dr12_labels.csv", delimiter=',', usecols=(8,), dtype=str)
-    nstars = len(allfiles)
-    dir_dat = "example_LAMOST/Data_All"
-    ID, wl, flux, ivar = load_spectra(dir_dat, allfiles)
-    npix = np.float(flux.shape[1])
-    ngoodpix = np.array([np.count_nonzero(ivar[jj,:]) for jj in range(nstars)])
-    good_frac = ngoodpix/npix
-    SNR_raw = flux * ivar**0.5
-    bad = SNR_raw == 0
-    SNR_raw = np.ma.array(SNR_raw, mask=bad)
-    SNR = np.ma.median(SNR_raw, axis=1).filled()
-    good_cut = np.logical_and(good_frac > frac_cut, SNR>snr_cut)
-    starflags = starflags[np.argsort(allfiles)]
-    good = np.logical_and(good_cut, starflags=="False")
-    tr_files = ID[good] #945 spectra 
+    #nstars = len(allfiles)
+    #dir_dat = "example_LAMOST/Data_All"
+    #ID, wl, flux, ivar = load_spectra(dir_dat, allfiles)
+    #npix = np.float(flux.shape[1])
+    #ngoodpix = np.array([np.count_nonzero(ivar[jj,:]) for jj in range(nstars)])
+    #good_frac = ngoodpix/npix
+    #SNR_raw = flux * ivar**0.5
+    #bad = SNR_raw == 0
+    #SNR_raw = np.ma.array(SNR_raw, mask=bad)
+    #SNR = np.ma.median(SNR_raw, axis=1).filled()
+    #good_cut = np.logical_and(good_frac > frac_cut, SNR>snr_cut)
+    #starflags = starflags[np.argsort(allfiles)]
+    #good = np.logical_and(good_cut, starflags=="False")
+    good = starflags == "False"
+    #tr_files = ID[good] #945 spectra 
+    tr_files = allfiles[good]
     outputf = open("tr_files.txt", "w")
     for tr_file in tr_files:
         outputf.write(tr_file + '\n')

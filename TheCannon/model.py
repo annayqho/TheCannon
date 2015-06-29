@@ -123,8 +123,8 @@ class CannonModel(object):
         plt.close()
 
 
-    def diagnostics_contpix(self, dataset, fig = "baseline_spec_with_cont_pix"):
-        """ Call plot_contpix once for each tenth of the spectrum """
+    def diagnostics_contpix(self, dataset, n=10, fig = "baseline_spec_with_cont_pix"):
+        """ Call plot_contpix once for each nth of the spectrum """
         if dataset.contmask is None:
             print("No contmask set")
         else:
@@ -134,8 +134,7 @@ class CannonModel(object):
             contmask = dataset.contmask
             contpix_x = wl[contmask]
             contpix_y = baseline_spec[contmask]
-
-
+            
 
 
     def diagnostics(

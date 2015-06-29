@@ -107,8 +107,11 @@ def _find_cont_gaussian_smooth(wl, fluxes, ivars, w):
     smoothed_fluxes: numpy ndarray
         block of smoothed flux values, mean spectra
     """
-    val = (ivars * fluxes).T
-    return (np.dot(w,val) / np.dot(w,ivars.T)).T
+    print("Finding the continuum")
+    bot = np.dot(ivars, w.T)
+    cont = np.dot(fluxes*ivars, w.T)/bot
+    print(np.where(bot==0))
+    return cont
 
 
 def _cont_norm_gaussian_smooth(dataset, L):
