@@ -129,6 +129,7 @@ def load_spectra(data_dir, filenames):
         # resample onto a common grid
         flux_rs = (interpolate.interp1d(wl, flux))(grid)
         ivar_rs = (interpolate.interp1d(wl, ivar))(grid)
+        ivar_rs[ivar_rs < 0] = 0. # in interpolating you can end up with neg
         fluxes[jj,:] = flux_rs
         ivars[jj,:] = ivar_rs
 
