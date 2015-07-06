@@ -419,7 +419,7 @@ class Dataset(object):
         self._label_triangle_plot(self.test_label_vals, figname)
    
    
-    def diagnostics_1to1(self):
+    def diagnostics_1to1(self, figname="1to1_label"):
         """ Plots survey labels vs. training labels, color-coded by survey SNR """
         snr = self.test_SNR
         label_names = self.get_plotting_labels()
@@ -432,8 +432,8 @@ class Dataset(object):
             orig = reference_labels[:,i]
             cannon = test_labels[:,i]
             # calculate bias and scatter
-            scatter = np.round(np.std(orig-cannon),3)
-            bias  = np.round(np.mean(orig-cannon),3)
+            scatter = np.round(np.std(orig-cannon),5)
+            bias  = np.round(np.mean(orig-cannon),5)
 
             low = np.minimum(min(orig), min(cannon))
             high = np.maximum(max(orig), max(cannon))
@@ -472,10 +472,10 @@ class Dataset(object):
             ax2.set_title("Training Versus Test Labels for $%s$" %name,
                     fontsize=14)
             ax2.legend(fontsize=14)
-            figname = "1to1_label_%s.png" % i
-            plt.savefig(figname)
+            figname_full = "%s_%s.png" %(figname, i)
+            plt.savefig(figname_full)
             print("Diagnostic for label output vs. input")
-            print("Saved fig %s" % figname)
+            print("Saved fig %s" % figname_full)
             plt.close()
 
 

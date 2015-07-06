@@ -32,7 +32,7 @@ teff = all_labels[:,0]
 logg = all_labels[:,1]
 mh = all_labels[:,2]
 alpha = all_labels[:,3]
-test_label = np.vstack((teff, logg, mh, alpha)).T
+tr_label = np.vstack((teff, logg, mh, alpha)).T
 np.savez("./tr_label.npz", tr_label)
 with np.load("tr_label.npz") as a:
     tr_label = a['arr_0']
@@ -79,16 +79,6 @@ else:
     data.continuum_normalize_gaussian_smoothing(L=50)
     np.savez("./tr_norm", data.tr_flux, data.tr_ivar)
     np.savez("./test_norm", data.test_flux, data.test_ivar)
-
-# add PS1 colors
-# ids = np.loadtxt("example_PS1/ps_colors.txt", usecols=(0,), dtype='str', delimiter=',')
-# colors_all = np.loadtxt("example_PS1/ps_colors.txt", usecols=(1,2,3,4), dtype='float', delimiter=',')
-# apogee_ids = np.loadtxt("apogee_dr12_labels.csv", dtype='str', usecols=(1,), delimiter=',')
-# apogee_ids_short = np.array([apogee_id[19:37] for apogee_id in apogee_ids])
-# inds = np.array([np.where(ids==apogee_id)[0][0] for apogee_id in apogee_ids_short])
-# colors = colors_all[inds]
-
-# add another column to the tr_flux, tr_ivar, test_flux, test_ivar
 
 # learn the model from the reference_set
 model = model.CannonModel(2) # 2 = quadratic model

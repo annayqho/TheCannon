@@ -109,9 +109,10 @@ def _find_cont_gaussian_smooth(wl, fluxes, ivars, w):
     """
     print("Finding the continuum")
     bot = np.dot(ivars, w.T)
-    cont = np.dot(fluxes*ivars, w.T)/bot
-    print(np.where(bot==0))
-    return cont
+    top = np.dot(fluxes*ivars, w.T)
+    bad = bot == 0
+    cont = np.ma.array(top, mask=bad) / np.ma.array(bot, mask=bad)
+    return np.ma.filled(cont, fill_value=0.)
 
 
 def _cont_norm_gaussian_smooth(dataset, L):
@@ -333,8 +334,10 @@ def _cont_norm(fluxes, ivars, cont):
     nstars = fluxes.shape[0]
     norm_fluxes = np.ones(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
-    norm_fluxes[cont!=0] = fluxes[cont!=0]/cont[cont!=0]
+    bad = cont == 0.
+    norm_fluxes = np.ma.array(fluxes, mask=bad) / np.ma.array(cont, mask=bad)
     norm_ivars = cont**2 * ivars
+    norm_fluxes = np.ma.filled(norm_fluxes, fill_value=1.)
     return norm_fluxes, norm_ivars 
 
 
