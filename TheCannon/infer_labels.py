@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 
 from scipy import optimize as opt
 import numpy as np
+import matplotlib.pyplot as plt
 
 LARGE = 200.
 SMALL = 1. / LARGE
@@ -49,6 +50,18 @@ def _func(coeffs, *labels):
     return np.dot(coeffs, lvec)
 
 
+def _prep_data(dataset):
+    """ Prepare the data for The Cannon. Set all 0 ivar to SMALL
+
+    Parameters
+    ----------
+    dataset: Dataset object
+    """
+    dataset.tr_ivar[dataset.tr_ivar == 0] = 1e-12
+    dataset.test_ivar[dataset.test_ivar == 0] = 1e-12
+    return dataset
+
+
 def _infer_labels(model, dataset):
     """
     Uses the model to solve for labels of the test set.
@@ -66,6 +79,7 @@ def _infer_labels(model, dataset):
     errs_all:
         Covariance matrix of the fit
     """
+    dataset = _prep_data(dataset)
     print("Inferring Labels")
     coeffs_all = model.coeffs
     scatters = model.scatters
@@ -79,9 +93,10 @@ def _infer_labels(model, dataset):
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1] - 1,
                                coeffs_all.shape[1]-1.))
     errs_all = np.zeros((nstars, nlabels))
+    chisq_all = np.zeros(nstars)
 
     for jj in range(nstars):
-        print(jj)
+        # print(jj)
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
@@ -97,12 +112,15 @@ def _infer_labels(model, dataset):
             # rescale covariance matrix
             chi = (flux_piv-_func(coeffs, *labels)) / sig
             chi2 = (chi**2).sum()
-            # FIXME: dof does not seem to be right to me (MF)
-            dof = len(flux_piv) - nlabels
+            # dof = npix - nparam - 1
+            dof = len(flux_piv) - coeffs_all.shape[1] - 1
             factor = (chi2 / dof)
             covs /= factor
+        chi = (flux_piv-_func(coeffs, *labels)) / sig
+        chisq_all[jj] = (chi**2).sum()
         labels = labels + pivots
         labels_all[jj,:] = labels
         errs_all[jj,:] = covs.diagonal()
+
     dataset.set_test_label_vals(labels_all)
-    return errs_all
+    return errs_all, chisq_all

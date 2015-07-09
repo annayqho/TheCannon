@@ -162,7 +162,7 @@ class Dataset(object):
                 label="Ref Objects")
         plt.legend(loc='upper right')
         #plt.xscale('log')
-        plt.title("SNR Comparison Between Reference & Survey Objects")
+        plt.title("SNR Comparison Between Reference and Survey Objects")
         #plt.xlabel("log(Formal SNR)")
         plt.xlabel("Formal SNR")
         plt.ylabel("Number of Objects")

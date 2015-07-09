@@ -160,9 +160,6 @@ class CannonModel(object):
         scatters = model.scatters
 
         # Leading coefficients for each label & scatter
-        bad = scatters < 0.0002
-        scatters = np.ma.array(scatters, mask=bad)
-        lams = np.ma.array(lams, mask=bad)
         fig, axarr = plt.subplots(nlabels+1, figsize=(8,8), sharex=True)
         ax1 = axarr[0]
         plt.subplots_adjust(hspace=0.001)

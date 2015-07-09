@@ -3,6 +3,7 @@ neighbor APOGEE labels in the training set. """
 
 import numpy as np
 import os
+import glob
 
 def calc_dist(lamost_point, training_points, coeffs):
     """ dists from one lamost point to all training points """
@@ -43,4 +44,7 @@ if __name__ == "__main__":
     dates = np.delete(dates, np.where(dates=='.directory')[0][0])
     for date in dates: 
         print(date)
-        find_test_obj(date)
+        if glob.glob("%s_test_obj.txt" %date):
+            print("done already")
+        else:
+            find_test_obj(date)

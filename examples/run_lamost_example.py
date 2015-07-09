@@ -11,7 +11,7 @@ rc('text', usetex=True)
 rc('font', family='serif')
 
 # STEP 1: DATA MUNGING
-tr_ID = np.loadtxt("tr_files.txt", dtype=str)
+tr_ID = np.loadtxt("test_training_overlap/tr_files.txt", dtype=str)
 test_ID = np.loadtxt("lamost_dr2/20121125_filenames.txt", dtype=str)
 
 if glob.glob("tr_data_raw.npz"):
