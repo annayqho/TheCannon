@@ -130,7 +130,7 @@ def load_spectra(data_dir):
     return files, wl, fluxes, ivars
 
 
-def load_labels(filename):
+def load_labels(filename, lamost_ids, apogee_ids):
     """ Extracts reference labels from a file
 
     Parameters
@@ -138,20 +138,27 @@ def load_labels(filename):
     filename: str
         Name of the file containing the table of reference labels
 
+    ids: array
+        The IDs of stars to retrieve labels for
+
     Returns
     -------
     labels: ndarray
         Reference label values for all reference objects
     """
     print("Loading reference labels from file %s" %filename)
-    data = Table(filename)
-    data.sort('id')
-    label_names = data.keys()[1:] # ignore id
-    nlabels = len(label_names)
-    print('%s labels:' %nlabels)
-    print(label_names)
-    labels = np.array([data[k] for k in label_names], dtype=float).T
-    return labels 
+    lamost_ids = np.loadtxt(
+            label_file, usecols=(0,), delimiter=',', dtype=str)
+    apogee_ids = np.loadtxt(
+            label_file, usecols=(1,), delimiter=',', dtype=str)
+    all_labels = np.loadtxt(
+            label_file, usecols=(2,3,4,5,6,7,8), delimiter=',', dtype=str)
+    if lamost_ids==None:
+        searchIn = apogee_ids
+    if apogee_ids==None:
+        searchIn = lamost_ids
+    inds = np.array([np.where(searchIn==a)[0][0] for a in ids])
+    return all_labels[inds]
 
 
 if  __name__ =='__main__':

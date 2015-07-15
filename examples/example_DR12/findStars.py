@@ -1,6 +1,7 @@
 # This script takes in a star's particular 2MASS ID, and finds that 2MASS ID in the allStar-v603.fits file. Then, it uses the index of that ID to figure out the field, and prints the resulting link to the datafile on the SDSS website.
 
 import pyfits
+import numpy as np
 
 def findIndex(seachFor, searchIn):
     instances = searchIn.count(searchFor)
@@ -33,13 +34,10 @@ if __name__ == "__main__":
 
     # Goal: put .sh script commands into a .sh file
 
-    outputfile = open('wget_LAMOST_overlap_stars.sh', 'w')
+    outputfile = open('wget_APOKASC_overlap_stars.sh', 'w')
 
     # Open list of 2MASS IDs for LAMOST xcalib stars
-    inputfile = open('2MASSID.txt', 'r')
-    inputfile.readline() # ignore the first line
-    
-    starlist = inputfile.readlines()
+    starlist = np.load('..example_apokasc/apokasc_DR12_overlap.npz')
     
     for star in starlist:
         searchFor = filter(None, star.split(' '))[0]

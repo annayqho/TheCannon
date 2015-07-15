@@ -137,7 +137,7 @@ def load_spectra(data_dir, filenames):
     return files, grid, fluxes, ivars
 
 
-def load_labels(label_file, tr_files):
+def load_labels(filename, lamost_ids, apogee_ids):
     """ Extracts training labels from file.
 
     Assumes that first row is # then label names, first col is # then 
@@ -155,7 +155,6 @@ def load_labels(label_file, tr_files):
     tr_labels = np.zeros((len(tr_files), all_tr_label_val.shape[1]))
     for jj,tr_id in enumerate(tr_files):
         tr_labels[jj,:] = all_tr_label_val[lamost_ids==tr_id,:]
-    tr_labels = tr_labels[np.argsort(tr_files)]
     return tr_labels
 
 
@@ -206,25 +205,59 @@ def get_starmask(ids, labels, aspcapflag, paramflag):
     return cuts | aspcapflag_bad | paramflag_bad 
 
 
+def make_kepler_label_file():
+    """ using the values made by The Cannon """
+    lamost_key = np.loadtxt('lamost_sorted_by_ra.txt',dtype=str)
+    apogee_key = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
+    apogee_key_short = np.array(
+            [(item.split('v603-')[-1]).split('.fits')[0]
+            for item in apogee_key])
+    nstars = len(lamost_key)
+
+    direc = "/home/annaho/TheCannon/examples/example_apokasc/test_is_lamost_apogee_overlap"
+    kepler_ids = np.load("%s/test_ids.npz" %direc)['arr_0']
+    kepler_ids = np.array([a.split('/')[-1] for a in kepler_ids])
+    kepler_labels = np.load("%s/test_labels.npz" %direc)['arr_0']
+    inds = np.array(
+            [np.where(apogee_key==a)[0][0] for a in kepler_ids])
+    teff = kepler_labels[:,0][inds]
+    logg = kepler_labels[:,1][inds]
+    feh = kepler_labels[:,2][inds]
+    alpha = kepler_labels[:,3][inds]
+
+    outputf = open("apogee_cannon_labels.csv", "w")
+    header = "#lamost_id,apogee_id,teff,logg,feh,alpha,snr,vscatter,starflag\n"
+    outputf.write(header)
+    for i in range(nstars):
+        line = lamost_key[i]+','+apogee_key[i]+','+\
+               str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+\
+               str(alpha[i])+',0'+',0'+',0'+'\n'
+        outputf.write(line)
+ 
+
 def make_apogee_label_file():
     """ only for the 11,057 overlap objects """
 
     lamost_key = np.loadtxt('lamost_sorted_by_ra.txt',dtype=str)
     apogee_key = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
-    apogee_key_short = np.array([(item.split('v603-')[-1]).split('.fits')[0] 
-                                for item in apogee_key])
+    apogee_key_short = np.array(
+            [(item.split('v603-')[-1]).split('.fits')[0] 
+            for item in apogee_key])
     nstars = len(lamost_key)
 
-    hdulist = pyfits.open("allStar-v603.fits")
+    hdulist = pyfits.open("example_DR12/allStar-v603.fits")
     datain = hdulist[1].data
     apstarid= datain['APSTAR_ID']
     aspcapflag = datain['ASPCAPFLAG']
     paramflag =datain['PARAMFLAG']
-    apogee_id = np.array([element.split('.')[-1] for element in apstarid])
+    apogee_id = np.array(
+            [element.split('.')[-1] for element in apstarid])
+    # these are the calibrated parameters
     t = np.array(datain['TEFF'], dtype=float)
     g = np.array(datain['LOGG'], dtype=float)
     # according to Holtzman et al 2015, the most reliable values
-    f = np.array(datain['PARAM_M_H'], dtype=float)
+    m = np.array(datain['PARAM_M_H'], dtype=float)
+    f = np.array(datain['FE_H'], dtype=float)
     a = np.array(datain['PARAM_ALPHA_M'], dtype=float)
     mg = np.array(datain['MG_H'], dtype=float)
     mg_flag = np.array(datain['MG_H_FLAG'], dtype=float)
@@ -238,7 +271,9 @@ def make_apogee_label_file():
     mask = get_starmask(apogee_id, labels, aspcapflag, paramflag)
 
     # we only want the objects that are in apogee_key
-    inds = np.array([np.where(apogee_id==ID)[0][0] for ID in apogee_key_short]) 
+    inds = np.array(
+            [np.where(apogee_id==ID)[0][0] 
+                for ID in apogee_key_short]) 
     teff = t[inds]
     logg = g[inds]
     feh = f[inds]
@@ -276,7 +311,11 @@ def make_tr_file_list(frac_cut=0.94, snr_cut=100):
         list of file names of training objects
     """
     allfiles = np.loadtxt(
-            "apogee_dr12_labels.csv", delimiter=',', usecols=(0,), dtype=str)
+            "apogee_dr12_labels.csv", delimiter=',', usecols=(0,), 
+            dtype=str)
+    allfiles_apogee= np.loadtxt(
+            "apogee_dr12_labels.csv", delimiter=',', usecols=(1,), 
+            dtype=str)
     starflags = np.loadtxt(
             "apogee_dr12_labels.csv", delimiter=',', usecols=(8,), dtype=str)
     #nstars = len(allfiles)
@@ -295,8 +334,13 @@ def make_tr_file_list(frac_cut=0.94, snr_cut=100):
     good = starflags == "False"
     #tr_files = ID[good] #945 spectra 
     tr_files = allfiles[good]
-    outputf = open("tr_files.txt", "w")
+    tr_files_apogee = allfiles_apogee[good]
+    outputf = open("PAPER_training_step/tr_files.txt", "w")
     for tr_file in tr_files:
+        outputf.write(tr_file + '\n')
+    outputf.close()
+    outputf = open("PAPER_training_step/tr_files_apogee.txt", "w")
+    for tr_file in tr_files_apogee:
         outputf.write(tr_file + '\n')
     outputf.close()
     return tr_files

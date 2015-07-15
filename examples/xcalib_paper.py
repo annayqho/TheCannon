@@ -44,7 +44,7 @@ def run(date):
     nstars = len(test_IDs)
     lamost_labels = np.zeros((nstars,4))
     lamost_labels[:,0:3] = labels[inds,:][:,1:].astype(float) 
-    np.savez("./%s_tr_label" %date, lamost_labels)
+    np.savez("./%s_lamost_label" %date, lamost_labels)
 
     # Set dataset object
     data = dataset.Dataset(
