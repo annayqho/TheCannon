@@ -130,7 +130,7 @@ def load_spectra(data_dir):
     return files, wl, fluxes, ivars
 
 
-def load_labels(filename, lamost_ids, apogee_ids):
+def load_labels(lamost_ids, apogee_ids, filename):
     """ Extracts reference labels from a file
 
     Parameters

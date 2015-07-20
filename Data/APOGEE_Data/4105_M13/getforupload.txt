@@ -1,2 +1,0 @@
-a = open('stars.list') 
-al = a.readlines() 

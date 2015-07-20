@@ -137,25 +137,22 @@ def load_spectra(data_dir, filenames):
     return files, grid, fluxes, ivars
 
 
-def load_labels(filename, lamost_ids, apogee_ids):
+def load_labels(lamost_ids, filename='lamost_labels_all_dates.csv'):
     """ Extracts training labels from file.
 
     Assumes that first row is # then label names, first col is # then 
     filenames, remaining values are floats and user wants all the labels.
     """
+    direc = "home/annaho/TheCannon/examples/lamost_dr2"
+    label_file = '%s/%s' %(direc, filename)
     print("Loading reference labels from file %s" %label_file)
-    lamost_ids = np.loadtxt(
+    searchIn = np.loadtxt(
         label_file, usecols=(0,), delimiter=',', dtype=str)
-    apogee_ids = np.loadtxt(
-        label_file, usecols=(1,), delimiter=',', dtype=str)
-    starflags = np.loadtxt(
-        label_file, usecols=(8,), delimiter=',', dtype=str)
     all_tr_label_val = np.loadtxt(
-        label_file, usecols=(2,3,4,5,6,7), delimiter=',', dtype=str)
-    tr_labels = np.zeros((len(tr_files), all_tr_label_val.shape[1]))
-    for jj,tr_id in enumerate(tr_files):
-        tr_labels[jj,:] = all_tr_label_val[lamost_ids==tr_id,:]
-    return tr_labels
+        label_file, usecols=(1,2,3), delimiter=',', dtype=str)
+    searchIn = np.array([a.split('/')[-1] for a in searchIn])
+    inds = np.array([np.where(searchIn==a)[0][0] for a in lamost_ids])
+    return tr_labels[inds]
 
 
 def is_badstar(star_id):
@@ -191,16 +188,16 @@ def get_starmask(ids, labels, aspcapflag, paramflag):
     # M_H_WARN, ALPHAFE_WARN not included in the above, so do them separately
     star_warn = np.bitwise_and(aspcapflag, 2**7) != 0
     star_bad = np.bitwise_and(aspcapflag, 2**23) != 0
-    feh_warn = np.bitwise_and(aspcapflag, 2**3) != 0
+    mh_warn = np.bitwise_and(aspcapflag, 2**3) != 0
     alpha_warn = np.bitwise_and(aspcapflag, 2**4) != 0
-    aspcapflag_bad = star_warn | star_bad | feh_warn | alpha_warn
+    aspcapflag_bad = star_warn | star_bad | mh_warn | alpha_warn
 
     # separate element flags
     teff_flag = paramflag[:,0] != 0
     logg_flag = paramflag[:,1] != 0
-    feh_flag = paramflag[:,3] != 0
+    mh_flag = paramflag[:,3] != 0
     alpha_flag = paramflag[:,4] != 0
-    paramflag_bad = teff_flag | logg_flag | feh_flag | alpha_flag
+    paramflag_bad = teff_flag | logg_flag | mh_flag | alpha_flag
 
     return cuts | aspcapflag_bad | paramflag_bad 
 
@@ -236,15 +233,12 @@ def make_kepler_label_file():
  
 
 def make_apogee_label_file():
-    """ only for the 11,057 overlap objects """
-
-    lamost_key = np.loadtxt('lamost_sorted_by_ra.txt',dtype=str)
-    apogee_key = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
-    apogee_key_short = np.array(
-            [(item.split('v603-')[-1]).split('.fits')[0] 
-            for item in apogee_key])
-    nstars = len(lamost_key)
-
+    #lamost_key = np.loadtxt('lamost_sorted_by_ra.txt',dtype=str)
+    #apogee_key = np.loadtxt('apogee_sorted_by_ra.txt', dtype=str)
+    #apogee_key_short = np.array(
+    #        [(item.split('v603-')[-1]).split('.fits')[0] 
+    #        for item in apogee_key])
+    #nstars = len(lamost_key)
     hdulist = pyfits.open("example_DR12/allStar-v603.fits")
     datain = hdulist[1].data
     apstarid= datain['APSTAR_ID']
@@ -265,7 +259,7 @@ def make_apogee_label_file():
     ca_flag = np.array(datain['CA_H_FLAG'], dtype=float)
     vscat = np.array(datain['VSCATTER'])
     SNR = np.array(datain['SNR'])
-    labels = np.vstack((t, g, f, a))
+    labels = np.vstack((t, g, m, a))
 
     # 1 if object would be an unsuitable training object
     mask = get_starmask(apogee_id, labels, aspcapflag, paramflag)
@@ -276,18 +270,18 @@ def make_apogee_label_file():
                 for ID in apogee_key_short]) 
     teff = t[inds]
     logg = g[inds]
-    feh = f[inds]
+    mh = m[inds]
     alpha = a[inds]
     snr = SNR[inds]
     vscatter = vscat[inds]
     starflags = mask[inds]
 
     outputf = open("apogee_dr12_labels.csv", "w")
-    header = "#lamost_id,apogee_id,teff,logg,feh,alpha,snr,vscatter,starflag\n"
+    header = "#lamost_id,apogee_id,teff,logg,mh,alpha,snr,vscatter,starflag\n"
     outputf.write(header)
     for i in range(nstars):
         line = lamost_key[i]+','+apogee_key[i]+','+\
-               str(teff[i])+','+str(logg[i])+','+str(feh[i])+','+\
+               str(teff[i])+','+str(logg[i])+','+str(mh[i])+','+\
                str(alpha[i])+','+str(snr[i])+','+str(vscatter[i])+','+\
                str(starflags[i])+'\n'
         outputf.write(line)
