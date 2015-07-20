@@ -187,14 +187,14 @@ def _find_cont_fitfunc(fluxes, ivars, contmask, deg, ffunc):
         if ffunc=="sinusoid": 
             p0 = np.ones(deg*2) # one for cos, one for sin
             L = max(x)-min(x)
-            pcont_func = _partial_func(_cont_sinusoid, L=L, y=flux)
+            pcont_func = _partial_func(_sinusoid, L=L, y=flux)
             popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
                                        sigma=1./np.sqrt(yivar))
         elif ffunc=="chebyshev":
             fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=deg)
         for element in pix:
             if ffunc=="sinusoid":
-                cont[jj,element] = _cont_sinusoid(element, popt, L=L, y=flux)
+                cont[jj,element] = _sinusoid(element, popt, L=L, y=flux)
             elif ffunc=="chebyshev":
                 cont[jj,element] = fit(element)
     return cont
