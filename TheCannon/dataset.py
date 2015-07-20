@@ -9,7 +9,8 @@ rc('font', family='serif')
 from .helpers.triangle import corner
 from .helpers import Table
 from .find_continuum_pixels import * 
-from .continuum_normalization import _cont_norm_gaussian_smooth, _cont_norm_running_quantile, _cont_norm_running_quantile_regions
+from .continuum_normalization import _cont_norm_gaussian_smooth, _cont_norm_running_quantile, _cont_norm_running_quantile_regions, _find_cont_fitfunc, _find_cont_fitfunc_regions
+from .find_continuum_pixels import _find_contpix_regions
 from .spectral_model import overlay_spectra
 
 PY3 = sys.version_info[0] > 2
@@ -297,16 +298,17 @@ class Dataset(object):
         """
         print("Fitting Continuum...")
         if self.ranges == None:
-            tr_cont = _fit_cont(
+            tr_cont = _find_cont_fitfunc(
                     self.tr_flux, self.tr_ivar, self.contmask, deg, ffunc)
-            test_cont = _fit_cont(
+            test_cont = _find_cont_fitfunc(
                     self.test_flux, self.test_ivar, self.contmask, deg, ffunc)
         else:
             print("Fitting Continuum in %s Regions..." %len(self.ranges))
-            tr_cont = _fit_cont_regions(self.tr_flux, self.tr_ivar, 
+            tr_cont = _find_cont_fitfunc_regions(self.tr_flux, self.tr_ivar, 
                                        self.contmask, deg, self.ranges, ffunc)
-            test_cont = _fit_cont_regions(self.test_flux, self.test_ivar,
-                                         self.contmask, deg, self.ranges, ffunc)
+            test_cont = _find_cont_fitfunc_regions(
+                    self.test_flux, self.test_ivar,
+                    self.contmask, deg, self.ranges, ffunc)
         return tr_cont, test_cont
 
 
