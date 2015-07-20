@@ -6,6 +6,7 @@ import scipy.optimize as opt
 import os
 import sys
 import matplotlib.pyplot as plt
+from astropy.io import ascii
 
 # python 3 special
 PY3 = sys.version_info[0] > 2
@@ -130,7 +131,7 @@ def load_spectra(data_dir):
     return files, wl, fluxes, ivars
 
 
-def load_labels(lamost_ids, apogee_ids, filename):
+def load_labels(filename):
     """ Extracts reference labels from a file
 
     Parameters
@@ -147,18 +148,17 @@ def load_labels(lamost_ids, apogee_ids, filename):
         Reference label values for all reference objects
     """
     print("Loading reference labels from file %s" %filename)
-    lamost_ids = np.loadtxt(
-            label_file, usecols=(0,), delimiter=',', dtype=str)
-    apogee_ids = np.loadtxt(
-            label_file, usecols=(1,), delimiter=',', dtype=str)
-    all_labels = np.loadtxt(
-            label_file, usecols=(2,3,4,5,6,7,8), delimiter=',', dtype=str)
-    if lamost_ids==None:
-        searchIn = apogee_ids
-    if apogee_ids==None:
-        searchIn = lamost_ids
-    inds = np.array([np.where(searchIn==a)[0][0] for a in ids])
-    return all_labels[inds]
+    data = ascii.read(filename)
+    ids = data['ID']
+    inds = ids.argsort()
+    ids = ids[inds]
+    teff = data['Teff_{corr}']
+    teff = teff[inds]
+    logg = data['logg_{corr}']
+    logg = logg[inds]
+    mh = data['[M/H]_{corr}']
+    mh = mh[inds]
+    return np.vstack((teff,logg,mh)).T 
 
 
 if  __name__ =='__main__':
