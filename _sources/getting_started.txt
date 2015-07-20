@@ -33,7 +33,7 @@ all appropriately before feeding it into ``TheCannon``.
 
 >>> from TheCannon import apogee
 >>> tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
->>> all_labels = apogee.load_labels("example_DR10/reference_labels.csv")
+>>> tr_labels = apogee.load_labels("example_DR10/reference_labels.csv")
 
 There should be 548 spectra with 8575 pixels each. 
 
@@ -45,20 +45,6 @@ separately.
 >>> test_ID = tr_ID
 >>> test_flux = tr_flux
 >>> test_ivar = tr_ivar
-
-The ``reference_label.csv`` file contains more labels than we want to use; 
-in this example, we only want effective temperature, metallicity, and surface
-gravity. The output from the ``apogee.load_labels`` step shows which column
-corresponds to which label, so we select them as follows:
-
->>> teff = all_labels[:,1]
->>> logg = all_labels[:,3]
->>> mh = all_labels[:,5]
-
-and then repackage them to suit the requirements in "Requirements for Input:"
-
->>> import numpy as np
->>> tr_label = np.vstack((teff, logg, mh)).T
 
 Now, all the input data has been packaged properly, and we can begin running
 ``TheCannon.``

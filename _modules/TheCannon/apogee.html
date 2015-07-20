@@ -74,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#apogee-data">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
@@ -128,8 +128,8 @@
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">ascii</span>
 
 <span class="c"># python 3 special</span>
 <span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
@@ -164,6 +164,45 @@
     <span class="n">bad_err</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">flux_errs</span><span class="p">))</span> <span class="o">|</span> <span class="p">(</span><span class="n">flux_errs</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">bad_pix</span> <span class="o">=</span> <span class="n">bad_err</span> <span class="o">|</span> <span class="n">bad_flux</span>
     <span class="k">return</span> <span class="n">bad_pix</span>
+
+</div>
+<div class="viewcode-block" id="get_starmask"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.get_starmask">[docs]</a><span class="k">def</span> <span class="nf">get_starmask</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">aspcapflag</span><span class="p">,</span> <span class="n">paramflag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Identifies which APOGEE objects have unreliable physical parameters,</span>
+<span class="sd">    as laid out in Holzman et al 2015 and on the APOGEE DR12 website</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: np array</span>
+<span class="sd">        all APOGEE DR12 IDs and labels</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bad: np array</span>
+<span class="sd">        mask where 1 corresponds to a star with unreliable parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># teff outside range (4000,6000) K and logg &lt; 0</span>
+    <span class="n">teff</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+    <span class="n">bad_teff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">teff</span> <span class="o">&lt;</span> <span class="mi">4000</span><span class="p">,</span> <span class="n">teff</span> <span class="o">&gt;</span> <span class="mi">6000</span><span class="p">)</span>
+    <span class="n">logg</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+    <span class="n">bad_logg</span> <span class="o">=</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="n">cuts</span> <span class="o">=</span> <span class="n">bad_teff</span> <span class="o">|</span> <span class="n">bad_logg</span>
+
+    <span class="c"># STAR_WARN flag set (TEFF, LOGG, CHI2, COLORTE, ROTATION, SN)</span>
+    <span class="c"># M_H_WARN, ALPHAFE_WARN not included in the above, so do them separately</span>
+    <span class="n">star_warn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">star_bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">23</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">feh_warn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">alpha_warn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">aspcapflag_bad</span> <span class="o">=</span> <span class="n">star_warn</span> <span class="o">|</span> <span class="n">star_bad</span> <span class="o">|</span> <span class="n">feh_warn</span> <span class="o">|</span> <span class="n">alpha_warn</span>
+
+    <span class="c"># separate element flags</span>
+    <span class="n">teff_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">logg_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">feh_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">alpha_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">paramflag_bad</span> <span class="o">=</span> <span class="n">teff_flag</span> <span class="o">|</span> <span class="n">logg_flag</span> <span class="o">|</span> <span class="n">feh_flag</span> <span class="o">|</span> <span class="n">alpha_flag</span>
+
+    <span class="k">return</span> <span class="n">cuts</span> <span class="o">|</span> <span class="n">aspcapflag_bad</span> <span class="o">|</span> <span class="n">paramflag_bad</span> 
 
 </div>
 <div class="viewcode-block" id="load_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.load_spectra">[docs]</a><span class="k">def</span> <span class="nf">load_spectra</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
@@ -223,20 +262,30 @@
 <span class="sd">    filename: str</span>
 <span class="sd">        Name of the file containing the table of reference labels</span>
 
+<span class="sd">    ids: array</span>
+<span class="sd">        The IDs of stars to retrieve labels for</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    labels: ndarray</span>
 <span class="sd">        Reference label values for all reference objects</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;Loading reference labels from file </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
-    <span class="n">label_names</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span> <span class="c"># ignore id</span>
-    <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_names</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> labels:&#39;</span> <span class="o">%</span><span class="n">nlabels</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">label_names</span><span class="p">)</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">label_names</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="k">return</span> <span class="n">labels</span> </div>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;ID&#39;</span><span class="p">]</span>
+    <span class="n">inds</span> <span class="o">=</span> <span class="n">ids</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="n">teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;Teff_{corr}&#39;</span><span class="p">]</span>
+    <span class="n">teff</span> <span class="o">=</span> <span class="n">teff</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="n">logg</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;logg_{corr}&#39;</span><span class="p">]</span>
+    <span class="n">logg</span> <span class="o">=</span> <span class="n">logg</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="n">mh</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;[M/H]_{corr}&#39;</span><span class="p">]</span>
+    <span class="n">mh</span> <span class="o">=</span> <span class="n">mh</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">teff</span><span class="p">,</span><span class="n">logg</span><span class="p">,</span><span class="n">mh</span><span class="p">))</span><span class="o">.</span><span class="n">T</span> 
+
+</div>
+<span class="k">if</span>  <span class="n">__name__</span> <span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">make_apogee_label_file</span><span class="p">()</span>
 </pre></div>
 
           </div>

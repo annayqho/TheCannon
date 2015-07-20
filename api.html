@@ -74,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#apogee-data">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.apogee">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
@@ -122,8 +122,124 @@
             
   <div class="section" id="reference-api">
 <span id="api"></span><h1>Reference/API<a class="headerlink" href="#reference-api" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="apogee-data">
-<h2>APOGEE Data<a class="headerlink" href="#apogee-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-TheCannon.apogee">
+<span id="apogee-data"></span><h2>APOGEE Data<a class="headerlink" href="#module-TheCannon.apogee" title="Permalink to this headline">¶</a></h2>
+<p>Functions for reading in APOGEE spectra and training labels</p>
+<dl class="function">
+<dt id="TheCannon.apogee.get_pixmask">
+<tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">get_pixmask</tt><big>(</big><em>fluxes</em>, <em>flux_errs</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#get_pixmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_pixmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and return a bad pixel mask for an APOGEE spectrum</p>
+<p>Bad pixels are defined as follows: fluxes or errors are not finite, or 
+reported errors are &lt;= 0</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray</strong></p>
+<blockquote>
+<div><p>Flux data values</p>
+</div></blockquote>
+<p><strong>flux_errs: ndarray</strong></p>
+<blockquote>
+<div><p>Flux uncertainty data values</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mask: ndarray</p>
+<blockquote class="last">
+<div><p>Bad pixel mask, value of True corresponds to bad pixels</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.get_starmask">
+<tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">get_starmask</tt><big>(</big><em>ids</em>, <em>labels</em>, <em>aspcapflag</em>, <em>paramflag</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#get_starmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_starmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies which APOGEE objects have unreliable physical parameters,
+as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data: np array</strong></p>
+<blockquote>
+<div><p>all APOGEE DR12 IDs and labels</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bad: np array</p>
+<blockquote class="last">
+<div><p>mask where 1 corresponds to a star with unreliable parameters</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.load_labels">
+<tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">load_labels</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#load_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts reference labels from a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename: str</strong></p>
+<blockquote>
+<div><p>Name of the file containing the table of reference labels</p>
+</div></blockquote>
+<p><strong>ids: array</strong></p>
+<blockquote>
+<div><p>The IDs of stars to retrieve labels for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">labels: ndarray</p>
+<blockquote class="last">
+<div><p>Reference label values for all reference objects</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.load_spectra">
+<tt class="descclassname">TheCannon.apogee.</tt><tt class="descname">load_spectra</tt><big>(</big><em>data_dir</em><big>)</big><a class="reference internal" href="_modules/TheCannon/apogee.html#load_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads wavelength, flux, and flux uncertainty data from apogee fits files</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_dir: str</strong></p>
+<blockquote>
+<div><p>Name of the directory containing all of the data files</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: ndarray</p>
+<blockquote>
+<div><p>Rest-frame wavelength vector</p>
+</div></blockquote>
+<p>fluxes: ndarray</p>
+<blockquote>
+<div><p>Flux data values</p>
+</div></blockquote>
+<p>ivars: ndarray</p>
+<blockquote class="last">
+<div><p>Inverse variance values corresponding to flux values</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
