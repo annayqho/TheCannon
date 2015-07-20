@@ -74,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#apogee-data">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
@@ -137,27 +137,26 @@
 <span class="n">SMALL</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">LARGE</span>
 
 <div class="viewcode-block" id="CannonModel"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel">[docs]</a><span class="k">class</span> <span class="nc">CannonModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
-            <span class="n">txt</span> <span class="o">=</span> <span class="s">&#39;Expecting a Dataset instance, got {0}&#39;</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">txt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
 
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="CannonModel.model"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.model">[docs]</a>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the model definition or raise an error if not trained &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Model not trained&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span>
 
 </div>
-<div class="viewcode-block" id="CannonModel.train"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="CannonModel.train"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run training step: solve for best-fit spectral model &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">_train_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span> <span class="o">=</span> <span class="n">_train_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 </div>
     <span class="k">def</span> <span class="nf">diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -179,7 +178,7 @@
 <span class="sd">        errs_all: ndarray</span>
 <span class="sd">            Covariance matrix of the fit</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="CannonModel.draw_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.draw_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">draw_spectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
@@ -213,33 +212,56 @@
         <span class="k">return</span> <span class="n">cannon_set</span>
 
 </div>
-    <span class="k">def</span> <span class="nf">_split_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; split an array into a certain number of segments</span>
+<div class="viewcode-block" id="CannonModel.plot_contpix"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.plot_contpix">[docs]</a>    <span class="k">def</span> <span class="nf">plot_contpix</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">contpix_x</span><span class="p">,</span> <span class="n">contpix_y</span><span class="p">,</span> <span class="n">figname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Plot baseline spec with continuum pix overlaid </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        array: numpy ndarray</span>
-<span class="sd">            array to be split</span>
-
-<span class="sd">        num: int</span>
-<span class="sd">            number of elements to split array into</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        ------</span>
-<span class="sd">        out: list </span>
-<span class="sd">            split array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">avg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">last</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">while</span> <span class="n">last</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">last</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">last</span><span class="o">+</span><span class="n">avg</span><span class="p">)])</span>
-            <span class="n">last</span> <span class="o">+=</span> <span class="n">avg</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;Wavelength $\lambda (\AA)$&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s">&#39;mid&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s">r&#39;$\theta_0$&#39;</span> <span class="o">+</span> <span class="s">&quot;= the leading fit coefficient&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">contpix_x</span><span class="p">,</span> <span class="n">contpix_y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s">&quot;continuum pixels&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;lower right&#39;</span><span class="p">,</span> 
+                <span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;family&#39;</span><span class="p">:</span><span class="s">&#39;serif&#39;</span><span class="p">,</span> <span class="s">&#39;size&#39;</span><span class="p">:</span><span class="s">&#39;small&#39;</span><span class="p">})</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Baseline Spectrum with Continuum Pixels&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&#39;$\theta_0$&#39;</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s">&#39;mid&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+             <span class="n">label</span><span class="o">=</span><span class="s">r&#39;$\theta_0$&#39;</span> <span class="o">+</span> <span class="s">&quot;= the leading fit coefficient&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">contpix_x</span><span class="p">,</span> <span class="n">contpix_y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s">&quot;continuum pixels&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Baseline Spectrum with Continuum Pixels, Zoomed&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;upper right&#39;</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;family&#39;</span><span class="p">:</span><span class="s">&#39;serif&#39;</span><span class="p">,</span> 
+            <span class="s">&#39;size&#39;</span><span class="p">:</span><span class="s">&#39;small&#39;</span><span class="p">})</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&#39;$\theta_0$&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic plot: fitted 0th order spec w/ cont pix&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved as </span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">.png&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">baseline_spec_plot_name</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">baseline_spec_plot_name</span> <span class="o">+</span> <span class="s">&quot;_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
+</div>
+<div class="viewcode-block" id="CannonModel.diagnostics_contpix"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.diagnostics_contpix">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_contpix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="s">&quot;baseline_spec_with_cont_pix&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Call plot_contpix once for each nth of the spectrum &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">contmask</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;No contmask set&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">coeffs_all</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coeffs</span>
+            <span class="n">wl</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">wl</span>
+            <span class="n">baseline_spec</span> <span class="o">=</span> <span class="n">coeffs_all</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">contmask</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">contmask</span>
+            <span class="n">contpix_x</span> <span class="o">=</span> <span class="n">wl</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
+            <span class="n">contpix_y</span> <span class="o">=</span> <span class="n">baseline_spec</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
+            
 
+</div>
 <div class="viewcode-block" id="CannonModel.diagnostics"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.diagnostics">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">baseline_spec_plot_name</span> <span class="o">=</span> <span class="s">&quot;baseline_spec_with_cont_pix&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span>
             <span class="n">leading_coeffs_plot_name</span> <span class="o">=</span> <span class="s">&quot;leading_coeffs.png&quot;</span><span class="p">,</span>
             <span class="n">chisq_dist_plot_name</span> <span class="o">=</span> <span class="s">&quot;modelfit_chisqs.png&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Produce a set of diagnostic plots for the model </span>
@@ -253,67 +275,14 @@
 <span class="sd">        (optional) chisq_dist_plot_name: str</span>
 <span class="sd">            Filename of output saved plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
-        <span class="n">contmask</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">contmask</span>
-        <span class="n">lams</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">wl</span>
         <span class="n">label_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
-        <span class="n">coeffs_all</span><span class="p">,</span> <span class="n">covs</span><span class="p">,</span> <span class="n">scatters</span><span class="p">,</span> <span class="n">chisqs</span><span class="p">,</span> <span class="n">pivots</span><span class="p">,</span> <span class="n">label_vector</span> <span class="o">=</span> <span class="n">model</span>
         <span class="n">npixels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lams</span><span class="p">)</span>
         <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pivots</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">contmask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c"># Baseline spectrum with continuum</span>
-            <span class="n">baseline_spec</span> <span class="o">=</span> <span class="n">coeffs_all</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">baseline_spec</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-            <span class="n">baseline_spec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">baseline_spec</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
-            <span class="n">lams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lams</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
-
-            <span class="c"># Continuum pixels</span>
-            <span class="n">contpix_lambda</span> <span class="o">=</span> <span class="n">lams</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">baseline_spec</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
-
-            <span class="c"># Split into ten segments</span>
-            <span class="n">nseg</span> <span class="o">=</span> <span class="mi">10</span>
-            <span class="n">lams_seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_array</span><span class="p">(</span><span class="n">lams</span><span class="o">.</span><span class="n">compressed</span><span class="p">(),</span> <span class="n">nseg</span><span class="p">)</span>
-            <span class="n">xmins</span> <span class="o">=</span> <span class="p">[]</span> 
-            <span class="n">xmaxs</span> <span class="o">=</span> <span class="p">[]</span> 
-            <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">lams_seg</span><span class="p">:</span>
-                <span class="n">xmins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">xmaxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nseg</span><span class="p">):</span>
-                <span class="n">fig</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;Wavelength $\lambda (\AA)$&quot;</span><span class="p">)</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xmins</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xmaxs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                <span class="n">ax</span> <span class="o">=</span> <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">lams</span><span class="p">,</span> <span class="n">baseline_spec</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s">&#39;mid&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
-                        <span class="n">label</span><span class="o">=</span><span class="s">r&#39;$\theta_0$&#39;</span> <span class="o">+</span> <span class="s">&quot;= the leading fit coefficient&quot;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">contpix_lambda</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span>
-                        <span class="n">label</span><span class="o">=</span><span class="s">&quot;continuum pixels&quot;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;lower right&#39;</span><span class="p">,</span> 
-                        <span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;family&#39;</span><span class="p">:</span><span class="s">&#39;serif&#39;</span><span class="p">,</span> <span class="s">&#39;size&#39;</span><span class="p">:</span><span class="s">&#39;small&#39;</span><span class="p">})</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Baseline Spectrum with Continuum Pixels&quot;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&#39;$\theta_0$&#39;</span><span class="p">)</span>
-                <span class="n">ax</span> <span class="o">=</span> <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">lams</span><span class="p">,</span> <span class="n">baseline_spec</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s">&#39;mid&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
-                     <span class="n">label</span><span class="o">=</span><span class="s">r&#39;$\theta_0$&#39;</span> <span class="o">+</span> <span class="s">&quot;= the leading fit coefficient&quot;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">contpix_lambda</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span>
-                        <span class="n">label</span><span class="o">=</span><span class="s">&quot;continuum pixels&quot;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Baseline Spectrum with Continuum Pixels, Zoomed&quot;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;upper right&#39;</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;family&#39;</span><span class="p">:</span><span class="s">&#39;serif&#39;</span><span class="p">,</span> 
-                    <span class="s">&#39;size&#39;</span><span class="p">:</span><span class="s">&#39;small&#39;</span><span class="p">})</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&#39;$\theta_0$&#39;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
-                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic plot: fitted 0th order spec w/ cont pix&quot;</span><span class="p">)</span>
-                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved as </span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">.png&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">baseline_spec_plot_name</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">baseline_spec_plot_name</span> <span class="o">+</span> <span class="s">&quot;_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">chisqs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">chisqs</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">coeffs</span>
+        <span class="n">scatters</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">scatters</span>
 
         <span class="c"># Leading coefficients for each label &amp; scatter</span>
-        <span class="n">bad</span> <span class="o">=</span> <span class="n">scatters</span> <span class="o">&lt;</span> <span class="mf">0.0002</span>
-        <span class="n">scatters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scatters</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
-        <span class="n">lams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lams</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nlabels</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="n">ax1</span> <span class="o">=</span> <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
@@ -358,7 +327,9 @@
         <span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="p">(</span><span class="n">first_order</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">show_titles</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                      <span class="n">title_args</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;fontsize&quot;</span><span class="p">:</span><span class="mi">12</span><span class="p">})</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s">&quot;leading_coeffs_triangle.png&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic plot: triangle plot of leading coefficients&quot;</span><span class="p">)</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved as </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 
         <span class="c"># Histogram of the chi squareds of ind. stars</span>

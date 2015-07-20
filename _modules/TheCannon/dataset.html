@@ -74,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#apogee-data">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
@@ -128,8 +128,8 @@
 <span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">as</span> <span class="nn">gridspec</span>
 <span class="kn">from</span> <span class="nn">.helpers.triangle</span> <span class="kn">import</span> <span class="n">corner</span>
 <span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">Table</span>
-<span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="n">_find_contpix</span><span class="p">,</span> <span class="n">_find_contpix_regions</span>
-<span class="kn">from</span> <span class="nn">.continuum_normalization</span> <span class="kn">import</span> <span class="n">_fit_cont</span><span class="p">,</span> <span class="n">_fit_cont_regions</span><span class="p">,</span> <span class="n">_cont_norm</span><span class="p">,</span> <span class="n">_cont_norm_regions</span><span class="p">,</span> <span class="n">_cont_norm_q</span><span class="p">,</span> <span class="n">_cont_norm_q_regions</span>
+<span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="o">*</span> 
+<span class="kn">from</span> <span class="nn">.continuum_normalization</span> <span class="kn">import</span> <span class="n">_cont_norm_gaussian_smooth</span> 
 <span class="kn">from</span> <span class="nn">.spectral_model</span> <span class="kn">import</span> <span class="n">overlay_spectra</span>
 
 <span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
@@ -177,10 +177,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        SNR: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">bad</span> <span class="o">=</span> <span class="n">ivar</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
-        <span class="n">ivar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ivar</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
-        <span class="n">SNR</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">flux</span><span class="o">*</span><span class="n">ivar</span><span class="o">**</span><span class="mf">0.5</span><span class="p">))</span>
+        <span class="n">take</span> <span class="o">=</span> <span class="n">ivar</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="n">SNR</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">flux</span><span class="p">[</span><span class="n">take</span><span class="p">]</span><span class="o">*</span><span class="n">ivar</span><span class="p">[</span><span class="n">take</span><span class="p">]</span><span class="o">**</span><span class="mf">0.5</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">SNR</span>  
 
 
@@ -208,6 +206,66 @@
             <span class="k">return</span> <span class="bp">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.bin_flux"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.bin_flux">[docs]</a>    <span class="k">def</span> <span class="nf">bin_flux</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; bin two neighboring flux values &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ivar</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">ivar</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.smooth_spectrum"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.smooth_spectrum">[docs]</a>    <span class="k">def</span> <span class="nf">smooth_spectrum</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Bins down one spectrum </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wl: numpy ndarray</span>
+<span class="sd">            wavelengths</span>
+<span class="sd">        flux: numpy ndarray</span>
+<span class="sd">            flux values</span>
+<span class="sd">        ivar: numpy ndarray</span>
+<span class="sd">            inverse variances associated with fluxes</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        wl: numpy ndarray</span>
+<span class="sd">            updated binned pixel wavelengths</span>
+<span class="sd">        flux: numpy ndarray</span>
+<span class="sd">            updated binned flux values</span>
+<span class="sd">        ivar: numpy ndarray</span>
+<span class="sd">            updated binned inverse variances</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># if odd, discard the last point</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ivar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">ivar</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">wl</span> <span class="o">=</span> <span class="n">wl</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ivar</span> <span class="o">=</span> <span class="n">ivar</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">wl_binned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ivar_binned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ivar</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">flux_binned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bin_flux</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span><span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">wl_binned</span><span class="p">,</span> <span class="n">flux_binned</span><span class="p">,</span> <span class="n">ivar_binned</span>
+
+</div>
+<div class="viewcode-block" id="Dataset.smooth_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.smooth_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">smooth_spectra</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Bins down a block of spectra &quot;&quot;&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">smooth_spectrum</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span><span class="p">)</span> <span class="k">for</span> <span class="n">flux</span><span class="p">,</span><span class="n">ivar</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">output</span> 
+
+</div>
+<div class="viewcode-block" id="Dataset.smooth_dataset"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.smooth_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">smooth_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Bins down all of the spectra and updates the dataset &quot;&quot;&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">smooth_spectra</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">2</span><span class="p">,:]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">smooth_spectra</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">2</span><span class="p">,:]</span>
  
 </div>
 <div class="viewcode-block" id="Dataset.diagnostics_SNR"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_SNR">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_SNR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span> <span class="o">=</span> <span class="s">&quot;SNRdist.png&quot;</span><span class="p">):</span> 
@@ -219,15 +277,15 @@
 <span class="sd">            Filename to use for the output saved plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic for SNRs of reference and survey objects&quot;</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_SNR</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;b&#39;</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="s">&quot;Ref Objects&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_SNR</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> 
                 <span class="n">label</span><span class="o">=</span><span class="s">&quot;Survey Objects&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_SNR</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;b&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s">&quot;Ref Objects&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;upper right&#39;</span><span class="p">)</span>
         <span class="c">#plt.xscale(&#39;log&#39;)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;SNR Comparison Between Reference \&amp; Survey Objects&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;SNR Comparison Between Reference and Survey Objects&quot;</span><span class="p">)</span>
         <span class="c">#plt.xlabel(&quot;log(Formal SNR)&quot;)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&quot;Formal SNR&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&quot;Number of Objects&quot;</span><span class="p">)</span>
@@ -429,6 +487,24 @@
         <span class="k">return</span> <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span>
 
 </div>
+<div class="viewcode-block" id="Dataset.continuum_normalize_gaussian_smoothing"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.continuum_normalize_gaussian_smoothing">[docs]</a>    <span class="k">def</span> <span class="nf">continuum_normalize_gaussian_smoothing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Continuum normalize using a Gaussian-weighted smoothed spectrum</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset: Dataset</span>
+<span class="sd">            the dataset to continuum normalize</span>
+<span class="sd">        L: float</span>
+<span class="sd">            the width of the Gaussian used for weighting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> \
+                <span class="n">_cont_norm_gaussian_smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">norm_tr_flux</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">norm_tr_ivar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">norm_test_flux</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">norm_test_ivar</span>
+
+</div>
 <div class="viewcode-block" id="Dataset.diagnostics_test_step_flagstars"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_test_step_flagstars">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_test_step_flagstars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Write files listing stars whose inferred labels lie outside 2 standard deviations from the reference label space </span>
@@ -466,7 +542,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">,</span> <span class="n">figname</span><span class="p">)</span>
    
    </div>
-<div class="viewcode-block" id="Dataset.diagnostics_1to1"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_1to1">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_1to1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.diagnostics_1to1"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_1to1">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_1to1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s">&quot;1to1_label&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Plots survey labels vs. training labels, color-coded by survey SNR &quot;&quot;&quot;</span>
         <span class="n">snr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_SNR</span>
         <span class="n">label_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
@@ -479,8 +555,8 @@
             <span class="n">orig</span> <span class="o">=</span> <span class="n">reference_labels</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
             <span class="n">cannon</span> <span class="o">=</span> <span class="n">test_labels</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
             <span class="c"># calculate bias and scatter</span>
-            <span class="n">scatter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">orig</span><span class="o">-</span><span class="n">cannon</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span>
-            <span class="n">bias</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">orig</span><span class="o">-</span><span class="n">cannon</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">scatter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">orig</span><span class="o">-</span><span class="n">cannon</span><span class="p">),</span><span class="mi">5</span><span class="p">)</span>
+            <span class="n">bias</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">orig</span><span class="o">-</span><span class="n">cannon</span><span class="p">),</span><span class="mi">5</span><span class="p">)</span>
 
             <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">orig</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">cannon</span><span class="p">))</span>
             <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">orig</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">cannon</span><span class="p">))</span>
@@ -519,10 +595,10 @@
             <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Training Versus Test Labels for $</span><span class="si">%s</span><span class="s">$&quot;</span> <span class="o">%</span><span class="n">name</span><span class="p">,</span>
                     <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
             <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-            <span class="n">figname</span> <span class="o">=</span> <span class="s">&quot;1to1_label_</span><span class="si">%s</span><span class="s">.png&quot;</span> <span class="o">%</span> <span class="n">i</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
+            <span class="n">figname_full</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">.png&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">figname</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figname_full</span><span class="p">)</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&quot;Diagnostic for label output vs. input&quot;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved fig </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">figname</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved fig </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">figname_full</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 </div>

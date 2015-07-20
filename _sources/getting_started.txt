@@ -18,7 +18,6 @@ This file contains the following:
 
 * ``Data``: a folder with .fits data files
 * ``reference_labels.csv``: a table with reference label values for the training step
-* ``Results``: a folder with all of the diagnostic output plots that ``TheCannon`` produces in this example
 
 Before the data can be run through ``TheCannon``, it must be prepared
 according to the specifications laid out in the "Requirements for Input"

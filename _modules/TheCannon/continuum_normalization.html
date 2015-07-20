@@ -74,7 +74,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#apogee-data">APOGEE Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
@@ -123,23 +123,40 @@
   <h1>Source code for TheCannon.continuum_normalization</h1><div class="highlight"><pre>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
-
-<span class="sd">&quot;&quot;&quot; Performs continuum normalization on Cannon input spectra. &quot;&quot;&quot;</span>
 
 <span class="n">LARGE</span> <span class="o">=</span> <span class="mf">200.</span>
 <span class="n">SMALL</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">LARGE</span>
 
-<span class="k">def</span> <span class="nf">partial_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_partial_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; something &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wrap</span>
 
 
-<div class="viewcode-block" id="cont_func"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.cont_func">[docs]</a><span class="k">def</span> <span class="nf">cont_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Return the fitting function evaluated at input x for the continuum.</span>
-<span class="sd">    The fitting function is a sinusoid, sum of sines and cosines</span>
+<div class="viewcode-block" id="gaussian_weight_matrix"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.gaussian_weight_matrix">[docs]</a><span class="k">def</span> <span class="nf">gaussian_weight_matrix</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Matrix of Gaussian weights </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wl: numpy ndarray</span>
+<span class="sd">        pixel wavelength values</span>
+<span class="sd">    L: float</span>
+<span class="sd">        width of Gaussian</span>
+
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    Weight matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">wl</span><span class="p">[:,</span><span class="bp">None</span><span class="p">]</span><span class="o">-</span><span class="n">wl</span><span class="p">[</span><span class="bp">None</span><span class="p">,:])</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">L</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_sinusoid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Return the sinusoid cont func evaluated at input x for the continuum.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -165,8 +182,94 @@
         <span class="n">func</span> <span class="o">+=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span>
 
-</div>
-<div class="viewcode-block" id="fit_cont"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.fit_cont">[docs]</a><span class="k">def</span> <span class="nf">fit_cont</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_weighted_median</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">quantile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate a weighted median for values above a particular quantile cut</span>
+
+<span class="sd">    Used in pseudo continuum normalization</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    values: np ndarray of floats</span>
+<span class="sd">        the values to take the median of</span>
+<span class="sd">    weights: np ndarray of floats</span>
+<span class="sd">        the weights associated with the values</span>
+<span class="sd">    quantile: float</span>
+<span class="sd">        the cut applied to the input data</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ------</span>
+<span class="sd">    the weighted median</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sindx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">cvalues</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">sindx</span><span class="p">])</span>
+    <span class="n">cvalues</span> <span class="o">=</span> <span class="n">cvalues</span> <span class="o">/</span> <span class="n">cvalues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">sindx</span><span class="p">[</span><span class="n">cvalues</span> <span class="o">&gt;</span> <span class="n">quantile</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">indx</span> <span class="o">=</span> <span class="n">foo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_find_cont_gaussian_smooth</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the weighted mean block of spectra</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wl: numpy ndarray</span>
+<span class="sd">        wavelength vector</span>
+<span class="sd">    flux: numpy ndarray</span>
+<span class="sd">        block of flux values </span>
+<span class="sd">    ivar: numpy ndarray</span>
+<span class="sd">        block of ivar values</span>
+<span class="sd">    L: float</span>
+<span class="sd">        width of Gaussian used to assign weights</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    smoothed_fluxes: numpy ndarray</span>
+<span class="sd">        block of smoothed flux values, mean spectra</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Finding the continuum&quot;</span><span class="p">)</span>
+    <span class="n">bot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ivars</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">fluxes</span><span class="o">*</span><span class="n">ivars</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">bad</span> <span class="o">=</span> <span class="n">bot</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bot</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_cont_norm_gaussian_smooth</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Continuum normalize by dividing by a Gaussian-weighted smoothed spectrum</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: Dataset</span>
+<span class="sd">        the dataset to continuum normalize</span>
+<span class="sd">    L: float</span>
+<span class="sd">        the width of the Gaussian used for weighting</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dataset: Dataset</span>
+<span class="sd">        updated dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Gaussian smoothing the entire dataset...&quot;</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">gaussian_weight_matrix</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Gaussian smoothing the training set&quot;</span><span class="p">)</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">_find_cont_gaussian_smooth</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span> <span class="o">=</span> <span class="n">_cont_norm</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="n">cont</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Gaussian smoothing the test set&quot;</span><span class="p">)</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">_find_cont_gaussian_smooth</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> <span class="n">_cont_norm</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="n">cont</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> 
+
+
+<span class="k">def</span> <span class="nf">_find_cont_fitfunc</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Fit a continuum to a continuum pixels in a segment of spectra</span>
 
 <span class="sd">    Functional form can be either sinusoid or chebyshev, with specified degree</span>
@@ -207,20 +310,20 @@
         <span class="k">if</span> <span class="n">ffunc</span><span class="o">==</span><span class="s">&quot;sinusoid&quot;</span><span class="p">:</span> 
             <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">deg</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="c"># one for cos, one for sin</span>
             <span class="n">L</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="n">pcont_func</span> <span class="o">=</span> <span class="n">partial_func</span><span class="p">(</span><span class="n">cont_func</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
+            <span class="n">pcont_func</span> <span class="o">=</span> <span class="n">_partial_func</span><span class="p">(</span><span class="n">_cont_sinusoid</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
             <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">pcont_func</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">,</span> 
                                        <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">yivar</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">ffunc</span><span class="o">==</span><span class="s">&quot;chebyshev&quot;</span><span class="p">:</span>
             <span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">chebyshev</span><span class="o">.</span><span class="n">Chebyshev</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span><span class="n">w</span><span class="o">=</span><span class="n">yivar</span><span class="p">,</span><span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">pix</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">ffunc</span><span class="o">==</span><span class="s">&quot;sinusoid&quot;</span><span class="p">:</span>
-                <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">cont_func</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">popt</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
+                <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cont_sinusoid</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">popt</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">ffunc</span><span class="o">==</span><span class="s">&quot;chebyshev&quot;</span><span class="p">:</span>
-                <span class="n">cont</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cont</span>
 
-</div>
-<div class="viewcode-block" id="fit_cont_regions"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.fit_cont_regions">[docs]</a><span class="k">def</span> <span class="nf">fit_cont_regions</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_find_cont_fitfunc_regions</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Run fit_cont, dealing with spectrum in regions or chunks</span>
 
 <span class="sd">    This is useful if a spectrum has gaps.</span>
@@ -254,47 +357,18 @@
         <span class="n">start</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">ffunc</span><span class="o">==</span><span class="s">&quot;chebyshev&quot;</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">fit_cont</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
                               <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
                               <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="o">=</span><span class="s">&quot;chebyshev&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ffunc</span><span class="o">==</span><span class="s">&quot;sinusoid&quot;</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">fit_cont</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
                               <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
                               <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="o">=</span><span class="s">&quot;sinusoid&quot;</span><span class="p">)</span>
         <span class="n">cont</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
     <span class="k">return</span> <span class="n">cont</span>
 
-</div>
-<div class="viewcode-block" id="weighted_median"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.weighted_median">[docs]</a><span class="k">def</span> <span class="nf">weighted_median</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">quantile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Calculate a weighted median for values above a particular quantile cut</span>
 
-<span class="sd">    Used in pseudo continuum normalization</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    values: np ndarray of floats</span>
-<span class="sd">        the values to take the median of</span>
-<span class="sd">    weights: np ndarray of floats</span>
-<span class="sd">        the weights associated with the values</span>
-<span class="sd">    quantile: float</span>
-<span class="sd">        the cut applied to the input data</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    ------</span>
-<span class="sd">    the weighted median</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">sindx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-    <span class="n">cvalues</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">sindx</span><span class="p">])</span>
-    <span class="n">cvalues</span> <span class="o">=</span> <span class="n">cvalues</span> <span class="o">/</span> <span class="n">cvalues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">foo</span> <span class="o">=</span> <span class="n">sindx</span><span class="p">[</span><span class="n">cvalues</span> <span class="o">&gt;</span> <span class="n">quantile</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">indx</span> <span class="o">=</span> <span class="n">foo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
-
-</div>
-<div class="viewcode-block" id="cont_norm_q"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.cont_norm_q">[docs]</a><span class="k">def</span> <span class="nf">cont_norm_q</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_find_cont_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Perform continuum normalization using a running quantile</span>
 
 <span class="sd">    Parameters</span>
@@ -318,8 +392,6 @@
 <span class="sd">        rescaled pixel invariances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;contnorm.py: continuum norm using running quantile&quot;</span><span class="p">)</span>
-    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">nstars</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
@@ -330,14 +402,20 @@
             <span class="n">indx</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">wl</span><span class="o">-</span><span class="n">lam</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">delta_lambda</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">flux_cut</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
             <span class="n">ivar_cut</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
-            <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">ll</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted_median</span><span class="p">(</span><span class="n">flux_cut</span><span class="p">,</span> <span class="n">ivar_cut</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
-        <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span><span class="o">/</span><span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
-        <span class="n">norm_ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
+            <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">ll</span><span class="p">]</span> <span class="o">=</span> <span class="n">_weighted_median</span><span class="p">(</span><span class="n">flux_cut</span><span class="p">,</span> <span class="n">ivar_cut</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cont</span>
+
+
+<span class="k">def</span> <span class="nf">_cont_norm_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">):</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">_find_cont_running_quantile</span>
+    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">cont</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">cont</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ivars</span>
     <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
 
-</div>
-<div class="viewcode-block" id="cont_norm_q_regions"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.cont_norm_q_regions">[docs]</a><span class="k">def</span> <span class="nf">cont_norm_q_regions</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_cont_norm_running_quantile_regions</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Perform continuum normalization using running quantile, for spectrum</span>
 <span class="sd">    that comes in chunks</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -349,15 +427,15 @@
     <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">cont_norm_q</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
-                             <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
-                             <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">_cont_norm_running_quantile</span><span class="p">(</span>
+                <span class="n">wl</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+                <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">)</span>
         <span class="n">norm_fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">norm_ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
 
-</div>
-<div class="viewcode-block" id="cont_norm"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.cont_norm">[docs]</a><span class="k">def</span> <span class="nf">cont_norm</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">cont</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_cont_norm</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">cont</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Continuum-normalize a continuous segment of spectra.</span>
 
 <span class="sd">    Parameters</span>
@@ -377,18 +455,16 @@
 <span class="sd">        rescaled inverse variances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nstars</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
-        <span class="n">bad</span> <span class="o">=</span> <span class="p">(</span><span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span><span class="o">/</span><span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
-        <span class="n">norm_ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
-        <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:][</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
-        <span class="n">norm_ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:][</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="n">SMALL</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">bad</span> <span class="o">=</span> <span class="n">cont</span> <span class="o">==</span> <span class="mf">0.</span>
+    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+    <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">cont</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ivars</span>
+    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span> 
 
-</div>
-<div class="viewcode-block" id="cont_norm_regions"><a class="viewcode-back" href="../../api.html#TheCannon.continuum_normalization.cont_norm_regions">[docs]</a><span class="k">def</span> <span class="nf">cont_norm_regions</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">cont</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_cont_norm_regions</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">cont</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Perform continuum normalization for spectra in chunks</span>
 
 <span class="sd">    Useful for spectra that have gaps</span>
@@ -417,16 +493,15 @@
     <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">cont_norm</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">_cont_norm</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
                            <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
                            <span class="n">cont</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">])</span>
         <span class="n">norm_fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">norm_ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
         <span class="n">bad</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">)</span>
-        <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:][</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
-        <span class="n">norm_ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:][</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="n">SMALL</span><span class="o">**</span><span class="mi">2</span>
-    <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span></div>
+        <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:][</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
 </pre></div>
 
           </div>
