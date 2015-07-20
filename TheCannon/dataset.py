@@ -3,10 +3,13 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from matplotlib import rc
+rc('text', usetex=True)
+rc('font', family='serif')
 from .helpers.triangle import corner
 from .helpers import Table
 from .find_continuum_pixels import * 
-from .continuum_normalization import _cont_norm_gaussian_smooth 
+from .continuum_normalization import _cont_norm_gaussian_smooth, _cont_norm_running_quantile, _cont_norm_running_quantile_regions
 from .spectral_model import overlay_spectra
 
 PY3 = sys.version_info[0] > 2
@@ -319,11 +322,11 @@ class Dataset(object):
         """
         print("Continuum normalizing the tr set using running quantile...")
         if self.ranges is None:
-            return _cont_norm_q(
+            return _cont_norm_running_quantile(
                     self.wl, self.tr_flux, self.tr_ivar, 
                     q=q, delta_lambda=delta_lambda)
         else:
-            return _cont_norm_q_regions(
+            return _cont_norm_running_quantile_regions(
                     self.wl, self.tr_flux, self.tr_ivar,
                     q=q, delta_lambda=delta_lambda, ranges=self.ranges)
 

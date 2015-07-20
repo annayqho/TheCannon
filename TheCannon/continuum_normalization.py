@@ -284,7 +284,7 @@ def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda):
 
 
 def _cont_norm_running_quantile(wl, fluxes, ivars, q, delta_lambda):
-    cont = _find_cont_running_quantile
+    cont = _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda)
     norm_fluxes = np.ones(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
     norm_fluxes[cont!=0] = fluxes[cont!=0] / cont[cont!=0]

@@ -33,7 +33,7 @@ all appropriately before feeding it into ``TheCannon``.
 
 >>> from TheCannon import apogee
 >>> tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
->>> tr_labels = apogee.load_labels("example_DR10/reference_labels.csv")
+>>> tr_label = apogee.load_labels("example_DR10/reference_labels.csv")
 
 There should be 548 spectra with 8575 pixels each. 
 
