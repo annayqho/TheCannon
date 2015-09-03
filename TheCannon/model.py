@@ -89,7 +89,7 @@ class CannonModel(object):
         return cannon_set
 
 
-    def plot_contpix(x, y, contpix_x, contpix_y, figname):
+    def plot_contpix(self, x, y, contpix_x, contpix_y, figname):
         """ Plot baseline spec with continuum pix overlaid 
 
         Parameters
@@ -118,46 +118,47 @@ class CannonModel(object):
         ax.set_ylabel(r'$\theta_0$')
         ax.set_ylim(0.95, 1.05)
         print("Diagnostic plot: fitted 0th order spec w/ cont pix")
-        print("Saved as %s_%s.png" % (baseline_spec_plot_name, i))
-        plt.savefig(baseline_spec_plot_name + "_%s" %i)
+        print("Saved as %s.png" % (figname))
+        plt.savefig(figname)
         plt.close()
 
 
-    def diagnostics_contpix(self, dataset, n=10, fig = "baseline_spec_with_cont_pix"):
+    def diagnostics_contpix(self, data, nchunks=10, fig = "baseline_spec_with_cont_pix"):
         """ Call plot_contpix once for each nth of the spectrum """
-        if dataset.contmask is None:
+        if data.contmask is None:
             print("No contmask set")
         else:
-            coeffs_all = model.coeffs
-            wl = dataset.wl
+            coeffs_all = self.coeffs
+            wl = data.wl
             baseline_spec = coeffs_all[:,0]
-            contmask = dataset.contmask
+            contmask = data.contmask
             contpix_x = wl[contmask]
             contpix_y = baseline_spec[contmask]
-            
+            rem = len(wl)%nchunks
+            wl_split = np.array(np.split(wl[0:len(wl)-rem],nchunks))
+            baseline_spec_split = np.array(
+                    np.split(baseline_spec[0:len(wl)-rem],nchunks))
+            nchunks = wl_split.shape[0]
+            for i in range(nchunks):
+                fig_chunk = fig + "_%s" %str(i)
+                wl_chunk = wl_split[i,:]
+                baseline_spec_chunk = baseline_spec_split[i,:]
+                take = np.logical_and(
+                        contpix_x>wl_chunk[0], contpix_x<wl_chunk[-1])
+                self.plot_contpix(
+                        wl_chunk, baseline_spec_chunk, 
+                        contpix_x[take], contpix_y[take], fig_chunk)
 
 
-    def diagnostics(
-            self, dataset,
-            leading_coeffs_plot_name = "leading_coeffs.png",
-            chisq_dist_plot_name = "modelfit_chisqs.png"):
-        """ Produce a set of diagnostic plots for the model 
-
-        Parameters
-        ----------
-        (optional) baseline_spec_plot_name: str
-            Filename of output saved plot
-        (optional) leading_coeffs_plot_name: str
-            Filename of output saved plot
-        (optional) chisq_dist_plot_name: str
-            Filename of output saved plot
-        """
+    def diagnostics_leading_coeffs(self, dataset, figname = "leading_coeffs.png"):
         label_names = dataset.get_plotting_labels()
+        lams = dataset.wl
         npixels = len(lams)
+        pivots = self.pivots
         nlabels = len(pivots)
-        chisqs = model.chisqs
-        coeffs = model.coeffs
-        scatters = model.scatters
+        chisqs = self.chisqs
+        coeffs = self.coeffs
+        scatters = self.scatters
 
         # Leading coefficients for each label & scatter
         fig, axarr = plt.subplots(nlabels+1, figsize=(8,8), sharex=True)
@@ -173,15 +174,15 @@ class CannonModel(object):
         axarr[0].set_title(
                 "First-Order Fit Coeffs and Scatter from the Spectral Model",
                 fontsize=14)
-        ax.locator_params(axis='x', nbins=10)
-        first_order = np.zeros((len(coeffs_all[:,0]), nlabels))
+        axarr[0].locator_params(axis='x', nbins=10)
+        first_order = np.zeros((len(coeffs[:,0]), nlabels))
         for i in range(0, nlabels):
             ax = axarr[i]
             lbl = r'$%s$'%label_names[i]
             ax.set_ylabel(lbl, fontsize=14)
             ax.tick_params(axis='y', labelsize=14)
             ax.xaxis.grid(True)
-            y = np.ma.array(coeffs_all[:,i+1], mask=bad)
+            y = coeffs[:,i+1]
             first_order[:, i] = y
             ax.step(lams, y, where='mid', linewidth=0.5, c='k')
             ax.locator_params(axis='y', nbins=4)
@@ -195,9 +196,22 @@ class CannonModel(object):
         ax.xaxis.grid(True)
         ax.locator_params(axis='y', nbins=4)
         print("Diagnostic plot: leading coeffs and scatters across wavelength.")
-        print("Saved as %s" %leading_coeffs_plot_name)
-        fig.savefig(leading_coeffs_plot_name)
+        print("Saved as %s" %figname)
+        fig.savefig(figname)
         plt.close(fig)
+
+
+    def diagnostics_leading_coeffs_triangle(self, dataset, 
+            figname = "leading_coeffs_triangle.png"):
+        label_names = dataset.get_plotting_labels()
+        lams = dataset.wl
+        pivots = self.pivots
+        npixels = len(lams)
+        nlabels = len(pivots)
+        chisqs = self.chisqs
+        coeffs = self.coeffs
+        first_order = coeffs[:,1:1+nlabels]
+        scatters = self.scatters
 
         # triangle plot of the higher-order coefficients
         labels = [r"$%s$" % l for l in label_names]
@@ -205,21 +219,39 @@ class CannonModel(object):
                      title_args = {"fontsize":12})
         filename = "leading_coeffs_triangle.png"
         print("Diagnostic plot: triangle plot of leading coefficients")
-        fig.savefig(filename)
-        print("Saved as %s" %filename)
+        fig.savefig(figname)
+        print("Saved as %s" %figname)
         plt.close(fig)
+
+
+    def diagnostics_plot_chisq(self, dataset, figname = "modelfit_chisqs.png"):
+        """ Produce a set of diagnostic plots for the model 
+
+        Parameters
+        ----------
+        (optional) chisq_dist_plot_name: str
+            Filename of output saved plot
+        """
+        label_names = dataset.get_plotting_labels()
+        lams = dataset.wl
+        pivots = self.pivots
+        npixels = len(lams)
+        nlabels = len(pivots)
+        chisqs = self.chisqs
+        coeffs = self.coeffs
+        scatters = self.scatters
 
         # Histogram of the chi squareds of ind. stars
         plt.hist(np.sum(chisqs, axis=0), color='lightblue', alpha=0.7)
-        dof = len(lams) - coeffs_all.shape[1]   # for one star
+        dof = len(lams) - coeffs.shape[1]   # for one star
         plt.axvline(x=dof, c='k', linewidth=2, label="DOF")
         plt.legend()
         plt.title("Distribution of " + r"$\chi^2$" + " of the Model Fit")
         plt.ylabel("Count")
         plt.xlabel(r"$\chi^2$" + " of Individual Star")
         print("Diagnostic plot: histogram of the red chi squareds of the fit")
-        print("Saved as %s" %chisq_dist_plot_name)
-        plt.savefig(chisq_dist_plot_name)
+        print("Saved as %s" %figname)
+        plt.savefig(figname)
         plt.close()
 
     # convenient namings to match existing packages

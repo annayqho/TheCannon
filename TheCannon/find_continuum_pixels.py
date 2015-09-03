@@ -24,17 +24,13 @@ def _find_contpix_given_cuts(f_cut, sig_cut, wl, fluxes, ivars):
     contmask: boolean mask of length npixels
         True indicates that the pixel is continuum
     """
-    bad1 = np.median(fluxes, axis=0) == 0.
-    bad2 = np.var(fluxes, axis=0) == 0.
-    bad = np.logical_and(bad1, bad2)
     f_bar = np.median(fluxes, axis=0)
     sigma_f = np.var(fluxes, axis=0)
-    f_bar = np.ma.array(f_bar, mask=bad)
-    sigma_f = np.ma.array(sigma_f, mask=bad)
+    bad = np.logical_and(f_bar==0, sigma_f==0)
     cont1 = np.abs(f_bar-1) <= f_cut
     cont2 = sigma_f <= sig_cut
     contmask = np.logical_and(cont1, cont2)
-    contmask = np.ma.filled(contmask, fill_value=False)
+    contmask[bad] = False
     return contmask
 
 
