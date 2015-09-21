@@ -169,8 +169,8 @@ specify is the desired polynomial order of the spectral model.
 In this case, we use a quadratic model: order = 2
 
 >>> from TheCannon import model
->>> model = model.CannonModel(dataset, 2) 
->>> model.fit() 
+>>> model = model.CannonModel(2) 
+>>> model.fit(dataset) 
 
 equivalently,
 
@@ -179,7 +179,9 @@ equivalently,
 At this stage, more optional diagnostic plots can be produced to examine
 the spectral model:
 
->>> model.diagnostics()
+>>> model.diagnostics_cont_pix(dataset)
+>>> model.diagnostics_leading_coeffs(dataset)
+>>> model.diagnostics_plot_chisq(dataset)
 
 The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted. 
