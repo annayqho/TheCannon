@@ -170,7 +170,11 @@ In this case, we use a quadratic model: order = 2
 
 >>> from TheCannon import model
 >>> model = model.CannonModel(2) 
+<<<<<<< HEAD
 >>> model.fit() 
+=======
+>>> model.fit(dataset) 
+>>>>>>> ae1f78e2a333f6ad272fc66c184fc61b128844cf
 
 equivalently,
 
@@ -179,7 +183,11 @@ equivalently,
 At this stage, more optional diagnostic plots can be produced to examine
 the spectral model:
 
+<<<<<<< HEAD
 >>> model.diagnostics_contpix(dataset)
+=======
+>>> model.diagnostics_cont_pix(dataset)
+>>>>>>> ae1f78e2a333f6ad272fc66c184fc61b128844cf
 >>> model.diagnostics_leading_coeffs(dataset)
 >>> model.diagnostics_plot_chisq(dataset)
 
