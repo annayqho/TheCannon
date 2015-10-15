@@ -101,13 +101,11 @@ def load_spectra(filenames, input_grid=None):
     SNRs: numpy ndarray of length nstars
     """
     print("Loading spectra...")
-    files = np.array(filenames)
-    nstars = len(files)
-    npix = np.zeros(nstars) # count num of good (ivar>0) pix in each object
+    nstars = len(filenames)
 
     if input_grid is None:
         # use first file as template
-        file_in = pyfits.open(files[0]) 
+        file_in = pyfits.open(filenames[0]) 
         grid = np.array(file_in[0].data[2])
         middle = np.logical_and(grid_all > 3905, grid_all < 9000)
         grid = grid_all[middle]
@@ -122,7 +120,7 @@ def load_spectra(filenames, input_grid=None):
     fluxes = np.zeros((nstars, npixels), dtype=float)
     ivars = np.zeros(fluxes.shape, dtype=float)
 
-    for jj, fits_file in enumerate(files):
+    for jj, fits_file in enumerate(filenames):
         file_in = pyfits.open(fits_file)
         wl = np.array(file_in[0].data[2])
         flux = np.array(file_in[0].data[0])
@@ -141,7 +139,7 @@ def load_spectra(filenames, input_grid=None):
         ivars[jj,:] = ivar_rs
 
     print("Spectra loaded")
-    return files, grid, fluxes, ivars, npix
+    return filenames, grid, fluxes, ivars, npix
 
 
 def load_labels(lamost_ids, filename='lamost_labels_all_dates.csv'):
