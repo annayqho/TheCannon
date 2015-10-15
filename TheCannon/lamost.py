@@ -75,15 +75,12 @@ def get_pixmask(file_in, wl, middle, flux, ivar):
     return bad_pix_a
 
 
-def load_spectra(data_dir, filenames, input_grid=None):
+def load_spectra(filenames, input_grid=None):
     """
-    Extracts spectra (wavelengths, fluxes, fluxerrs) from apogee fits files
+    Extracts spectra (wavelengths, fluxes, fluxerrs) from lamost fits files
 
     Parameters
     ----------
-    data_dir: string
-        directory where the files are located
-
     filenames: np ndarray
         files from which to extract spectra
 
@@ -92,28 +89,25 @@ def load_spectra(data_dir, filenames, input_grid=None):
 
     Returns
     -------
-    IDs: list of length nstars
-        stellar IDs
-    
     wl: numpy ndarray of length npixels
         rest-frame wavelength vector
 
     fluxes: numpy ndarray of shape (nstars, npixels)
-        training set or test set pixel intensities
+        grid of pixel intensities
 
     ivars: numpy ndarray of shape (nstars, npixels)
-        inverse variances, parallel to fluxes
+        grid of inverse variances, parallel to fluxes
         
     SNRs: numpy ndarray of length nstars
     """
-    print("Loading spectra from directory %s" %data_dir)
+    print("Loading spectra...")
     files = np.array(filenames)
     nstars = len(files)
     npix = np.zeros(nstars) # count num of good (ivar>0) pix in each object
 
     if input_grid is None:
         # use first file as template
-        file_in = pyfits.open("%s/%s" %(data_dir, files[0])) 
+        file_in = pyfits.open(files[0]) 
         grid = np.array(file_in[0].data[2])
         middle = np.logical_and(grid_all > 3905, grid_all < 9000)
         grid = grid_all[middle]
@@ -129,7 +123,7 @@ def load_spectra(data_dir, filenames, input_grid=None):
     ivars = np.zeros(fluxes.shape, dtype=float)
 
     for jj, fits_file in enumerate(files):
-        file_in = pyfits.open("%s/%s" %(data_dir, fits_file))
+        file_in = pyfits.open(fits_file)
         wl = np.array(file_in[0].data[2])
         flux = np.array(file_in[0].data[0])
         ivar = np.array((file_in[0].data[1]))
