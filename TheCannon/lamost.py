@@ -8,6 +8,7 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import glob
+from astropy.table import Table
 
 # python 3 special
 PY3 = sys.version_info[0] > 2
@@ -152,13 +153,11 @@ def load_labels(lamost_ids, filename='lamost_labels_all_dates.csv'):
     Assumes that first row is # then label names, first col is # then 
     filenames, remaining values are floats and user wants all the labels.
     """
-    direc = "home/annaho/TheCannon/examples/lamost_dr2"
-    label_file = '%s/%s' %(direc, filename)
-    print("Loading reference labels from file %s" %label_file)
+    print("Loading reference labels from file %s" %filename)
     searchIn = np.loadtxt(
-        label_file, usecols=(0,), delimiter=',', dtype=str)
+        filename, usecols=(0,), delimiter=',', dtype=str)
     all_tr_label_val = np.loadtxt(
-        label_file, usecols=(1,2,3), delimiter=',', dtype=str)
+        filename, usecols=(1,2,3), delimiter=',', dtype=str)
     searchIn = np.array([a.split('/')[-1] for a in searchIn])
     inds = np.array([np.where(searchIn==a)[0][0] for a in lamost_ids])
     return tr_labels[inds]
@@ -321,21 +320,7 @@ def make_tr_file_list(frac_cut=0.94, snr_cut=100):
             dtype=str)
     starflags = np.loadtxt(
             "apogee_dr12_labels.csv", delimiter=',', usecols=(8,), dtype=str)
-    #nstars = len(allfiles)
-    #dir_dat = "example_LAMOST/Data_All"
-    #ID, wl, flux, ivar = load_spectra(dir_dat, allfiles)
-    #npix = np.float(flux.shape[1])
-    #ngoodpix = np.array([np.count_nonzero(ivar[jj,:]) for jj in range(nstars)])
-    #good_frac = ngoodpix/npix
-    #SNR_raw = flux * ivar**0.5
-    #bad = SNR_raw == 0
-    #SNR_raw = np.ma.array(SNR_raw, mask=bad)
-    #SNR = np.ma.median(SNR_raw, axis=1).filled()
-    #good_cut = np.logical_and(good_frac > frac_cut, SNR>snr_cut)
-    #starflags = starflags[np.argsort(allfiles)]
-    #good = np.logical_and(good_cut, starflags=="False")
     good = starflags == "False"
-    #tr_files = ID[good] #945 spectra 
     tr_files = allfiles[good]
     tr_files_apogee = allfiles_apogee[good]
     outputf = open("PAPER_training_step/tr_files.txt", "w")

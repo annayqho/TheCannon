@@ -159,10 +159,10 @@ class Dataset(object):
         """
         print("Diagnostic for SNRs of reference and survey objects")
         data = self.test_SNR
-        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, facecolor='r', 
+        plt.hist(data, bins=int(np.sqrt(len(data))), alpha=0.5, facecolor='r', 
                 label="Survey Objects")
         data = self.tr_SNR
-        plt.hist(data, bins=np.sqrt(len(data)), alpha=0.5, color='b',
+        plt.hist(data, bins=int(np.sqrt(len(data))), alpha=0.5, color='b',
                 label="Ref Objects")
         plt.legend(loc='upper right')
         #plt.xscale('log')
