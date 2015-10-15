@@ -110,7 +110,7 @@ def load_spectra(filenames, input_grid=None):
     if input_grid is None:
         # use first file as template
         file_in = pyfits.open(filenames[0]) 
-        grid = np.array(file_in[0].data[2])
+        grid_all = np.array(file_in[0].data[2])
         middle = np.logical_and(grid_all > 3905, grid_all < 9000)
         grid = grid_all[middle]
         file_in.close()
