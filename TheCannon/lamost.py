@@ -98,10 +98,14 @@ def load_spectra(filenames, input_grid=None):
     ivars: numpy ndarray of shape (nstars, npixels)
         grid of inverse variances, parallel to fluxes
         
+    npix: numpy ndarray of shape (nstars)
+        number of non-zero ivar pixels for each object
+
     SNRs: numpy ndarray of length nstars
     """
     print("Loading spectra...")
     nstars = len(filenames)
+    npix = np.zeros(nstars) # count num of good (ivar>0) pix in each object
 
     if input_grid is None:
         # use first file as template
@@ -127,7 +131,7 @@ def load_spectra(filenames, input_grid=None):
         ivar = np.array((file_in[0].data[1]))
         npix[jj] = sum(ivar>0)
         # SNR should be calculated ignoring bad pixels
-        SNR[jj] = np.median(flux[ivar>0]*ivar[ivar>0]**0.5)
+        SNRs[jj] = np.median(flux[ivar>0]*ivar[ivar>0]**0.5)
         # correct for radial velocity of star
         redshift = file_in[0].header['Z']
         wl_shifted = wl - redshift * wl
@@ -139,7 +143,7 @@ def load_spectra(filenames, input_grid=None):
         ivars[jj,:] = ivar_rs
 
     print("Spectra loaded")
-    return filenames, grid, fluxes, ivars, npix
+    return grid, fluxes, ivars, npix, SNRs
 
 
 def load_labels(lamost_ids, filename='lamost_labels_all_dates.csv'):
