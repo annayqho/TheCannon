@@ -278,10 +278,11 @@ In this case, we use a quadratic model: order = 2</p>
 </div>
 <p>At this stage, more optional diagnostic plots can be produced to examine
 the spectral model:</p>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-&gt;&gt;&gt; model.diagnostics_contpix(dataset)
-&gt;&gt;&gt; model.diagnostics_leading_coeffs(dataset)
-&gt;&gt;&gt; model.diagnostics_plot_chisq(dataset)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">diagnostics_contpix</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">diagnostics_leading_coeffs</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">diagnostics_plot_chisq</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted.</p>
 <img alt="_images/contpix.gif" src="_images/contpix.gif" />
