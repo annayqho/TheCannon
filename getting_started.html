@@ -75,13 +75,9 @@
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.apogee">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#model">Model</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#apogee-data">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#model">Model</a></li>
 </ul>
 </li>
 </ul>
@@ -123,31 +119,31 @@
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> can be installed using <tt class="docutils literal"><span class="pre">pip</span></tt>:</p>
+<p><code class="docutils literal"><span class="pre">TheCannon</span></code> can be installed using <code class="docutils literal"><span class="pre">pip</span></code>:</p>
 <blockquote>
 <div>$ pip install TheCannon</div></blockquote>
 <p>Here is an overview of the basic workflow using a simple illustration
 with APOGEE DR10 data in which the test set is identical to the training set.
-To run this example, download the file <tt class="docutils literal"><span class="pre">example_DR10.tar.gz</span></tt> by clicking
-<a class="reference download internal" href="_downloads/example_DR10.tar.gz"><tt class="xref download docutils literal"><span class="pre">here</span></tt></a>
+To run this example, download the file <code class="docutils literal"><span class="pre">example_DR10.tar.gz</span></code> by clicking
+<a class="reference download internal" href="_downloads/example_DR10.tar.gz"><code class="xref download docutils literal"><span class="pre">here</span></code></a>
 and unzip it using the command</p>
 <blockquote>
 <div>$ tar -zxvf example_DR10.tar.gz</div></blockquote>
 <p>This file contains the following:</p>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">Data</span></tt>: a folder with .fits data files</li>
-<li><tt class="docutils literal"><span class="pre">reference_labels.csv</span></tt>: a table with reference label values for the training step</li>
+<li><code class="docutils literal"><span class="pre">Data</span></code>: a folder with .fits data files</li>
+<li><code class="docutils literal"><span class="pre">reference_labels.csv</span></code>: a table with reference label values for the training step</li>
 </ul>
-<p>Before the data can be run through <tt class="docutils literal"><span class="pre">TheCannon</span></tt>, it must be prepared
+<p>Before the data can be run through <code class="docutils literal"><span class="pre">TheCannon</span></code>, it must be prepared
 according to the specifications laid out in the &#8220;Requirements for Input&#8221;
 section. One of the requirements is for data to be continuum normalized
-in a SNR-independent way. <tt class="docutils literal"><span class="pre">TheCannon</span></tt> does have built-in
+in a SNR-independent way. <code class="docutils literal"><span class="pre">TheCannon</span></code> does have built-in
 options for continuum normalizing spectra, and we illustrate that here.</p>
 <p>Here are the steps for reading in the data. In practice, the user would
-write his own code; for this example, we provide the module <tt class="docutils literal"><span class="pre">apogee.py</span></tt>.
+write his own code; for this example, we provide the module <code class="docutils literal"><span class="pre">apogee.py</span></code>.
 The procedure for reading in spectra and training labels of course depends on
 the survey, the file type, etc, and it is up to the user to package this
-all appropriately before feeding it into <tt class="docutils literal"><span class="pre">TheCannon</span></tt>.</p>
+all appropriately before feeding it into <code class="docutils literal"><span class="pre">TheCannon</span></code>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">apogee</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tr_ID</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">apogee</span><span class="o">.</span><span class="n">load_spectra</span><span class="p">(</span><span class="s">&quot;example_DR10/Data&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">apogee</span><span class="o">.</span><span class="n">load_labels</span><span class="p">(</span><span class="s">&quot;example_DR10/reference_labels.csv&quot;</span><span class="p">)</span>
@@ -155,7 +151,7 @@ all appropriately before feeding it into <tt class="docutils literal"><span clas
 </div>
 <p>There should be 548 spectra with 8575 pixels each.</p>
 <p>For simplicity, we set the test set is set as equal to the training set, so that
-<tt class="docutils literal"><span class="pre">TheCannon</span></tt> is simply re-determining labels for the reference objects. In
+<code class="docutils literal"><span class="pre">TheCannon</span></code> is simply re-determining labels for the reference objects. In
 practice, the test IDs, fluxes, and inverse variances would be read in
 separately.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">tr_ID</span>
@@ -164,14 +160,14 @@ separately.</p>
 </pre></div>
 </div>
 <p>Now, all the input data has been packaged properly, and we can begin running
-<tt class="docutils literal"><span class="pre">TheCannon.</span></tt></p>
-<p>The first step is to initialize a <tt class="docutils literal"><span class="pre">Dataset</span></tt> object:</p>
+<code class="docutils literal"><span class="pre">TheCannon.</span></code></p>
+<p>The first step is to initialize a <code class="docutils literal"><span class="pre">Dataset</span></code> object:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">TheCannon</span></tt> has a number of optional diagnostic plots built-in, to help the
+<p><code class="docutils literal"><span class="pre">TheCannon</span></code> has a number of optional diagnostic plots built-in, to help the
 user visualize the results. Some of these plots require knowing the names
 of the labels. If the user wants to produce these diagnostic plots, he or
 she must specify the label names in LaTeX format:</p>
@@ -182,28 +178,28 @@ she must specify the label names in LaTeX format:</p>
 one with the distribution
 of SNR in the training and test set (in practice, the training set
 should consist of higher SNR spectra than the test set)
-and the other using <tt class="docutils literal"><span class="pre">triangle.py</span></tt> to plot
+and the other using <code class="docutils literal"><span class="pre">triangle.py</span></code> to plot
 every label&#8217;s set of training values against every other.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_SNR</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The output is saved to the directory that <tt class="docutils literal"><span class="pre">TheCannon</span></tt> is being run in.
-The first should be called <tt class="docutils literal"><span class="pre">SNRdist.png</span></tt> and look as follows:</p>
+<p>The output is saved to the directory that <code class="docutils literal"><span class="pre">TheCannon</span></code> is being run in.
+The first should be called <code class="docutils literal"><span class="pre">SNRdist.png</span></code> and look as follows:</p>
 <img alt="_images/SNRdist.png" src="_images/SNRdist.png" />
-<p>The second should be called <tt class="docutils literal"><span class="pre">ref_labels_triangle.png</span></tt> and look as follows:</p>
+<p>The second should be called <code class="docutils literal"><span class="pre">ref_labels_triangle.png</span></code> and look as follows:</p>
 <img alt="_images/ref_labels_triangle.png" src="_images/ref_labels_triangle.png" />
-<p>Again, <tt class="docutils literal"><span class="pre">TheCannon</span></tt> requires incoming spectra to be continuum normalized
+<p>Again, <code class="docutils literal"><span class="pre">TheCannon</span></code> requires incoming spectra to be continuum normalized
 in a way that is independent of signal to noise. If the data does not satisfy
 this criteria already, the user can use the continuum identification and
-normalization functions built into <tt class="docutils literal"><span class="pre">TheCannon</span></tt>.</p>
+normalization functions built into <code class="docutils literal"><span class="pre">TheCannon</span></code>.</p>
 <p>First, continuum pixels are identified from a pseudo-continuum normalized
 version of the training set spectra. Pseudo-continuum normalization is
 performed using a running quantile. In this case, the
 window size for calculating the median is set to 50 Angstroms and the quantile
 level is set to 90%. APOGEE spectra come in three chunks, and we want to
-perform continuum normalization for each chunk separately. For <tt class="docutils literal"><span class="pre">TheCannon</span></tt>
-to treat spectra in chunks, the <tt class="docutils literal"><span class="pre">ranges</span></tt> attribute must be set:</p>
+perform continuum normalization for each chunk separately. For <code class="docutils literal"><span class="pre">TheCannon</span></code>
+to treat spectra in chunks, the <code class="docutils literal"><span class="pre">ranges</span></code> attribute must be set:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
 </pre></div>
 </div>
@@ -225,7 +221,7 @@ not. &#8220;True&#8221; continuum pixels are identified using a median and varia
 cut across the training objects: in other words, continuum pixels are those
 that consistently have values close to 1 in all of the training spectra. The
 user specifies what fraction of pixels to identify as continuum, and the
-flux and variance cuts are determined appropriately. If the <tt class="docutils literal"><span class="pre">dataset.ranges</span></tt>
+flux and variance cuts are determined appropriately. If the <code class="docutils literal"><span class="pre">dataset.ranges</span></code>
 attribute is set, then continuum pixels are identified separately for each
 region (in this case, three regions). This enables the user to control how
 evenly spread the pixels are.</p>
@@ -271,24 +267,21 @@ spectra can be calculated:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">norm_test_ivar</span>
 </pre></div>
 </div>
-<p>Now, the data munging is over and we&#8217;re ready to run <tt class="docutils literal"><span class="pre">TheCannon</span></tt>!</p>
+<p>Now, the data munging is over and we&#8217;re ready to run <code class="docutils literal"><span class="pre">TheCannon</span></code>!</p>
 <p>For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model.
 In this case, we use a quadratic model: order = 2</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>equivalently,</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>At this stage, more optional diagnostic plots can be produced to examine
 the spectral model:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">()</span>
-</pre></div>
-</div>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+&gt;&gt;&gt; model.diagnostics_contpix(dataset)
+&gt;&gt;&gt; model.diagnostics_leading_coeffs(dataset)
+&gt;&gt;&gt; model.diagnostics_plot_chisq(dataset)</p>
 <p>The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted.</p>
 <img alt="_images/contpix.gif" src="_images/contpix.gif" />
@@ -308,7 +301,7 @@ and returned the corresponding covariance matrix.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">diagnostics_survey_labels</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The first generates one text file for each label, called <tt class="docutils literal"><span class="pre">flagged_stars.txt</span></tt>.
+<p>The first generates one text file for each label, called <code class="docutils literal"><span class="pre">flagged_stars.txt</span></code>.
 The second generates a triangle plot of the survey (Cannon) labels,
 shown below.</p>
 <img alt="_images/survey_labels_triangle.png" src="_images/survey_labels_triangle.png" />
