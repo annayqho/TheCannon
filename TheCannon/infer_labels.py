@@ -96,7 +96,7 @@ def _infer_labels(model, dataset):
     chisq_all = np.zeros(nstars)
 
     for jj in range(nstars):
-        # print(jj)
+        print(jj)
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
@@ -105,7 +105,7 @@ def _infer_labels(model, dataset):
         try:
             labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels),
-                                         sigma=sig, absolute_sigma=True)
+                                         sigma=sig, absolute_sigma=True, maxfev=5000)
         except TypeError:  # old scipy version
             labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
                                          p0=np.repeat(1, nlabels), sigma=sig)
