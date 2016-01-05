@@ -79,6 +79,7 @@ def _infer_labels(model, dataset, starting_guess):
     errs_all:
         Covariance matrix of the fit
     """
+    print("Inferring Labels")
     dataset = _prep_data(dataset)
     coeffs_all = model.coeffs
     scatters = model.scatters
