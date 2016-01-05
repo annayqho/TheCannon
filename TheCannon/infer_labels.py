@@ -62,7 +62,7 @@ def _prep_data(dataset):
     return dataset
 
 
-def _infer_labels(model, dataset):
+def _infer_labels(model, dataset, starting_guess):
     """
     Uses the model to solve for labels of the test set.
 
@@ -80,7 +80,6 @@ def _infer_labels(model, dataset):
         Covariance matrix of the fit
     """
     dataset = _prep_data(dataset)
-    print("Inferring Labels")
     coeffs_all = model.coeffs
     scatters = model.scatters
     chisqs = model.chisqs
@@ -96,30 +95,20 @@ def _infer_labels(model, dataset):
     chisq_all = np.zeros(nstars)
 
     for jj in range(nstars):
-        print(jj)
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
-        sig = np.sqrt(1./ivar + scatters**2)
+        sig = np.ones(len(flux)) * LARGE
+        good = ivar > 0
+        sig[good] = np.sqrt(1./ivar[good] + scatters[good]**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
-        try:
-            labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
-                                         p0=np.repeat(1, nlabels),
-                                         sigma=sig, absolute_sigma=True, maxfev=5000)
-        except TypeError:  # old scipy version
-            labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
-                                         p0=np.repeat(1, nlabels), sigma=sig)
-            # rescale covariance matrix
-            chi = (flux_piv-_func(coeffs, *labels)) / sig
-            chi2 = (chi**2).sum()
-            # dof = npix - nparam - 1
-            dof = len(flux_piv) - coeffs_all.shape[1] - 1
-            factor = (chi2 / dof)
-            covs /= factor
-        chi = (flux_piv-_func(coeffs, *labels)) / sig
-        chisq_all[jj] = (chi**2).sum()
-        labels = labels + pivots
-        labels_all[jj,:] = labels
+        labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
+                                     p0 = starting_guess,
+                                     # p0=np.repeat(1, nlabels),
+                                     sigma=sig, absolute_sigma=True)
+        chi2 = (flux_piv-_func(coeffs, *labels))**2 * ivar / (1 + ivar * scatters**2)
+        chisq_all[jj] = sum(chi2)
+        labels_all[jj,:] = labels + pivots
         errs_all[jj,:] = covs.diagonal()
 
     dataset.set_test_label_vals(labels_all)

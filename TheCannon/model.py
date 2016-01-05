@@ -41,7 +41,7 @@ class CannonModel(object):
         _model_diagnostics(self.dataset, self.model)
 
 
-    def infer_labels(self, dataset):
+    def infer_labels(self, dataset, starting_guess):
         """
         Uses the model to solve for labels of the test set, updates Dataset
 
@@ -55,7 +55,7 @@ class CannonModel(object):
         errs_all: ndarray
             Covariance matrix of the fit
         """
-        return _infer_labels(self, dataset)
+        return _infer_labels(self, dataset, starting_guess)
 
 
     def draw_spectra(self, dataset):
