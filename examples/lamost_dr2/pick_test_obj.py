@@ -43,6 +43,7 @@ if __name__ == "__main__":
     dates = np.array(dates)
     dates = np.delete(dates, np.where(dates=='.directory')[0][0])
     for date in dates: 
+        date = "20111203"
         print(date)
         if glob.glob("%s_test_obj.txt" %date):
             print("done already")

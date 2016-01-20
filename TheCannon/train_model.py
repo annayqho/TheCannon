@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from .helpers.compatibility import range, map
 from .helpers.triangle import corner
 
-SMALL = 1e-12
-
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
     Parameters
@@ -39,8 +37,7 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     logdet_Cinv: float
         inverse of the log determinant of the cov matrix
     """
-    sig2 = 1. / ivars
-    Cinv = 1. / (sig2 + scatter**2)
+    Cinv = ivars / (1 + ivars*scatter**2)
     lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
     lTCinvf = np.dot(lvec.T, Cinv * fluxes)
     try:
@@ -138,19 +135,7 @@ def _get_lvec(label_vals, pivots):
     return lvec
 
 
-def _prep_data(dataset):
-    """ Prepare the data for The Cannon. Set all 0 ivar to SMALL
-
-    Parameters
-    ----------
-    dataset: Dataset object
-    """
-    dataset.tr_ivar[dataset.tr_ivar == 0] = 1e-12 
-    dataset.test_ivar[dataset.test_ivar == 0] = 1e-12
-    return dataset
-
-
-def _train_model(data):
+def _train_model(dataset):
     """
     This determines the coefficients of the model using the training data
 
@@ -164,14 +149,18 @@ def _train_model(data):
     model: model
         best-fit Cannon model
     """
-    dataset = _prep_data(data)
-    print("Training model...")
+    print("new version")
     label_names = dataset.get_plotting_labels()
     label_vals = dataset.tr_label
     lams = dataset.wl
     npixels = len(lams)
     fluxes = dataset.tr_flux
     ivars = dataset.tr_ivar
+    
+    # for training, ivar can't be zero, otherwise you get singular matrices
+    # DWH says: make sure no ivar goes below 1 or 0.01
+    ivars[ivars==0] = 0.01
+
     pivots = np.mean(label_vals, axis=0)
     lvec = _get_lvec(label_vals, pivots)
     lvec_full = np.array([lvec,] * npixels)

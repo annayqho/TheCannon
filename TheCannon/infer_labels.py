@@ -50,18 +50,6 @@ def _func(coeffs, *labels):
     return np.dot(coeffs, lvec)
 
 
-def _prep_data(dataset):
-    """ Prepare the data for The Cannon. Set all 0 ivar to SMALL
-
-    Parameters
-    ----------
-    dataset: Dataset object
-    """
-    dataset.tr_ivar[dataset.tr_ivar == 0] = 1e-12
-    dataset.test_ivar[dataset.test_ivar == 0] = 1e-12
-    return dataset
-
-
 def _infer_labels(model, dataset, starting_guess):
     """
     Uses the model to solve for labels of the test set.
@@ -80,7 +68,6 @@ def _infer_labels(model, dataset, starting_guess):
         Covariance matrix of the fit
     """
     print("Inferring Labels")
-    dataset = _prep_data(dataset)
     coeffs_all = model.coeffs
     scatters = model.scatters
     chisqs = model.chisqs
@@ -95,18 +82,24 @@ def _infer_labels(model, dataset, starting_guess):
     errs_all = np.zeros((nstars, nlabels))
     chisq_all = np.zeros(nstars)
 
+    print("starting guess: %s" %starting_guess)
     for jj in range(nstars):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
         sig = np.ones(len(flux)) * LARGE
-        good = ivar > 0
-        sig[good] = np.sqrt(1./ivar[good] + scatters[good]**2)
+        bad = ivar == 0
+        sig[~bad] = np.sqrt(1./ivar[~bad] + scatters[~bad]**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
-        labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
-                                     p0 = starting_guess,
-                                     # p0=np.repeat(1, nlabels),
-                                     sigma=sig, absolute_sigma=True)
+        try:
+            labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
+                                         p0 = starting_guess,
+                                         # p0=np.repeat(1, nlabels),
+                                         sigma=sig, absolute_sigma=True)
+        except RuntimeError:
+            print("Error - curve_fit failed")
+            labels = np.zeros(starting_guess.shape)-9999.
+            covs = np.zeros((len(starting_guess),len(starting_guess)))-9999.
         chi2 = (flux_piv-_func(coeffs, *labels))**2 * ivar / (1 + ivar * scatters**2)
         chisq_all[jj] = sum(chi2)
         labels_all[jj,:] = labels + pivots

@@ -5,10 +5,7 @@ import random
 from .helpers.triangle import corner
 import matplotlib.pyplot as plt
 from matplotlib import colorbar
-from copy import deepcopy
 
-LARGE = 200.
-SMALL = 1. / LARGE
 
 def draw_spectra(model, dataset):
     """ Generate best-fit spectra for all the test objects  
