@@ -151,14 +151,22 @@ must satisfy the criteria laid out in <a class="reference external" href="http:/
 The spirit of these requirements is that any differences between two
 spectra should, to the extent possible, be due to differences in label
 values rather than measurement procedure.
-In particular, the spectra must:</p>
+In practice:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Come from the same dataset</li>
-<li>Be continuum normalized in a consistent way that is independent of
-signal-to-noise</li>
-<li>Be radial velocity shifted</li>
-<li>Be sampled onto a common wavelength grid with a common line-spread function</li>
+<li>Spectra must come from the same dataset</li>
+<li>Input labels must come from a consistent source</li>
+<li>Spectra must be continuum normalized in a consistent way that is independent of
+signal-to-noise (more precisely, the normalization procedure should be a
+linear operation on the data, so that it is unbiased as (symmetric) noise grows)</li>
+<li>Spectra must be radial velocity shifted</li>
+<li>Spectra must be sampled onto a common wavelength grid with a common line-spread function
+(so, all spectra must have the same start and stop wavelengths)</li>
+<li>Each flux value in the spectrum must be accompanied by error bars / an inverse variance
+array</li>
+<li>Bad or masked data should be assigned inverse variances of zero or very close to zero.
+<code class="docutils literal"><span class="pre">Bad</span> <span class="pre">Data</span></code> includes: regions where there are many skylines, regions where sky
+subtraction is known to be an issue, telluric regions</li>
 </ul>
 </div></blockquote>
 </div>
