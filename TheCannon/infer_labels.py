@@ -4,9 +4,6 @@ from scipy import optimize as opt
 import numpy as np
 import matplotlib.pyplot as plt
 
-LARGE = 200.
-SMALL = 1. / LARGE
-
 def _get_lvec(labels):
     """
     Constructs a label vector for an arbitrary number of labels
