@@ -86,16 +86,20 @@ def _infer_labels(model, dataset, starting_guess):
     for jj in range(nstars):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
-        flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
-        sig = np.ones(len(flux)) * LARGE
+
+        # where the ivar == 0, set the normalized flux to 1 and the sigma to 100
         bad = ivar == 0
-        sig[~bad] = np.sqrt(1./ivar[~bad] + scatters[~bad]**2)
+        flux[bad] = 1.0
+        sigma = np.ones(ivar.shape) * 100.0
+        sigma[~bad] = np.sqrt(1.0 / ivar[~bad])
+
+        flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
+        errbar = np.sqrt(sigma**2 + scatters**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
         try:
             labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
                                          p0 = starting_guess,
-                                         # p0=np.repeat(1, nlabels),
-                                         sigma=sig, absolute_sigma=True)
+                                         sigma=errbar, absolute_sigma=True)
         except RuntimeError:
             print("Error - curve_fit failed")
             labels = np.zeros(starting_guess.shape)-9999.
