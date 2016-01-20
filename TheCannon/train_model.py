@@ -179,26 +179,3 @@ def _train_model(dataset):
     all_chisqs = chis*chis
     print("Done training model")
     return coeffs, scatters, all_chisqs, pivots
-
-
-def _split_array(array, num):
-    """ split array into a number of chunks
-
-    Parameters
-    ----------
-    array: numpy ndarray
-        array to be split
-    num: int
-        number of chunks
-
-    Returns
-    ------
-    out: split array
-    """
-    avg = len(array) / float(num)
-    out = []
-    last = 0.0
-    while last < len(array):
-        out.append(array[int(last):int(last+avg)])
-        last += avg
-    return out
