@@ -159,7 +159,7 @@ def _train_model(dataset):
     
     # for training, ivar can't be zero, otherwise you get singular matrices
     # DWH says: make sure no ivar goes below 1 or 0.01
-    ivars[ivars==0] = 0.01
+    ivars[ivars<0.01] = 0.01
 
     pivots = np.mean(label_vals, axis=0)
     lvec = _get_lvec(label_vals, pivots)
