@@ -131,7 +131,7 @@ continuum pixels to ensure that they look reasonable and that they roughly
 evenly cover the spectrum. Large gaps in continuum pixels could result in
 poor continuum normalization in those regions. If the continuum pixels
 do not look evenly sampled enough, the range can be changed and the process
-repeated. For this example, we change it as foollows:
+repeated. For this example, we change it as follows:
 
     >>> dataset.ranges = [[371,3192], [3697,5500], [5500,5997], [6461,8255]]
     >>> contmask = dataset.make_contmask(

@@ -236,7 +236,7 @@ continuum pixels to ensure that they look reasonable and that they roughly
 evenly cover the spectrum. Large gaps in continuum pixels could result in
 poor continuum normalization in those regions. If the continuum pixels
 do not look evenly sampled enough, the range can be changed and the process
-repeated. For this example, we change it as foollows:</p>
+repeated. For this example, we change it as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5500</span><span class="p">],</span> <span class="p">[</span><span class="mi">5500</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
