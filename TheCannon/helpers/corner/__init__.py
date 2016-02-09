@@ -3,7 +3,7 @@
 from __future__ import print_function, absolute_import, unicode_literals
 
 try:
-    from triangle import *
+    from corner import *
 except ImportError:
     # fallback to internal
-    from .triangle import *
+    from .corner import *
