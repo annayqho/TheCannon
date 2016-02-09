@@ -8,8 +8,10 @@
 *.log
 *.blg
 *.pyc
-vc.tex
+*.tex
+*.csv
 *.synctex.gz
 *.pdf
 *.eps
 *.png
+*.npz
