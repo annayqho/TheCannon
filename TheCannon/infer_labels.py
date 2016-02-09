@@ -69,7 +69,7 @@ def _infer_labels(model, dataset, starting_guess):
     scatters = model.scatters
     chisqs = model.chisqs
     pivots = model.pivots
-    nlabels = dataset.tr_label.shape[1] 
+    nlabels = len(dataset.get_plotting_labels())
     fluxes = dataset.test_flux
     ivars = dataset.test_ivar
     nstars = fluxes.shape[0]
