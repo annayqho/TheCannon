@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 import numpy as np
 import os
 import random
-from .helpers.triangle import corner
+from .helpers.corner import corner
 import matplotlib.pyplot as plt
 from matplotlib import colorbar
 
