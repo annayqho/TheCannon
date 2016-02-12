@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 import numpy as np
 import matplotlib.pyplot as plt
 from .helpers.compatibility import range, map
-from .helpers.triangle import corner
+from .helpers.corner import corner
 
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """

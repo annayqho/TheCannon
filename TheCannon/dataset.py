@@ -11,7 +11,6 @@ from .helpers import Table
 from .find_continuum_pixels import * 
 from .continuum_normalization import _cont_norm_gaussian_smooth, _cont_norm_running_quantile, _cont_norm_running_quantile_regions, _find_cont_fitfunc, _find_cont_fitfunc_regions, _cont_norm, _cont_norm_regions
 from .find_continuum_pixels import _find_contpix_regions
-from .spectral_model import overlay_spectra
 
 PY3 = sys.version_info[0] > 2
 
