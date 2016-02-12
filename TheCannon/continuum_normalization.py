@@ -111,8 +111,9 @@ def _find_cont_gaussian_smooth(wl, fluxes, ivars, w):
     bot = np.dot(ivars, w.T)
     top = np.dot(fluxes*ivars, w.T)
     bad = bot == 0
-    cont = np.ma.array(top, mask=bad) / np.ma.array(bot, mask=bad)
-    return np.ma.filled(cont, fill_value=0.)
+    cont = np.zeros(top.shape)
+    cont[~bad] = top[~bad] / bot[~bad]
+    return cont
 
 
 def _cont_norm_gaussian_smooth(dataset, L):
@@ -332,12 +333,13 @@ def _cont_norm(fluxes, ivars, cont):
         rescaled inverse variances
     """
     nstars = fluxes.shape[0]
+    npixels = fluxes.shape[1]
     norm_fluxes = np.ones(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
     bad = cont == 0.
-    norm_fluxes = np.ma.array(fluxes, mask=bad) / np.ma.array(cont, mask=bad)
+    norm_fluxes = np.ones(fluxes.shape)
+    norm_fluxes[~bad] = fluxes[~bad] / cont[~bad]
     norm_ivars = cont**2 * ivars
-    norm_fluxes = np.ma.filled(norm_fluxes, fill_value=1.)
     return norm_fluxes, norm_ivars 
 
 

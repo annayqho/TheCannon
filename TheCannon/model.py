@@ -10,9 +10,6 @@ from copy import deepcopy
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
-LARGE = 200.
-SMALL = 1. / LARGE
-
 class CannonModel(object):
     def __init__(self, order):
         self.coeffs = None
@@ -169,8 +166,7 @@ class CannonModel(object):
             axarr[i].yaxis.set_major_locator(
                     MaxNLocator(nbins=nbins, prune='upper'))
         plt.xlabel(r"Wavelength $\lambda (\AA)$", fontsize=14)
-        plt.xlim(np.ma.min(lams), np.ma.max(lams))
-        #plt.xlim(np.ma.min(lams), np.ma.min(lams)+100)
+        plt.xlim(np.min(lams), np.max(lams))
         plt.tick_params(axis='x', labelsize=14)
         axarr[0].set_title(
                 "First-Order Fit Coeffs and Scatter from the Spectral Model",

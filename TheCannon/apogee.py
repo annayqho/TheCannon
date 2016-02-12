@@ -120,11 +120,8 @@ def load_spectra(data_dir):
             wl = np.array(wl_full)
         flux_err = np.array((file_in[2].data))
         badpix = get_pixmask(flux, flux_err)
-        flux = np.ma.array(flux, mask=badpix)
-        flux_err = np.ma.array(flux_err, mask=badpix)
-        ones = np.ma.array(np.ones(npixels), mask=badpix)
-        ivar = ones / flux_err**2
-        ivar = np.ma.filled(ivar, fill_value=0.)
+        ivar = np.zeros(npixels)
+        ivar[~badpix] = 1. / flux_err[~badpix]**2
         fluxes[jj,:] = flux
         ivars[jj,:] = ivar
     print("Spectra loaded")
