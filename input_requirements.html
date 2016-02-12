@@ -75,8 +75,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#apogee-data">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.apogee">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#model">Model</a></li>
 </ul>
 </li>
@@ -120,8 +122,16 @@
   <div class="section" id="requirements-for-input">
 <h1>Requirements for Input<a class="headerlink" href="#requirements-for-input" title="Permalink to this headline">¶</a></h1>
 <p>Required input to <code class="docutils literal"><span class="pre">TheCannon</span></code> are as follows:</p>
+<ul>
+<li><p class="first"><strong>Wavelength Grid</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>an array of wavelength values with shape [num_pixels] corresponding to all      of the spectra (both training spectra and test spectra)</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first"><strong>Training Set</strong></p>
 <ul class="simple">
-<li><strong>Training Set</strong><ul>
 <li>Training Spectra<ul>
 <li>a block of continuum-normalized pixel intensity (flux) values with shape
 [num_training_objects x num_pixels]</li>
@@ -135,7 +145,8 @@ pixel intensity values described above</li>
 </li>
 </ul>
 </li>
-<li><strong>Test Set</strong><ul>
+<li><p class="first"><strong>Test Set</strong></p>
+<ul class="simple">
 <li>Test Spectra<ul>
 <li>a block of continuum-normalized pixel intensity (flux) values with shape
 [num_test_objects x num_pixels]</li>

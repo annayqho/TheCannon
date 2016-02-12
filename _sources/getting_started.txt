@@ -195,9 +195,13 @@ The third is a histogram of the reduced chi squareds of the model fit.
 
 If the model fitting worked, then we can proceed to the test step. This 
 command automatically updates the dataset with the fitted-for test labels,
-and returned the corresponding covariance matrix.
+and returns the corresponding covariance matrix.
 
 >>> label_errs = model.infer_labels(dataset)
+
+You can access the new labels as follows:
+
+>>> test_labels = dataset.test_label_vals
 
 A set of diagnostic output:
 

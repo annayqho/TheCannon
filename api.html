@@ -74,8 +74,10 @@
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#apogee-data">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.apogee">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
 </ul>
 </li>
@@ -118,15 +120,593 @@
             
   <div class="section" id="reference-api">
 <span id="api"></span><h1>Reference/API<a class="headerlink" href="#reference-api" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="apogee-data">
-<h2>APOGEE Data<a class="headerlink" href="#apogee-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-TheCannon.apogee">
+<span id="apogee-data"></span><h2>APOGEE Data<a class="headerlink" href="#module-TheCannon.apogee" title="Permalink to this headline">¶</a></h2>
+<p>Functions for reading in APOGEE spectra and training labels</p>
+<dl class="function">
+<dt id="TheCannon.apogee.get_pixmask">
+<code class="descclassname">TheCannon.apogee.</code><code class="descname">get_pixmask</code><span class="sig-paren">(</span><em>fluxes</em>, <em>flux_errs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/apogee.html#get_pixmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_pixmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and return a bad pixel mask for an APOGEE spectrum</p>
+<p>Bad pixels are defined as follows: fluxes or errors are not finite, or 
+reported errors are &lt;= 0</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray</strong></p>
+<blockquote>
+<div><p>Flux data values</p>
+</div></blockquote>
+<p><strong>flux_errs: ndarray</strong></p>
+<blockquote>
+<div><p>Flux uncertainty data values</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mask: ndarray</p>
+<blockquote class="last">
+<div><p>Bad pixel mask, value of True corresponds to bad pixels</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.get_starmask">
+<code class="descclassname">TheCannon.apogee.</code><code class="descname">get_starmask</code><span class="sig-paren">(</span><em>ids</em>, <em>labels</em>, <em>aspcapflag</em>, <em>paramflag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/apogee.html#get_starmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_starmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies which APOGEE objects have unreliable physical parameters,
+as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data: np array</strong></p>
+<blockquote>
+<div><p>all APOGEE DR12 IDs and labels</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bad: np array</p>
+<blockquote class="last">
+<div><p>mask where 1 corresponds to a star with unreliable parameters</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.load_labels">
+<code class="descclassname">TheCannon.apogee.</code><code class="descname">load_labels</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/apogee.html#load_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts reference labels from a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename: str</strong></p>
+<blockquote>
+<div><p>Name of the file containing the table of reference labels</p>
+</div></blockquote>
+<p><strong>ids: array</strong></p>
+<blockquote>
+<div><p>The IDs of stars to retrieve labels for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">labels: ndarray</p>
+<blockquote class="last">
+<div><p>Reference label values for all reference objects</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="TheCannon.apogee.load_spectra">
+<code class="descclassname">TheCannon.apogee.</code><code class="descname">load_spectra</code><span class="sig-paren">(</span><em>data_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/apogee.html#load_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.load_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads wavelength, flux, and flux uncertainty data from apogee fits files</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_dir: str</strong></p>
+<blockquote>
+<div><p>Name of the directory containing all of the data files</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: ndarray</p>
+<blockquote>
+<div><p>Rest-frame wavelength vector</p>
+</div></blockquote>
+<p>fluxes: ndarray</p>
+<blockquote>
+<div><p>Flux data values</p>
+</div></blockquote>
+<p>ivars: ndarray</p>
+<blockquote class="last">
+<div><p>Inverse variance values corresponding to flux values</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="TheCannon.dataset.Dataset">
+<em class="property">class </em><code class="descclassname">TheCannon.dataset.</code><code class="descname">Dataset</code><span class="sig-paren">(</span><em>wl</em>, <em>tr_ID</em>, <em>tr_flux</em>, <em>tr_ivar</em>, <em>tr_label</em>, <em>test_ID</em>, <em>test_flux</em>, <em>test_ivar</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to represent Cannon input: a dataset of spectra and labels</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">bin_flux</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">continuum_normalize</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_gaussian_smoothing</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_training_q</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_1to1</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_SNR</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_best_fit_spectra</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_contmask</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_ref_labels</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_survey_labels</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_test_step_flagstars</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">fit_continuum</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">get_plotting_labels</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">make_contmask</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">set_continuum</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">set_label_names</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">set_test_label_vals</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_dataset</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectra</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectrum</span></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.bin_flux">
+<code class="descname">bin_flux</code><span class="sig-paren">(</span><em>flux</em>, <em>ivar</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.bin_flux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.bin_flux" title="Permalink to this definition">¶</a></dt>
+<dd><p>bin two neighboring flux values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.continuum_normalize">
+<code class="descname">continuum_normalize</code><span class="sig-paren">(</span><em>cont</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.continuum_normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.continuum_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum normalize spectra, in chunks if spectrum has regions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cont: ndarray</strong></p>
+<blockquote>
+<div><p>Flux values corresponding to the continuum</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">norm_tr_flux: ndarray</p>
+<blockquote>
+<div><p>Normalized flux values for the training objects</p>
+</div></blockquote>
+<p>norm_tr_ivar: ndarray</p>
+<blockquote>
+<div><p>Rescaled inverse variance values for the training objects</p>
+</div></blockquote>
+<p>norm_test_flux: ndarray</p>
+<blockquote>
+<div><p>Normalized flux values for the test objects</p>
+</div></blockquote>
+<p>norm_test_ivar: numpy ndarray</p>
+<blockquote class="last">
+<div><p>Rescaled inverse variance values for the test objects</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.continuum_normalize_gaussian_smoothing">
+<code class="descname">continuum_normalize_gaussian_smoothing</code><span class="sig-paren">(</span><em>L</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.continuum_normalize_gaussian_smoothing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.continuum_normalize_gaussian_smoothing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum normalize using a Gaussian-weighted smoothed spectrum</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>the dataset to continuum normalize</p>
+</div></blockquote>
+<p><strong>L: float</strong></p>
+<blockquote class="last">
+<div><p>the width of the Gaussian used for weighting</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.continuum_normalize_training_q">
+<code class="descname">continuum_normalize_training_q</code><span class="sig-paren">(</span><em>q</em>, <em>delta_lambda</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.continuum_normalize_training_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.continuum_normalize_training_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum normalize the training set using a running quantile</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>q: float</strong></p>
+<blockquote>
+<div><p>The quantile cut</p>
+</div></blockquote>
+<p><strong>delta_lambda: float</strong></p>
+<blockquote class="last">
+<div><p>The width of the pixel range used to calculate the median</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_1to1">
+<code class="descname">diagnostics_1to1</code><span class="sig-paren">(</span><em>figname='1to1_label'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_1to1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_1to1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots survey labels vs. training labels, color-coded by survey SNR</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_SNR">
+<code class="descname">diagnostics_SNR</code><span class="sig-paren">(</span><em>figname='SNRdist.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_SNR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_SNR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots SNR distributions of ref and test object spectra</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) figname: string</strong></p>
+<blockquote class="last">
+<div><p>Filename to use for the output saved plot</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_best_fit_spectra">
+<code class="descname">diagnostics_best_fit_spectra</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_best_fit_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_best_fit_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot results of best-fit spectra for ten random test objects</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_contmask">
+<code class="descname">diagnostics_contmask</code><span class="sig-paren">(</span><em>figname='contpix.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_contmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_contmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots continuum pixels against training spectra median flux values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) figname: str</strong></p>
+<blockquote class="last">
+<div><p>Filename of the output figure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_ref_labels">
+<code class="descname">diagnostics_ref_labels</code><span class="sig-paren">(</span><em>figname='ref_labels_triangle.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_ref_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_ref_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots all training labels against each other</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) figname: string</strong></p>
+<blockquote class="last">
+<div><p>Filename of the saved output plot</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_survey_labels">
+<code class="descname">diagnostics_survey_labels</code><span class="sig-paren">(</span><em>figname='survey_labels_triangle.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_survey_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_survey_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot all survey labels against each other</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) figname: str</strong></p>
+<blockquote class="last">
+<div><p>Filename of saved output plot</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.diagnostics_test_step_flagstars">
+<code class="descname">diagnostics_test_step_flagstars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_test_step_flagstars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_test_step_flagstars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write files listing stars whose inferred labels lie outside 2 standard deviations from the reference label space</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.fit_continuum">
+<code class="descname">fit_continuum</code><span class="sig-paren">(</span><em>deg</em>, <em>ffunc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.fit_continuum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.fit_continuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit a continuum to the continuum pixels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deg: int</strong></p>
+<blockquote>
+<div><p>Degree of the fitting function</p>
+</div></blockquote>
+<p><strong>ffunc: str</strong></p>
+<blockquote>
+<div><p>Type of fitting function, &#8216;sinusoid&#8217; or &#8216;chebyshev&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">tr_cont: ndarray</p>
+<blockquote>
+<div><p>Flux values corresponding to the fitted continuum of training objects</p>
+</div></blockquote>
+<p>test_cont: ndarray</p>
+<blockquote class="last">
+<div><p>Flux values corresponding to the fitted continuum of test objects</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.get_plotting_labels">
+<code class="descname">get_plotting_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.get_plotting_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.get_plotting_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the label names used make plots</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">label_names: ndarray</p>
+<blockquote class="last">
+<div><p>The label names</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.make_contmask">
+<code class="descname">make_contmask</code><span class="sig-paren">(</span><em>fluxes</em>, <em>ivars</em>, <em>frac</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.make_contmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.make_contmask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify continuum pixels using training spectra</p>
+<p>Does this for each region of the spectrum if dataset.ranges is not None</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fluxes: ndarray</strong></p>
+<blockquote>
+<div><p>Flux data values</p>
+</div></blockquote>
+<p><strong>ivars: ndarray</strong></p>
+<blockquote>
+<div><p>Inverse variances corresponding to flux data values</p>
+</div></blockquote>
+<p><strong>frac: float</strong></p>
+<blockquote>
+<div><p>The fraction of pixels that should be identified as continuum</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">contmask: ndarray</p>
+<blockquote class="last">
+<div><p>Mask with True indicating that the pixel is continuum</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.set_continuum">
+<code class="descname">set_continuum</code><span class="sig-paren">(</span><em>contmask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.set_continuum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.set_continuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the contmask attribute</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>contmask: ndarray</strong></p>
+<blockquote class="last">
+<div><p>Mask with True indicating that the pixel is continuum</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.set_label_names">
+<code class="descname">set_label_names</code><span class="sig-paren">(</span><em>names</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.set_label_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.set_label_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the label names for plotting</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>names: ndarray or list</strong></p>
+<blockquote class="last">
+<div><p>The names of the labels used for plotting, ex. in LaTeX syntax</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.set_test_label_vals">
+<code class="descname">set_test_label_vals</code><span class="sig-paren">(</span><em>vals</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.set_test_label_vals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.set_test_label_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set test label values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>vals: ndarray</strong></p>
+<blockquote class="last">
+<div><p>Test label values</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.smooth_dataset">
+<code class="descname">smooth_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.smooth_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.smooth_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bins down all of the spectra and updates the dataset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.smooth_spectra">
+<code class="descname">smooth_spectra</code><span class="sig-paren">(</span><em>wl</em>, <em>fluxes</em>, <em>ivars</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.smooth_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.smooth_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bins down a block of spectra</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.dataset.Dataset.smooth_spectrum">
+<code class="descname">smooth_spectrum</code><span class="sig-paren">(</span><em>wl</em>, <em>flux</em>, <em>ivar</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.smooth_spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.smooth_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bins down one spectrum</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
+<blockquote>
+<div><p>wavelengths</p>
+</div></blockquote>
+<p><strong>flux: numpy ndarray</strong></p>
+<blockquote>
+<div><p>flux values</p>
+</div></blockquote>
+<p><strong>ivar: numpy ndarray</strong></p>
+<blockquote>
+<div><p>inverse variances associated with fluxes</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">wl: numpy ndarray</p>
+<blockquote>
+<div><p>updated binned pixel wavelengths</p>
+</div></blockquote>
+<p>flux: numpy ndarray</p>
+<blockquote>
+<div><p>updated binned flux values</p>
+</div></blockquote>
+<p>ivar: numpy ndarray</p>
+<blockquote class="last">
+<div><p>updated binned inverse variances</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-TheCannon.find_continuum_pixels"></span><span class="target" id="module-TheCannon.continuum_normalization"></span><dl class="function">
+<dt id="TheCannon.continuum_normalization.gaussian_weight_matrix">
+<code class="descclassname">TheCannon.continuum_normalization.</code><code class="descname">gaussian_weight_matrix</code><span class="sig-paren">(</span><em>wl</em>, <em>L</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#gaussian_weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.gaussian_weight_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matrix of Gaussian weights</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
+<blockquote>
+<div><p>pixel wavelength values</p>
+</div></blockquote>
+<p><strong>L: float</strong></p>
+<blockquote class="last">
+<div><p>width of Gaussian</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
-</div>
+<span class="target" id="module-TheCannon.infer_labels"></span></div>
 </div>
 
 

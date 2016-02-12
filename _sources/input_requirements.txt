@@ -3,6 +3,10 @@ Requirements for Input
 
 Required input to ``TheCannon`` are as follows:
 
+* **Wavelength Grid**
+
+    * an array of wavelength values with shape [num_pixels] corresponding to all      of the spectra (both training spectra and test spectra)
+
 * **Training Set**
 
   * Training Spectra
