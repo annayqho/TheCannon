@@ -248,36 +248,6 @@ class Dataset(object):
         self.contmask = contmask
 
 
-    def diagnostics_contmask(self, figname='contpix.png'):
-        """ Plots continuum pixels against training spectra median flux values 
-
-        Parameters
-        ----------
-        (optional) figname: str
-            Filename of the output figure
-        """
-        contmask = self.contmask
-        f_bar = np.zeros(len(self.wl))
-        sigma_f = np.zeros(len(self.wl))
-        for wl in range(0,len(self.wl)):
-            flux = self.tr_flux[:,wl]
-            ivar = self.tr_ivar[:,wl]
-            f_bar[wl] = np.median(flux[ivar>0])
-            sigma_f[wl] = np.sqrt(np.var(flux[ivar>0]))
-        bad = np.var(self.tr_ivar, axis=0) == 0
-        f_bar = np.ma.array(f_bar, mask=bad)
-        sigma_f = np.ma.array(sigma_f, mask=bad)
-        plt.plot(self.wl, f_bar, alpha=0.7)
-        plt.fill_between(self.wl, (f_bar+sigma_f), (f_bar-sigma_f), alpha=0.2)
-        plt.scatter(self.wl[contmask], f_bar[contmask], c='r', label="Cont Pix")
-        plt.xlabel("Wavelength (A)")
-        plt.ylabel("Median Flux Across Training Objects")
-        plt.legend()
-        plt.title("Continuum Pix Found by The Cannon")
-        plt.savefig(figname)
-        print("Saving fig %s" %figname)
-
-
     def fit_continuum(self, deg, ffunc):
         """ Fit a continuum to the continuum pixels
 
