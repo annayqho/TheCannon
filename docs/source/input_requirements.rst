@@ -20,6 +20,7 @@ Required input to ``TheCannon`` are as follows:
 
     * a block of training labels with shape [num_training_objects x num_labels]
 
+
 * **Test Set**
 
   * Test Spectra
