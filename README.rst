@@ -1,12 +1,11 @@
 TheCannon
 =========
 
-This is the code associated with *The Cannon*, a new data-driven method for 
+This is the code associated with *The Cannon*, a data-driven method for 
 determining stellar labels (physical parameters and chemical abundances) from
-stellar spectra in the context of vast spectroscopic surveys. It closely 
+stellar spectra in the context of large spectroscopic surveys. It closely 
 follows the method outlined in Ness et al. 2015, although some minor changes 
-have been made. A list of these changes will be outlined in Ho et al. 
-(in prep.)
+have been made. A description of these changes is outlined in Ho et al. 2016.
 
 Documentation for The Cannon can be found here_. 
 
@@ -27,10 +26,9 @@ Copyright 2015 the authors. TheCannon is open-source software released under
 the MIT License. See the file ``LICENSE`` for details.
 
 A condition on using this code for any academic purpose is citation of
-Ness et al. 2015 (arXiv:1501.07604) and Ho et al. (in preparation). 
+Ness et al. 2015 (arXiv:1501.07604) and Ho et al. 2016 (arXiv:1602.00303). 
 
 Projects
 --------
 
-* Cross-calibration of APOGEE and LAMOST: putting LAMOST spectra onto the 
-  APOGEE parameter scale.
+* Survey Cross-Calibration with The Cannon: Apogee-scale Stellar Labels from Lamost Spectra
