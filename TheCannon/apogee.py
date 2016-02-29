@@ -7,6 +7,7 @@ import os
 import sys
 import matplotlib.pyplot as plt
 from astropy.io import ascii
+from TheCannon import *
 
 # python 3 special
 PY3 = sys.version_info[0] > 2
@@ -157,6 +158,70 @@ def load_labels(filename):
     mh = mh[inds]
     return np.vstack((teff,logg,mh)).T 
 
+
+def continuum_normalize_training(ds):
+    """ 
+    Continuum normalize the training set, using an iterative Cannon approach
+
+    Parameters
+    ----------
+    ds: dataset object
+
+    Returns
+    -------
+    updated dataset object
+    
+    """
+
+    # To initialize the continuum-pixel determination, we define a
+    # preliminary pseudo-continuum-normalization by using a polynomial
+    # fit to an upper quantile (in this case 90%) of the spectra, determined
+    # from a running median
+    # this is SNR-dependent
+    pseudo_tr_flux, pseudo_tr_ivar = ds.continuum_normalize_training_q(
+            q=0.90, delta_lambda=50)
+    ds.tr_flux = pseudo_tr_flux
+    ds.tr_ivar = pseudo_tr_ivar
+
+    # Run the training step
+    m = model.CannonModel(2)
+    m.fit(ds)
+
+    # Baseline spectrum
+    baseline_spec = m.coeffs[:,0]
+
+    # Flux cut: 1 +/- 0.15 (0.985 - 1.015)
+    fcut = (np.abs(baseline_spec - 1) <= 0.15)
+
+    # Smallest percentiles of the first order coefficients
+    ccut_1 = np.logical_and(
+            np.abs(m.coeffs[:,1]) < 1.0e-5, np.abs(m.coeffs[:,1] > 0))
+    ccut_2 = np.logical_and(
+            np.abs(m.coeffs[:,2]) < 0.0045, np.abs(m.coeffs[:,2] > 0))
+    ccut_3 = np.logical_and(
+            np.abs(m.coeffs[:,3]) < 0.0085, np.abs(m.coeffs[:,3] > 0))
+    ccut12 = np.logical_and(ccut_1, ccut_2)
+    ccut = np.logical_and(ccut12, ccut_3)
+
+    # Choose the continuum pixels
+    contpix = np.logical_and(fcut, ccut)
+    dataset.set_continuum(contpix)
+
+    # Fit a sinusoid to these pixels, using the inverse variance weighting
+    # Adding an additional error term that is set to 0 for continuum pixels
+    # and a large error value for all other pixels so that the new error 
+    # term becomes 
+    err2 = err1 + err[0 OR LARGE]
+    cont = dataset.fit_continuum(3, "sinusoid")
+    norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
+            dataset.continuum_normalize(cont)
+   
+    ds.tr_flux = norm_tr_flux
+    ds.tr_ivar = norm_tr_ivar
+    ds.test_flux = norm_test_flux
+    ds.test_ivar = norm_test_ivar
+
+    return ds
 
 if  __name__ =='__main__':
     make_apogee_label_file()

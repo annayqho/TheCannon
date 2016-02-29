@@ -4,12 +4,8 @@ from multiprocessing import Pool
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 
-LARGE = 200.
-SMALL = 1. / LARGE
-
 
 def _partial_func(func, *args, **kwargs):
-    """ something """
     def wrap(x, *p):
         return func(x, p, **kwargs)
     return wrap
@@ -80,7 +76,10 @@ def _weighted_median(values, weights, quantile):
     """
     sindx = np.argsort(values)
     cvalues = 1. * np.cumsum(weights[sindx])
-    cvalues = cvalues / cvalues[-1]
+    if cvalues[-1] == 0: # means all the values are 0
+        return values[0]
+    print(cvalues[-1])
+    cvalues = cvalues / cvalues[-1] # div by largest value
     foo = sindx[cvalues > quantile]
     if len(foo) == 0:
         return values[0]
@@ -285,6 +284,7 @@ def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda):
 
 
 def _cont_norm_running_quantile(wl, fluxes, ivars, q, delta_lambda):
+    print("running")
     cont = _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda)
     norm_fluxes = np.ones(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)

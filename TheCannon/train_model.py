@@ -149,7 +149,6 @@ def _train_model(dataset):
     model: model
         best-fit Cannon model
     """
-    print("new version")
     label_names = dataset.get_plotting_labels()
     label_vals = dataset.tr_label
     lams = dataset.wl
