@@ -47,7 +47,7 @@ def _func(coeffs, *labels):
     return np.dot(coeffs, lvec)
 
 
-def _infer_labels(model, dataset, starting_guess):
+def _infer_labels(model, dataset, starting_guess=None):
     """
     Uses the model to solve for labels of the test set.
 
@@ -78,6 +78,9 @@ def _infer_labels(model, dataset, starting_guess):
                                coeffs_all.shape[1]-1.))
     errs_all = np.zeros((nstars, nlabels))
     chisq_all = np.zeros(nstars)
+
+    if starting_guess == None:
+        starting_guess = np.ones(nlabels)
 
     print("starting guess: %s" %starting_guess)
     for jj in range(nstars):
