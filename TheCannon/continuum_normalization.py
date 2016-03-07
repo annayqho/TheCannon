@@ -78,7 +78,6 @@ def _weighted_median(values, weights, quantile):
     cvalues = 1. * np.cumsum(weights[sindx])
     if cvalues[-1] == 0: # means all the values are 0
         return values[0]
-    print(cvalues[-1])
     cvalues = cvalues / cvalues[-1] # div by largest value
     foo = sindx[cvalues > quantile]
     if len(foo) == 0:
@@ -284,7 +283,6 @@ def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda):
 
 
 def _cont_norm_running_quantile(wl, fluxes, ivars, q, delta_lambda):
-    print("running")
     cont = _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda)
     norm_fluxes = np.ones(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)

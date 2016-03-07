@@ -148,7 +148,7 @@ class Dataset(object):
         self.test_ivar = output[:,2,:]
  
 
-    def diagnostics_SNR(self, figname = "SNRdist.png"): 
+    def diagnostics_SNR(self): 
         """ Plots SNR distributions of ref and test object spectra
 
         Parameters
@@ -157,6 +157,8 @@ class Dataset(object):
             Filename to use for the output saved plot
         """
         print("Diagnostic for SNRs of reference and survey objects")
+        print("new fig")
+        fig = plt.figure()
         data = self.test_SNR
         plt.hist(data, bins=int(np.sqrt(len(data))), alpha=0.5, facecolor='r', 
                 label="Survey Objects")
@@ -169,9 +171,7 @@ class Dataset(object):
         #plt.xlabel("log(Formal SNR)")
         plt.xlabel("Formal SNR")
         plt.ylabel("Number of Objects")
-        plt.savefig(figname)
-        plt.close()
-        print("Saved fig %s" %figname)
+        return fig
 
     
     def diagnostics_ref_labels(self, figname="ref_labels_triangle.png"):
@@ -185,7 +185,7 @@ class Dataset(object):
         self._label_triangle_plot(self.tr_label, figname)
 
 
-    def _label_triangle_plot(self, label_vals, figname):
+    def _label_triangle_plot(self, label_vals):
         """Make a triangle plot for the selected labels
 
         Parameters
@@ -199,9 +199,7 @@ class Dataset(object):
         print("Plotting every label against every other")
         fig = corner(label_vals, labels=labels, show_titles=True,
                      title_args={"fontsize":12})
-        fig.savefig(figname)
-        print("Saved fig %s" % figname)
-        plt.close(fig)
+        return fig
 
 
     def make_contmask(self, fluxes, ivars, frac):

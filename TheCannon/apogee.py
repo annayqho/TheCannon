@@ -205,13 +205,13 @@ def continuum_normalize_training(ds):
 
     # Choose the continuum pixels
     contpix = np.logical_and(fcut, ccut)
-    dataset.set_continuum(contpix)
+    ds.set_continuum(contpix)
 
     # Fit a sinusoid to these pixels, using the inverse variance weighting
     # Adding an additional error term that is set to 0 for continuum pixels
     # and a large error value for all other pixels so that the new error 
     # term becomes 
-    err2 = err1 + err[0 OR LARGE]
+    #err2 = err1 + err[0 OR LARGE]
     cont = dataset.fit_continuum(3, "sinusoid")
     norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
             dataset.continuum_normalize(cont)
