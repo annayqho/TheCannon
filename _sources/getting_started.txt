@@ -71,12 +71,7 @@ every label's set of training values against every other.
 
     >>> fig = ds.diagnostics_SNR()
 
-The figure can be viewed using matplotlib:
-
-    >>> import matplotlib.pyplot as plt
-    >>> plt.show()
-
-It should look like this:
+The figure should look like this:
 .. image:: images/SNRdist.png
 
 The output is saved to the directory that ``TheCannon`` is being run in. 
