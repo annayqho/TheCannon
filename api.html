@@ -75,12 +75,8 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Reference/API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.apogee">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#model">Model</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
 </ul>
 </li>
 </ul>
@@ -263,72 +259,6 @@ as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
 <dt id="TheCannon.dataset.Dataset">
 <em class="property">class </em><code class="descclassname">TheCannon.dataset.</code><code class="descname">Dataset</code><span class="sig-paren">(</span><em>wl</em>, <em>tr_ID</em>, <em>tr_flux</em>, <em>tr_ivar</em>, <em>tr_label</em>, <em>test_ID</em>, <em>test_flux</em>, <em>test_ivar</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to represent Cannon input: a dataset of spectra and labels</p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">bin_flux</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">continuum_normalize</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_gaussian_smoothing</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">continuum_normalize_training_q</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_1to1</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_SNR</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_best_fit_spectra</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_ref_labels</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_survey_labels</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_test_step_flagstars</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fit_continuum</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">get_plotting_labels</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">make_contmask</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">set_continuum</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">set_label_names</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">set_test_label_vals</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_dataset</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectra</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectrum</span></code></td>
-<td></td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="TheCannon.dataset.Dataset.bin_flux">
 <code class="descname">bin_flux</code><span class="sig-paren">(</span><em>flux</em>, <em>ivar</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.bin_flux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.bin_flux" title="Permalink to this definition">¶</a></dt>
@@ -706,61 +636,7 @@ as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
 <dl class="class">
 <dt id="TheCannon.model.CannonModel">
 <em class="property">class </em><code class="descclassname">TheCannon.model.</code><code class="descname">CannonModel</code><span class="sig-paren">(</span><em>order</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel" title="Permalink to this definition">¶</a></dt>
-<dd><p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">model</span></code></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_contpix</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_leading_coeffs</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_leading_coeffs_triangle</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_plot_chisq</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">draw_spectra</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fit</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">infer_labels</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_contpix</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">predict</span></code></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">train</span></code></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
+<dd><dl class="method">
 <dt id="TheCannon.model.CannonModel.diagnostics">
 <code class="descname">diagnostics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.diagnostics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce a set of diagnostics plots about the model.</p>
