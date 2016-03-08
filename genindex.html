@@ -78,7 +78,9 @@
 <li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#model">Model</a><ul class="simple">
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -125,8 +127,10 @@
  | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#P"><strong>P</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  
@@ -145,6 +149,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api.html#TheCannon.model.CannonModel">CannonModel (class in TheCannon.model)</a>
+  </dt>
+
+      
   <dt><a href="api.html#TheCannon.dataset.Dataset.continuum_normalize">continuum_normalize() (TheCannon.dataset.Dataset method)</a>
   </dt>
 
@@ -154,6 +162,10 @@
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.apogee.continuum_normalize_training">continuum_normalize_training() (in module TheCannon.apogee)</a>
+  </dt>
+
       
   <dt><a href="api.html#TheCannon.dataset.Dataset.continuum_normalize_training_q">continuum_normalize_training_q() (TheCannon.dataset.Dataset method)</a>
   </dt>
@@ -169,6 +181,10 @@
   </dt>
 
       
+  <dt><a href="api.html#TheCannon.model.CannonModel.diagnostics">diagnostics() (TheCannon.model.CannonModel method)</a>
+  </dt>
+
+      
   <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_1to1">diagnostics_1to1() (TheCannon.dataset.Dataset method)</a>
   </dt>
 
@@ -177,7 +193,11 @@
   </dt>
 
       
-  <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_contmask">diagnostics_contmask() (TheCannon.dataset.Dataset method)</a>
+  <dt><a href="api.html#TheCannon.model.CannonModel.diagnostics_contpix">diagnostics_contpix() (TheCannon.model.CannonModel method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.diagnostics_plot_chisq">diagnostics_plot_chisq() (TheCannon.model.CannonModel method)</a>
   </dt>
 
   </dl></td>
@@ -198,11 +218,21 @@
   <dt><a href="api.html#TheCannon.dataset.Dataset.diagnostics_test_step_flagstars">diagnostics_test_step_flagstars() (TheCannon.dataset.Dataset method)</a>
   </dt>
 
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.draw_spectra">draw_spectra() (TheCannon.model.CannonModel method)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.fit">fit() (TheCannon.model.CannonModel method)</a>
+  </dt>
+
+  </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.dataset.Dataset.fit_continuum">fit_continuum() (TheCannon.dataset.Dataset method)</a>
@@ -235,6 +265,16 @@
   </dl></td>
 </tr></table>
 
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.infer_labels">infer_labels() (TheCannon.model.CannonModel method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
@@ -256,6 +296,28 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#TheCannon.dataset.Dataset.make_contmask">make_contmask() (TheCannon.dataset.Dataset method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.model">model (TheCannon.model.CannonModel attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.plot_contpix">plot_contpix() (TheCannon.model.CannonModel method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.predict">predict() (TheCannon.model.CannonModel method)</a>
   </dt>
 
   </dl></td>
@@ -304,14 +366,22 @@
   <dt><a href="api.html#module-TheCannon.continuum_normalization">TheCannon.continuum_normalization (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#module-TheCannon.find_continuum_pixels">TheCannon.find_continuum_pixels (module)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#module-TheCannon.infer_labels">TheCannon.infer_labels (module)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#module-TheCannon.train_model">TheCannon.train_model (module)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#TheCannon.model.CannonModel.train">train() (TheCannon.model.CannonModel method)</a>
   </dt>
 
   </dl></td>

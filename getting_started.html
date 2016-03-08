@@ -187,12 +187,11 @@ every label&#8217;s set of training values against every other.</p>
 </div>
 <p>The figure should look like this:
 .. image:: images/SNRdist.png</p>
-<p>The output is saved to the directory that <code class="docutils literal"><span class="pre">TheCannon</span></code> is being run in.
-The first should be called <code class="docutils literal"><span class="pre">SNRdist.png</span></code> and look as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
+<p>We can also plot the reference labels against each other:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The second should be called <code class="docutils literal"><span class="pre">ref_labels_triangle.png</span></code> and look as follows:</p>
+<p>That figure should look like this:</p>
 <img alt="_images/ref_labels_triangle.png" src="_images/ref_labels_triangle.png" />
 <p>Again, <code class="docutils literal"><span class="pre">TheCannon</span></code> requires incoming spectra to be continuum normalized
 in a way that is independent of signal to noise. If the data does not satisfy

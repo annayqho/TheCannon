@@ -78,7 +78,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model">Model</a><ul class="simple">
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -123,6 +125,22 @@
 <div class="section" id="module-TheCannon.apogee">
 <span id="apogee-data"></span><h2>APOGEE Data<a class="headerlink" href="#module-TheCannon.apogee" title="Permalink to this headline">¶</a></h2>
 <p>Functions for reading in APOGEE spectra and training labels</p>
+<dl class="function">
+<dt id="TheCannon.apogee.continuum_normalize_training">
+<code class="descclassname">TheCannon.apogee.</code><code class="descname">continuum_normalize_training</code><span class="sig-paren">(</span><em>ds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/apogee.html#continuum_normalize_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.continuum_normalize_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continuum normalize the training set, using an iterative Cannon approach</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ds: dataset object</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">updated dataset object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="TheCannon.apogee.get_pixmask">
 <code class="descclassname">TheCannon.apogee.</code><code class="descname">get_pixmask</code><span class="sig-paren">(</span><em>fluxes</em>, <em>flux_errs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/apogee.html#get_pixmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_pixmask" title="Permalink to this definition">¶</a></dt>
@@ -273,43 +291,40 @@ as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_best_fit_spectra</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_contmask</span></code></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_ref_labels</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_ref_labels</span></code></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_survey_labels</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_survey_labels</span></code></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_test_step_flagstars</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_test_step_flagstars</span></code></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fit_continuum</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">fit_continuum</span></code></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">get_plotting_labels</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">get_plotting_labels</span></code></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">make_contmask</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">make_contmask</span></code></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">set_continuum</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">set_continuum</span></code></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">set_label_names</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">set_label_names</span></code></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">set_test_label_vals</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">set_test_label_vals</span></code></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_dataset</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_dataset</span></code></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectra</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectra</span></code></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectrum</span></code></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">smooth_spectrum</span></code></td>
 <td></td>
 </tr>
 </tbody>
@@ -408,7 +423,7 @@ as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
 
 <dl class="method">
 <dt id="TheCannon.dataset.Dataset.diagnostics_SNR">
-<code class="descname">diagnostics_SNR</code><span class="sig-paren">(</span><em>figname='SNRdist.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_SNR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_SNR" title="Permalink to this definition">¶</a></dt>
+<code class="descname">diagnostics_SNR</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_SNR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_SNR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots SNR distributions of ref and test object spectra</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -428,24 +443,6 @@ as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
 <dt id="TheCannon.dataset.Dataset.diagnostics_best_fit_spectra">
 <code class="descname">diagnostics_best_fit_spectra</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_best_fit_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_best_fit_spectra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot results of best-fit spectra for ten random test objects</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="TheCannon.dataset.Dataset.diagnostics_contmask">
-<code class="descname">diagnostics_contmask</code><span class="sig-paren">(</span><em>figname='contpix.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/dataset.html#Dataset.diagnostics_contmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.dataset.Dataset.diagnostics_contmask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots continuum pixels against training spectra median flux values</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) figname: str</strong></p>
-<blockquote class="last">
-<div><p>Filename of the output figure</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -706,7 +703,197 @@ as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
 </div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-TheCannon.infer_labels"></span></div>
+<dl class="class">
+<dt id="TheCannon.model.CannonModel">
+<em class="property">class </em><code class="descclassname">TheCannon.model.</code><code class="descname">CannonModel</code><span class="sig-paren">(</span><em>order</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">model</span></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_contpix</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_leading_coeffs</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_leading_coeffs_triangle</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">diagnostics_plot_chisq</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">draw_spectra</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fit</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">infer_labels</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot_contpix</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">predict</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">train</span></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.diagnostics">
+<code class="descname">diagnostics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a set of diagnostics plots about the model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.diagnostics_contpix">
+<code class="descname">diagnostics_contpix</code><span class="sig-paren">(</span><em>data</em>, <em>nchunks=10</em>, <em>fig='baseline_spec_with_cont_pix'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.diagnostics_contpix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.diagnostics_contpix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call plot_contpix once for each nth of the spectrum</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.diagnostics_plot_chisq">
+<code class="descname">diagnostics_plot_chisq</code><span class="sig-paren">(</span><em>dataset</em>, <em>figname='modelfit_chisqs.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.diagnostics_plot_chisq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.diagnostics_plot_chisq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a set of diagnostic plots for the model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>(optional) chisq_dist_plot_name: str</strong></p>
+<blockquote class="last">
+<div><p>Filename of output saved plot</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.draw_spectra">
+<code class="descname">draw_spectra</code><span class="sig-paren">(</span><em>dataset</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.draw_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.draw_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new dataset whose test flux and ivar values correspond to the
+fitted-for test spectra</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>Dataset that needs label inference</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">cannon_set: Dataset</p>
+<blockquote class="last">
+<div><p>Dataset with best-fit fluxes and variances as test_flux and test_ivar</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#TheCannon.model.CannonModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run training step: solve for best-fit spectral model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.infer_labels">
+<code class="descname">infer_labels</code><span class="sig-paren">(</span><em>dataset</em>, <em>starting_guess</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.infer_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.infer_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the model to solve for labels of the test set, updates Dataset</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>Dataset that needs label inference</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">errs_all: ndarray</p>
+<blockquote class="last">
+<div><p>Covariance matrix of the fit</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="TheCannon.model.CannonModel.model">
+<code class="descname">model</code><a class="headerlink" href="#TheCannon.model.CannonModel.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the model definition or raise an error if not trained</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.plot_contpix">
+<code class="descname">plot_contpix</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>contpix_x</em>, <em>contpix_y</em>, <em>figname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.plot_contpix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.plot_contpix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot baseline spec with continuum pix overlaid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>starting_guess=None</em><span class="sig-paren">)</span><a class="headerlink" href="#TheCannon.model.CannonModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the model to solve for labels of the test set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model: tuple</strong></p>
+<blockquote>
+<div><p>Coeffs_all, covs, scatters, chis, chisqs, pivots</p>
+</div></blockquote>
+<p><strong>dataset: Dataset</strong></p>
+<blockquote>
+<div><p>Dataset that needs label inference</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">errs_all:</p>
+<blockquote class="last">
+<div><p>Covariance matrix of the fit</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="TheCannon.model.CannonModel.train">
+<code class="descname">train</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/model.html#CannonModel.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.model.CannonModel.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run training step: solve for best-fit spectral model</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-TheCannon.train_model"></span><span class="target" id="module-TheCannon.infer_labels"></span></div>
 </div>
 
 

@@ -78,7 +78,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a><ul class="simple">
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -125,12 +127,8 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
 
-<span class="n">LARGE</span> <span class="o">=</span> <span class="mf">200.</span>
-<span class="n">SMALL</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">LARGE</span>
-
 
 <span class="k">def</span> <span class="nf">_partial_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; something &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wrap</span>
@@ -201,7 +199,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sindx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
     <span class="n">cvalues</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">sindx</span><span class="p">])</span>
-    <span class="n">cvalues</span> <span class="o">=</span> <span class="n">cvalues</span> <span class="o">/</span> <span class="n">cvalues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cvalues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># means all the values are 0</span>
+        <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">cvalues</span> <span class="o">=</span> <span class="n">cvalues</span> <span class="o">/</span> <span class="n">cvalues</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># div by largest value</span>
     <span class="n">foo</span> <span class="o">=</span> <span class="n">sindx</span><span class="p">[</span><span class="n">cvalues</span> <span class="o">&gt;</span> <span class="n">quantile</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -232,8 +232,9 @@
     <span class="n">bot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ivars</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">fluxes</span><span class="o">*</span><span class="n">ivars</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="n">bad</span> <span class="o">=</span> <span class="n">bot</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bot</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">top</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">cont</span><span class="p">[</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="n">top</span><span class="p">[</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span> <span class="o">/</span> <span class="n">bot</span><span class="p">[</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">cont</span>
 
 
 <span class="k">def</span> <span class="nf">_cont_norm_gaussian_smooth</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
@@ -453,12 +454,13 @@
 <span class="sd">        rescaled inverse variances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nstars</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">npixels</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">bad</span> <span class="o">=</span> <span class="n">cont</span> <span class="o">==</span> <span class="mf">0.</span>
-    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">bad</span><span class="p">)</span>
+    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">norm_fluxes</span><span class="p">[</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span> <span class="o">/</span> <span class="n">cont</span><span class="p">[</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span>
     <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">cont</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ivars</span>
-    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span> 
 
 

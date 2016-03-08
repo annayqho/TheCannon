@@ -74,12 +74,11 @@ every label's set of training values against every other.
 The figure should look like this:
 .. image:: images/SNRdist.png
 
-The output is saved to the directory that ``TheCannon`` is being run in. 
-The first should be called ``SNRdist.png`` and look as follows:
+We can also plot the reference labels against each other:
 
-    >>> ds.diagnostics_ref_labels()
+    >>> fig = ds.diagnostics_ref_labels()
 
-The second should be called ``ref_labels_triangle.png`` and look as follows:
+That figure should look like this:
 
 .. image:: images/ref_labels_triangle.png
 

@@ -78,7 +78,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a><ul class="simple">
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -128,6 +130,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">ascii</span>
+<span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="c1"># python 3 special</span>
 <span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
@@ -241,11 +244,8 @@
             <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wl_full</span><span class="p">)</span>
         <span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">file_in</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
         <span class="n">badpix</span> <span class="o">=</span> <span class="n">get_pixmask</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="p">)</span>
-        <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">badpix</span><span class="p">)</span>
-        <span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">flux_err</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">badpix</span><span class="p">)</span>
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">npixels</span><span class="p">),</span> <span class="n">mask</span><span class="o">=</span><span class="n">badpix</span><span class="p">)</span>
-        <span class="n">ivar</span> <span class="o">=</span> <span class="n">ones</span> <span class="o">/</span> <span class="n">flux_err</span><span class="o">**</span><span class="mi">2</span>
-        <span class="n">ivar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">ivar</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+        <span class="n">ivar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">npixels</span><span class="p">)</span>
+        <span class="n">ivar</span><span class="p">[</span><span class="o">~</span><span class="n">badpix</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">flux_err</span><span class="p">[</span><span class="o">~</span><span class="n">badpix</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">flux</span>
         <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">ivar</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Spectra loaded&quot;</span><span class="p">)</span>
@@ -281,6 +281,70 @@
     <span class="n">mh</span> <span class="o">=</span> <span class="n">mh</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">teff</span><span class="p">,</span><span class="n">logg</span><span class="p">,</span><span class="n">mh</span><span class="p">))</span><span class="o">.</span><span class="n">T</span> </div>
 
+
+<div class="viewcode-block" id="continuum_normalize_training"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.continuum_normalize_training">[docs]</a><span class="k">def</span> <span class="nf">continuum_normalize_training</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Continuum normalize the training set, using an iterative Cannon approach</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds: dataset object</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    updated dataset object</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># To initialize the continuum-pixel determination, we define a</span>
+    <span class="c1"># preliminary pseudo-continuum-normalization by using a polynomial</span>
+    <span class="c1"># fit to an upper quantile (in this case 90%) of the spectra, determined</span>
+    <span class="c1"># from a running median</span>
+    <span class="c1"># this is SNR-dependent</span>
+    <span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize_training_q</span><span class="p">(</span>
+            <span class="n">q</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">pseudo_tr_flux</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">pseudo_tr_ivar</span>
+
+    <span class="c1"># Run the training step</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+    <span class="c1"># Baseline spectrum</span>
+    <span class="n">baseline_spec</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Flux cut: 1 +/- 0.15 (0.985 - 1.015)</span>
+    <span class="n">fcut</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">baseline_spec</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.15</span><span class="p">)</span>
+
+    <span class="c1"># Smallest percentiles of the first order coefficients</span>
+    <span class="n">ccut_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1.0e-5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ccut_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.0045</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ccut_3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">3</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.0085</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ccut12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">ccut_1</span><span class="p">,</span> <span class="n">ccut_2</span><span class="p">)</span>
+    <span class="n">ccut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">ccut12</span><span class="p">,</span> <span class="n">ccut_3</span><span class="p">)</span>
+
+    <span class="c1"># Choose the continuum pixels</span>
+    <span class="n">contpix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">fcut</span><span class="p">,</span> <span class="n">ccut</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">set_continuum</span><span class="p">(</span><span class="n">contpix</span><span class="p">)</span>
+
+    <span class="c1"># Fit a sinusoid to these pixels, using the inverse variance weighting</span>
+    <span class="c1"># Adding an additional error term that is set to 0 for continuum pixels</span>
+    <span class="c1"># and a large error value for all other pixels so that the new error </span>
+    <span class="c1"># term becomes </span>
+    <span class="c1">#err2 = err1 + err[0 OR LARGE]</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">fit_continuum</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;sinusoid&quot;</span><span class="p">)</span>
+    <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> \
+            <span class="n">dataset</span><span class="o">.</span><span class="n">continuum_normalize</span><span class="p">(</span><span class="n">cont</span><span class="p">)</span>
+   
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">norm_tr_flux</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">norm_tr_ivar</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">norm_test_flux</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">norm_test_ivar</span>
+
+    <span class="k">return</span> <span class="n">ds</span></div>
 
 <span class="k">if</span>  <span class="n">__name__</span> <span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">make_apogee_label_file</span><span class="p">()</span>
