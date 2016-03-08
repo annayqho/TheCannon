@@ -94,7 +94,7 @@ level is set to 90\%. APOGEE spectra come in three chunks, and we want to
 perform continuum normalization for each chunk separately. For ``TheCannon``
 to treat spectra in chunks, the ``ranges`` attribute must be set:
 
-    >>> dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
+    >>> ds.ranges = [[371,3192], [3697,5997], [6461,8255]]
 
 Even if a spectral dataset do not consist of chunks separated by gaps, one can
 imagine other reasons for wanting to treat a spectrum as though it had gaps:
@@ -106,7 +106,7 @@ spectra.
 
 Pseudo continuum normalization can then be performed as follows:
 
-    >>> pseudo_tr_flux, pseudo_tr_ivar = dataset.continuum_normalize_training_q(
+    >>> pseudo_tr_flux, pseudo_tr_ivar = ds.continuum_normalize_training_q(
     >>> ...q=0.90, delta_lambda=50)
 
 Once the pseudo continuum has been calculated, a continuum mask is created:
@@ -115,7 +115,7 @@ not. "True" continuum pixels are identified using a median and variance flux
 cut across the training objects: in other words, continuum pixels are those
 that consistently have values close to 1 in all of the training spectra. The
 user specifies what fraction of pixels to identify as continuum, and the
-flux and variance cuts are determined appropriately. If the ``dataset.ranges``
+flux and variance cuts are determined appropriately. If the ``ds.ranges``
 attribute is set, then continuum pixels are identified separately for each
 region (in this case, three regions). This enables the user to control how
 evenly spread the pixels are.
@@ -123,7 +123,7 @@ evenly spread the pixels are.
 In this case, we choose 7% of the pixels in the spectrum as continuum, but the
 best value should be determined through experimentation.
 
-    >>> contmask = dataset.make_contmask(
+    >>> contmask = ds.make_contmask(
     >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
 
 At this stage, the user should plot spectra overlaid with the identified
@@ -133,34 +133,34 @@ poor continuum normalization in those regions. If the continuum pixels
 do not look evenly sampled enough, the range can be changed and the process
 repeated. For this example, we change it as follows:
 
-    >>> dataset.ranges = [[371,3192], [3697,5500], [5500,5997], [6461,8255]]
-    >>> contmask = dataset.make_contmask(
+    >>> ds.ranges = [[371,3192], [3697,5500], [5500,5997], [6461,8255]]
+    >>> contmask = ds.make_contmask(
     >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
 
 Once a satisfactory set of continuum pixels has been identified, the dataset's
 continuum mask attribute is set as follows:
 
-    >>> dataset.set_continuum(contmask)
+    >>> ds.set_continuum(contmask)
 
 Once the dataset has a continuum mask, the continuum is fit for using either
 a sinusoid or chebyshev function. In this case, we use a sinusoid; the user
 can specify the desired order. Again, this is 3 for this simple illustration,
 but should be determined through experimentation.
 
-    >>> cont = dataset.fit_continuum(3, "sinusoid")
+    >>> cont = ds.fit_continuum(3, "sinusoid")
 
 Once a satisfactory continuum has been fit, the normalized training and test
 spectra can be calculated:
 
     >>> norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
-    >>> dataset.continuum_normalize(cont)
+    >>> ds.continuum_normalize(cont)
 
 If these normalized spectra look acceptable, then they can be set:
 
-    >>> dataset.tr_flux = norm_tr_flux
-    >>> dataset.tr_ivar = norm_tr_ivar
-    >>> dataset.test_flux = norm_test_flux
-    >>> dataset.test_ivar = norm_test_ivar
+    >>> ds.tr_flux = norm_tr_flux
+    >>> ds.tr_ivar = norm_tr_ivar
+    >>> ds.test_flux = norm_test_flux
+    >>> ds.test_ivar = norm_test_ivar
 
 Now, the data munging is over and we're ready to run ``TheCannon``!
 
@@ -169,15 +169,15 @@ specify is the desired polynomial order of the spectral model.
 In this case, we use a quadratic model: order = 2
 
 >>> from TheCannon import model
->>> model = model.CannonModel(2) 
->>> model.fit(dataset) 
+>>> md = model.CannonModel(2) 
+>>> md.fit(ds) 
 
 At this stage, more optional diagnostic plots can be produced to examine
 the spectral model:
 
->>> model.diagnostics_contpix(dataset)
->>> model.diagnostics_leading_coeffs(dataset)
->>> model.diagnostics_plot_chisq(dataset)
+>>> md.diagnostics_contpix(ds)
+>>> md.diagnostics_leading_coeffs(ds)
+>>> md.diagnostics_plot_chisq(ds)
 
 The first is a series of plots showing the full baseline (first-order) model
 spectrum with continuum pixels overplotted. 
@@ -197,16 +197,16 @@ If the model fitting worked, then we can proceed to the test step. This
 command automatically updates the dataset with the fitted-for test labels,
 and returns the corresponding covariance matrix.
 
->>> label_errs = model.infer_labels(dataset)
+>>> label_errs = md.infer_labels(ds)
 
 You can access the new labels as follows:
 
->>> test_labels = dataset.test_label_vals
+>>> test_labels = ds.test_label_vals
 
 A set of diagnostic output:
 
->>> dataset.diagnostics_test_step_flagstars()
->>> dataset.diagnostics_survey_labels()
+>>> ds.diagnostics_test_step_flagstars()
+>>> ds.diagnostics_survey_labels()
 
 The first generates one text file for each label, called ``flagged_stars.txt``. 
 The second generates a triangle plot of the survey (Cannon) labels,
@@ -217,7 +217,7 @@ shown below.
 If the test set is simply equivalent to the training set, 
 as in this example, then one final diagnostic plot can be produced:  
 
->>> dataset.diagnostics_1to1()
+>>> dset.diagnostics_1to1()
 
 .. image:: images/1to1_label_0.png
 
