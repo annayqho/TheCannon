@@ -52,7 +52,7 @@ Now, all the input data has been packaged properly, and we can begin running
 The first step is to initialize a ``Dataset`` object:
 
     >>> from TheCannon import dataset
-    >>> dataset = dataset.Dataset(
+    >>> ds = dataset.Dataset(
     >>> ...wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 
 ``TheCannon`` has a number of optional diagnostic plots built-in, to help the
@@ -60,7 +60,7 @@ user visualize the results. Some of these plots require knowing the names
 of the labels. If the user wants to produce these diagnostic plots, he or
 she must specify the label names in LaTeX format: 
 
-    >>> dataset.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
+    >>> ds.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
 
 At this stage, two diagnotic plots can already be produced, 
 one with the distribution
@@ -69,13 +69,20 @@ should consist of higher SNR spectra than the test set)
 and the other using ``triangle.py`` to plot
 every label's set of training values against every other.  
 
-    >>> dataset.diagnostics_SNR()
-    >>> dataset.diagnostics_ref_labels()
+    >>> fig = ds.diagnostics_SNR()
+
+The figure can be viewed using matplotlib:
+
+    >>> import matplotlib.pyplot as plt
+    >>> plt.show()
+
+It should look like this:
+.. image:: images/SNRdist.png
 
 The output is saved to the directory that ``TheCannon`` is being run in. 
 The first should be called ``SNRdist.png`` and look as follows:
 
-.. image:: images/SNRdist.png
+    >>> ds.diagnostics_ref_labels()
 
 The second should be called ``ref_labels_triangle.png`` and look as follows:
 
