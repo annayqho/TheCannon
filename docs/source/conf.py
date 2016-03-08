@@ -53,6 +53,8 @@ source_suffix = '.rst'
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
 
+numpydoc_show_class_members = False
+
 # The master toctree document.
 master_doc = 'index'
 
