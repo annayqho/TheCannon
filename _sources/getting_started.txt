@@ -71,7 +71,6 @@ every label's set of training values against every other.
 
     >>> fig = ds.diagnostics_SNR()
 
-The figure should look like this:
 .. image:: images/SNRdist.png
 
 We can also plot the reference labels against each other:
