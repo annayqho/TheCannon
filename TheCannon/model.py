@@ -239,7 +239,8 @@ class CannonModel(object):
         scatters = self.scatters
 
         # Histogram of the chi squareds of ind. stars
-        plt.hist(np.sum(chisqs, axis=0), color='lightblue', alpha=0.7)
+        plt.hist(np.sum(chisqs, axis=0), color='lightblue', alpha=0.7,
+                bins=np.sqrt(len(chisqs)))
         dof = len(lams) - coeffs.shape[1]   # for one star
         plt.axvline(x=dof, c='k', linewidth=2, label="DOF")
         plt.legend()

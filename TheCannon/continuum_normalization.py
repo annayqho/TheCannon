@@ -4,6 +4,7 @@ from multiprocessing import Pool
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 
+SMALL = 1.0/200
 
 def _partial_func(func, *args, **kwargs):
     def wrap(x, *p):

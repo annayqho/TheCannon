@@ -10,7 +10,7 @@ from .helpers.corner import corner
 from .helpers import Table
 from .find_continuum_pixels import * 
 from .continuum_normalization import _cont_norm_gaussian_smooth, _cont_norm_running_quantile, _cont_norm_running_quantile_regions, _find_cont_fitfunc, _find_cont_fitfunc_regions, _cont_norm, _cont_norm_regions
-from .find_continuum_pixels import _find_contpix_regions
+from .find_continuum_pixels import _find_contpix,_find_contpix_regions
 
 PY3 = sys.version_info[0] > 2
 
@@ -149,13 +149,7 @@ class Dataset(object):
  
 
     def diagnostics_SNR(self): 
-        """ Plots SNR distributions of ref and test object spectra
-
-        Parameters
-        ----------
-        (optional) figname: string
-            Filename to use for the output saved plot
-        """
+        """ Plots SNR distributions of ref and test object spectra """
         print("Diagnostic for SNRs of reference and survey objects")
         print("new fig")
         fig = plt.figure()
@@ -174,15 +168,9 @@ class Dataset(object):
         return fig
 
     
-    def diagnostics_ref_labels(self, figname="ref_labels_triangle.png"):
-        """ Plots all training labels against each other 
-        
-        Parameters
-        ----------
-        (optional) figname: string
-            Filename of the saved output plot
-        """
-        self._label_triangle_plot(self.tr_label, figname)
+    def diagnostics_ref_labels(self):
+        """ Plots all training labels against each other """
+        return self._label_triangle_plot(self.tr_label)
 
 
     def _label_triangle_plot(self, label_vals):
