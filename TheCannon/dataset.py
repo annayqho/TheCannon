@@ -151,7 +151,6 @@ class Dataset(object):
     def diagnostics_SNR(self): 
         """ Plots SNR distributions of ref and test object spectra """
         print("Diagnostic for SNRs of reference and survey objects")
-        print("new fig")
         fig = plt.figure()
         data = self.test_SNR
         plt.hist(data, bins=int(np.sqrt(len(data))), alpha=0.5, facecolor='r', 
