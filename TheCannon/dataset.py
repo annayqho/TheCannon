@@ -368,15 +368,9 @@ class Dataset(object):
             print("Saved list %s" % filename)
 
 
-    def diagnostics_survey_labels(self, figname="survey_labels_triangle.png"):
-        """ Plot all survey labels against each other
-
-        Parameters
-        ----------
-        (optional) figname: str
-            Filename of saved output plot
-        """  
-        self._label_triangle_plot(self.test_label_vals, figname)
+    def diagnostics_survey_labels(self):
+        """ Plot all survey labels against each other """  
+        fig = self._label_triangle_plot(self.test_label_vals)
    
    
     def diagnostics_1to1(self, figname="1to1_label"):
