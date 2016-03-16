@@ -34,6 +34,7 @@ class Dataset(object):
         self.test_ID = test_ID
         self.test_flux = test_flux
         self.test_ivar = test_ivar
+        self._label_names = None
         self.ranges = None
         
         # calculate SNR
