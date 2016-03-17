@@ -38,7 +38,7 @@ class CannonModel(object):
         _model_diagnostics(self.dataset, self.model)
 
 
-    def infer_labels(self, dataset, starting_guess):
+    def infer_labels(self, dataset, starting_guess = None):
         """
         Uses the model to solve for labels of the test set, updates Dataset
 

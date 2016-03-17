@@ -82,7 +82,7 @@ def _infer_labels(model, dataset, starting_guess=None):
     if starting_guess == None:
         starting_guess = np.ones(nlabels)
 
-    print("starting guess: %s" %starting_guess)
+    # print("starting guess: %s" %starting_guess)
     for jj in range(nstars):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]

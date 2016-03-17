@@ -180,8 +180,6 @@ class Dataset(object):
         ----------
         label_vals: numpy ndarray 
             values of the labels
-        figname: str
-            if provided, save the figure into the given file
         """
         labels = [r"$%s$" % l for l in self.get_plotting_labels()]
         print("Plotting every label against every other")
