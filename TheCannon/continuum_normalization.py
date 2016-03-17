@@ -268,7 +268,6 @@ def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda):
     norm_ivars: numpy ndarray of shape (nstars, npixels)
         rescaled pixel invariances
     """
-    print("contnorm.py: continuum norm using running quantile")
     cont = np.zeros(fluxes.shape)
     nstars = fluxes.shape[0]
     for jj in range(nstars):

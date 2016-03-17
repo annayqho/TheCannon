@@ -147,7 +147,7 @@ class CannonModel(object):
                         contpix_x[take], contpix_y[take], fig_chunk)
 
 
-    def diagnostics_leading_coeffs(self, dataset, figname = "leading_coeffs.png"):
+    def diagnostics_leading_coeffs(self, dataset):
         label_names = dataset.get_plotting_labels()
         lams = dataset.wl
         npixels = len(lams)
@@ -193,9 +193,7 @@ class CannonModel(object):
         ax.xaxis.grid(True)
         ax.locator_params(axis='y', nbins=4)
         print("Diagnostic plot: leading coeffs and scatters across wavelength.")
-        print("Saved as %s" %figname)
-        fig.savefig(figname)
-        plt.close(fig)
+        return fig
 
 
     def diagnostics_leading_coeffs_triangle(self, dataset, 
