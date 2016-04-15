@@ -17,14 +17,10 @@
 *.png
 *.npz
 *.sh
-snr_investigation.py
 examples/*
-Caltech/*
-Internal/*
 build/*
 docs/*
 dist/*
-findStars.py
 TheCannon.egg-info/*
 cont_fit_experiments/*
 lamost_paper/*
