@@ -17,9 +17,9 @@ class CannonModel(object):
         self.chisqs = None
         self.pivots = None
         self.order = order
+        self.test_spectra = None
 
 
-    @property
     def model(self):
         """ Return the model definition or raise an error if not trained """
         if self.coeffs is None:
@@ -41,6 +41,7 @@ class CannonModel(object):
     def infer_labels(self, dataset, starting_guess = None):
         """
         Uses the model to solve for labels of the test set, updates Dataset
+        Then use those inferred labels to set the model.test_spectra attribute
 
         Parameters
         ----------
@@ -53,37 +54,6 @@ class CannonModel(object):
             Covariance matrix of the fit
         """
         return _infer_labels(self, dataset, starting_guess)
-
-
-    def draw_spectra(self, dataset):
-        """
-        Create a new dataset whose test flux and ivar values correspond to the
-        fitted-for test spectra
-
-        Parameters
-        ----------
-        dataset: Dataset
-            Dataset that needs label inference
-
-        Returns
-        -------
-        cannon_set: Dataset
-            Dataset with best-fit fluxes and variances as test_flux and test_ivar
-        """
-        coeffs_all, covs, scatters, red_chisqs, pivots, label_vector = self.model
-        nstars = len(dataset.test_SNR)
-        cannon_fluxes = np.zeros(dataset.test_flux.shape)
-        cannon_ivars = np.zeros(dataset.test_ivar.shape)
-        for i in range(nstars):
-            x = label_vector[:,i,:]
-            spec_fit = np.einsum('ij, ij->i', x, coeffs_all)
-            cannon_fluxes[i,:] = spec_fit
-            bad = dataset.test_ivar[i,:] == SMALL
-            cannon_ivars[i,:][~bad] = 1. / scatters[~bad] ** 2
-        cannon_set = deepcopy(dataset)
-        cannon_set.test_flux = cannon_fluxes
-        cannon_set.test_ivar = cannon_ivars
-        return cannon_set
 
 
     def plot_contpix(self, x, y, contpix_x, contpix_y, figname):
