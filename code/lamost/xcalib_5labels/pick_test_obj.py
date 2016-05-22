@@ -14,9 +14,9 @@ def calc_dist(lamost_point, training_points, coeffs):
 
 def find_test_obj(date):
     print("loading data...")
-    with np.load("tr_label.npz") as a:
+    with np.load("../test_training_overlap/tr_label.npz") as a:
         training_points = a['arr_0'][:,0:3]
-    labels = np.load("../xcalib_4labels/lamost_labels/lamost_labels_%s.npz" %date)['arr_0']
+    labels = np.load("lamost_labels_%s.npz" %date)['arr_0']
     lamost_label_id = labels[:,0]
     lamost_teff = labels[:,1].astype(np.float)
     lamost_logg = labels[:,2].astype(np.float)
@@ -32,21 +32,20 @@ def find_test_obj(date):
     print("finding the test objects")
     test_obj = lamost_label_id[training_dist < 2.5]
 
-    outputf = open('test_obj/%s_test_obj.txt' %date, "w")
+    outputf = open('%s_test_obj.txt' %date, "w")
     for obj in test_obj: 
         outputf.write(obj + '\n')
     outputf.close()
 
 
 if __name__ == "__main__":
-    dates = os.listdir("/home/share/LAMOST/DR2/DR2_release")
+    dates = os.listdir("DR2_release")
     dates = np.array(dates)
     dates = np.delete(dates, np.where(dates=='.directory')[0][0])
-    dates = np.delete(dates, np.where(dates=='all_folders.list')[0][0])
-    dates = np.delete(dates, np.where(dates=='dr2.lis')[0][0])
     for date in dates: 
+        date = "20111203"
         print(date)
-        if glob.glob("test_obj/%s_test_obj.txt" %date):
+        if glob.glob("%s_test_obj.txt" %date):
             print("done already")
         else:
             find_test_obj(date)
