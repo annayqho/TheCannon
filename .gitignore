@@ -17,6 +17,7 @@
 *.png
 *.npz
 *.sh
+*.save
 examples/*
 build/*
 docs/*
