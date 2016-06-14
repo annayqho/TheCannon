@@ -49,15 +49,19 @@ def train(ds, ii):
     return m
 
 
-def test(ds, m, ii):
+def test(ds, m, group):
     nguesses = 7
     nobj = len(ds.test_ID)
     nlabels = len(m.pivots)
     choose = np.random.randint(0,nobj,size=nguesses)
     tr_label = ds.tr_label
-    print("nlab" + nlabels)
-    print("nobj" + nobj)
+    print("nlab")
+    print(nlabels)
+    print("nobj")
+    print(nobj)
+    print("tr label shape")
     print(tr_label.shape)
+    print("m pivots shape")
     print(m.pivots.shape)
     starting_guesses = tr_label[choose]-m.pivots
     labels = np.zeros((nguesses, nobj, nlabels))
@@ -70,9 +74,9 @@ def test(ds, m, ii):
         chisq[ii,:] = b
         errs[ii,:] = c
 
-    np.savez("ex%s_labels_all_starting_vals.npz" %ii, labels)
-    np.savez("ex%s_chisq_all_starting_vals.npz" %ii, chisq)
-    np.savez("ex%s_errs_all_starting_vals.npz" %ii, errs)
+    np.savez("ex%s_labels_all_starting_vals.npz" %group, labels)
+    np.savez("ex%s_chisq_all_starting_vals.npz" %group, chisq)
+    np.savez("ex%s_errs_all_starting_vals.npz" %group, errs)
 
     choose = np.argmin(chisq, axis=0)
     best_chisq = np.min(chisq, axis=0)
@@ -82,13 +86,13 @@ def test(ds, m, ii):
         best_labels[jj,:] = labels[:,jj,:][val]
         best_errs[jj,:] = errs[:,jj,:][val]
 
-    np.savez("./ex%s_cannon_label_vals.npz" %ii, best_labels)
-    np.savez("./ex%s_cannon_label_chisq.npz" %ii, best_chisq)
-    np.savez("./ex%s_cannon_label_errs.npz" %ii, best_errs)
+    np.savez("./ex%s_cannon_label_vals.npz" %group, best_labels)
+    np.savez("./ex%s_cannon_label_chisq.npz" %group, best_chisq)
+    np.savez("./ex%s_cannon_label_errs.npz" %group, best_errs)
 
     ds.test_label_vals = best_labels
     ds.diagnostics_survey_labels()
-    ds.diagnostics_1to1(figname = "ex%s_1to1_test_label" %ii)
+    ds.diagnostics_1to1(figname = "ex%s_1to1_test_label" %group)
 
 
 def test_step_iteration(ds, m, starting_guess):
