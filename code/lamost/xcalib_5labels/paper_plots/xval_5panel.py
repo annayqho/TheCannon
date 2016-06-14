@@ -4,9 +4,7 @@ from matplotlib import rc
 import matplotlib.gridspec as gridspec
 from matplotlib.colors import LogNorm
 plt.rc('text', usetex=True)
-rc('text.latex', preamble = ','.join('''
-\usepackage{txfonts}
-'''.split()))
+# rc('text.latex', preamble = ','.join('''\usepackage{txfonts}'''.split()))
 plt.rc('font', family='serif')
 import numpy as np
 
@@ -17,7 +15,7 @@ def round_sig(x, sig=2):
     return round(x, sig-int(floor(log10(x)))-1)
 
 
-names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}', r'[\alphaup/\mbox{M}]', 
+names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}', r'[\alpha/\mbox{M}]', 
 '\mbox{A}_{\mbox{k}}']
 units = ['K', 'dex', 'dex', 'dex', 'mag']
 mins = [3700, 0.5, -2.4, -0.11, -0.1]
@@ -27,7 +25,7 @@ print("Loading data")
 direc = "/Users/annaho/TheCannon/data/lamost_paper"
 snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
 apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
-cannon = np.load("all_cannon_label_vals.npz")['arr_0']
+cannon = np.load("../all_cannon_label_vals.npz")['arr_0']
 
 fig = plt.figure(figsize=(8,9))
 gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
@@ -65,5 +63,5 @@ for i in range(0, len(names)):
     ax.set_xlabel(r"$%s$" %name + " (%s) from APOGEE" %unit)
     ax.set_ylabel(r"$%s$" %(name) + " (%s) from Cannon" %unit)
 
-#plt.show()
+# plt.show()
 plt.savefig("xval_5panel.png")
