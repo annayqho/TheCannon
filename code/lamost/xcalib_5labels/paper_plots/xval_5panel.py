@@ -43,7 +43,7 @@ for i in range(0, len(names)):
     ax.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
     #ax.legend(fontsize=14)
     #print(np.mean(cannon[:,i]-apogee[:,i]))
-    choose = snr > 50
+    choose = snr > 0
     diff = cannon[:,i][choose] - apogee[:,i][choose]
     bias = round_sig(np.mean(diff), sig=3)
     scatter = round_sig(np.std(diff), sig=3)

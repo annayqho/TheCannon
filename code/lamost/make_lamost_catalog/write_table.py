@@ -23,13 +23,14 @@ ak_test = label_test[:,4]
 
 # add in the training set
 print("loading training data")
-direc = "../run_9b_reddening" 
-#direc = "../run_14_all_abundances_fe_xcalib/high_snr"
-id_training = np.load("%s/tr_id.npz" %direc)['arr_0']
-ngoodpix_training = np.sum(np.load("%s/tr_ivar.npz" %direc)['arr_0'] > 0, axis=1)
-label_training = np.load("%s/all_cannon_labels.npz" %direc)['arr_0']
-err_training = np.load("%s/cannon_label_errs.npz" %direc)['arr_0']
-chisq_training = np.load("%s/cannon_label_chisq.npz" %direc)['arr_0']
+direc = "../xcalib_5labels" 
+direc1 = "/Users/annaho/TheCannon/data/lamost_paper"
+id_training = np.load("%s/ref_id.npz" %direc1)['arr_0']
+ngoodpix_training = np.sum(
+        np.load("%s/ref_ivar.npz" %direc1)['arr_0'] > 0, axis=1)
+label_training = np.load("%s/all_cannon_label_vals.npz" %direc)['arr_0']
+err_training = np.load("%s/all_cannon_label_errs.npz" %direc)['arr_0']
+chisq_training = np.load("%s/all_cannon_label_chisq.npz" %direc)['arr_0']
 id_total = np.append(id_test, id_training)
 teff_total = np.append(teff_test, label_training[:,0])
 teff_err_total = np.append(teff_err_test, err_training[:,0])
@@ -67,6 +68,7 @@ header = "id,teff,logg,m_h,alpha_m,a_k,teff_err,logg_err,mh_err,alpha_err,ak_err
 #header = "id," + label_names
 fout.write(header)
 for i,id_val in enumerate(id_all):
+    id_val = id_val.decode("utf-8") 
     id_short = id_val.split("/")[-1]
     line = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" %(
             id_short, teff[i], logg[i], feh[i], alpha[i], ak[i], 
