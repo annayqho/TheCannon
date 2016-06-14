@@ -1,41 +1,55 @@
 import matplotlib.pyplot as plt
 from matplotlib import rc
 import matplotlib.gridspec as gridspec
+import pyfits
 from matplotlib.colors import LogNorm
 plt.rc('text', usetex=True)
+#rc('text.latex', preamble = ','.join('''
+#    \usepackage{txfonts}
+#    \usepackage{lmodern}
+#    '''.split()))
 plt.rc('font', family='serif')
 import numpy as np
 
-names = ['T_{eff}', '\log g', '[Fe/H]', '[\\alpha/Fe]']
+#names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}', r'[\alphaup/\mbox{Fe}]', 
+#'\mbox{A}_{\mbox{k}}']
+names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}', r'[\alpha/\mbox{M}]']
+#units = ['K', 'dex', 'dex', 'dex', 'mag']
 units = ['K', 'dex', 'dex', 'dex']
 
-direc = "../run_9_more_metal_poor/"
-all_cannon = np.load("%s/all_cannon_labels.npz" %direc)['arr_0']
-all_ids = np.load("../run_2_train_on_good/all_ids.npz")['arr_0']
-all_apogee = np.load("../run_2_train_on_good/all_label.npz")['arr_0']
-good_id = np.load("%s/tr_id.npz" %direc)['arr_0']
-snr = np.load("%s/tr_snr.npz" %direc)['arr_0']
+direc = "/Users/annaho/TheCannon/data/lamost_paper"
 
-IDs_lamost = np.loadtxt(
-        "../../examples/test_training_overlap/lamost_sorted_by_ra_with_dr2_params.txt",
-        usecols=(0,), dtype=(str))
-labels_all_lamost = np.loadtxt(
-        "../../examples/test_training_overlap/lamost_sorted_by_ra_with_dr2_params.txt",
-        usecols=(3,4,5), dtype=(float))
-inds = np.array([np.where(IDs_lamost==a)[0][0] for a in good_id])
-lamost = labels_all_lamost[inds,:]
 
-choose = np.array([np.where(all_ids==val)[0][0] for val in good_id])
-apogee = all_apogee[choose]
-cannon = all_cannon
+hdulist = pyfits.open("%s/lamost_catalog_training.fits" %direc)
+tbdata = hdulist[1].data
+hdulist.close()
+snrg = tbdata.field("snrg")
+snri = tbdata.field("snri")
+lamost_id_full = tbdata.field("lamost_id")
+lamost_id = np.array([val.strip() for val in lamost_id_full])
+lamost_teff = tbdata.field("teff_1")
+lamost_logg = tbdata.field("logg_1")
+lamost_feh = tbdata.field("feh")
+lamost = np.vstack((lamost_teff, lamost_logg, lamost_feh)).T
+
+apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
+cannon = np.load("../all_cannon_label_vals.npz")['arr_0']
 
 fig = plt.figure(figsize=(10,8))
 gs = gridspec.GridSpec(2,2, wspace=0.3, hspace=0.3)
 
-b = 70
-K = [b*80, 0.2*b, 0.10*b, 0.03*b]
-lows = [60, 0.10, 0.06, 0.035]
-highs = [180, 0.45, 0.21, 0.07]
+lowsg = [50, 0.10, 0.06, 0.025]
+highsg = [145, 0.40, 0.17, 0.063]
+lowsi = [70, 0.14, 0.07, 0.047]
+highsi = [160, 0.4, 0.2, 0.065]
+offsetsg = np.array([50, 0.1, 0.06, 0.03])
+offsetsi = np.array([70, 0.14, 0.08, 0.045])
+
+snr = snrg
+snr_label = r"$\sim$\,SNRg"
+lows = lowsg
+highs = highsg
+offsets = offsetsg
 
 obj = []
 
@@ -53,7 +67,8 @@ for i in range(0, len(names)):
     for ii,center in enumerate(snr_bins):
         choose = np.abs(snr-center)<10
         diff_cannon = cannon[:,i][choose]-apogee[:,i][choose]
-        if i < len(names)-1:
+        if i < 3:
+            print(i)
             diff_lamost = lamost[:,i][choose]-apogee[:,i][choose]
         else:
             diff_lamost = np.zeros(len(diff_cannon))
@@ -69,22 +84,28 @@ for i in range(0, len(names)):
         yerr_lamost[ii] = np.std(stdev)
 
     ax = plt.subplot(gs[i])
-    ax.scatter(snr_bins, y_cannon)
-    obj.append(ax.errorbar(snr_bins, y_cannon, yerr=yerr_cannon, fmt='.', c='darkorchid', label="Cannon from LAMOST spectra"))
     ax.scatter(snr_bins, y_lamost)
     obj.append(ax.errorbar(snr_bins, y_lamost, yerr=yerr_lamost, fmt='.', c='darkorange', label="Cannon from LAMOST spectra"))
+    ax.scatter(snr_bins, y_cannon)
+    obj.append(ax.errorbar(snr_bins, y_cannon, yerr=yerr_cannon, fmt='.', c='darkorchid', label="Cannon from LAMOST spectra"))
     # a 1/r^2 line
-    xfit = np.linspace(min(snr_bins), max(snr_bins))
-    yfit = K[i] / xfit
-    obj.append(ax.plot(xfit,yfit,c='k', label="1/SNR")[0])
+    xfit = np.linspace(0.1, max(snr_bins)*2, 100)
+    b = 30
+    K = b * y_cannon[1] 
+    yfit = (K / (xfit*3)) 
+    #yfit = (K / (xfit)) 
+    offset = offsets[i]
+    obj.append(ax.plot(xfit,yfit+offset,c='k', label="1/(%s)" %snr_label)[0])
+    #obj.append(ax.plot(xfit,yfit,c='k', label="1/%s" %snr_label)[0])
     ax.set_xlim(0, 120)
     ax.set_ylim(lows[i], highs[i])
     ax.tick_params(axis='x', labelsize=14)
     ax.tick_params(axis='y', labelsize=14)
-    ax.set_xlabel("SNR", fontsize=16)
+    ax.set_xlabel("%s" %snr_label, fontsize=16)
     ax.set_ylabel(r"$\sigma %s \mathrm{(%s)}$" %(name,unit), fontsize=16)
 
-fig.legend((obj[0],obj[1],obj[2]), ("Cannon", "LAMOST", "1/SNR"), fontsize=16)
+fig.legend((obj[0],obj[1],obj[2]), ("LAMOST", "Cannon", "1/(%s)" %snr_label), fontsize=16)
 
 #plt.show()
+#plt.savefig("%s_test_4panel_stretched.png" %snr_label[8:])
 plt.savefig("snr_test_4panel.png")

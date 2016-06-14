@@ -22,17 +22,11 @@ y_highs = [300, 0.5, 0.3]
 x_lows = [4000, 1.1, -2.0, -0.08]
 x_highs = [5300, 3.8, 0.5, 0.4]
 
-direc = "../run_9b_reddening"
-all_cannon = np.load("%s/all_cannon_labels.npz" %direc)['arr_0']
-all_ids = np.load("../run_2_train_on_good/all_ids.npz")['arr_0']
-all_apogee = np.load("../run_2_train_on_good/all_label.npz")['arr_0']
-good_id = np.load("%s/tr_id.npz" %direc)['arr_0']
-all_snr = np.load("../run_2_train_on_good/SNRs.npz")['arr_0']
-
-subset = np.array([np.where(all_ids==val)[0][0] for val in good_id])
-apogee = all_apogee[subset]
-cannon = all_cannon
-snr = all_snr[subset]
+print("Loading data")
+direc = "/Users/annaho/TheCannon/data/lamost_paper"
+snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
+apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
+cannon = np.load("../all_cannon_label_vals.npz")['arr_0']
 
 fig = plt.figure(figsize=(15,15))
 gs = gridspec.GridSpec(3,3, wspace=0.3, hspace=0)
