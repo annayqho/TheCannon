@@ -1,8 +1,6 @@
 """
-In this run, I train TC on all *good* objects in the 11,057 overlap set 
-(this is the 9594 objects from run_2, + the 500-something objects in 
-examples/example_DR12/temp_keep_metalpoor.txt) minus the 4 ish objects
-that havebad AKWISE values. The label file here was made using topcat
+Divide 9952 training objects into eight groups, 
+and do an 8-fold leave-1/8 out. 
 """
 
 import numpy as np
@@ -11,9 +9,9 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon/TheCannon')
 sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon')
-from lamost import load_spectra
 from TheCannon import dataset
 from TheCannon import model
+from TheCannon import lamost
 from astropy.table import Table
 from matplotlib.colors import LogNorm
 from matplotlib import rc
@@ -22,80 +20,45 @@ rc('text', usetex=True)
 import os
 import pyfits
 
+direc_ref = "/Users/annaho/TheCannon/data/lamost_paper"
 
-def train():
-    a = pyfits.open("label_file.fits") 
-    tbdata = a[1].data
-    a.close()
-    apogee_teff = tbdata['apogee_teff']
-    apogee_logg = tbdata['apogee_logg']
-    apogee_mh = tbdata['apogee_mh']
-    apogee_alpham = tbdata['apogee_alpham']
-    apogee_reddening = tbdata['AK_WISE']
-    tr_label = np.vstack((apogee_teff,apogee_logg,apogee_mh,apogee_alpham,apogee_reddening)).T
-    tr_id_full = tbdata['lamost_id']
-    tr_id = np.array([val.strip() for val in tr_id_full])
 
-    all_id = np.load("../run_2_train_on_good/all_ids.npz")['arr_0']
-    all_flux = np.load("../run_2_train_on_good/test_flux.npz")['arr_0']
-    all_ivar = np.load("../run_2_train_on_good/test_ivar.npz")['arr_0']
-    good = np.array([np.where(all_id==f)[0][0] for f in tr_id])
+def group_data():
+    """ Load the reference data, and assign each object
+    a random integer from 0 to 7. Save the IDs. """
 
-    good_flux = all_flux[good,:] 
-    good_ivar = all_ivar[good,:]
+    tr_obj = np.load("%s/ref_id.npz" %direc_ref)['arr_0']
+    groups = np.random.randint(0, 8, size=len(tr_obj))
+    np.savez("ref_groups.npz", groups)
 
-    np.savez("tr_id.npz", tr_id)
-    np.savez("tr_label.npz", tr_label)
-    np.savez("tr_flux.npz", good_flux)
-    np.savez("tr_ivar.npz", good_ivar)
 
-    wl = np.load("../run_2_train_on_good/wl.npz")['arr_0']
-
-    ds = dataset.Dataset(
-            wl, tr_id, good_flux, good_ivar, tr_label, tr_id, good_flux, good_ivar)
-    ds.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]', 'AKWISE'])
-    ds.diagnostics_SNR()
-    #ds.diagnostics_ref_labels()
-    np.savez("tr_snr.npz", ds.tr_SNR)
-
+def train(ds, ii):
+    """ Run the training step, given a dataset object. """
+    print("Loading model")
     m = model.CannonModel(2)
+    print("Training...")
     m.fit(ds)
-    np.savez("./coeffs.npz", m.coeffs)
-    np.savez("./scatters.npz", m.scatters)
-    np.savez("./chisqs.npz", m.chisqs)
-    np.savez("./pivots.npz", m.pivots)
-    m.diagnostics_leading_coeffs(ds)
-    #m.diagnostics_leading_coeffs_triangle(ds)
-    m.diagnostics_plot_chisq(ds)
+    np.savez("./ex%s_coeffs.npz" %ii, m.coeffs)
+    np.savez("./ex%s_scatters.npz" %ii, m.scatters)
+    np.savez("./ex%s_chisqs.npz" %ii, m.chisqs)
+    np.savez("./ex%s_pivots.npz" %ii, m.pivots)
+    fig = m.diagnostics_leading_coeffs(ds)
+    plt.savefig("ex%s_leading_coeffs.png" %ii)
+    # m.diagnostics_leading_coeffs_triangle(ds)
+    # m.diagnostics_plot_chisq(ds)
+    return m
 
 
-def test_step_iteration(ds, m, starting_guess):
-    errs, chisq = m.infer_labels(ds, starting_guess)
-    return ds.test_label_vals, chisq, errs
-
-
-def test_step():
-    wl = np.load("../run_2_train_on_good/wl.npz")['arr_0']
-    direc = "../../examples/test_small_random"
-    tr_id = np.load("./tr_id.npz")['arr_0']
-    tr_flux = np.load("./tr_flux.npz")['arr_0']
-    tr_ivar = np.load("./tr_ivar.npz")['arr_0']
-    tr_label = np.load("./tr_label.npz")['arr_0']
-
-    ds = dataset.Dataset(wl, tr_id, tr_flux, tr_ivar, tr_label, tr_id, tr_flux, tr_ivar)
-    ds.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]', 'AKWISE'])
-
-    m = model.CannonModel(2)
-    m.coeffs = np.load("./coeffs.npz")['arr_0']
-    m.scatters = np.load("./scatters.npz")['arr_0']
-    m.chisqs = np.load("./chisqs.npz")['arr_0']
-    m.pivots = np.load("./pivots.npz")['arr_0']
-
+def test(ds, m, ii):
     nguesses = 7
-    nobj = len(tr_id)
+    nobj = len(ds.test_ID)
     nlabels = len(m.pivots)
     choose = np.random.randint(0,nobj,size=nguesses)
-    apogee_label = np.load("./tr_label.npz")['arr_0']
+    tr_label = ds.tr_label
+    print("nlab" + nlabels)
+    print("nobj" + nobj)
+    print(tr_label.shape)
+    print(m.pivots.shape)
     starting_guesses = tr_label[choose]-m.pivots
     labels = np.zeros((nguesses, nobj, nlabels))
     chisq = np.zeros((nguesses, nobj))
@@ -107,9 +70,9 @@ def test_step():
         chisq[ii,:] = b
         errs[ii,:] = c
 
-    np.savez("labels_all_starting_vals.npz", labels)
-    np.savez("chisq_all_starting_vals.npz", chisq)
-    np.savez("errs_all_starting_vals.npz", errs)
+    np.savez("ex%s_labels_all_starting_vals.npz" %ii, labels)
+    np.savez("ex%s_chisq_all_starting_vals.npz" %ii, chisq)
+    np.savez("ex%s_errs_all_starting_vals.npz" %ii, errs)
 
     choose = np.argmin(chisq, axis=0)
     best_chisq = np.min(chisq, axis=0)
@@ -119,15 +82,71 @@ def test_step():
         best_labels[jj,:] = labels[:,jj,:][val]
         best_errs[jj,:] = errs[:,jj,:][val]
 
-    np.savez("./all_cannon_labels.npz", best_labels)
-    np.savez("./cannon_label_chisq.npz", best_chisq)
-    np.savez("./cannon_label_errs.npz", best_errs)
+    np.savez("./ex%s_cannon_label_vals.npz" %ii, best_labels)
+    np.savez("./ex%s_cannon_label_chisq.npz" %ii, best_chisq)
+    np.savez("./ex%s_cannon_label_errs.npz" %ii, best_errs)
 
     ds.test_label_vals = best_labels
-    #ds.diagnostics_survey_labels()
-    ds.diagnostics_1to1(figname = "1to1_test_label")
+    ds.diagnostics_survey_labels()
+    ds.diagnostics_1to1(figname = "ex%s_1to1_test_label" %ii)
+
+
+def test_step_iteration(ds, m, starting_guess):
+    errs, chisq = m.infer_labels(ds, starting_guess)
+    return ds.test_label_vals, chisq, errs
+
+
+def xvalidate():
+    """ Train a model, leaving out a group corresponding
+    to a random integer from 0 to 7, e.g. leave out 0. 
+    Test on the remaining 1/8 of the sample. """
+
+    print("Loading data")
+    groups = np.load("ref_groups.npz")['arr_0']
+    ref_label = np.load("%s/ref_label.npz" %direc_ref)['arr_0']
+    ref_id = np.load("%s/ref_id.npz" %direc_ref)['arr_0']
+    ref_flux = np.load("%s/ref_flux.npz" %direc_ref)['arr_0']
+    ref_ivar = np.load("%s/ref_ivar.npz" %direc_ref)['arr_0']
+    wl = np.load("%s/wl.npz" %direc_ref)['arr_0']
+
+    num_models = 8
+
+    for ii in np.arange(num_models):
+        print("Leaving out group %s" %ii)
+        train_on = groups != ii
+        test_on = groups == ii
+
+        tr_label = ref_label[train_on]
+        tr_id = ref_id[train_on]
+        tr_flux = ref_flux[train_on]
+        tr_ivar = ref_ivar[train_on]
+        print("Training on %s objects" %len(tr_id))
+        test_label = ref_label[test_on]
+        test_id = ref_id[test_on]
+        test_flux = ref_flux[test_on]
+        test_ivar = ref_ivar[test_on]
+        print("Testing on %s objects" %len(test_id))
+
+        print("Loading dataset...")
+        ds = dataset.Dataset(
+                wl, tr_id, tr_flux, tr_ivar, tr_label, 
+                test_id, test_flux, test_ivar)
+        ds.set_label_names(
+                ['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]', 'AKWISE'])
+        fig = ds.diagnostics_SNR()
+        plt.savefig("ex%s_SNR.png" %ii)
+        fig = ds.diagnostics_ref_labels()
+        plt.savefig("ex%s_ref_label_triangle.png" %ii)
+        np.savez("ex%s_tr_snr.npz" %ii, ds.tr_SNR)
+
+        # train a model
+        m = train(ds, ii)
+
+        # test step
+        ds.tr_label = test_label # to compare the results
+        test(ds, m, ii)
 
 
 if __name__=="__main__":
-    #train()
-    test_step()
+    # group_data()
+    xvalidate()
