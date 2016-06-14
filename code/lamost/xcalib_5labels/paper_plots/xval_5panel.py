@@ -10,10 +10,12 @@ rc('text.latex', preamble = ','.join('''
 plt.rc('font', family='serif')
 import numpy as np
 
+
 def round_sig(x, sig=2):
     if x < 0:
         return -round(-x, sig-int(floor(log10(-x)))-1)
     return round(x, sig-int(floor(log10(x)))-1)
+
 
 names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}', r'[\alphaup/\mbox{M}]', 
 '\mbox{A}_{\mbox{k}}']
