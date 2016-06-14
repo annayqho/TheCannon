@@ -23,19 +23,11 @@ units = ['K', 'dex', 'dex', 'dex', 'mag']
 mins = [3700, 0.5, -2.4, -0.11, -0.1]
 maxs = [5500, 4.1, 0.6, 0.38, 0.5]
 
-direc_orig = "../run_2_train_on_good"
-direc = "../run_9_more_metal_poor"
-direc = "../run_9b_reddening"
-all_cannon = np.load("%s/all_cannon_labels.npz" %direc)['arr_0']
-all_ids = np.load("%s/all_ids.npz" %direc_orig)['arr_0']
-all_apogee = np.load("%s/all_label.npz" %direc_orig)['arr_0']
-good_id = np.load("%s/tr_id.npz" %direc)['arr_0']
-snr = np.load("%s/tr_snr.npz" %direc)['arr_0']
-
-choose = np.array([np.where(all_ids==val)[0][0] for val in good_id])
-#apogee = all_apogee[choose]
-apogee = np.load("%s/tr_label.npz" %direc)['arr_0']
-cannon = all_cannon
+print("Loading data")
+direc = "/Users/annaho/TheCannon/data/lamost_paper"
+snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
+apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
+cannon = np.load("all_cannon_label_vals.npz")['arr_0']
 
 fig = plt.figure(figsize=(8,9))
 gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
