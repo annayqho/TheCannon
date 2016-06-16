@@ -52,10 +52,10 @@ def train(ds, ii):
 def load_model(ii):
     print("Loading model")
     m = model.CannonModel(2)
-    m.coeffs = np.load("./ex%s_coeffs.npz" %ii)
-    m.scatters = np.load("./ex%s_scatters.npz" %ii)
-    m.chisqs = np.load("./ex%s_chisqs.npz" %ii)
-    m.pivots = np.load("./ex%s_pivots.npz" %ii)
+    m.coeffs = np.load("./ex%s_coeffs.npz" %ii)['arr_0']
+    m.scatters = np.load("./ex%s_scatters.npz" %ii)['arr_0']
+    m.chisqs = np.load("./ex%s_chisqs.npz" %ii)['arr_0']
+    m.pivots = np.load("./ex%s_pivots.npz" %ii)['arr_0']
     return m
 
 
