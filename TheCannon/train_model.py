@@ -177,5 +177,4 @@ def _train_model(ds):
     all_chisqs = chis*chis
     print("Done training model")
 
-    # Now calculate model spectra
     return coeffs, scatters, all_chisqs, pivots
