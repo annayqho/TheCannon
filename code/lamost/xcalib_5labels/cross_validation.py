@@ -49,6 +49,16 @@ def train(ds, ii):
     return m
 
 
+def load_model(ii):
+    print("Loading model")
+    m = model.CannonModel(2)
+    coeffs = np.load("./ex%s_coeffs.npz" %ii)
+    scatters = np.load("./ex%s_scatters.npz" %ii)
+    chisqs = np.load("./ex%s_chisqs.npz" %ii)
+    pivots = np.load("./ex%s_pivots.npz" %ii)
+    return m
+
+
 def test(ds, m, group):
     nguesses = 7
     nobj = len(ds.test_ID)
@@ -98,6 +108,44 @@ def test(ds, m, group):
 def test_step_iteration(ds, m, starting_guess):
     errs, chisq = m.infer_labels(ds, starting_guess)
     return ds.test_label_vals, chisq, errs
+
+
+def load_dataset(ii):
+    ("loading data")
+    groups = np.load("ref_groups.npz")['arr_0']
+    ref_label = np.load("%s/ref_label.npz" %direc_ref)['arr_0']
+    ref_id = np.load("%s/ref_id.npz" %direc_ref)['arr_0']
+    ref_flux = np.load("%s/ref_flux.npz" %direc_ref)['arr_0']
+    ref_ivar = np.load("%s/ref_ivar.npz" %direc_ref)['arr_0']
+    wl = np.load("%s/wl.npz" %direc_ref)['arr_0']
+
+    print("Leaving out group %s" %ii)
+    train_on = groups != ii
+    test_on = groups == ii
+
+    tr_label = ref_label[train_on]
+    tr_id = ref_id[train_on]
+    tr_flux = ref_flux[train_on]
+    tr_ivar = ref_ivar[train_on]
+    print("Training on %s objects" %len(tr_id))
+    test_label = ref_label[test_on]
+    test_id = ref_id[test_on]
+    test_flux = ref_flux[test_on]
+    test_ivar = ref_ivar[test_on]
+    print("Testing on %s objects" %len(test_id))
+
+    print("Loading dataset...")
+    ds = dataset.Dataset(
+            wl, tr_id, tr_flux, tr_ivar, tr_label, 
+            test_id, test_flux, test_ivar)
+    ds.set_label_names(
+            ['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]', 'AKWISE'])
+    fig = ds.diagnostics_SNR()
+    plt.savefig("ex%s_SNR.png" %ii)
+    fig = ds.diagnostics_ref_labels()
+    plt.savefig("ex%s_ref_label_triangle.png" %ii)
+    np.savez("ex%s_tr_snr.npz" %ii, ds.tr_SNR)
+    return ds
 
 
 def xvalidate():
@@ -152,5 +200,9 @@ def xvalidate():
 
 
 if __name__=="__main__":
+    group = 0
+    ds = load_dataset(group)
+    # m = load_model(group)
+    # test(ds, m, group)
     # group_data()
-    xvalidate()
+    # xvalidate()
