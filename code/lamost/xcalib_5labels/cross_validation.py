@@ -52,10 +52,10 @@ def train(ds, ii):
 def load_model(ii):
     print("Loading model")
     m = model.CannonModel(2)
-    coeffs = np.load("./ex%s_coeffs.npz" %ii)
-    scatters = np.load("./ex%s_scatters.npz" %ii)
-    chisqs = np.load("./ex%s_chisqs.npz" %ii)
-    pivots = np.load("./ex%s_pivots.npz" %ii)
+    m.coeffs = np.load("./ex%s_coeffs.npz" %ii)
+    m.scatters = np.load("./ex%s_scatters.npz" %ii)
+    m.chisqs = np.load("./ex%s_chisqs.npz" %ii)
+    m.pivots = np.load("./ex%s_pivots.npz" %ii)
     return m
 
 
@@ -202,7 +202,7 @@ def xvalidate():
 if __name__=="__main__":
     group = 0
     ds = load_dataset(group)
-    # m = load_model(group)
-    # test(ds, m, group)
+    m = load_model(group)
+    test(ds, m, group)
     # group_data()
     # xvalidate()
