@@ -105,6 +105,11 @@ def test(ds, m, group):
     ds.diagnostics_1to1(figname = "ex%s_1to1_test_label" %group)
 
 
+def infer_spectra(ds, m):
+    m.infer_spectra(ds)
+    return m.model_spectra
+
+
 def test_step_iteration(ds, m, starting_guess):
     errs, chisq = m.infer_labels(ds, starting_guess)
     return ds.test_label_vals, chisq, errs
@@ -138,6 +143,9 @@ def load_dataset(ii):
     ds = dataset.Dataset(
             wl, tr_id, tr_flux, tr_ivar, tr_label, 
             test_id, test_flux, test_ivar)
+
+    ds.test_label_vals = np.load("./ex%s_cannon_label_vals.npz" %group)['arr_0']
+    print(ds.test_label_vals.shape)
     ds.set_label_names(
             ['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]', 'AKWISE'])
     fig = ds.diagnostics_SNR()
@@ -200,9 +208,7 @@ def xvalidate():
 
 
 if __name__=="__main__":
-    group = 0
+    group = 2
     ds = load_dataset(group)
     m = load_model(group)
-    test(ds, m, group)
-    # group_data()
-    # xvalidate()
+    model_spectra = infer_spectra(ds, m)

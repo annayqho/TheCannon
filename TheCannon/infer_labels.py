@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from scipy import optimize as opt
 import numpy as np
 import matplotlib.pyplot as plt
+from TheCannon import train_model
 
 def _get_lvec(labels):
     """
@@ -45,24 +46,6 @@ def _func(coeffs, *labels):
     """
     lvec = _get_lvec(list(labels))
     return np.dot(coeffs, lvec)
-
-
-def _predict_spectra(m, ds):
-    """ Generate spectra for all of the test objects
-
-    Parameters
-    ----------
-    m: Model
-    ds: Dataset
-
-    Returns
-    -------
-    nothing; sets model attribute
-    """
-    print("Predicting spectra")
-    lvec_all = get_lvec(ds.test_label_vals, m.pivots)
-    model = np.dot(m.coeffs, lvec_all)
-    m.model_spectra = model
 
 
 def _infer_labels(model, dataset, starting_guess=None):
@@ -128,5 +111,4 @@ def _infer_labels(model, dataset, starting_guess=None):
         errs_all[jj,:] = covs.diagonal()
 
     dataset.set_test_label_vals(labels_all)
-    _predict_spectra(model, dataset)
     return errs_all, chisq_all

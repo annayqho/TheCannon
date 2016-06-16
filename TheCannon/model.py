@@ -1,5 +1,6 @@
 from .dataset import Dataset
 from .train_model import _train_model 
+from .train_model import _get_lvec
 from .infer_labels import _infer_labels
 from .helpers.corner import corner
 import numpy as np
@@ -17,7 +18,7 @@ class CannonModel(object):
         self.chisqs = None
         self.pivots = None
         self.order = order
-        self.test_spectra = None
+        self.model_spectra = None
 
 
     def model(self):
@@ -54,6 +55,11 @@ class CannonModel(object):
             Covariance matrix of the fit
         """
         return _infer_labels(self, ds, starting_guess)
+
+
+    def infer_spectra(self, ds):
+        lvec_all = _get_lvec(ds.test_label_vals, self.pivots)
+        self.model_spectra = np.dot(lvec_all, self.coeffs.T)
 
 
     def plot_contpix(self, x, y, contpix_x, contpix_y, figname):
