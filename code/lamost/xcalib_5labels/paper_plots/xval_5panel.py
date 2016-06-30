@@ -43,10 +43,18 @@ for i in range(0, len(names)):
     ax.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
     #ax.legend(fontsize=14)
     #print(np.mean(cannon[:,i]-apogee[:,i]))
-    choose = snr > 0
+    choose = snr > 50
     diff = cannon[:,i][choose] - apogee[:,i][choose]
-    bias = round_sig(np.mean(diff), sig=3)
-    scatter = round_sig(np.std(diff), sig=3)
+    bias_raw = np.mean(diff)
+    scatter_raw = np.std(diff)
+    if np.abs(bias_raw) < 1:
+        bias = round_sig(bias_raw, sig=1)
+    else:
+        bias = int(bias_raw)
+    if np.abs(scatter_raw) < 1:
+        scatter = round_sig(scatter_raw, sig=1)
+    else:
+        scatter = int(scatter_raw)
     textstr1 = "Bias: %s\nScatter: %s" %(bias, scatter)
     if i < 4:
         ax.hist2d(apogee[:,i], cannon[:,i], range=[[low,high],[low,high]], bins=50, norm=LogNorm(), cmap="gray_r")
