@@ -9,8 +9,22 @@ rc('font', family='serif')
 from .helpers.corner import corner
 from .helpers import Table
 from .find_continuum_pixels import * 
-from .continuum_normalization import _cont_norm_gaussian_smooth, _cont_norm_running_quantile, _cont_norm_running_quantile_regions, _find_cont_fitfunc, _find_cont_fitfunc_regions, _cont_norm, _cont_norm_regions
+from .continuum_normalization import \
+    (_cont_norm_gaussian_smooth,
+     _cont_norm_running_quantile,
+     _cont_norm_running_quantile_regions,
+     _cont_norm_running_quantile_mp,
+     _cont_norm_running_quantile_regions_mp,
+     _find_cont_fitfunc,
+     _find_cont_fitfunc_regions,
+     _cont_norm,
+     _cont_norm_regions)
 from .find_continuum_pixels import _find_contpix,_find_contpix_regions
+from multiprocessing import cpu_count
+from astropy.io import fits
+from astropy.table import Table
+
+n_cpus = cpu_count()
 
 PY3 = sys.version_info[0] > 2
 
@@ -232,7 +246,7 @@ class Dataset(object):
         self.contmask = contmask
 
 
-    def fit_continuum(self, deg, ffunc):
+    def fit_continuum(self, deg, ffunc, n_proc=1):
         """ Fit a continuum to the continuum pixels
 
         Parameters
@@ -252,20 +266,24 @@ class Dataset(object):
         print("Fitting Continuum...")
         if self.ranges == None:
             tr_cont = _find_cont_fitfunc(
-                    self.tr_flux, self.tr_ivar, self.contmask, deg, ffunc)
+                self.tr_flux, self.tr_ivar, self.contmask, deg, ffunc,
+                n_proc=n_proc)
             test_cont = _find_cont_fitfunc(
-                    self.test_flux, self.test_ivar, self.contmask, deg, ffunc)
+                self.test_flux, self.test_ivar, self.contmask, deg, ffunc,
+                n_proc=n_proc)
         else:
             print("Fitting Continuum in %s Regions..." %len(self.ranges))
-            tr_cont = _find_cont_fitfunc_regions(self.tr_flux, self.tr_ivar, 
-                                       self.contmask, deg, self.ranges, ffunc)
+            tr_cont = _find_cont_fitfunc_regions(
+                self.tr_flux, self.tr_ivar, self.contmask, deg, self.ranges,
+                ffunc, n_proc=n_proc)
             test_cont = _find_cont_fitfunc_regions(
-                    self.test_flux, self.test_ivar,
-                    self.contmask, deg, self.ranges, ffunc)
+                self.test_flux, self.test_ivar, self.contmask, deg, self.ranges,
+                ffunc, n_proc=n_proc)
         return tr_cont, test_cont
 
 
-    def continuum_normalize_training_q(self, q, delta_lambda):
+    def continuum_normalize_training_q(self, q, delta_lambda,
+                                       n_proc=1, verbose=True):
         """ Continuum normalize the training set using a running quantile
 
         Parameters
@@ -274,16 +292,53 @@ class Dataset(object):
             The quantile cut
         delta_lambda: float
             The width of the pixel range used to calculate the median
+
+
+        Modified by:
+            [08 Jun 2016] Bo Zhang (NAOC):    add multiprocessing option
+        Note:
+            Multiprocessing calls for more memory on computer.
         """
+
+        # don't use too many process
+        assert n_proc >= 1 and n_proc <= 100*n_cpus
+        if n_proc > n_cpus:
+            print('@Bo Zhang: n_proc is larger than your numbers of physical CPUs!')
+
         print("Continuum normalizing the tr set using running quantile...")
-        if self.ranges is None:
-            return _cont_norm_running_quantile(
-                    self.wl, self.tr_flux, self.tr_ivar, 
-                    q=q, delta_lambda=delta_lambda)
-        else:
-            return _cont_norm_running_quantile_regions(
+
+        if n_proc == 1:
+            # use old version (single process)
+            print('##########################################################')
+            print('@Bo Zhang: you will use only 1 process ...')
+            print('           i.e., the original TheCannon version')
+            print('##########################################################')
+            if self.ranges is None:
+                return _cont_norm_running_quantile(
                     self.wl, self.tr_flux, self.tr_ivar,
-                    q=q, delta_lambda=delta_lambda, ranges=self.ranges)
+                    q=q, delta_lambda=delta_lambda,
+                    verbose=verbose)
+            else:
+                return _cont_norm_running_quantile_regions(
+                    self.wl, self.tr_flux, self.tr_ivar,
+                    q=q, delta_lambda=delta_lambda,
+                    ranges=self.ranges, verbose=verbose)
+        else:
+            # use new version (multi process)
+            print('##########################################################')
+            print('@Bo Zhang: you will use ** %d ** processes ... ' % n_proc)
+            print('Note: Multiprocessing calls for more memory on computer!')
+            print('##########################################################')
+            if self.ranges is None:
+                return _cont_norm_running_quantile_mp(
+                    self.wl, self.tr_flux, self.tr_ivar,
+                    q=q, delta_lambda=delta_lambda,
+                    n_proc=n_proc, verbose=verbose)
+            else:
+                return _cont_norm_running_quantile_regions_mp(
+                    self.wl, self.tr_flux, self.tr_ivar,
+                    q=q, delta_lambda=delta_lambda, ranges=self.ranges,
+                    n_proc=n_proc, verbose=verbose)
 
 
     def continuum_normalize(self, cont):
@@ -445,4 +500,84 @@ class Dataset(object):
     
     def diagnostics_best_fit_spectra(self, model):
         """ Plot results of best-fit spectra for ten random test objects """
-        overlay_spectra(model, self) 
+        overlay_spectra(model, self)
+
+
+    def write_to_fits(self, filepath, **kwargs):
+        hl = convert_to_hdulist(self)
+        print('@Bo Zhang: writting to fits [%s] ...' % filepath)
+        hl.writeto(filepath, **kwargs)
+        print('@Bo Zhang: ---------------------------------------------------')
+
+
+def convert_to_hdulist(ds):
+    """ transform TheCannon dataset into fits HDU list """
+    print('@Bo Zhang: ---------------------------------------------------')
+    print('@Bo Zhang: transforming TheCannon data cubes into HDU list ...')
+    print('@Bo Zhang: ---------------------------------------------------')
+
+    # initialize data list
+    data_list = [ds.wl,
+                 ds.ranges,
+                 ds.contmask*1,
+                 ds.tr_ID,
+                 ds.tr_SNR,
+                 ds.tr_flux,
+                 ds.tr_ivar,
+                 ds.tr_label,
+                 ds.test_ID,
+                 ds.test_SNR,
+                 ds.test_flux,
+                 ds.test_ivar]
+    name_list = ['wl',
+                 'ranges',
+                 'contmask',
+                 'tr_ID',
+                 'tr_SNR',
+                 'tr_flux',
+                 'tr_ivar',
+                 'tr_label',
+                 'test_ID',
+                 'test_SNR',
+                 'test_flux',
+                 'test_ivar']
+    hdu_format_list_rw = ['image',
+                          'image',
+                          'image',
+                          'table',
+                          'image',
+                          'image',
+                          'image',
+                          'image',
+                          'table',
+                          'image',
+                          'image',
+                          'image']
+
+    # construct Primary header
+    header = fits.Header()
+    header['author'] = 'Bo Zhang (@NAOC)'
+    header['version'] = 'v1.0'
+    header['last_modified'] = 'Sat 11 Jun 2016'
+    header['data'] = 'TheCannon dataset object'
+
+    # initialize HDU list
+    print('@Bo Zhang: initializing the HDU list ...')
+    hl = [fits.hdu.PrimaryHDU(header=header)]
+
+    # construct HDU list
+    assert len(data_list) == len(name_list)
+    n_hdus = len(data_list)
+    for i in xrange(n_hdus):
+        print('@Bo Zhang: transforming HDU [%d/%d]: %s ...'
+              % (i+1, n_hdus, name_list[i]))
+        if hdu_format_list_rw[i] == 'table':
+            data = Table(data=data_list[i].reshape((-1, 1)),
+                         names=[name_list[i]])
+            hl.append(fits.BinTableHDU(data.as_array()))
+        else:
+            hl.append(fits.ImageHDU(data=np.array(data_list[i]),
+                                    name=name_list[i]))
+
+    print('@Bo Zhang: ---------------------------------------------------')
+    return fits.HDUList(hl)
