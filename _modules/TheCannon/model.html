@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TheCannon.model &mdash; TheCannon 0.3.4 documentation</title>
+  <title>TheCannon.model &mdash; TheCannon 0.5.6 documentation</title>
   
 
   
@@ -30,11 +30,11 @@
   
 
   
-    <link rel="top" title="TheCannon 0.3.4 documentation" href="../../index.html"/>
+    <link rel="top" title="TheCannon 0.5.6 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -44,17 +44,27 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-        
-          <a href="../../index.html" class="icon icon-home"> TheCannon
-        
+          
+            <a href="../../index.html" class="icon icon-home"> TheCannon
+          
 
-        
-        </a>
+          
+          </a>
 
-        
+          
+            
+            
+              <div class="version">
+                0.5.6
+              </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -63,28 +73,23 @@
   </form>
 </div>
 
-        
-      </div>
+          
+        </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-          
-              <ul>
+            
+            
+                <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a></li>
 </ul>
 
+            
           
-        
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -99,7 +104,13 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../../index.html">Docs</a> &raquo;</li>
       
@@ -114,11 +125,13 @@
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for TheCannon.model</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">.train_model</span> <span class="kn">import</span> <span class="n">_train_model</span> 
+<span class="kn">from</span> <span class="nn">.train_model</span> <span class="kn">import</span> <span class="n">_get_lvec</span>
 <span class="kn">from</span> <span class="nn">.infer_labels</span> <span class="kn">import</span> <span class="n">_infer_labels</span>
 <span class="kn">from</span> <span class="nn">.helpers.corner</span> <span class="kn">import</span> <span class="n">corner</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -136,20 +149,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_spectra</span> <span class="o">=</span> <span class="bp">None</span>
 
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CannonModel.model"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.model">[docs]</a>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the model definition or raise an error if not trained &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Model not trained&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span></div>
 
 
-<div class="viewcode-block" id="CannonModel.train"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="CannonModel.train"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run training step: solve for best-fit spectral model &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span> <span class="o">=</span> <span class="n">_train_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span> <span class="o">=</span> <span class="n">_train_model</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CannonModel.diagnostics"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.diagnostics">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -157,13 +170,14 @@
         <span class="n">_model_diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="CannonModel.infer_labels"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.infer_labels">[docs]</a>    <span class="k">def</span> <span class="nf">infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">starting_guess</span><span class="p">):</span>
+<div class="viewcode-block" id="CannonModel.infer_labels"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.infer_labels">[docs]</a>    <span class="k">def</span> <span class="nf">infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">starting_guess</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the model to solve for labels of the test set, updates Dataset</span>
+<span class="sd">        Then use those inferred labels to set the model.test_spectra attribute</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        dataset: Dataset</span>
+<span class="sd">        ds: Dataset</span>
 <span class="sd">            Dataset that needs label inference</span>
 
 <span class="sd">        Returns</span>
@@ -171,38 +185,21 @@
 <span class="sd">        errs_all: ndarray</span>
 <span class="sd">            Covariance matrix of the fit</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">starting_guess</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_infer_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">starting_guess</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="CannonModel.draw_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.draw_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">draw_spectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a new dataset whose test flux and ivar values correspond to the</span>
-<span class="sd">        fitted-for test spectra</span>
-
+<div class="viewcode-block" id="CannonModel.infer_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.infer_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">infer_spectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        After inferring labels for the test spectra,</span>
+<span class="sd">        infer the model spectra and update the dataset</span>
+<span class="sd">        model_spectra attribute.</span>
+<span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        dataset: Dataset</span>
-<span class="sd">            Dataset that needs label inference</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        cannon_set: Dataset</span>
-<span class="sd">            Dataset with best-fit fluxes and variances as test_flux and test_ivar</span>
+<span class="sd">        ds: Dataset object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">coeffs_all</span><span class="p">,</span> <span class="n">covs</span><span class="p">,</span> <span class="n">scatters</span><span class="p">,</span> <span class="n">red_chisqs</span><span class="p">,</span> <span class="n">pivots</span><span class="p">,</span> <span class="n">label_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
-        <span class="n">nstars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">test_SNR</span><span class="p">)</span>
-        <span class="n">cannon_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">test_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">cannon_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">test_ivar</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">label_vector</span><span class="p">[:,</span><span class="n">i</span><span class="p">,:]</span>
-            <span class="n">spec_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij, ij-&gt;i&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">coeffs_all</span><span class="p">)</span>
-            <span class="n">cannon_fluxes</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">spec_fit</span>
-            <span class="n">bad</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">==</span> <span class="n">SMALL</span>
-            <span class="n">cannon_ivars</span><span class="p">[</span><span class="n">i</span><span class="p">,:][</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">scatters</span><span class="p">[</span><span class="o">~</span><span class="n">bad</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-        <span class="n">cannon_set</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="n">cannon_set</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">cannon_fluxes</span>
-        <span class="n">cannon_set</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">cannon_ivars</span>
-        <span class="k">return</span> <span class="n">cannon_set</span></div>
+        <span class="n">lvec_all</span> <span class="o">=</span> <span class="n">_get_lvec</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_spectra</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lvec_all</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CannonModel.plot_contpix"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.plot_contpix">[docs]</a>    <span class="k">def</span> <span class="nf">plot_contpix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">contpix_x</span><span class="p">,</span> <span class="n">contpix_y</span><span class="p">,</span> <span class="n">figname</span><span class="p">):</span>
@@ -266,9 +263,9 @@
                         <span class="n">contpix_x</span><span class="p">[</span><span class="n">take</span><span class="p">],</span> <span class="n">contpix_y</span><span class="p">[</span><span class="n">take</span><span class="p">],</span> <span class="n">fig_chunk</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">diagnostics_leading_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">figname</span> <span class="o">=</span> <span class="s2">&quot;leading_coeffs.png&quot;</span><span class="p">):</span>
-        <span class="n">label_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
-        <span class="n">lams</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">wl</span>
+    <span class="k">def</span> <span class="nf">diagnostics_leading_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+        <span class="n">label_names</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
+        <span class="n">lams</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">wl</span>
         <span class="n">npixels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lams</span><span class="p">)</span>
         <span class="n">pivots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span>
         <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pivots</span><span class="p">)</span>
@@ -312,15 +309,13 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">locator_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Diagnostic plot: leading coeffs and scatters across wavelength.&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Saved as </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">figname</span><span class="p">)</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figname</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span>
 
 
-    <span class="k">def</span> <span class="nf">diagnostics_leading_coeffs_triangle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">diagnostics_leading_coeffs_triangle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> 
             <span class="n">figname</span> <span class="o">=</span> <span class="s2">&quot;leading_coeffs_triangle.png&quot;</span><span class="p">):</span>
-        <span class="n">label_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
-        <span class="n">lams</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">wl</span>
+        <span class="n">label_names</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
+        <span class="n">lams</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">wl</span>
         <span class="n">pivots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span>
         <span class="n">npixels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lams</span><span class="p">)</span>
         <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pivots</span><span class="p">)</span>
@@ -340,7 +335,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="CannonModel.diagnostics_plot_chisq"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.diagnostics_plot_chisq">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_plot_chisq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">figname</span> <span class="o">=</span> <span class="s2">&quot;modelfit_chisqs.png&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="CannonModel.diagnostics_plot_chisq"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.diagnostics_plot_chisq">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_plot_chisq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">figname</span> <span class="o">=</span> <span class="s2">&quot;modelfit_chisqs.png&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Produce a set of diagnostic plots for the model </span>
 
 <span class="sd">        Parameters</span>
@@ -348,8 +343,8 @@
 <span class="sd">        (optional) chisq_dist_plot_name: str</span>
 <span class="sd">            Filename of output saved plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">label_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
-        <span class="n">lams</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">wl</span>
+        <span class="n">label_names</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()</span>
+        <span class="n">lams</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">wl</span>
         <span class="n">pivots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span>
         <span class="n">npixels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lams</span><span class="p">)</span>
         <span class="n">nlabels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pivots</span><span class="p">)</span>
@@ -358,7 +353,8 @@
         <span class="n">scatters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span>
 
         <span class="c1"># Histogram of the chi squareds of ind. stars</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">chisqs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightblue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">chisqs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightblue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chisqs</span><span class="p">)))</span>
         <span class="n">dof</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lams</span><span class="p">)</span> <span class="o">-</span> <span class="n">coeffs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>   <span class="c1"># for one star</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">dof</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DOF&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
@@ -375,6 +371,7 @@
     <span class="n">fit</span> <span class="o">=</span> <span class="n">train</span></div>
 </pre></div>
 
+           </div>
           </div>
           <footer>
   
@@ -384,9 +381,10 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, Anna Ho.
+
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -404,7 +402,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.4',
+            VERSION:'0.5.6',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

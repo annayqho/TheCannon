@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TheCannon.dataset &mdash; TheCannon 0.3.4 documentation</title>
+  <title>TheCannon.dataset &mdash; TheCannon 0.5.6 documentation</title>
   
 
   
@@ -30,11 +30,11 @@
   
 
   
-    <link rel="top" title="TheCannon 0.3.4 documentation" href="../../index.html"/>
+    <link rel="top" title="TheCannon 0.5.6 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -44,17 +44,27 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-        
-          <a href="../../index.html" class="icon icon-home"> TheCannon
-        
+          
+            <a href="../../index.html" class="icon icon-home"> TheCannon
+          
 
-        
-        </a>
+          
+          </a>
 
-        
+          
+            
+            
+              <div class="version">
+                0.5.6
+              </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -63,28 +73,23 @@
   </form>
 </div>
 
-        
-      </div>
+          
+        </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-          
-              <ul>
+            
+            
+                <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a></li>
 </ul>
 
+            
           
-        
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -99,7 +104,13 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../../index.html">Docs</a> &raquo;</li>
       
@@ -114,10 +125,11 @@
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for TheCannon.dataset</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
@@ -128,8 +140,22 @@
 <span class="kn">from</span> <span class="nn">.helpers.corner</span> <span class="kn">import</span> <span class="n">corner</span>
 <span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="o">*</span> 
-<span class="kn">from</span> <span class="nn">.continuum_normalization</span> <span class="kn">import</span> <span class="n">_cont_norm_gaussian_smooth</span><span class="p">,</span> <span class="n">_cont_norm_running_quantile</span><span class="p">,</span> <span class="n">_cont_norm_running_quantile_regions</span><span class="p">,</span> <span class="n">_find_cont_fitfunc</span><span class="p">,</span> <span class="n">_find_cont_fitfunc_regions</span><span class="p">,</span> <span class="n">_cont_norm</span><span class="p">,</span> <span class="n">_cont_norm_regions</span>
-<span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="n">_find_contpix_regions</span>
+<span class="kn">from</span> <span class="nn">.continuum_normalization</span> <span class="kn">import</span> \
+    <span class="p">(</span><span class="n">_cont_norm_gaussian_smooth</span><span class="p">,</span>
+     <span class="n">_cont_norm_running_quantile</span><span class="p">,</span>
+     <span class="n">_cont_norm_running_quantile_regions</span><span class="p">,</span>
+     <span class="n">_cont_norm_running_quantile_mp</span><span class="p">,</span>
+     <span class="n">_cont_norm_running_quantile_regions_mp</span><span class="p">,</span>
+     <span class="n">_find_cont_fitfunc</span><span class="p">,</span>
+     <span class="n">_find_cont_fitfunc_regions</span><span class="p">,</span>
+     <span class="n">_cont_norm</span><span class="p">,</span>
+     <span class="n">_cont_norm_regions</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.find_continuum_pixels</span> <span class="kn">import</span> <span class="n">_find_contpix</span><span class="p">,</span><span class="n">_find_contpix_regions</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">cpu_count</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+
+<span class="n">n_cpus</span> <span class="o">=</span> <span class="n">cpu_count</span><span class="p">()</span>
 
 <span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
 
@@ -153,6 +179,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">test_ID</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">test_flux</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">test_ivar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="bp">None</span>
         
         <span class="c1"># calculate SNR</span>
@@ -268,15 +295,8 @@
  
 
 <div class="viewcode-block" id="Dataset.diagnostics_SNR"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_SNR">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_SNR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        <span class="sd">&quot;&quot;&quot; Plots SNR distributions of ref and test object spectra</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        (optional) figname: string</span>
-<span class="sd">            Filename to use for the output saved plot</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Plots SNR distributions of ref and test object spectra &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Diagnostic for SNRs of reference and survey objects&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;new fig&quot;</span><span class="p">)</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_SNR</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> 
@@ -293,15 +313,9 @@
         <span class="k">return</span> <span class="n">fig</span></div>
 
     
-<div class="viewcode-block" id="Dataset.diagnostics_ref_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_ref_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_ref_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;ref_labels_triangle.png&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Plots all training labels against each other </span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        (optional) figname: string</span>
-<span class="sd">            Filename of the saved output plot</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span><span class="p">,</span> <span class="n">figname</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Dataset.diagnostics_ref_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_ref_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_ref_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Plots all training labels against each other &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_vals</span><span class="p">):</span>
@@ -311,8 +325,6 @@
 <span class="sd">        ----------</span>
 <span class="sd">        label_vals: numpy ndarray </span>
 <span class="sd">            values of the labels</span>
-<span class="sd">        figname: str</span>
-<span class="sd">            if provided, save the figure into the given file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">r&quot;$</span><span class="si">%s</span><span class="s2">$&quot;</span> <span class="o">%</span> <span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotting_labels</span><span class="p">()]</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Plotting every label against every other&quot;</span><span class="p">)</span>
@@ -365,7 +377,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span> <span class="o">=</span> <span class="n">contmask</span></div>
 
 
-<div class="viewcode-block" id="Dataset.fit_continuum"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.fit_continuum">[docs]</a>    <span class="k">def</span> <span class="nf">fit_continuum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.fit_continuum"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.fit_continuum">[docs]</a>    <span class="k">def</span> <span class="nf">fit_continuum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">,</span> <span class="n">n_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fit a continuum to the continuum pixels</span>
 
 <span class="sd">        Parameters</span>
@@ -385,20 +397,24 @@
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Fitting Continuum...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">tr_cont</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">,</span>
+                <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
             <span class="n">test_cont</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">,</span>
+                <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Fitting Continuum in </span><span class="si">%s</span><span class="s2"> Regions...&quot;</span> <span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">))</span>
-            <span class="n">tr_cont</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc_regions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> 
-                                       <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+            <span class="n">tr_cont</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc_regions</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span>
+                <span class="n">ffunc</span><span class="p">,</span> <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
             <span class="n">test_cont</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc_regions</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span>
+                <span class="n">ffunc</span><span class="p">,</span> <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tr_cont</span><span class="p">,</span> <span class="n">test_cont</span></div>
 
 
-<div class="viewcode-block" id="Dataset.continuum_normalize_training_q"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.continuum_normalize_training_q">[docs]</a>    <span class="k">def</span> <span class="nf">continuum_normalize_training_q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">):</span>
+<div class="viewcode-block" id="Dataset.continuum_normalize_training_q"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.continuum_normalize_training_q">[docs]</a>    <span class="k">def</span> <span class="nf">continuum_normalize_training_q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span>
+                                       <span class="n">n_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Continuum normalize the training set using a running quantile</span>
 
 <span class="sd">        Parameters</span>
@@ -407,16 +423,53 @@
 <span class="sd">            The quantile cut</span>
 <span class="sd">        delta_lambda: float</span>
 <span class="sd">            The width of the pixel range used to calculate the median</span>
+
+
+<span class="sd">        Modified by:</span>
+<span class="sd">            [08 Jun 2016] Bo Zhang (NAOC):    add multiprocessing option</span>
+<span class="sd">        Note:</span>
+<span class="sd">            Multiprocessing calls for more memory on computer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># don&#39;t use too many process</span>
+        <span class="k">assert</span> <span class="n">n_proc</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">n_proc</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="o">*</span><span class="n">n_cpus</span>
+        <span class="k">if</span> <span class="n">n_proc</span> <span class="o">&gt;</span> <span class="n">n_cpus</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: n_proc is larger than your numbers of physical CPUs!&#39;</span><span class="p">)</span>
+
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Continuum normalizing the tr set using running quantile...&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_cont_norm_running_quantile</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span> 
-                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_cont_norm_running_quantile_regions</span><span class="p">(</span>
+
+        <span class="k">if</span> <span class="n">n_proc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># use old version (single process)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;##########################################################&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: you will use only 1 process ...&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;           i.e., the original TheCannon version&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;##########################################################&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_cont_norm_running_quantile</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span>
-                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">,</span> <span class="n">ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">)</span></div>
+                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_cont_norm_running_quantile_regions</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span>
+                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">,</span>
+                    <span class="n">ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># use new version (multi process)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;##########################################################&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: you will use ** </span><span class="si">%d</span><span class="s1"> ** processes ... &#39;</span> <span class="o">%</span> <span class="n">n_proc</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Note: Multiprocessing calls for more memory on computer!&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;##########################################################&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_cont_norm_running_quantile_mp</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span>
+                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">,</span>
+                    <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_cont_norm_running_quantile_regions_mp</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span>
+                    <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="n">delta_lambda</span><span class="p">,</span> <span class="n">ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span>
+                    <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Dataset.continuum_normalize"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.continuum_normalize">[docs]</a>    <span class="k">def</span> <span class="nf">continuum_normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cont</span><span class="p">):</span>
@@ -499,15 +552,9 @@
             <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Saved list </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Dataset.diagnostics_survey_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_survey_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_survey_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;survey_labels_triangle.png&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Plot all survey labels against each other</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        (optional) figname: str</span>
-<span class="sd">            Filename of saved output plot</span>
-<span class="sd">        &quot;&quot;&quot;</span>  
-        <span class="bp">self</span><span class="o">.</span><span class="n">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">,</span> <span class="n">figname</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Dataset.diagnostics_survey_labels"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_survey_labels">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_survey_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Plot all survey labels against each other &quot;&quot;&quot;</span>  
+        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_triangle_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">)</span></div>
    
    
 <div class="viewcode-block" id="Dataset.diagnostics_1to1"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_1to1">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_1to1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="s2">&quot;1to1_label&quot;</span><span class="p">):</span>
@@ -584,9 +631,90 @@
     
 <div class="viewcode-block" id="Dataset.diagnostics_best_fit_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset.diagnostics_best_fit_spectra">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics_best_fit_spectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Plot results of best-fit spectra for ten random test objects &quot;&quot;&quot;</span>
-        <span class="n">overlay_spectra</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> </div></div>
+        <span class="n">overlay_spectra</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">write_to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">hl</span> <span class="o">=</span> <span class="n">convert_to_hdulist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: writting to fits [</span><span class="si">%s</span><span class="s1">] ...&#39;</span> <span class="o">%</span> <span class="n">filepath</span><span class="p">)</span>
+        <span class="n">hl</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: ---------------------------------------------------&#39;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">convert_to_hdulist</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; transform TheCannon dataset into fits HDU list &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: ---------------------------------------------------&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: transforming TheCannon data cubes into HDU list ...&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: ---------------------------------------------------&#39;</span><span class="p">)</span>
+
+    <span class="c1"># initialize data list</span>
+    <span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">wl</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">contmask</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">tr_ID</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">tr_SNR</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">tr_ivar</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">tr_label</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">test_ID</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">test_SNR</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">test_flux</span><span class="p">,</span>
+                 <span class="n">ds</span><span class="o">.</span><span class="n">test_ivar</span><span class="p">]</span>
+    <span class="n">name_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;wl&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;ranges&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;contmask&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;tr_ID&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;tr_SNR&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;tr_flux&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;tr_ivar&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;tr_label&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;test_ID&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;test_SNR&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;test_flux&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;test_ivar&#39;</span><span class="p">]</span>
+    <span class="n">hdu_format_list_rw</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;table&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;table&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;image&#39;</span><span class="p">]</span>
+
+    <span class="c1"># construct Primary header</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">()</span>
+    <span class="n">header</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Bo Zhang (@NAOC)&#39;</span>
+    <span class="n">header</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;v1.0&#39;</span>
+    <span class="n">header</span><span class="p">[</span><span class="s1">&#39;last_modified&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Sat 11 Jun 2016&#39;</span>
+    <span class="n">header</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;TheCannon dataset object&#39;</span>
+
+    <span class="c1"># initialize HDU list</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: initializing the HDU list ...&#39;</span><span class="p">)</span>
+    <span class="n">hl</span> <span class="o">=</span> <span class="p">[</span><span class="n">fits</span><span class="o">.</span><span class="n">hdu</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)]</span>
+
+    <span class="c1"># construct HDU list</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">name_list</span><span class="p">)</span>
+    <span class="n">n_hdus</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">n_hdus</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: transforming HDU [</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">]: </span><span class="si">%s</span><span class="s1"> ...&#39;</span>
+              <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_hdus</span><span class="p">,</span> <span class="n">name_list</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">hdu_format_list_rw</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+                         <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="n">name_list</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+            <span class="n">hl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_list</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+                                    <span class="n">name</span><span class="o">=</span><span class="n">name_list</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: ---------------------------------------------------&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">(</span><span class="n">hl</span><span class="p">)</span>
 </pre></div>
 
+           </div>
           </div>
           <footer>
   
@@ -596,9 +724,10 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, Anna Ho.
+
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -616,7 +745,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.4',
+            VERSION:'0.5.6',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

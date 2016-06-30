@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; TheCannon 0.3.4 documentation</title>
+  <title>Getting Started &mdash; TheCannon 0.5.6 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="TheCannon 0.3.4 documentation" href="index.html"/>
+    <link rel="top" title="TheCannon 0.5.6 documentation" href="index.html"/>
         <link rel="next" title="Reference/API" href="api.html"/>
         <link rel="prev" title="Requirements for Input" href="input_requirements.html"/> 
 
@@ -45,17 +45,27 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-        
-          <a href="index.html" class="icon icon-home"> TheCannon
-        
+          
+            <a href="index.html" class="icon icon-home"> TheCannon
+          
 
-        
-        </a>
+          
+          </a>
 
-        
+          
+            
+            
+              <div class="version">
+                0.5.6
+              </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -64,28 +74,23 @@
   </form>
 </div>
 
-        
-      </div>
+          
+        </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-          
-              <ul class="current">
+            
+            
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#module-TheCannon.apogee">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#model">Model</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a></li>
 </ul>
 
+            
           
-        
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -100,7 +105,13 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
@@ -115,7 +126,8 @@
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
@@ -144,7 +156,7 @@ write his own code; for this example, we provide the module <code class="docutil
 The procedure for reading in spectra and training labels of course depends on
 the survey, the file type, etc, and it is up to the user to package this
 all appropriately before feeding it into <code class="docutils literal"><span class="pre">TheCannon</span></code>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">apogee</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">apogee</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tr_ID</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">apogee</span><span class="o">.</span><span class="n">load_spectra</span><span class="p">(</span><span class="s2">&quot;example_DR10/Data&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">apogee</span><span class="o">.</span><span class="n">load_labels</span><span class="p">(</span><span class="s2">&quot;example_DR10/reference_labels.csv&quot;</span><span class="p">)</span>
 </pre></div>
@@ -154,7 +166,7 @@ all appropriately before feeding it into <code class="docutils literal"><span cl
 <code class="docutils literal"><span class="pre">TheCannon</span></code> is simply re-determining labels for the reference objects. In
 practice, the test IDs, fluxes, and inverse variances would be read in
 separately.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">tr_ID</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">tr_ID</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">tr_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">tr_ivar</span>
 </pre></div>
@@ -162,7 +174,7 @@ separately.</p>
 <p>Now, all the input data has been packaged properly, and we can begin running
 <code class="docutils literal"><span class="pre">TheCannon.</span></code></p>
 <p>The first step is to initialize a <code class="docutils literal"><span class="pre">Dataset</span></code> object:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">dataset</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)</span>
 </pre></div>
@@ -171,7 +183,7 @@ separately.</p>
 user visualize the results. Some of these plots require knowing the names
 of the labels. If the user wants to produce these diagnostic plots, he or
 she must specify the label names in LaTeX format:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">set_label_names</span><span class="p">([</span><span class="s1">&#39;T_{eff}&#39;</span><span class="p">,</span> <span class="s1">&#39;\log g&#39;</span><span class="p">,</span> <span class="s1">&#39;[Fe/H]&#39;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">set_label_names</span><span class="p">([</span><span class="s1">&#39;T_{eff}&#39;</span><span class="p">,</span> <span class="s1">&#39;\log g&#39;</span><span class="p">,</span> <span class="s1">&#39;[Fe/H]&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>At this stage, two diagnotic plots can already be produced,
@@ -180,12 +192,12 @@ of SNR in the training and test set (in practice, the training set
 should consist of higher SNR spectra than the test set)
 and the other using <code class="docutils literal"><span class="pre">triangle.py</span></code> to plot
 every label&#8217;s set of training values against every other.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_SNR</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_SNR</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/SNRdist.png" src="_images/SNRdist.png" />
 <p>We can also plot the reference labels against each other:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>That figure should look like this:</p>
@@ -201,7 +213,7 @@ window size for calculating the median is set to 50 Angstroms and the quantile
 level is set to 90%. APOGEE spectra come in three chunks, and we want to
 perform continuum normalization for each chunk separately. For <code class="docutils literal"><span class="pre">TheCannon</span></code>
 to treat spectra in chunks, the <code class="docutils literal"><span class="pre">ranges</span></code> attribute must be set:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
 </pre></div>
 </div>
 <p>Even if a spectral dataset do not consist of chunks separated by gaps, one can
@@ -212,7 +224,7 @@ The user should make sure to examine the results of continuum normalization,
 for example plotting fifty sample continuum fits and continuum normalized
 spectra.</p>
 <p>Pseudo continuum normalization can then be performed as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize_training_q</span><span class="p">(</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize_training_q</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">q</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -228,7 +240,7 @@ region (in this case, three regions). This enables the user to control how
 evenly spread the pixels are.</p>
 <p>In this case, we choose 7% of the pixels in the spectrum as continuum, but the
 best value should be determined through experimentation.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -238,31 +250,31 @@ evenly cover the spectrum. Large gaps in continuum pixels could result in
 poor continuum normalization in those regions. If the continuum pixels
 do not look evenly sampled enough, the range can be changed and the process
 repeated. For this example, we change it as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5500</span><span class="p">],</span> <span class="p">[</span><span class="mi">5500</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5500</span><span class="p">],</span> <span class="p">[</span><span class="mi">5500</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once a satisfactory set of continuum pixels has been identified, the dataset&#8217;s
 continuum mask attribute is set as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">set_continuum</span><span class="p">(</span><span class="n">contmask</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">set_continuum</span><span class="p">(</span><span class="n">contmask</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once the dataset has a continuum mask, the continuum is fit for using either
 a sinusoid or chebyshev function. In this case, we use a sinusoid; the user
 can specify the desired order. Again, this is 3 for this simple illustration,
 but should be determined through experimentation.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cont</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">fit_continuum</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;sinusoid&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cont</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">fit_continuum</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;sinusoid&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once a satisfactory continuum has been fit, the normalized training and test
 spectra can be calculated:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> \
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> \
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize</span><span class="p">(</span><span class="n">cont</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If these normalized spectra look acceptable, then they can be set:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">norm_tr_flux</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">norm_tr_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">norm_tr_ivar</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">norm_test_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">norm_test_ivar</span>
@@ -272,14 +284,14 @@ spectra can be calculated:</p>
 <p>For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model.
 In this case, we use a quadratic model: order = 2</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">model</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">model</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>At this stage, more optional diagnostic plots can be produced to examine
 the spectral model:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">diagnostics_contpix</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">diagnostics_contpix</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">diagnostics_leading_coeffs</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">diagnostics_plot_chisq</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
@@ -295,15 +307,15 @@ as a function of wavelength</p>
 <p>If the model fitting worked, then we can proceed to the test step. This
 command automatically updates the dataset with the fitted-for test labels,
 and returns the corresponding covariance matrix.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">label_errs</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">infer_labels</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">label_errs</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">infer_labels</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can access the new labels as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test_labels</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">test_label_vals</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_labels</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">test_label_vals</span>
 </pre></div>
 </div>
 <p>A set of diagnostic output:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_test_step_flagstars</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_test_step_flagstars</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_survey_labels</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -313,7 +325,7 @@ shown below.</p>
 <img alt="_images/survey_labels_triangle.png" src="_images/survey_labels_triangle.png" />
 <p>If the test set is simply equivalent to the training set,
 as in this example, then one final diagnostic plot can be produced:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dset</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dset</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/1to1_label_0.png" src="_images/1to1_label_0.png" />
@@ -322,6 +334,7 @@ as in this example, then one final diagnostic plot can be produced:</p>
 </div>
 
 
+           </div>
           </div>
           <footer>
   
@@ -340,9 +353,10 @@ as in this example, then one final diagnostic plot can be produced:</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, Anna Ho.
+
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -360,7 +374,7 @@ as in this example, then one final diagnostic plot can be produced:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.4',
+            VERSION:'0.5.6',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

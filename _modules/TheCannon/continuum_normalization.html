@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TheCannon.continuum_normalization &mdash; TheCannon 0.3.4 documentation</title>
+  <title>TheCannon.continuum_normalization &mdash; TheCannon 0.5.6 documentation</title>
   
 
   
@@ -30,11 +30,11 @@
   
 
   
-    <link rel="top" title="TheCannon 0.3.4 documentation" href="../../index.html"/>
+    <link rel="top" title="TheCannon 0.5.6 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -44,17 +44,27 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-        
-          <a href="../../index.html" class="icon icon-home"> TheCannon
-        
+          
+            <a href="../../index.html" class="icon icon-home"> TheCannon
+          
 
-        
-        </a>
+          
+          </a>
 
-        
+          
+            
+            
+              <div class="version">
+                0.5.6
+              </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -63,28 +73,23 @@
   </form>
 </div>
 
-        
-      </div>
+          
+        </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-          
-              <ul>
+            
+            
+                <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-TheCannon.apogee">APOGEE Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#dataset">Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#model">Model</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a></li>
 </ul>
 
+            
           
-        
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -99,7 +104,13 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../../index.html">Docs</a> &raquo;</li>
       
@@ -114,15 +125,18 @@
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for TheCannon.continuum_normalization</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="kn">as</span> <span class="nn">mp</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
+<span class="c1"># from joblib import Parallel, delayed</span>
 
+<span class="n">SMALL</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="mi">200</span>
 
 <span class="k">def</span> <span class="nf">_partial_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="p">):</span>
@@ -264,7 +278,7 @@
     <span class="k">return</span> <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> 
 
 
-<span class="k">def</span> <span class="nf">_find_cont_fitfunc</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_find_cont_fitfunc</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">,</span> <span class="n">n_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Fit a continuum to a continuum pixels in a segment of spectra</span>
 
 <span class="sd">    Functional form can be either sinusoid or chebyshev, with specified degree</span>
@@ -294,31 +308,51 @@
     <span class="n">nstars</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">npixels</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
-        <span class="n">flux</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
-        <span class="n">ivar</span> <span class="o">=</span> <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
-        <span class="n">pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">npixels</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">pix</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
-        <span class="n">yivar</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
-        <span class="n">yivar</span><span class="p">[</span><span class="n">yivar</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">SMALL</span><span class="o">**</span><span class="mi">2</span>   
-        <span class="k">if</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;sinusoid&quot;</span><span class="p">:</span> 
-            <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">deg</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># one for cos, one for sin</span>
-            <span class="n">L</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="n">pcont_func</span> <span class="o">=</span> <span class="n">_partial_func</span><span class="p">(</span><span class="n">_sinusoid</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
-            <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">pcont_func</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">,</span> 
-                                       <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">yivar</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;chebyshev&quot;</span><span class="p">:</span>
-            <span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">chebyshev</span><span class="o">.</span><span class="n">Chebyshev</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span><span class="n">w</span><span class="o">=</span><span class="n">yivar</span><span class="p">,</span><span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">pix</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="n">n_proc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
+            <span class="n">flux</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
+            <span class="n">ivar</span> <span class="o">=</span> <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
+            <span class="n">pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">npixels</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">pix</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
+            <span class="n">yivar</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="n">contmask</span><span class="p">]</span>
+            <span class="n">yivar</span><span class="p">[</span><span class="n">yivar</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">SMALL</span><span class="o">**</span><span class="mi">2</span>
             <span class="k">if</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;sinusoid&quot;</span><span class="p">:</span>
-                <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sinusoid</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">popt</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
+                <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">deg</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># one for cos, one for sin</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">pcont_func</span> <span class="o">=</span> <span class="n">_partial_func</span><span class="p">(</span><span class="n">_sinusoid</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
+                <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">pcont_func</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">,</span>
+                                           <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">yivar</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;chebyshev&quot;</span><span class="p">:</span>
-                <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+                <span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">chebyshev</span><span class="o">.</span><span class="n">Chebyshev</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span><span class="n">w</span><span class="o">=</span><span class="n">yivar</span><span class="p">,</span><span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">pix</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;sinusoid&quot;</span><span class="p">:</span>
+                    <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sinusoid</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">popt</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;chebyshev&quot;</span><span class="p">:</span>
+                    <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># start mp.Pool</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
+        <span class="n">mp_results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
+            <span class="n">mp_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span>\
+                <span class="n">_find_cont_fitfunc</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">fluxes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+                 <span class="n">ivars</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+                 <span class="n">contmask</span><span class="p">[:]),</span>
+                <span class="p">{</span><span class="s1">&#39;deg&#39;</span><span class="p">:</span><span class="n">deg</span><span class="p">,</span> <span class="s1">&#39;ffunc&#39;</span><span class="p">:</span><span class="n">ffunc</span><span class="p">}))</span>
+        <span class="c1"># close mp.Pool</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+        <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mp_results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nstars</span><span class="p">)])</span>
+
     <span class="k">return</span> <span class="n">cont</span>
 
 
-<span class="k">def</span> <span class="nf">_find_cont_fitfunc_regions</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_find_cont_fitfunc_regions</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">contmask</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">ranges</span><span class="p">,</span> <span class="n">ffunc</span><span class="p">,</span>
+                               <span class="n">n_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Run fit_cont, dealing with spectrum in regions or chunks</span>
 
 <span class="sd">    This is useful if a spectrum has gaps.</span>
@@ -353,17 +387,23 @@
         <span class="n">stop</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;chebyshev&quot;</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
-                              <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
-                              <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="o">=</span><span class="s2">&quot;chebyshev&quot;</span><span class="p">)</span>
+                                        <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+                                        <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+                                        <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="o">=</span><span class="s2">&quot;chebyshev&quot;</span><span class="p">,</span>
+                                        <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ffunc</span><span class="o">==</span><span class="s2">&quot;sinusoid&quot;</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="n">_find_cont_fitfunc</span><span class="p">(</span><span class="n">fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
-                              <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
-                              <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="o">=</span><span class="s2">&quot;sinusoid&quot;</span><span class="p">)</span>
-        <span class="n">cont</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+                                        <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+                                        <span class="n">contmask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+                                        <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">ffunc</span><span class="o">=</span><span class="s2">&quot;sinusoid&quot;</span><span class="p">,</span>
+                                        <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
+        <span class="n">cont</span><span class="p">[:,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+
     <span class="k">return</span> <span class="n">cont</span>
 
 
-<span class="k">def</span> <span class="nf">_find_cont_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_find_cont_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span>
+                                <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Perform continuum normalization using a running quantile</span>
 
 <span class="sd">    Parameters</span>
@@ -386,36 +426,95 @@
 <span class="sd">    norm_ivars: numpy ndarray of shape (nstars, npixels)</span>
 <span class="sd">        rescaled pixel invariances</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;contnorm.py: continuum norm using running quantile&quot;</span><span class="p">)</span>
     <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">nstars</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstars</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;cont_norm_q(): working on star </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">jj</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;cont_norm_q(): working on star [</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">]...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">jj</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nstars</span><span class="p">))</span>
         <span class="n">flux</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
         <span class="n">ivar</span> <span class="o">=</span> <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span>
         <span class="k">for</span> <span class="n">ll</span><span class="p">,</span> <span class="n">lam</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">wl</span><span class="p">):</span>
             <span class="n">indx</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">wl</span><span class="o">-</span><span class="n">lam</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">delta_lambda</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">flux_cut</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
             <span class="n">ivar_cut</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
-            <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span><span class="n">ll</span><span class="p">]</span> <span class="o">=</span> <span class="n">_weighted_median</span><span class="p">(</span><span class="n">flux_cut</span><span class="p">,</span> <span class="n">ivar_cut</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+            <span class="n">cont</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span> <span class="n">ll</span><span class="p">]</span> <span class="o">=</span> <span class="n">_weighted_median</span><span class="p">(</span><span class="n">flux_cut</span><span class="p">,</span> <span class="n">ivar_cut</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cont</span>
 
 
-<span class="k">def</span> <span class="nf">_cont_norm_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">):</span>
-    <span class="n">cont</span> <span class="o">=</span> <span class="n">_find_cont_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">)</span>
+<span class="c1">####################################################</span>
+<span class="c1"># structure of the continuum normalization process</span>
+<span class="c1">#</span>
+<span class="c1"># continuum_normalize_training_q()</span>
+<span class="c1"># |- _cont_norm_running_quantile()</span>
+<span class="c1">#    |- _find_cont_running_quantile()</span>
+<span class="c1">#    |- _find_cont_running_quantile_mp()</span>
+<span class="c1"># |- _cont_norm_running_quantile_regions</span>
+<span class="c1">#    |- _cont_norm_running_quantile</span>
+<span class="c1">#    |- _cont_norm_running_quantile_mp()</span>
+<span class="c1">#</span>
+<span class="c1"># the basic running_quantile method:</span>
+<span class="c1"># _find_cont_running_quantile()</span>
+<span class="c1">####################################################</span>
+
+
+<span class="k">def</span> <span class="nf">_cont_norm_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">_find_cont_running_quantile</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
     <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c1"># norm_ivars = np.zeros(ivars.shape)</span>
     <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">cont</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">cont</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ivars</span>
     <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
 
+<span class="k">def</span> <span class="nf">_cont_norm_running_quantile_mp</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span>
+                                   <span class="n">n_proc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The same as _cont_norm_running_quantile() above,</span>
+<span class="sd">    but using multi-processing.</span>
 
-<span class="k">def</span> <span class="nf">_cont_norm_running_quantile_regions</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
+<span class="sd">    Bo Zhang (NAOC)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nStar</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># start mp.Pool</span>
+    <span class="n">mp_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">n_proc</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nStar</span><span class="p">):</span>
+        <span class="n">mp_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span>\
+            <span class="n">_find_cont_running_quantile</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">ivars</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+             <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}))</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: continuum normalizing star [</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">] ...&#39;</span>\
+                  <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nStar</span><span class="p">))</span>
+    <span class="c1"># close mp.Pool</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="c1"># reshape results --&gt; cont</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">fluxes</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nStar</span><span class="p">):</span>
+        <span class="n">cont</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">mp_results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="c1">#.flatten()</span>
+    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">norm_fluxes</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">cont</span><span class="p">[</span><span class="n">cont</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">cont</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ivars</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: continuum normalization finished!&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
+
+    <span class="c1"># if use joblib</span>
+    <span class="c1"># mp_results = Parallel(n_jobs=n_proc)\</span>
+    <span class="c1">#     (delayed(_find_cont_running_quantile)\</span>
+    <span class="c1">#          (wl, fluxes[i, :].reshape((1, -1)), ivars[i, :].reshape((1, -1)), q, delta_lambda, False, True) for i in range(nStar))</span>
+    <span class="c1"># return mp_results</span>
+
+
+<span class="k">def</span> <span class="nf">_cont_norm_running_quantile_regions</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span>
+                                        <span class="n">ranges</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Perform continuum normalization using running quantile, for spectrum</span>
 <span class="sd">    that comes in chunks</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;contnorm.py: continuum norm using running quantile&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Taking spectra in </span><span class="si">%s</span><span class="s2"> chunks&quot;</span> <span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Taking spectra in </span><span class="si">%s</span><span class="s2"> chunks&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">))</span>
     <span class="n">nstars</span> <span class="o">=</span> <span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -427,6 +526,39 @@
                 <span class="n">ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">)</span>
         <span class="n">norm_fluxes</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">norm_ivars</span><span class="p">[:,</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
+
+
+<span class="k">def</span> <span class="nf">_cont_norm_running_quantile_regions_mp</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span>
+                                           <span class="n">ranges</span><span class="p">,</span> <span class="n">n_proc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform continuum normalization using running quantile, for spectrum</span>
+<span class="sd">    that comes in chunks.</span>
+
+<span class="sd">    The same as _cont_norm_running_quantile_regions(),</span>
+<span class="sd">    but using multi-processing.</span>
+
+<span class="sd">    Bo Zhang (NAOC)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;contnorm.py: continuum norm using running quantile&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Taking spectra in </span><span class="si">%s</span><span class="s2"> chunks&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">))</span>
+    <span class="c1"># nstars = fluxes.shape[0]</span>
+    <span class="n">nchunks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span>
+    <span class="n">norm_fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">norm_ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nchunks</span><span class="p">):</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">ranges</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;@Bo Zhang: Going to normalize Chunk [</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">], pixel:[</span><span class="si">%d</span><span class="s1">, </span><span class="si">%d</span><span class="s1">] ...&#39;</span>
+                  <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nchunks</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">))</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">_cont_norm_running_quantile_mp</span><span class="p">(</span>
+            <span class="n">wl</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">fluxes</span><span class="p">[:,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span>
+            <span class="n">ivars</span><span class="p">[:,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">],</span> <span class="n">q</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="p">,</span>
+            <span class="n">n_proc</span><span class="o">=</span><span class="n">n_proc</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="n">norm_fluxes</span><span class="p">[:,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">norm_ivars</span><span class="p">[:,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
 
 
@@ -500,6 +632,7 @@
     <span class="k">return</span> <span class="n">norm_fluxes</span><span class="p">,</span> <span class="n">norm_ivars</span>
 </pre></div>
 
+           </div>
           </div>
           <footer>
   
@@ -509,9 +642,10 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, Anna Ho.
+
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -529,7 +663,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.4',
+            VERSION:'0.5.6',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
