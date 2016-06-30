@@ -7,16 +7,16 @@ import matplotlib.pyplot as plt
 from matplotlib import colorbar
 
 
-def draw_spectra(model, dataset):
+def draw_spectra(md, ds):
     """ Generate best-fit spectra for all the test objects  
 
     Parameters
     ----------
-    model: CannonModel
+    md: model
         The Cannon spectral model
 
-    dataset: Dataset 
-        Dataset that needs label inference
+    ds: Dataset 
+        Dataset object
 
     Returns
     -------
