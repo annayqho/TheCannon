@@ -14,6 +14,8 @@ spectroscopic surveys.
 For a detailed overview of *The Cannon* and a description of its
 successful application to determining labels for APOGEE DR10 spectra,
 see `Ness et al. 2015`_. 
+For an application of *The Cannon* to bringing two spectroscopic surveys
+(APOGEE and LAMOST) onto the same physical scale, see `Ho et al. 2016`.
 
 Features include:
 
