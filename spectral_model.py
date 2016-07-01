@@ -1,22 +1,15 @@
-from __future__ import (absolute_import, division, print_function, unicode_literals)
-import numpy as np
-import os
-import random
-from .helpers.corner import corner
-import matplotlib.pyplot as plt
-from matplotlib import colorbar
+""" Generate model spectra, add model attribute """
 
-
-def draw_spectra(model, dataset):
+def draw_spectra(md, ds):
     """ Generate best-fit spectra for all the test objects  
 
     Parameters
     ----------
-    model: CannonModel
+    md: model
         The Cannon spectral model
 
-    dataset: Dataset 
-        Dataset that needs label inference
+    ds: Dataset 
+        Dataset object
 
     Returns
     -------

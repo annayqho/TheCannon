@@ -135,26 +135,25 @@ def _get_lvec(label_vals, pivots):
     return lvec
 
 
-def _train_model(dataset):
+def _train_model(ds):
     """
     This determines the coefficients of the model using the training data
 
     Parameters
     ----------
-    dataset: Dataset
-        reference objects
+    ds: Dataset
 
     Returns
     -------
     model: model
         best-fit Cannon model
     """
-    label_names = dataset.get_plotting_labels()
-    label_vals = dataset.tr_label
-    lams = dataset.wl
+    label_names = ds.get_plotting_labels()
+    label_vals = ds.tr_label
+    lams = ds.wl
     npixels = len(lams)
-    fluxes = dataset.tr_flux
-    ivars = dataset.tr_ivar
+    fluxes = ds.tr_flux
+    ivars = ds.tr_ivar
     
     # for training, ivar can't be zero, otherwise you get singular matrices
     # DWH says: make sure no ivar goes below 1 or 0.01
@@ -177,4 +176,5 @@ def _train_model(dataset):
     # Calc chi sq
     all_chisqs = chis*chis
     print("Done training model")
+
     return coeffs, scatters, all_chisqs, pivots

@@ -1,8 +1,9 @@
 import numpy as np
 from functools import partial
-from multiprocessing import Pool
+import multiprocessing as mp
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
+# from joblib import Parallel, delayed
 
 SMALL = 1.0/200
 
@@ -146,7 +147,7 @@ def _cont_norm_gaussian_smooth(dataset, L):
     return norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar 
 
 
-def _find_cont_fitfunc(fluxes, ivars, contmask, deg, ffunc):
+def _find_cont_fitfunc(fluxes, ivars, contmask, deg, ffunc, n_proc=1):
     """ Fit a continuum to a continuum pixels in a segment of spectra
 
     Functional form can be either sinusoid or chebyshev, with specified degree
@@ -176,31 +177,51 @@ def _find_cont_fitfunc(fluxes, ivars, contmask, deg, ffunc):
     nstars = fluxes.shape[0]
     npixels = fluxes.shape[1]
     cont = np.zeros(fluxes.shape)
-    for jj in range(nstars):
-        flux = fluxes[jj,:]
-        ivar = ivars[jj,:]
-        pix = np.arange(0, npixels)
-        y = flux[contmask]
-        x = pix[contmask]
-        yivar = ivar[contmask]
-        yivar[yivar == 0] = SMALL**2   
-        if ffunc=="sinusoid": 
-            p0 = np.ones(deg*2) # one for cos, one for sin
-            L = max(x)-min(x)
-            pcont_func = _partial_func(_sinusoid, L=L, y=flux)
-            popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0, 
-                                       sigma=1./np.sqrt(yivar))
-        elif ffunc=="chebyshev":
-            fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=deg)
-        for element in pix:
+
+    if n_proc == 1:
+        for jj in range(nstars):
+            flux = fluxes[jj,:]
+            ivar = ivars[jj,:]
+            pix = np.arange(0, npixels)
+            y = flux[contmask]
+            x = pix[contmask]
+            yivar = ivar[contmask]
+            yivar[yivar == 0] = SMALL**2
             if ffunc=="sinusoid":
-                cont[jj,element] = _sinusoid(element, popt, L=L, y=flux)
+                p0 = np.ones(deg*2) # one for cos, one for sin
+                L = max(x)-min(x)
+                pcont_func = _partial_func(_sinusoid, L=L, y=flux)
+                popt, pcov = opt.curve_fit(pcont_func, x, y, p0=p0,
+                                           sigma=1./np.sqrt(yivar))
             elif ffunc=="chebyshev":
-                cont[jj,element] = fit(element)
+                fit = np.polynomial.chebyshev.Chebyshev.fit(x=x,y=y,w=yivar,deg=deg)
+            for element in pix:
+                if ffunc=="sinusoid":
+                    cont[jj,element] = _sinusoid(element, popt, L=L, y=flux)
+                elif ffunc=="chebyshev":
+                    cont[jj,element] = fit(element)
+    else:
+        # start mp.Pool
+        pool = mp.Pool(processes=n_proc)
+        mp_results = []
+        for i in xrange(nstars):
+            mp_results.append(pool.apply_async(\
+                _find_cont_fitfunc,
+                (fluxes[i, :].reshape((1, -1)),
+                 ivars[i, :].reshape((1, -1)),
+                 contmask[:]),
+                {'deg':deg, 'ffunc':ffunc}))
+        # close mp.Pool
+        pool.close()
+        pool.join()
+
+        cont = np.array([mp_results[i].get().flatten() for i in xrange(nstars)])
+
     return cont
 
 
-def _find_cont_fitfunc_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
+def _find_cont_fitfunc_regions(fluxes, ivars, contmask, deg, ranges, ffunc,
+                               n_proc=1):
     """ Run fit_cont, dealing with spectrum in regions or chunks
 
     This is useful if a spectrum has gaps.
@@ -235,17 +256,23 @@ def _find_cont_fitfunc_regions(fluxes, ivars, contmask, deg, ranges, ffunc):
         stop = chunk[1]
         if ffunc=="chebyshev":
             output = _find_cont_fitfunc(fluxes[:,start:stop],
-                              ivars[:,start:stop],
-                              contmask[start:stop], deg=deg, ffunc="chebyshev")
+                                        ivars[:,start:stop],
+                                        contmask[start:stop],
+                                        deg=deg, ffunc="chebyshev",
+                                        n_proc=n_proc)
         elif ffunc=="sinusoid":
             output = _find_cont_fitfunc(fluxes[:,start:stop],
-                              ivars[:,start:stop],
-                              contmask[start:stop], deg=deg, ffunc="sinusoid")
-        cont[:,start:stop] = output
+                                        ivars[:,start:stop],
+                                        contmask[start:stop],
+                                        deg=deg, ffunc="sinusoid",
+                                        n_proc=n_proc)
+        cont[:, start:stop] = output
+
     return cont
 
 
-def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda):
+def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda,
+                                verbose=False):
     """ Perform continuum normalization using a running quantile
 
     Parameters
@@ -271,32 +298,92 @@ def _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda):
     cont = np.zeros(fluxes.shape)
     nstars = fluxes.shape[0]
     for jj in range(nstars):
-        print("cont_norm_q(): working on star %s" %jj) 
+        if verbose:
+            print("cont_norm_q(): working on star [%s/%s]..." % (jj+1, nstars))
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
         for ll, lam in enumerate(wl):
             indx = (np.where(abs(wl-lam) < delta_lambda))[0]
             flux_cut = flux[indx]
             ivar_cut = ivar[indx]
-            cont[jj,ll] = _weighted_median(flux_cut, ivar_cut, q)
+            cont[jj, ll] = _weighted_median(flux_cut, ivar_cut, q)
     return cont
 
 
-def _cont_norm_running_quantile(wl, fluxes, ivars, q, delta_lambda):
-    cont = _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda)
+####################################################
+# structure of the continuum normalization process
+#
+# continuum_normalize_training_q()
+# |- _cont_norm_running_quantile()
+#    |- _find_cont_running_quantile()
+#    |- _find_cont_running_quantile_mp()
+# |- _cont_norm_running_quantile_regions
+#    |- _cont_norm_running_quantile
+#    |- _cont_norm_running_quantile_mp()
+#
+# the basic running_quantile method:
+# _find_cont_running_quantile()
+####################################################
+
+
+def _cont_norm_running_quantile(wl, fluxes, ivars, q, delta_lambda, verbose=True):
+    cont = _find_cont_running_quantile(wl, fluxes, ivars, q, delta_lambda, verbose=verbose)
     norm_fluxes = np.ones(fluxes.shape)
-    norm_ivars = np.zeros(ivars.shape)
+    # norm_ivars = np.zeros(ivars.shape)
     norm_fluxes[cont!=0] = fluxes[cont!=0] / cont[cont!=0]
     norm_ivars = cont**2 * ivars
     return norm_fluxes, norm_ivars
 
+def _cont_norm_running_quantile_mp(wl, fluxes, ivars, q, delta_lambda,
+                                   n_proc=2, verbose=False):
+    """
+    The same as _cont_norm_running_quantile() above,
+    but using multi-processing.
 
-def _cont_norm_running_quantile_regions(wl, fluxes, ivars, q, delta_lambda, ranges):
+    Bo Zhang (NAOC)
+    """
+    nStar = fluxes.shape[0]
+
+    # start mp.Pool
+    mp_results = []
+    pool = mp.Pool(processes=n_proc)
+    for i in xrange(nStar):
+        mp_results.append(pool.apply_async(\
+            _find_cont_running_quantile,
+            (wl, fluxes[i, :].reshape((1, -1)), ivars[i, :].reshape((1, -1)),
+             q, delta_lambda), {'verbose': False}))
+        if verbose:
+            print('@Bo Zhang: continuum normalizing star [%d/%d] ...'\
+                  % (i + 1, nStar))
+    # close mp.Pool
+    pool.close()
+    pool.join()
+
+    # reshape results --> cont
+    cont = np.zeros_like(fluxes)
+    for i in xrange(nStar):
+        cont[i, :] = mp_results[i].get() #.flatten()
+    norm_fluxes = np.ones(fluxes.shape)
+    norm_fluxes[cont!=0] = fluxes[cont!=0] / cont[cont!=0]
+    norm_ivars = cont**2 * ivars
+
+    print('@Bo Zhang: continuum normalization finished!')
+    return norm_fluxes, norm_ivars
+
+    # if use joblib
+    # mp_results = Parallel(n_jobs=n_proc)\
+    #     (delayed(_find_cont_running_quantile)\
+    #          (wl, fluxes[i, :].reshape((1, -1)), ivars[i, :].reshape((1, -1)), q, delta_lambda, False, True) for i in range(nStar))
+    # return mp_results
+
+
+def _cont_norm_running_quantile_regions(wl, fluxes, ivars, q, delta_lambda,
+                                        ranges, verbose=True):
     """ Perform continuum normalization using running quantile, for spectrum
     that comes in chunks
     """
     print("contnorm.py: continuum norm using running quantile")
-    print("Taking spectra in %s chunks" %len(ranges))
+    print("Taking spectra in %s chunks" % len(ranges))
     nstars = fluxes.shape[0]
     norm_fluxes = np.zeros(fluxes.shape)
     norm_ivars = np.zeros(ivars.shape)
@@ -308,6 +395,39 @@ def _cont_norm_running_quantile_regions(wl, fluxes, ivars, q, delta_lambda, rang
                 ivars[:,start:stop], q, delta_lambda)
         norm_fluxes[:,start:stop] = output[0]
         norm_ivars[:,start:stop] = output[1]
+    return norm_fluxes, norm_ivars
+
+
+def _cont_norm_running_quantile_regions_mp(wl, fluxes, ivars, q, delta_lambda,
+                                           ranges, n_proc=2, verbose=False):
+    """
+    Perform continuum normalization using running quantile, for spectrum
+    that comes in chunks.
+
+    The same as _cont_norm_running_quantile_regions(),
+    but using multi-processing.
+
+    Bo Zhang (NAOC)
+    """
+    print("contnorm.py: continuum norm using running quantile")
+    print("Taking spectra in %s chunks" % len(ranges))
+    # nstars = fluxes.shape[0]
+    nchunks = len(ranges)
+    norm_fluxes = np.zeros(fluxes.shape)
+    norm_ivars = np.zeros(ivars.shape)
+    for i in xrange(nchunks):
+        chunk = ranges[i, :]
+        start = chunk[0]
+        stop = chunk[1]
+        if verbose:
+            print('@Bo Zhang: Going to normalize Chunk [%d/%d], pixel:[%d, %d] ...'
+                  % (i+1, nchunks, start, stop))
+        output = _cont_norm_running_quantile_mp(
+            wl[start:stop], fluxes[:, start:stop],
+            ivars[:, start:stop], q, delta_lambda,
+            n_proc=n_proc, verbose=verbose)
+        norm_fluxes[:, start:stop] = output[0]
+        norm_ivars[:, start:stop] = output[1]
     return norm_fluxes, norm_ivars
 
 

@@ -1,5 +1,6 @@
 from .dataset import Dataset
 from .train_model import _train_model 
+from .train_model import _get_lvec
 from .infer_labels import _infer_labels
 from .helpers.corner import corner
 import numpy as np
@@ -17,7 +18,7 @@ class CannonModel(object):
         self.chisqs = None
         self.pivots = None
         self.order = order
-        self.test_spectra = None
+        self.model_spectra = None
 
 
     def model(self):
@@ -28,9 +29,9 @@ class CannonModel(object):
             return self.coeffs
 
 
-    def train(self, data):
+    def train(self, ds):
         """ Run training step: solve for best-fit spectral model """
-        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(data)
+        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(ds)
 
 
     def diagnostics(self):
@@ -38,14 +39,14 @@ class CannonModel(object):
         _model_diagnostics(self.dataset, self.model)
 
 
-    def infer_labels(self, dataset, starting_guess = None):
+    def infer_labels(self, ds, starting_guess = None):
         """
         Uses the model to solve for labels of the test set, updates Dataset
         Then use those inferred labels to set the model.test_spectra attribute
 
         Parameters
         ----------
-        dataset: Dataset
+        ds: Dataset
             Dataset that needs label inference
 
         Returns
@@ -53,7 +54,21 @@ class CannonModel(object):
         errs_all: ndarray
             Covariance matrix of the fit
         """
-        return _infer_labels(self, dataset, starting_guess)
+        return _infer_labels(self, ds, starting_guess)
+
+
+    def infer_spectra(self, ds):
+        """ 
+        After inferring labels for the test spectra,
+        infer the model spectra and update the dataset
+        model_spectra attribute.
+        
+        Parameters
+        ----------
+        ds: Dataset object
+        """
+        lvec_all = _get_lvec(ds.test_label_vals, self.pivots)
+        self.model_spectra = np.dot(lvec_all, self.coeffs.T)
 
 
     def plot_contpix(self, x, y, contpix_x, contpix_y, figname):
@@ -117,9 +132,9 @@ class CannonModel(object):
                         contpix_x[take], contpix_y[take], fig_chunk)
 
 
-    def diagnostics_leading_coeffs(self, dataset):
-        label_names = dataset.get_plotting_labels()
-        lams = dataset.wl
+    def diagnostics_leading_coeffs(self, ds):
+        label_names = ds.get_plotting_labels()
+        lams = ds.wl
         npixels = len(lams)
         pivots = self.pivots
         nlabels = len(pivots)
@@ -166,10 +181,10 @@ class CannonModel(object):
         return fig
 
 
-    def diagnostics_leading_coeffs_triangle(self, dataset, 
+    def diagnostics_leading_coeffs_triangle(self, ds, 
             figname = "leading_coeffs_triangle.png"):
-        label_names = dataset.get_plotting_labels()
-        lams = dataset.wl
+        label_names = ds.get_plotting_labels()
+        lams = ds.wl
         pivots = self.pivots
         npixels = len(lams)
         nlabels = len(pivots)
@@ -189,7 +204,7 @@ class CannonModel(object):
         plt.close(fig)
 
 
-    def diagnostics_plot_chisq(self, dataset, figname = "modelfit_chisqs.png"):
+    def diagnostics_plot_chisq(self, ds, figname = "modelfit_chisqs.png"):
         """ Produce a set of diagnostic plots for the model 
 
         Parameters
@@ -197,8 +212,8 @@ class CannonModel(object):
         (optional) chisq_dist_plot_name: str
             Filename of output saved plot
         """
-        label_names = dataset.get_plotting_labels()
-        lams = dataset.wl
+        label_names = ds.get_plotting_labels()
+        lams = ds.wl
         pivots = self.pivots
         npixels = len(lams)
         nlabels = len(pivots)

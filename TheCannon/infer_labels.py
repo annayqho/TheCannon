@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from scipy import optimize as opt
 import numpy as np
 import matplotlib.pyplot as plt
+from TheCannon import train_model
 
 def _get_lvec(labels):
     """
