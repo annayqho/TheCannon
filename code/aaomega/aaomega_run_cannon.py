@@ -9,7 +9,6 @@ from TheCannon import model
 
 SMALL = 1.0 / 1000000000.0
 DATA_DIR = '/Users/annaho/Data/AAOmega'
-sys.path.append(DATA_DIR)
 
 
 def test_step_iteration(ds, md, starting_guess):
@@ -18,8 +17,8 @@ def test_step_iteration(ds, md, starting_guess):
 
 
 def choose_reference_set():
-    wl = np.load("wl.npz")['arr_0']
-    all_id = np.load("id_all.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    all_id = np.load("%s/id_all.npz" %DATA_DIR)['arr_0']
     all_flux = np.load("flux_all.npz")['arr_0']
     all_scat = np.load("spec_scat_all.npz")['arr_0']
     # all_ivar = np.load("ivar_all.npz")['arr_0']
@@ -164,19 +163,19 @@ def choose_training_set():
 
 
 def train():
-    wl = np.load("wl.npz")['arr_0']
-    tr_id = np.load("tr_id.npz")['arr_0']
-    tr_flux = np.load("tr_flux_norm.npz")['arr_0']
-    tr_ivar = np.load("tr_ivar_norm.npz")['arr_0']
-    tr_label = np.load("tr_label.npz")['arr_0']
-    val_id = np.load("val_id.npz")['arr_0']
-    val_flux = np.load("val_flux_norm.npz")['arr_0']
-    val_ivar = np.load("val_ivar_norm.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    tr_id = np.load("%s/tr_id.npz" %DATA_DIR)['arr_0']
+    tr_flux = np.load("%s/tr_flux_norm.npz" %DATA_DIR)['arr_0']
+    tr_ivar = np.load("%s/tr_ivar_norm.npz" %DATA_DIR)['arr_0']
+    tr_label = np.load("%s/tr_label.npz" %DATA_DIR)['arr_0']
+    val_id = np.load("%s/val_id.npz" %DATA_DIR)['arr_0']
+    val_flux = np.load("%s/val_flux_norm.npz" %DATA_DIR)['arr_0']
+    val_ivar = np.load("%s/val_ivar_norm.npz" %DATA_DIR)['arr_0']
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:3], 
+            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:4], 
             val_id, val_flux, val_ivar)
-    ds.set_label_names(["Teff", "logg", "FeH"])
+    ds.set_label_names(["Teff", "logg", "FeH", 'aFe'])
 
     np.savez("%s/tr_SNR.npz" %DATA_DIR, ds.tr_SNR)
 
@@ -267,27 +266,27 @@ def validate():
     ds.diagnostics_1to1()
 
 def test():
-    wl = np.load("wl.npz")['arr_0']
-    tr_id = np.load("tr_id.npz")['arr_0']
-    tr_flux = np.load("tr_flux_norm.npz")['arr_0']
-    tr_ivar = np.load("tr_ivar_norm.npz")['arr_0']
-    test_id = np.load("test_id.npz")['arr_0']
-    test_flux = np.load("test_flux_norm.npz")['arr_0']
-    test_ivar = np.load("test_ivar_norm.npz")['arr_0']
-    tr_label = np.load("tr_label.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    tr_id = np.load("%s/tr_id.npz" %DATA_DIR)['arr_0']
+    tr_flux = np.load("%s/tr_flux_norm.npz" %DATA_DIR)['arr_0']
+    tr_ivar = np.load("%s/tr_ivar_norm.npz" %DATA_DIR)['arr_0']
+    test_id = np.load("%s/test_id.npz" %DATA_DIR)['arr_0']
+    test_flux = np.load("%s/test_flux_norm.npz" %DATA_DIR)['arr_0']
+    test_ivar = np.load("%s/test_ivar_norm.npz" %DATA_DIR)['arr_0']
+    tr_label = np.load("%s/tr_label.npz" %DATA_DIR)['arr_0']
 
-    coeffs = np.load("Model/coeffs.npz")['arr_0']
-    scatters = np.load("Model/scatters.npz")['arr_0']
-    chisqs = np.load("Model/chisqs.npz")['arr_0']
-    pivots = np.load("Model/pivots.npz")['arr_0']
+    coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
+    scatters = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
+    chisqs = np.load("%s/chisqs.npz" %DATA_DIR)['arr_0']
+    pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:3],
+            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:4],
             test_id, test_flux, test_ivar)
 
     np.savez("%s/test_SNR.npz" %DATA_DIR, ds.test_SNR)
 
-    ds.set_label_names(["Teff", "logg", "FeH"])
+    ds.set_label_names(["Teff", "logg", "FeH", "aFe"])
     md = model.CannonModel(2)
     md.coeffs = coeffs
     md.scatters = scatters
@@ -334,7 +333,7 @@ if __name__=="__main__":
     # choose_reference_set()
     # normalize_ref_set()
     # choose_training_set()
-    train()
-    normalize_test_set()
+    # train()
+    # normalize_test_set()
     # validate()
     test()

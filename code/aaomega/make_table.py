@@ -2,25 +2,29 @@
 
 import numpy as np
 
-test_id = np.load("test_id.npz")['arr_0']
-lab = np.load("test_cannon_labels.npz")['arr_0']
-errs = np.load("test_errs.npz")['arr_0']
+DATA_DIR = '/Users/annaho/Data/AAOmega'
+
+test_id = np.load("%s/test_id.npz" %DATA_DIR)['arr_0']
+lab = np.load("%s/test_cannon_labels.npz" %DATA_DIR)['arr_0']
+errs = np.load("%s/test_errs.npz" %DATA_DIR)['arr_0']
 
 nobj = len(test_id)
 
 outputf = open("science_parameters.txt", "w")
-outputf.write("filename,Teff,logg,FeH,Teff_err,logg_err,FeH_err \n")
+outputf.write("filename,Teff,logg,FeH,aFe,Teff_err,logg_err,FeH_err,aFe_err \n")
 
 for ii,filename in enumerate(test_id):
     f = filename.split("/")[1]
     teff = lab[ii,0]
     logg = lab[ii,1]
     feh = lab[ii,2]
+    afe = lab[ii,3]
     teff_err = errs[ii,0]
     logg_err = errs[ii,1]
     feh_err = errs[ii,2]
-    line = "%s,%s,%s,%s,%s,%s,%s \n" %(
-            f,teff,logg,feh,teff_err,logg_err,feh_err)
+    afe_err = errs[ii,3]
+    line = "%s,%s,%s,%s,%s,%s,%s,%s,%s \n" %(
+            f,teff,logg,feh,afe,teff_err,logg_err,feh_err,afe_err)
     outputf.write(line)
 
 outputf.close()
