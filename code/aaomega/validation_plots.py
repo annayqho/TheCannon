@@ -10,15 +10,18 @@ from TheCannon import train_model
 import matplotlib.gridspec as gridspec
 
 
+DATA_DIR = '/Users/annaho/Data/AAOmega'
+
+
 def round_sig(x, sig=2):
     if x < 0:
         return -round(-x, sig-int(floor(log10(-x)))-1)
     return round(x, sig-int(floor(log10(x)))-1)
 
 def validation():
-    orig = np.load("../val_label.npz")['arr_0']
-    cannon = np.load("../val_labels.npz")['arr_0']
-    snr = np.load("../val_SNR.npz")['arr_0']
+    orig = np.load("%s/val_label.npz" %DATA_DIR)['arr_0']
+    cannon = np.load("%s/val_labels.npz" %DATA_DIR)['arr_0']
+    snr = np.load("%s/val_SNR.npz" %DATA_DIR)['arr_0']
     choose = snr > 50
 
     labels = ["$\mathrm{T}_{\mathrm{eff}}$ (K)", "$\log g$ (dex)", "[M/H]"]
@@ -72,9 +75,9 @@ def snr_dist():
 
 def chisq_dist():
     fig = plt.figure(figsize=(6,4))
-    ivar = np.load("../val_ivar_norm.npz")['arr_0']
+    ivar = np.load("%s/val_ivar_norm.npz" %DATA_DIR)['arr_0']
     npix = np.sum(ivar>0, axis=1)
-    chisq = np.load("../chisq_val.npz")['arr_0']
+    chisq = np.load("%s/val_chisq.npz" %DATA_DIR)['arr_0']
     redchisq = chisq/npix
     nbins = 25
     plt.hist(redchisq, bins=nbins, color='k', histtype="step",
@@ -166,4 +169,4 @@ def spectral_model():
 
 
 if __name__=="__main__":
-    spectral_model()
+    chisq_dist()

@@ -201,27 +201,27 @@ def train():
 
 
 def validate():
-    wl = np.load("wl.npz")['arr_0']
-    tr_id = np.load("tr_id.npz")['arr_0']
-    tr_flux = np.load("tr_flux_norm.npz")['arr_0']
-    tr_ivar = np.load("tr_ivar_norm.npz")['arr_0']
-    val_id = np.load("val_id.npz")['arr_0']
-    val_flux = np.load("val_flux_norm.npz")['arr_0']
-    val_ivar = np.load("val_ivar_norm.npz")['arr_0']
-    val_label = np.load("val_label.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    tr_id = np.load("%s/tr_id.npz" %DATA_DIR)['arr_0']
+    tr_flux = np.load("%s/tr_flux_norm.npz" %DATA_DIR)['arr_0']
+    tr_ivar = np.load("%s/tr_ivar_norm.npz" %DATA_DIR)['arr_0']
+    val_id = np.load("%s/val_id.npz" %DATA_DIR)['arr_0']
+    val_flux = np.load("%s/val_flux_norm.npz" %DATA_DIR)['arr_0']
+    val_ivar = np.load("%s/val_ivar_norm.npz" %DATA_DIR)['arr_0']
+    val_label = np.load("%s/val_label.npz" %DATA_DIR)['arr_0']
 
-    coeffs = np.load("coeffs.npz")['arr_0']
-    scatters = np.load("scatters.npz")['arr_0']
-    chisqs = np.load("chisqs.npz")['arr_0']
-    pivots = np.load("pivots.npz")['arr_0']
+    coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
+    scatters = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
+    chisqs = np.load("%s/chisqs.npz" %DATA_DIR)['arr_0']
+    pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, val_label[:,0:3],
+            wl, tr_id, tr_flux, tr_ivar, val_label[:,0:4],
             val_id, val_flux, val_ivar)
 
     np.savez("%s/val_SNR.npz" %DATA_DIR, ds.test_SNR)
 
-    ds.set_label_names(["Teff", "logg", "FeH"])
+    ds.set_label_names(["Teff", "logg", "FeH", "aFe"])
     md = model.CannonModel(2)
     md.coeffs = coeffs
     md.scatters = scatters
@@ -238,8 +238,6 @@ def validate():
     chisq = np.zeros((nguesses, nobj))
     errs = np.zeros(labels.shape)
 
-    ds.tr_label = np.zeros((nobj, nlabels))
-    
     for ii,guess in enumerate(starting_guesses):
         a,b,c = test_step_iteration(ds,md,starting_guesses[ii])
         labels[ii,:] = a
@@ -335,5 +333,5 @@ if __name__=="__main__":
     # choose_training_set()
     # train()
     # normalize_test_set()
-    # validate()
-    test()
+    validate()
+    # test()
