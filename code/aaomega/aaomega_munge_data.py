@@ -6,14 +6,18 @@ from astropy import stats
 import pyfits
 
 
+DATA_DIR = "/Users/annaho/Data/AAOmega/Run_13_July"
+
+
 def weighted_std(values, weights):
+    """ Calculate standard deviation weighted by errors """
     average = np.average(values, weights=weights)
     variance = np.average((values-average)**2, weights=weights)
     return np.sqrt(variance)
 
 
 def estimate_noise(fluxes, contmask):
-    """ Estimate the scatter around the mean in a region of the spectrum
+    """ Estimate the scatter in a region of the spectrum
     taken to be continuum """
     nstars = fluxes.shape[0]
     scatter = np.zeros(nstars)
@@ -23,9 +27,11 @@ def estimate_noise(fluxes, contmask):
     return scatter
 
 
-def load_spectra():
+def load_ref_spectra():
+    """ Pull out wl, flux, ivar from files of training spectra """
+    data_dir = "/Users/annaho/Data/AAOmega/ref_spectra"
     # Load the files & count the number of training objects
-    ff = glob.glob("training_spectra/*.txt")
+    ff = glob.glob("%s/*.txt" %data_dir)
     nstars = len(ff)
     print("We have %s training objects" %nstars)
     
@@ -65,33 +71,29 @@ def test_spectra_initial_cull():
 
 
 def test_spectra_no_cull():
-    ff_all = glob.glob("science_spectra/*.asc")
+    """ Pull out test IDs of science spectra """
+    data_dir = "/Users/annaho/Data/AAOmega/science_spectra"
+    ff_all = glob.glob("%s/*.asc" %data_dir)
     np.savez("test_id.npz", ff_all)
 
 
 def load_test_spectra():
     """ after you've done the initial cull, load the spectra """
-    ff = np.load("test_id.npz")['arr_0']
+    data_dir = "/Users/annaho/Data/AAOmega"
+    ff = np.load("%s/test_id.npz" %data_dir)['arr_0']
     nobj = len(ff)
-    wl = np.load("wl.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %data_dir)['arr_0']
     npix = len(wl)
     test_flux = np.zeros((nobj, npix))
     for i,f in enumerate(ff):
-        # if it's in a .fits file:
-        #a = pyfits.open(f)
-        #data = a[0].data
-        #start_wl = a[0].header['CRVAL1']
-        #delta_wl = a[0].header['CDELT1']
-        #wl = start_wl + delta_wl * np.linspace(0,npix-1,npix)
-        # if it's in a .txt file:
-        a = np.loadtxt(f)
+        a = np.loadtxt("%s/%s" %(data_dir, f))
         test_flux[i,:] = a[:,1]
-
     return np.array(ff), test_flux
 
 
 def load_labels():
-    data = Table.read("asu.fit")
+    data_dir = "/Users/annaho/Data/AAOmega"
+    data = Table.read("%s/asu.fit" %data_dir)
     field = data['Field']
     fib = data['Fib']
     ids = [(x+"."+str(y)).replace(" ", "") for x,y in zip(field,fib)]
@@ -104,26 +106,28 @@ def load_labels():
     return np.array(ids), labels.T
 
 
-def load_raw_test_data():
-    test_id, test_flux = load_test_spectra()
-    contmask = np.load("contmask_regions.npz")['arr_0']
-    scatter = estimate_noise(test_flux, contmask) 
-    
-    np.savez("test_id.npz", test_id)
-    np.savez("test_flux.npz", test_flux)
-    np.savez("test_spec_scat.npz", scatter)
+def load_data():
+    data_dir = "/Users/annaho/Data/AAOmega"
+    out_dir = "%s/%s" %(data_dir, "Run_13_July")
 
+    """ Use all the above functions to set data up for The Cannon """
+    ff, wl, tr_flux, tr_ivar = load_ref_spectra()
 
-def load_raw_data():
-    ff, wl, tr_flux, tr_ivar = load_spectra()
-    contmask = np.load("contmask_regions.npz")['arr_0']
-    scatter = estimate_noise(tr_flux, contmask, tr_ivar) 
+    """ pick one that doesn't have extra dead pixels """
+    skylines = tr_ivar[4,:] # should be the same across all obj
+    np.savez("%s/skylines.npz" %out_dir, skylines)
+
+    contmask = np.load("%s/contmask_regions.npz" %data_dir)['arr_0']
+    scatter = estimate_noise(tr_flux, contmask)
     ids, labels = load_labels()
     
     # Select the objects in the catalog corresponding to the files
     inds = []
-    for val in ff:
-        short = (val.split('.')[0] + '.' + val.split('.')[1]).split('/')[1]
+    ff_short = []
+    for fname in ff:
+        val = fname.split("/")[-1]
+        short = (val.split('.')[0] + '.' + val.split('.')[1])
+        ff_short.append(short)
         if short in ids:
             ind = np.where(ids==short)[0][0]
             inds.append(ind)
@@ -133,22 +137,52 @@ def load_raw_data():
     tr_label = labels[inds]
 
     # find the corresponding spectra
-    ff_short = np.array([
-            (val.split('.')[0] + '.' + val.split('.')[1]).split('/')[1] 
-            for val in ff])
-
+    ff_short = np.array(ff_short)
     inds = np.array([np.where(ff_short==val)[0][0] for val in tr_id])
     tr_flux_choose = tr_flux[inds]
     tr_ivar_choose = tr_ivar[inds]
     scatter_choose = scatter[inds]
-    np.savez("wl.npz", wl)
-    np.savez("id_all.npz", tr_id)
-    np.savez("flux_all.npz", tr_flux_choose)
-    np.savez("ivar_all.npz", tr_ivar_choose)
-    np.savez("label_all.npz", tr_label)
-    np.savez("spec_scat_all.npz", scatter_choose)
+    np.savez("%s/wl.npz" %out_dir, wl)
+    np.savez("%s/ref_id_all.npz" %out_dir, tr_id)
+    np.savez("%s/ref_flux_all.npz" %out_dir, tr_flux_choose)
+    np.savez("%s/ref_ivar_all.npz" %out_dir, tr_ivar_choose)
+    np.savez("%s/ref_label_all.npz" %out_dir, tr_label)
+    np.savez("%s/ref_spec_scat_all.npz" %out_dir, scatter_choose)
+
+    # now, the test spectra
+    test_id, test_flux = load_test_spectra()
+    scatter = estimate_noise(test_flux, contmask) 
+    np.savez("%s/test_id.npz" %out_dir, test_id)
+    np.savez("%s/test_flux.npz" %out_dir, test_flux)
+    np.savez("%s/test_spec_scat.npz" %out_dir, scatter)
+
+
+def make_full_ivar():
+    """ take the scatters and skylines and make final ivars """
+
+    # skylines come as an ivar
+    # don't use them for now, because I don't really trust them...
+    # skylines = np.load("%s/skylines.npz" %DATA_DIR)['arr_0']
+
+    ref_flux = np.load("%s/ref_flux_all.npz" %DATA_DIR)['arr_0']
+    ref_scat = np.load("%s/ref_spec_scat_all.npz" %DATA_DIR)['arr_0']
+    test_flux = np.load("%s/test_flux.npz" %DATA_DIR)['arr_0']
+    test_scat = np.load("%s/test_spec_scat.npz" %DATA_DIR)['arr_0']
+    ref_ivar = np.ones(ref_flux.shape) / ref_scat[:,None]**2
+    test_ivar = np.ones(test_flux.shape) / test_scat[:,None]**2
+
+    # ref_ivar = (ref_ivar_temp * skylines[None,:]) / (ref_ivar_temp + skylines)
+    # test_ivar = (test_ivar_temp * skylines[None,:]) / (test_ivar_temp + skylines)
+
+    ref_bad = np.logical_or(ref_flux <= 0, ref_flux > 1.1)
+    test_bad = np.logical_or(test_flux <= 0, test_flux > 1.1)
+    SMALL = 1.0 / 1000000000.0
+    ref_ivar[ref_bad] = SMALL
+    test_ivar[test_bad] = SMALL
+    np.savez("%s/ref_ivar_corr.npz" %DATA_DIR, ref_ivar)
+    np.savez("%s/test_ivar_corr.npz" %DATA_DIR, test_ivar)
 
 
 if __name__=="__main__":
-    test_spectra_no_cull()
-    load_raw_test_data()
+    #load_data()
+    make_full_ivar()

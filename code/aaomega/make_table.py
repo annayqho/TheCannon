@@ -2,7 +2,7 @@
 
 import numpy as np
 
-DATA_DIR = '/Users/annaho/Data/AAOmega'
+DATA_DIR = '/Users/annaho/Data/AAOmega/Run_13_July'
 
 test_id = np.load("%s/test_id.npz" %DATA_DIR)['arr_0']
 lab = np.load("%s/test_cannon_labels.npz" %DATA_DIR)['arr_0']
