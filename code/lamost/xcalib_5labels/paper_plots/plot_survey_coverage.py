@@ -1,3 +1,5 @@
+"""" Plot a parameter (e.g. [alpha/M]) across the sky for LAMOST and/or APOGEE """
+
 #!/usr/bin/env python
 import numpy as np
 import healpy as hp
@@ -10,22 +12,24 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 import pyfits
 
-# import the data
-hdulist = pyfits.open("../make_lamost_catalog/lamost_catalog_full.fits")
+# import the LAMOST data
+hdulist = pyfits.open("../../make_lamost_catalog/lamost_catalog_full.fits")
 tbdata = hdulist[1].data
-# cols = hdulist[1].columns
-# cols.names
 ra_lamost = tbdata.field('ra')
 dec_lamost = tbdata.field('dec')
-am_lamost = tbdata.field("cannon_a_k")
+am_lamost = tbdata.field("cannon_alpha_m")
 rmag_lamost = tbdata.field("mag3")
 hdulist.close()
-hdulist = pyfits.open("/home/annaho/aida41040/annaho/TheCannon/examples/example_DR12/allStar-v603.fits")
+
+# import the APOGEE data
+hdulist = pyfits.open("/home/annaho/aida41040/annaho/TheCannon/data/apogee_DR12/labels/allStar-v603.fits")
 tbdata = hdulist[1].data
 ra_apogee_all = tbdata['RA']
 dec_apogee_all = tbdata['DEC']
 am_apogee_all = tbdata['PARAM_ALPHA_M']
-am_apogee_all = tbdata['AK_WISE']
+#ak_apogee_all = tbdata['AK_WISE']
+
+# select values
 good_coords = np.logical_and(ra_apogee_all > -90, dec_apogee_all > -90)
 good = np.logical_and(good_coords, am_apogee_all > -90)
 ra_apogee = ra_apogee_all[good]
@@ -66,8 +70,8 @@ phi_all, theta_all = toPhiTheta(ra_both, dec_both)
 # https://healpy.readthedocs.org/en/latest/generated/healpy.visufunc.projplot.html#healpy.visufunc.projplot
 
 ## to plot a 2D histogram in the Mollweide projection
-# define the HEALPIX level
-# NSIDE = 32 # defines the resolution of the map
+# define resolution of map
+# NSIDE = 32 
 NSIDE =  128
 
 # find the pixel ID for each point
@@ -136,11 +140,8 @@ rcParams.update({'font.size':16})
         #norm=None, min=11, max=17, cmap=cmap, unit = r"r-band magnitude [mag]")
 hp.visufunc.mollview(m_all, coord=['C','G'], rot=(150, 0, 0), flip='astro',
         notext=True, title=r'$\alpha$/M for APOGEE DR12 + 500,000 LAMOST giants', cbar=True,
-        norm=None, min=0.00, max=0.4, cmap=cmap, unit = r'$\alpha$/M [dex]')
+        norm=None, min=-0.07, max=0.3, cmap=cmap, unit = r'$\alpha$/M [dex]')
 hp.visufunc.graticule()
 
 #plt.show()
-plt.savefig("full_ak_map.png")
-#plt.savefig("apogee_am_map.png")
-#plt.savefig("lamost_am_map_magma.png")
-#plt.savefig("lamost_rmag_map.png")
+plt.savefig("survey_coverage.png")
