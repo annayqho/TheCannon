@@ -19,9 +19,6 @@ def estimate_noise(fluxes, contmask):
     scatter = np.zeros(nstars)
     for i,spec in enumerate(fluxes): 
         cont = spec[contmask]
-        # w = ivars[i][contmask]
-        #scatter[i] = weighted_std(cont, w)
-        #scatter[i] = np.std(cont)
         scatter[i] = stats.funcs.mad_std(cont)
     return scatter
 

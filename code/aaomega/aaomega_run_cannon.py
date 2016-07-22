@@ -2,11 +2,13 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 from TheCannon import dataset
 from TheCannon import model
 
 
 SMALL = 1.0 / 1000000000.0
+DATA_DIR = '/Users/annaho/Data/AAOmega'
 
 
 def test_step_iteration(ds, md, starting_guess):
@@ -15,15 +17,15 @@ def test_step_iteration(ds, md, starting_guess):
 
 
 def choose_reference_set():
-    wl = np.load("wl.npz")['arr_0']
-    all_id = np.load("id_all.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    all_id = np.load("%s/id_all.npz" %DATA_DIR)['arr_0']
     all_flux = np.load("flux_all.npz")['arr_0']
     all_scat = np.load("spec_scat_all.npz")['arr_0']
     # all_ivar = np.load("ivar_all.npz")['arr_0']
     all_ivar = np.ones(all_flux.shape) / all_scat[:,None]**2
     bad = np.logical_or(all_flux <= 0, all_flux > 1.1)
     all_ivar[bad] = SMALL
-    np.savez("my_ivar_all.npz", all_ivar)
+    np.savez("%s/my_ivar_all.npz" %DATA_DIR, all_ivar)
     all_label = np.load("label_all.npz")['arr_0']
 
     # choose reference objects
@@ -47,10 +49,10 @@ def choose_reference_set():
     ref_ivar = all_ivar[good]
     ref_label = all_label[good]
 
-    np.savez("ref_id.npz", ref_id)
-    np.savez("ref_flux.npz", ref_flux)
-    np.savez("ref_ivar.npz", ref_ivar)
-    np.savez("ref_label.npz", ref_label)
+    np.savez("%s/ref_id.npz" %DATA_DIR, ref_id)
+    np.savez("%s/ref_flux.npz" %DATA_DIR, ref_flux)
+    np.savez("%s/ref_ivar.npz" %DATA_DIR, ref_ivar)
+    np.savez("%s/ref_label.npz" %DATA_DIR, ref_label)
 
 
 def normalize_ref_set():
@@ -81,13 +83,13 @@ def normalize_ref_set():
     ds.set_continuum(contmask)
 
     cont = ds.fit_continuum(3, "sinusoid")
-    np.savez("ref_cont.npz", cont)
+    np.savez("%s/ref_cont.npz" %DATA_DIR, cont)
     norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
             ds.continuum_normalize(cont)
     bad = np.logical_or(norm_tr_flux <= 0, norm_tr_flux > 1.1)
     norm_tr_ivar[bad] = 0.0
-    np.savez("ref_flux_norm.npz", norm_tr_flux)
-    np.savez("ref_ivar_norm.npz", norm_tr_ivar)
+    np.savez("%s/ref_flux_norm.npz" %DATA_DIR, norm_tr_flux)
+    np.savez("%s/ref_ivar_norm.npz" %DATA_DIR, norm_tr_ivar)
 
 
 def normalize_test_set():
@@ -101,7 +103,7 @@ def normalize_test_set():
     # bad = np.logical_or(test_flux <= 0, test_flux >= 1.2)
     bad = test_flux <= 0
     test_ivar[bad] = SMALL
-    np.savez("test_ivar.npz", test_ivar)
+    np.savez("%s/test_ivar.npz" %DATA_DIR, test_ivar)
 
     contmask = np.load("wl_contmask.npz")['arr_0']
 
@@ -120,14 +122,14 @@ def normalize_test_set():
         ds.test_ivar[ii][bad] = SMALL
 
     cont = ds.fit_continuum(3, "sinusoid")
-    np.savez("test_cont.npz", cont)
+    np.savez("%s/test_cont.npz" %DATA_DIR, cont)
     norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
             ds.continuum_normalize(cont)
     # bad = np.logical_or(norm_test_flux <= 0, norm_test_flux >= 1.2)
     bad = norm_test_flux <= 0
     norm_test_ivar[bad] = 0.0
-    np.savez("test_flux_norm.npz", norm_test_flux)
-    np.savez("test_ivar_norm.npz", norm_test_ivar)
+    np.savez("%s/test_flux_norm.npz" %DATA_DIR, norm_test_flux)
+    np.savez("%s/test_ivar_norm.npz" %DATA_DIR, norm_test_ivar)
 
 
 def choose_training_set():
@@ -145,81 +147,81 @@ def choose_training_set():
     tr_flux = ref_flux[choose]
     tr_ivar = ref_ivar[choose]
     tr_label = ref_label[choose]
-    np.savez("tr_id.npz", tr_id)
-    np.savez("tr_flux_norm.npz", tr_flux)
-    np.savez("tr_ivar_norm.npz", tr_ivar)
-    np.savez("tr_label.npz", tr_label)
+    np.savez("%s/tr_id.npz" %DATA_DIR, tr_id)
+    np.savez("%s/tr_flux_norm.npz" %DATA_DIR, tr_flux)
+    np.savez("%s/tr_ivar_norm.npz" %DATA_DIR, tr_ivar)
+    np.savez("%s/tr_label.npz" %DATA_DIR, tr_label)
 
     val_id = ref_id[~choose]
     val_flux = ref_flux[~choose]
     val_ivar = ref_ivar[~choose]
     val_label = ref_label[~choose]
-    np.savez("val_id.npz", val_id)
-    np.savez("val_flux_norm.npz", val_flux)
-    np.savez("val_ivar_norm.npz", val_ivar)
-    np.savez("val_label.npz", val_label)
+    np.savez("%s/val_id.npz" %DATA_DIR, val_id)
+    np.savez("%s/val_flux_norm.npz" %DATA_DIR, val_flux)
+    np.savez("%s/val_ivar_norm.npz" %DATA_DIR, val_ivar)
+    np.savez("%s/val_label.npz" %DATA_DIR, val_label)
 
 
 def train():
-    wl = np.load("wl.npz")['arr_0']
-    tr_id = np.load("tr_id.npz")['arr_0']
-    tr_flux = np.load("tr_flux_norm.npz")['arr_0']
-    tr_ivar = np.load("tr_ivar_norm.npz")['arr_0']
-    tr_label = np.load("tr_label.npz")['arr_0']
-    val_id = np.load("val_id.npz")['arr_0']
-    val_flux = np.load("val_flux_norm.npz")['arr_0']
-    val_ivar = np.load("val_ivar_norm.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    tr_id = np.load("%s/tr_id.npz" %DATA_DIR)['arr_0']
+    tr_flux = np.load("%s/tr_flux_norm.npz" %DATA_DIR)['arr_0']
+    tr_ivar = np.load("%s/tr_ivar_norm.npz" %DATA_DIR)['arr_0']
+    tr_label = np.load("%s/tr_label.npz" %DATA_DIR)['arr_0']
+    val_id = np.load("%s/val_id.npz" %DATA_DIR)['arr_0']
+    val_flux = np.load("%s/val_flux_norm.npz" %DATA_DIR)['arr_0']
+    val_ivar = np.load("%s/val_ivar_norm.npz" %DATA_DIR)['arr_0']
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:3], 
+            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:4], 
             val_id, val_flux, val_ivar)
-    ds.set_label_names(["Teff", "logg", "FeH"])
+    ds.set_label_names(["Teff", "logg", "FeH", 'aFe'])
 
-    np.savez("tr_SNR.npz", ds.tr_SNR)
+    np.savez("%s/tr_SNR.npz" %DATA_DIR, ds.tr_SNR)
 
     fig = ds.diagnostics_SNR()
-    plt.savefig("SNR_dist.png")
+    plt.savefig("%s/SNR_dist.png" %DATA_DIR)
     plt.close()
 
     fig = ds.diagnostics_ref_labels()
-    plt.savefig("ref_label_triangle.png")
+    plt.savefig("%s/ref_label_triangle.png" %DATA_DIR)
     plt.close()
 
     md = model.CannonModel(2)
     md.fit(ds)
 
     fig = md.diagnostics_leading_coeffs(ds)
-    plt.savefig("leading_coeffs.png")
+    plt.savefig("%s/leading_coeffs.png" %DATA_DIR)
     plt.close()
 
-    np.savez("coeffs.npz", md.coeffs)
-    np.savez("scatters.npz", md.scatters)
-    np.savez("chisqs.npz", md.chisqs)
-    np.savez("pivots.npz", md.pivots)
+    np.savez("%s/coeffs.npz" %DATA_DIR, md.coeffs)
+    np.savez("%s/scatters.npz" %DATA_DIR, md.scatters)
+    np.savez("%s/chisqs.npz" %DATA_DIR, md.chisqs)
+    np.savez("%s/pivots.npz" %DATA_DIR, md.pivots)
 
 
 def validate():
-    wl = np.load("wl.npz")['arr_0']
-    tr_id = np.load("tr_id.npz")['arr_0']
-    tr_flux = np.load("tr_flux_norm.npz")['arr_0']
-    tr_ivar = np.load("tr_ivar_norm.npz")['arr_0']
-    val_id = np.load("val_id.npz")['arr_0']
-    val_flux = np.load("val_flux_norm.npz")['arr_0']
-    val_ivar = np.load("val_ivar_norm.npz")['arr_0']
-    val_label = np.load("val_label.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    tr_id = np.load("%s/tr_id.npz" %DATA_DIR)['arr_0']
+    tr_flux = np.load("%s/tr_flux_norm.npz" %DATA_DIR)['arr_0']
+    tr_ivar = np.load("%s/tr_ivar_norm.npz" %DATA_DIR)['arr_0']
+    val_id = np.load("%s/val_id.npz" %DATA_DIR)['arr_0']
+    val_flux = np.load("%s/val_flux_norm.npz" %DATA_DIR)['arr_0']
+    val_ivar = np.load("%s/val_ivar_norm.npz" %DATA_DIR)['arr_0']
+    val_label = np.load("%s/val_label.npz" %DATA_DIR)['arr_0']
 
-    coeffs = np.load("coeffs.npz")['arr_0']
-    scatters = np.load("scatters.npz")['arr_0']
-    chisqs = np.load("chisqs.npz")['arr_0']
-    pivots = np.load("pivots.npz")['arr_0']
+    coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
+    scatters = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
+    chisqs = np.load("%s/chisqs.npz" %DATA_DIR)['arr_0']
+    pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, val_label[:,0:3],
+            wl, tr_id, tr_flux, tr_ivar, val_label[:,0:4],
             val_id, val_flux, val_ivar)
 
-    np.savez("val_SNR.npz", ds.test_SNR)
+    np.savez("%s/val_SNR.npz" %DATA_DIR, ds.test_SNR)
 
-    ds.set_label_names(["Teff", "logg", "FeH"])
+    ds.set_label_names(["Teff", "logg", "FeH", "aFe"])
     md = model.CannonModel(2)
     md.coeffs = coeffs
     md.scatters = scatters
@@ -236,17 +238,15 @@ def validate():
     chisq = np.zeros((nguesses, nobj))
     errs = np.zeros(labels.shape)
 
-    ds.tr_label = np.zeros((nobj, nlabels))
-    
     for ii,guess in enumerate(starting_guesses):
         a,b,c = test_step_iteration(ds,md,starting_guesses[ii])
         labels[ii,:] = a
         chisq[ii,:] = b
         errs[ii,:] = c
 
-    np.savez("val_labels_all_starting_vals.npz", labels)
-    np.savez("val_chisq_all_starting_vals.npz", chisq)
-    np.savez("val_errs_all_starting_vals.npz", errs)
+    np.savez("%s/val_labels_all_starting_vals.npz" %DATA_DIR, labels)
+    np.savez("%s/val_chisq_all_starting_vals.npz" %DATA_DIR, chisq)
+    np.savez("%s/val_errs_all_starting_vals.npz" %DATA_DIR, errs)
 
     choose = np.argmin(chisq, axis=0)
     best_chisq = np.min(chisq, axis=0)
@@ -256,35 +256,35 @@ def validate():
         best_labels[jj,:] = labels[:,jj,:][val]
         best_errs[jj,:] = errs[:,jj,:][val]
 
-    np.savez("val_cannon_labels.npz", best_labels)
-    np.savez("val_errs.npz", best_errs)
-    np.savez("val_chisq.npz", best_chisq)
+    np.savez("%s/val_cannon_labels.npz" %DATA_DIR, best_labels)
+    np.savez("%s/val_errs.npz" %DATA_DIR, best_errs)
+    np.savez("%s/val_chisq.npz" %DATA_DIR, best_chisq)
 
     ds.test_label_vals = best_labels
     ds.diagnostics_1to1()
 
 def test():
-    wl = np.load("wl.npz")['arr_0']
-    tr_id = np.load("tr_id.npz")['arr_0']
-    tr_flux = np.load("tr_flux_norm.npz")['arr_0']
-    tr_ivar = np.load("tr_ivar_norm.npz")['arr_0']
-    test_id = np.load("test_id.npz")['arr_0']
-    test_flux = np.load("test_flux_norm.npz")['arr_0']
-    test_ivar = np.load("test_ivar_norm.npz")['arr_0']
-    tr_label = np.load("tr_label.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    tr_id = np.load("%s/tr_id.npz" %DATA_DIR)['arr_0']
+    tr_flux = np.load("%s/tr_flux_norm.npz" %DATA_DIR)['arr_0']
+    tr_ivar = np.load("%s/tr_ivar_norm.npz" %DATA_DIR)['arr_0']
+    test_id = np.load("%s/test_id.npz" %DATA_DIR)['arr_0']
+    test_flux = np.load("%s/test_flux_norm.npz" %DATA_DIR)['arr_0']
+    test_ivar = np.load("%s/test_ivar_norm.npz" %DATA_DIR)['arr_0']
+    tr_label = np.load("%s/tr_label.npz" %DATA_DIR)['arr_0']
 
-    coeffs = np.load("Model/coeffs.npz")['arr_0']
-    scatters = np.load("Model/scatters.npz")['arr_0']
-    chisqs = np.load("Model/chisqs.npz")['arr_0']
-    pivots = np.load("Model/pivots.npz")['arr_0']
+    coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
+    scatters = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
+    chisqs = np.load("%s/chisqs.npz" %DATA_DIR)['arr_0']
+    pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:3],
+            wl, tr_id, tr_flux, tr_ivar, tr_label[:,0:4],
             test_id, test_flux, test_ivar)
 
-    np.savez("test_SNR.npz", ds.test_SNR)
+    np.savez("%s/test_SNR.npz" %DATA_DIR, ds.test_SNR)
 
-    ds.set_label_names(["Teff", "logg", "FeH"])
+    ds.set_label_names(["Teff", "logg", "FeH", "aFe"])
     md = model.CannonModel(2)
     md.coeffs = coeffs
     md.scatters = scatters
@@ -309,9 +309,9 @@ def test():
         chisq[ii,:] = b
         errs[ii,:] = c
 
-    np.savez("labels_all_starting_vals.npz", labels)
-    np.savez("chisq_all_starting_vals.npz", chisq)
-    np.savez("errs_all_starting_vals.npz", errs)
+    np.savez("%s/labels_all_starting_vals.npz" %DATA_DIR, labels)
+    np.savez("%s/chisq_all_starting_vals.npz" %DATA_DIR, chisq)
+    np.savez("%s/errs_all_starting_vals.npz" %DATA_DIR, errs)
 
     choose = np.argmin(chisq, axis=0)
     best_chisq = np.min(chisq, axis=0)
@@ -321,9 +321,9 @@ def test():
         best_labels[jj,:] = labels[:,jj,:][val]
         best_errs[jj,:] = errs[:,jj,:][val]
 
-    np.savez("test_cannon_labels.npz", best_labels)
-    np.savez("test_errs.npz", best_errs)
-    np.savez("test_chisq.npz", best_chisq)
+    np.savez("%s/test_cannon_labels.npz" %DATA_DIR, best_labels)
+    np.savez("%s/test_errs.npz" %DATA_DIR, best_errs)
+    np.savez("%s/test_chisq.npz" %DATA_DIR, best_chisq)
 
     ds.test_label_vals = best_labels
 
@@ -332,6 +332,6 @@ if __name__=="__main__":
     # normalize_ref_set()
     # choose_training_set()
     # train()
-    normalize_test_set()
-    # validate()
-    test()
+    # normalize_test_set()
+    validate()
+    # test()
