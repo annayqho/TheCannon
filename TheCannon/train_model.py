@@ -3,6 +3,65 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .helpers.compatibility import range, map
 from .helpers.corner import corner
+import scipy.optimize as op
+
+def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
+    """
+    This is just for a single lambda.
+    """
+    coeff_m = pars[:-1]
+    scatter_m = pars[-1]
+    nstars = len(ivars_m)
+    Delta2 = np.zeros((nstars))
+    for n in range(nstars):
+        ldelta2 = np.dot(ldelta[n], ldelta[n])
+        Delta2[n] = np.dot(np.dot(coeff_m[n].T, lvec_derivs[n]), ldelta2 * np.dot(lvec_derivs[n].T, coeff_m[n]))
+    inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
+    lnLs = -0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * (fluxes_m - np.dot(coeff_m, lvec))**2 * inv_var
+    return np.sum(lnLs)
+
+def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
+    x0 = np.ones((len(lvec)+1, 4, 15))
+    pars = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta))
+    coeff_m = pars[:-1]
+    scatter_m = pars[-1]
+    
+    return coeff_m, scatter_m
+   
+def train_model(ds):
+    
+    label_vals = ds.tr_label
+    lams = ds.wl
+    npixels = len(lams)
+    fluxes = ds.tr_flux
+    ivars = ds.tr_ivar
+    ldelta = np.ones((len(fluxes[0]), len(label_vals[1]))) #ds.tr_delta
+    
+    # for training, ivar can't be zero, otherwise you get singular matrices
+    # DWH says: make sure no ivar goes below 1 or 0.01
+    ivars[ivars<0.01] = 0.01
+
+    pivots = np.mean(label_vals, axis=0)
+    lvec, lvec_derivs = _get_lvec(label_vals, pivots, derivs=True)
+    lvec_full = np.array([lvec,] * npixels)
+    lvec_derivs = np.array([lvec_derivs,] * npixels)
+    ldelta = np.array([ldelta,] * npixels)
+
+    # Perform REGRESSIONS
+    fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
+    ivars = ivars.swapaxes(0,1)
+    
+    blob = list(map(train_one_wavelength, fluxes, ivars, lvec_full, lvec_derivs, ldelta))
+    coeffs = np.array([b[0] for b in blob])
+    # covs = np.array([np.linalg.inv(b[1]) for b in blob])
+    chis = np.array([b[2] for b in blob])
+    scatters = np.array([b[4] for b in blob])
+    
+    # Calc chi sq
+    all_chisqs = chis*chis
+    print("Done training model")
+
+    return coeffs, scatters, all_chisqs, pivots
 
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
@@ -107,10 +166,12 @@ def _do_one_regression(lams, fluxes, ivars, lvec):
     return _r + (best_scatter, )
 
 
-def _get_lvec(label_vals, pivots):
+def _get_lvec(label_vals, pivots, derivs):
     """
     Constructs a label vector for an arbitrary number of labels
     Assumes that our model is quadratic in the labels
+    
+    Comment: this is really slow, but we will only have to compute it once!
 
     Parameters
     ----------
@@ -118,11 +179,14 @@ def _get_lvec(label_vals, pivots):
         labels 
     pivots: numpy ndarray
         mean of the label_vals
+    derivs: return also the derivatives of the vector wrt the labels
 
     Returns
     -------
     lvec: numpy ndarray
         label vector
+    dlvec_dl: numpy ndarray (if derivs)
+        label vector derivatives
     """
     nlabels = label_vals.shape[1]
     nstars = label_vals.shape[0]
@@ -132,8 +196,22 @@ def _get_lvec(label_vals, pivots):
                                   for m in (linear_offsets)])
     ones = np.ones((nstars, 1))
     lvec = np.hstack((ones, linear_offsets, quadratic_offsets))
-    return lvec
-
+    if not derivs:
+        return lvec
+    ones_derivs = np.zeros((nstars, 1, nlabels))
+    linear_derivs = np.zeros((nstars, nlabels, nlabels))
+    for i in range(nstars):
+        linear_derivs[i] = np.eye(nlabels) 
+    quadratic_derivs = np.zeros((nstars, len(quadratic_offsets[1]), nlabels))
+    for n in range(nstars):
+        for k in range(nlabels): 
+            foo = np.zeros((nlabels, nlabels))
+            foo[k, :] = linear_offsets[n]
+            foo[:, k] = linear_offsets[n]
+            quadratic_derivs[n, :, k] = np.array(foo[np.triu_indices(nlabels)]) 
+    lvec_derivs = np.hstack((ones_derivs, linear_derivs, quadratic_derivs))
+    
+    return lvec, lvec_derivs
 
 def _train_model(ds):
     """
@@ -160,7 +238,7 @@ def _train_model(ds):
     ivars[ivars<0.01] = 0.01
 
     pivots = np.mean(label_vals, axis=0)
-    lvec = _get_lvec(label_vals, pivots)
+    lvec, lvec_derivs = _get_lvec(label_vals, pivots, derivs=True)
     lvec_full = np.array([lvec,] * npixels)
 
     # Perform REGRESSIONS
