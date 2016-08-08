@@ -36,10 +36,13 @@
 \newcommand{\feh}{\mbox{$\rm [Fe/H]$}}
 \newcommand{\afe}{\mbox{$\rm [\alpha/Fe]$}}
 \newcommand{\alpham}{\mbox{$\rm [\alpha/M]$}}
+\newcommand{\cm}{\mbox{$\rm [C/M]$}}
 \newcommand{\carbon}{\mbox{$\rm [C/H]$}}
+\newcommand{\cn}{\mbox{$\rm [C/N]$}}
 \newcommand{\cfe}{\mbox{$\rm [C/Fe]$}}
 \newcommand{\nitrogen}{\mbox{$\rm [N/H]$}}
 \newcommand{\nfe}{\mbox{$\rm [N/Fe]$}}
+\newcommand{\nm}{\mbox{$\rm [N/M]$}}
 \newcommand{\ak}{\mbox{$\rm A_k$}}
 \newcommand{\starlabel}{\ell}
 \newcommand{\starlabelvec}{\set{\starlabel}}
@@ -47,7 +50,7 @@
 \newcommand{\angstrom}{\mbox{\AA}}
 
 \newcommand{\nabundances}{15}
-\newcommand{\ntrobj}{9948}
+\newcommand{\ntrobj}{9173}
 \newcommand{\ntestobj}{275,193}
 \newcommand{\snr}{S/N}
 \newcommand{\afebias}{-0.00765}
@@ -95,7 +98,7 @@ to construct a predictive model for \lamost\ spectra
 using a reference set of \ntrobj\ stars observed in common 
 between the \apogee\ and \lamost\ surveys,
 taking seven labels as ground truth from \apogee\ DR12:
-\teff, \logg, \feh, \alpham, \carbon, \nitrogen, 
+\teff, \logg, \feh, \alpham, \cm, \nm, 
 and K-band extinction \ak.
 We cross-validate the model by using it to infer these labels 
 directly from the \lamost\ spectra of these objects
@@ -218,12 +221,32 @@ work of \citet{Ho2016} by two additional labels (\carbon\ and \nitrogen)
 to learn about the information content of \lamost\ spectra
 and determine ages for as many giant stars as possible.
 
+
+
+\section{Data}
+\label{sec:data}
+
+Following \citet{Martig2016}, we use the DR12 parameters from the
+FPARAM array. These are the \emph{raw}, uncalibrated values.
+We do this because we want to use the formula from \citet{Martig2016}
+and thus our labels must be on the same scale.
+
+Also following \citet{Martig2016}, we excise objects that have both
+$\teff > 4550$ and $-1 < \mh < -0.5$ (743 objects)
+This was done in order to eliminate objects with only
+an upper limit measurement on \cm\ and a lower limit on \nm.
+In addition, \citet{Martig2016} found that the minimum \cm\ possible
+to measure is on the level of -0.4 to -0.5 dex, so we also exclude
+objects with $\cm < -0.4$ (40 objects).
+Thus, this left us with \ntrobj\ out of the original 9956 in
+\citet{Ho2016}.
+
+
 \section{Training Step}
 \label{sec:training}
 
 For the reference set, we use the 
-\ntrobj\ objects observed in common between
-\apogee\ and \lamost.
+\ntrobj\ objects selected as described in Section \ref{sec:data}.
 
 Following \citet{Ness2015} we presume that the spectral model $g$ 
 can be written as a linear function of the label vector $\starlabelvec_n$: 
@@ -352,9 +375,20 @@ We can independently measure mass using the standard seismic scaling relation (e
 M= \left( \frac{\nu_{\mathrm{max}}}{\nu_{\mathrm{max,\odot}}}\right)^3\  \left( \frac{\Delta \nu}{\Delta \nu_{\odot}}\right)^{-4} \ \left( \frac{T_{\mathrm{eff}}}{T_{\mathrm{eff,\odot}}}\right)^{1.5} \ 
 \end{equation}
 
+
+\section{Test Step}
+\label{test-step}
+
 Finally, we use our inferred \carbon\ and \nitrogen\ 
 labels together with the formula in \citet{Martig2016}
 to calculate ages for \ntestobj\ \lamost\ objects not observed by \apogee.
+
+To choose which objects to apply the formula to,
+we apply the same cuts as in \citet{Martig2016}:
+$\mh > -0.8$, $4000 < \teff < 5000$, $1.8 < \logg < 3.3$,
+$-0.25 < \cm < 0.15$, $-0.1 < \nm < 0.45$, $-0.1 < [(C+N)/M] < 0.15$,
+$-0.6 < \cn < 0.2$. 
+
 The results are shown in Figures \ref{fig:feh-alpha-logg}
 and \ref{fig:feh-alpha}. 
 Figure \ref{fig:feh-alpha-logg} shows the results

@@ -88,7 +88,7 @@ def loop(num_sets):
     assignments = np.load("assignments.npz")['arr_0']
     
     print("looping through %s sets" %num_sets)
-    for leave_out in range(1,num_sets):
+    for leave_out in range(0,num_sets):
         print("leaving out %s" %leave_out)
         training = assignments != leave_out
         test = assignments == leave_out

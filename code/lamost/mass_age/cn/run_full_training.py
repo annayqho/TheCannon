@@ -44,16 +44,16 @@ def load_data():
     print("Discarding objects")
     choose_teff = teff_all > 4550
     choose_mh = np.logical_and(-1 < mh_all, mh_all < -0.5)
-    discard_teff = np.logical_and(choose_mh, choose_teff) # 955 objects
+    discard_teff = np.logical_and(choose_mh, choose_teff) # 743 objects
 
     # Discard objects with [C/M] < -0.4 dex
-    discard_cm = cm_all < -0.4
+    discard_cm = cm_all < -0.4 # 40 objects
 
     # metal-poor stars [M/H] < -0.1 have sketchy scaling relations
     # but this shouldn't affect our spectral C and N 
     # in Marie's paper they don't have any low-metallicity stars,
     # but it doesn't matter for the training anyway.
-    bad = np.logical_and(discard_teff, discard_cm)
+    bad = np.logical_or(discard_teff, discard_cm)
     choose = ~bad
 
     ref_id = tbl['lamost_id'][choose]
