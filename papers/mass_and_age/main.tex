@@ -346,6 +346,8 @@ in the 4100-4200\,\angstrom\ region.
 \label{fig:cannon-cn}
 \end{figure}
 
+\section{Cross Validation}
+
 To test the model, we use it to infer new labels for the
 \ntrobj\ reference objects, and compare the results 
 to the original \apogee\ labels used in training.
@@ -359,7 +361,7 @@ captured information about these seven labels in the
 
 \begin{figure}[!hp]
 \centering
-\includegraphics[scale=0.75]{xval.png}
+\includegraphics[scale=0.75]{xval_5panel.png}
 \caption{Cross-validation of \tc 's label transfer from \apogee\ to \lamost~: Shown are the \apogee\ labels of all reference objects compared to the labels derived from \lamost\ data by \tc\ in the test step. This is a take-none-out test. The tight one-to-one correlations in the \teff , \logg~ \feh, and \alpham\ panels simply reflect the quality of the label transfer demonstrated in \citet{Ho2016}.
 We include extinction as a panel
 but emphasize that ours is not a reliable method for 
@@ -374,6 +376,9 @@ We can independently measure mass using the standard seismic scaling relation (e
 \begin{equation} \label{eq:mass}
 M= \left( \frac{\nu_{\mathrm{max}}}{\nu_{\mathrm{max,\odot}}}\right)^3\  \left( \frac{\Delta \nu}{\Delta \nu_{\odot}}\right)^{-4} \ \left( \frac{T_{\mathrm{eff}}}{T_{\mathrm{eff,\odot}}}\right)^{1.5} \ 
 \end{equation}
+
+
+
 
 
 \section{Test Step}

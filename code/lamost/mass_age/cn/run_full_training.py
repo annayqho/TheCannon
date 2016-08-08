@@ -20,7 +20,7 @@ rc('text', usetex=True)
 import os
 
 GIT_DIR = "/Users/annaho/Dropbox/Research/TheCannon/"
-DATA_DIR = "data/"
+DATA_DIR = GIT_DIR + "data/"
 SPEC_DIR = "/Users/annaho/Data/LAMOST"
 
 def load_data():
@@ -78,11 +78,11 @@ def load_data():
 
 
 def train():
-    wl = np.load("wl.npz")['arr_0']
-    tr_id = np.load("tr_id.npz")['arr_0']
-    tr_label = np.load("tr_label.npz")['arr_0']
-    tr_flux = np.load("tr_flux.npz")['arr_0']
-    tr_ivar = np.load("tr_ivar.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %SPEC_DIR)['arr_0']
+    tr_id = np.load("ref_id.npz")['arr_0']
+    tr_label = np.load("ref_label.npz")['arr_0']
+    tr_flux = np.load("ref_flux.npz")['arr_0']
+    tr_ivar = np.load("ref_ivar.npz")['arr_0']
 
     ds = dataset.Dataset(
             wl, tr_id, tr_flux, tr_ivar, tr_label, tr_id, tr_flux, tr_ivar)
@@ -91,8 +91,8 @@ def train():
             ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
                 '[\\alpha/M]', 'A_k'])
     ds.diagnostics_SNR()
-    ds.diagnostics_ref_labels()
-    np.savez("tr_snr.npz", ds.tr_SNR)
+    #ds.diagnostics_ref_labels()
+    np.savez("ref_snr.npz", ds.tr_SNR)
 
     m = model.CannonModel(2)
     m.fit(ds)
@@ -166,7 +166,7 @@ def test_step():
 
 
 if __name__=="__main__":
-    load_data()
-    #train()
+    #load_data()
+    train()
     #print("test")
     #test_step()
