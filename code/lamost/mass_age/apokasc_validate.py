@@ -42,7 +42,8 @@ ref_id_2mass = np.array(ref_id_2mass)
 
 # find the overlap between LAMOST and APOKASC
 #overlap_id = np.intersect1d(ref_id_2mass, apokasc_ids) #1426 objects
-overlap_id = np.intersect1d(ref_id_2mass, np.intersect1d(marie_ids, apokasc_ids))
+overlap_id = np.intersect1d(
+        ref_id_2mass, np.intersect1d(marie_ids, apokasc_ids))
 
 # for each ID in ref ID, calculate mass using the astroseismic scaling relation
 inds_astr = np.array([np.where(apokasc_ids==val)[0][0] for val in overlap_id])

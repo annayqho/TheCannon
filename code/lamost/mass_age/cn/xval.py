@@ -68,7 +68,9 @@ def validate(ds, m, leave_out):
         best_labels[jj,:] = labels[:,jj,:][val]
         best_errs[jj,:] = errs[:,jj,:][val]
 
-    np.savez("test_results_%s.npz" %leave_out, best_labels, best_errs, best_chisq) 
+    np.savez(
+            "test_results_%s.npz" %leave_out, 
+            best_labels, best_errs, best_chisq) 
 
     ds.test_label_vals = best_labels
     ds.diagnostics_1to1(figname="1to1_test_label_%s" %leave_out)
@@ -98,11 +100,14 @@ def loop(num_sets):
         test_ivar = ref_ivar[test]
         test_label = ref_label[test]
         np.savez(
-            "test_set_%s.npz" %leave_out, test_id, test_flux, test_ivar, test_label)
+            "test_set_%s.npz" %leave_out, 
+            test_id, test_flux, test_ivar, test_label)
         ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label, test_id, test_flux, test_ivar)
+            wl, tr_id, tr_flux, tr_ivar, tr_label, 
+            test_id, test_flux, test_ivar)
         ds.set_label_names(
-            ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', '[\\alpha/M]', 'A_k'])
+            ['T_{eff}', '\log g', '[Fe/H]', '[C/M]', 
+                '[N/M]', '[\\alpha/M]', 'A_k'])
         fig = ds.diagnostics_SNR()
         plt.savefig("SNRdist_%s.png" %leave_out)
         plt.close()
