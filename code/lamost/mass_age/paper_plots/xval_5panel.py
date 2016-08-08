@@ -16,19 +16,23 @@ def round_sig(x, sig=2):
 
 
 names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', 
-'\mbox{[Fe/H]}', r'[\alpha/\mbox{M}]', '\mbox{A}_{\mbox{k}}']
-units = ['K', 'dex', 'dex', 'dex', 'mag']
-mins = [3700, 0.5, -2.4, -0.11, -0.1]
-maxs = [5500, 4.1, 0.6, 0.38, 0.5]
+'\mbox{[Fe/H]}', 
+'\mbox{[C/M]}', '\mbox{[N/M]}',
+r'[\alpha/\mbox{M}]',
+'\mbox{A}_{\mbox{k}}']
+units = ['K', 'dex', 'dex', 'dex', 'dex','dex', 'mag']
+mins = [3700, 1.0, -2.0, -0.3, -0.3,-0.11,-0.11]
+maxs = [5500, 4.1, 0.6, 0.38, 0.5, 0.4, 0.4]
 
 print("Loading data")
-direc = "/Users/annaho/Data/LAMOST"
-snr = np.load("%s/tr_snr.npz" %direc)['arr_0']
-apogee = np.load("%s/tr_label.npz" %direc)['arr_0']
-cannon = np.load("%s/all_cannon_labels.npz" %direc)['arr_0']
+#direc = "/Users/annaho/Data/LAMOST"
+direc = "../cn"
+snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
+apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
+cannon = np.load("%s/xval_cannon_label_vals.npz" %direc)['arr_0']
 
-fig = plt.figure(figsize=(8,9))
-gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
+fig = plt.figure(figsize=(9,10))
+gs = gridspec.GridSpec(4,2, wspace=0.3, hspace=0.3)
 props = dict(boxstyle='round', facecolor='white', alpha=0.3)
 props2 = dict(boxstyle='round', facecolor='white', alpha=0.3)
 
@@ -56,14 +60,14 @@ for i in range(0, len(names)):
     else:
         scatter = int(scatter_raw)
     textstr1 = "Bias: %s\nScatter: %s" %(bias, scatter)
-    if i < 4:
+    if i < 6:
         ax.hist2d(
                 apogee[:,i], cannon[:,i], range=[[low,high],[low,high]], 
                 bins=50, norm=LogNorm(), cmap="gray_r")
         ax.text(
                 0.05, 0.95, textstr1, transform=ax.transAxes, fontsize=14, 
                 verticalalignment='top', bbox=props)
-    elif i ==4:
+    elif i ==6:
         ax.hist2d(
                 apogee[:,i], cannon[:,i], range=[[low,high],[low,high]], 
                 bins=50, norm=LogNorm(), cmap="Purples", alpha=1.0)
@@ -77,5 +81,5 @@ for i in range(0, len(names)):
     ax.set_xlabel(r"$%s$" %name + " (%s) from APOGEE" %unit)
     ax.set_ylabel(r"$%s$" %(name) + " (%s) from Cannon" %unit)
 
-# plt.show()
+#plt.show()
 plt.savefig("xval_5panel.png")
