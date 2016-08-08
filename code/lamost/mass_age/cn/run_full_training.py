@@ -58,10 +58,10 @@ def load_data():
 
     ref_id = tbl['lamost_id'][choose]
     ref_id = np.array([val.strip() for val in ref_id]).astype(str)
-    ref_label = np.hstack((
+    ref_label = np.vstack((
             teff_all[choose], logg_all[choose], mh_all[choose],
             cm_all[choose], nm_all[choose], am_all[choose], 
-            ak_all[choose]))
+            ak_all[choose])).T
 
     np.savez("./ref_id.npz", ref_id)
     np.savez("./ref_label.npz", ref_label)

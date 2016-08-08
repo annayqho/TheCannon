@@ -47,7 +47,7 @@
 \newcommand{\angstrom}{\mbox{\AA}}
 
 \newcommand{\nabundances}{15}
-\newcommand{\ntrobj}{9592}
+\newcommand{\ntrobj}{9948}
 \newcommand{\ntestobj}{275,193}
 \newcommand{\snr}{S/N}
 \newcommand{\afebias}{-0.00765}
@@ -92,11 +92,13 @@ for \ntestobj\ giant stars in \lamost\ DR2,
 the largest catalog of these properties to date.
 To obtain these values, we use \tc\ \citep{Ness2015}
 to construct a predictive model for \lamost\ spectra 
-using a reference set of \ntrobj\ stars observed in common between the \apogee\ and \lamost\ surveys,
+using a reference set of \ntrobj\ stars observed in common 
+between the \apogee\ and \lamost\ surveys,
 taking seven labels as ground truth from \apogee\ DR12:
 \teff, \logg, \feh, \alpham, \carbon, \nitrogen, 
 and K-band extinction \ak.
-We cross-validate the model by using it to infer these labels directly from the \lamost\ spectra of these objects
+We cross-validate the model by using it to infer these labels 
+directly from the \lamost\ spectra of these objects
 and confirming that they are in excellent agreement
 with the \apogee\ values.
 We then apply the model to \ntestobj\ giants
@@ -131,7 +133,8 @@ To reconstruct the history of the Milky Way,
 we need to be able to test our simulations of galaxy formation
 and evolution against an empirical description of the galaxy's present 
 structure.
-A key ingredient in such an empirical description would be accurate and consistent age estimates for large samples of stars distributed
+A key ingredient in such an empirical description would be accurate and
+consistent age estimates for large samples of stars distributed
 across the galaxy. However, although we have recently entered
 an era of extensive spatial, kinematic, and chemical
 information beyond the solar neighborhood, similarly extensive 
@@ -157,7 +160,8 @@ challenging to estimate ages.
 The standard technique of isochrone-fitting is not reliable in this regime,
 because effective temperature depends so strongly on metallicity.
 
-Recently, there has been exciting progress recently in measuring the ages of red giant stars. Age can be inferred from asteroseismic
+Recently, there has been exciting progress recently in measuring 
+the ages of red giant stars. Age can be inferred from asteroseismic
 measurements of stellar seismic oscillations, 
 which elucidate the internal structure of stars. 
 However, the population of stars with measured light curves is
@@ -165,14 +169,16 @@ spatially very limited, and \citet{Ness2016} and \citet{Martig2016}
 were able to greatly expand the spatial coverage of red giants by
 determining ages spectroscopically:
 they showed that the masses
-and ages of post dredge-up giants can be measured from high-resolution infrared (\apogee, R\,$\approx\,$22,500) spectra, and
+and ages of post dredge-up giants can be measured from 
+high-resolution infrared (\apogee, R\,$\approx\,$22,500) spectra, and
 determined a model of mass and age as a function of 
 \teff, \logg, \mh, \carbon, and \nitrogen\ values 
 (see Tables A2 and A3 in \citet{Martig2016}).
 Their work increased the sample of giant stars with known ages
 to 70,000, all objects observed by \apogee.
 
-However, this set of \apogee\ objects is limited in size and area coverage, being primarily in the disk.
+However, this set of \apogee\ objects is limited in size and area coverage, 
+being primarily in the disk.
 In this work, we set out to extend this spectroscopic age work to
 \lamost, the largest ongoing stellar spectroscopic survey. 
 \lamost\ represents a large expansion over \apogee\ in area coverage
@@ -183,12 +189,16 @@ basic labels (\teff, \logg, \feh, and \alpham) consistent with
 \apogee\ values can be determined directly from \lamost\ spectra,
 using \tc.
 
-\tc\ \citep{Ness2015} is a data-driven method for measuring stellar labels from stellar spectra in the context of large spectroscopic surveys, and is an excellent tool for transferring information from one survey to another. 
+\tc\ \citep{Ness2015} is a data-driven method for measuring stellar labels 
+from stellar spectra in the context of large spectroscopic surveys, 
+and is an excellent tool for transferring information from one survey 
+to another. 
 \citet{Ho2016} used \tc\ to transfer information about \alpham\ from a
 high-resolution, high-\snr\ survey (\apogee) to a low-resolution,
 modest-\snr\ survey (\lamost) and measure the first-ever \alpham\ values
-from \lamost\ spectra. The result was a catalog of \afe\ values for $\sim$450,000 \lamost\ giants, by far the largest and most spatially-extended
-sample to-date. 
+from \lamost\ spectra. 
+The result was a catalog of \afe\ values for $\sim$450,000 \lamost\ giants, 
+by far the largest and most spatially-extended sample to-date. 
 
 Taken together, the work in \citet{Martig2016}, \citet{Ness2016}, and
 \citet{Ho2016} opens up the possibility that ages could be determined
@@ -215,8 +225,8 @@ For the reference set, we use the
 \ntrobj\ objects observed in common between
 \apogee\ and \lamost.
 
-Following \citet{Ness2015} we presume that the spectral model $g$ can be written 
- as a linear function of the label vector $\starlabelvec_n$: 
+Following \citet{Ness2015} we presume that the spectral model $g$ 
+can be written as a linear function of the label vector $\starlabelvec_n$: 
 
 \begin{eqnarray}
 f_{n\lambda}^B &=&
@@ -233,12 +243,17 @@ f_{n\lambda}^B &=&
 \label{eq:like}\quad.
 \end{eqnarray}
 
-\noindent For this work, once more as in \citet{Ness2015}, we use a model that is quadratic in the labels. 
+\noindent For this work, once more as in \citet{Ness2015}, 
+we use a model that is quadratic in the labels. 
 
-The training step consists of holding the labels in the label vector $\starlabelvec^A_n$ fixed (these are the reference labels) and optimizing the log likelihood to solve for the coefficients 
+The training step consists of holding the labels in the label vector 
+$\starlabelvec^A_n$ fixed (these are the reference labels) 
+and optimizing the log likelihood to solve for the coefficients 
 $[\theta_\lambda, s_\lambda^2]$ independently at every pixel. 
-For a fixed scatter value, optimization is a pure linear-algebra operation (weighted least squares). 
-Currently, we optimize for the scatter by stepping through a grid of scatter values.
+For a fixed scatter value, optimization is a pure linear-algebra operation 
+(weighted least squares). 
+Currently, we optimize for the scatter by stepping through a 
+grid of scatter values.
 
 In addition, we can use the spectral model to investigate
 which wavelength regions of these optical spectra
@@ -252,12 +267,15 @@ This dependence is shown in Figure \ref{fig:leading-coeffs}.
 \begin{figure}[!p]
 \centering
 \includegraphics[scale=0.7]{leading_coeffs.png}
-\caption{Leading (linear) coefficients and scatter from the best-fit spectral model, 
+\caption{Leading (linear) coefficients and scatter 
+  from the best-fit spectral model, 
 determined by \tc\ using the \ntrobj\ reference objects. 
-These leading coefficients indicate how sensitive each pixel in the spectrum is to each of the labels. 
+These leading coefficients indicate how sensitive each pixel 
+in the spectrum is to each of the labels. 
 Scaled by the approximate errors in the labels:
-91.5~K in \teff, 0.11 in 
-\logg, 0.05 for \mh, \alpham, and \carbon, and 0.06 for \nitrogen. \Comment{AYQH}{Not sure about uncertainties in C and N...}
+91.5~K in \teff, 0.11 in \logg, 0.05 for \mh, \alpham, and \carbon, 
+and 0.06 for \nitrogen. 
+\Comment{AYQH}{Not sure about uncertainties in C and N...}
 \citep{Holtzman2015}.}
 \label{fig:leading-coeffs}
 \end{figure}

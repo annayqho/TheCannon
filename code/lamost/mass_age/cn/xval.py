@@ -16,6 +16,9 @@ rc('text', usetex=True)
 import os
 
 
+DATA_DIR = "/Users/annaho/Data/LAMOST"
+
+
 def test_step_iteration(ds, m, starting_guess):
     errs, chisq = m.infer_labels(ds, starting_guess)
     return ds.test_label_vals, chisq, errs
@@ -77,7 +80,7 @@ def validate(ds, m, leave_out):
 
 
 def loop(num_sets):
-    wl = np.load("wl.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
     ref_id = np.load("ref_id.npz")['arr_0']
     ref_flux = np.load("ref_flux.npz")['arr_0']
     ref_ivar = np.load("ref_ivar.npz")['arr_0']
