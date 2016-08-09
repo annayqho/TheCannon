@@ -1,37 +1,90 @@
 import numpy as np
+import sys
+sys.path.append("..")
 import matplotlib.pyplot as plt
 import glob
+from mass_age_functions import *
 from matplotlib.colors import LogNorm
 from matplotlib import rc
 plt.rc('text', usetex=True)
-rc('text.latex', preamble = ','.join('''
-    \usepackage{txfonts}
-    \usepackage{lmodern}
-    '''.split()))
 plt.rc('font', family='serif')
 
 
 files = glob.glob("output/*all_cannon_labels.npz")
 chisq = glob.glob("output/*cannon_label_chisq.npz")
+errs = glob.glob("output/*cannon_label_errs.npz")
 
+teff_all = []
+teff_err_all = []
+logg_all = []
+logg_err_all = []
 feh_all = []
-#teff_all = []
+feh_err_all = []
+cm_all = []
+cm_err_all = []
+nm_all = []
+nm_err_all = []
 alpha_all = []
+alpha_err_all = []
 chisq_all = []
 
 for i,f in enumerate(files):
     labels = np.load(f)['arr_0']
+    err = np.load(errs[i])['arr_0']
+    teff = labels[:,0]
+    teff_err = err[:,0]
+    logg = labels[:,1]
+    logg_err = err[:,1]
+    feh = labels[:,2]
+    feh_err = err[:,2]
+    cm = labels[:,3]
+    cm_err = err[:,3]
+    nm = labels[:,4]
+    nm_err = err[:,4]
+    alpha = labels[:,5]
+    alpha_err = err[:,5]
+    teff_all.extend(teff)
+    teff_err_all.extend(teff_err)
+    logg_all.extend(logg)
+    logg_err_all.extend(logg_err)
+    feh_all.extend(feh)
+    feh_err_all.extend(feh_err)
+    cm_all.extend(cm)
+    cm_err_all.extend(cm_err)
+    nm_all.extend(nm)
+    nm_err_all.extend(nm_err)
+    alpha_all.extend(alpha)
+    alpha_err_all.extend(alpha_err)
     chisq_val = np.load(chisq[i])['arr_0']
     chisq_all.extend(chisq_val)
-    feh = labels[:,2]
-    feh_all.extend(feh)
-    alpha = labels[:,5]
-    alpha_all.extend(alpha)
-    #teff = labels[:,0]
-    #teff_all.extend(teff)
 
-tr_feh = np.load("tr_label.npz")['arr_0'][:,2]
-tr_afe = np.load("tr_label.npz")['arr_0'][:,3]
+teff_all = np.array(teff_all)
+logg_all = np.array(logg_all)
+feh_all = np.array(feh_all)
+cm_all = np.array(cm_all)
+nm_all = np.array(nm_all)
+
+mass = calc_mass_2(feh_all, cm_all, nm_all, teff_all, logg_all)
+age = 10.0**calc_logAge(feh_all, cm_all, nm_all, teff_all, logg_all)
+
+np.savez("teff_all.npz", teff_all)
+np.savez("teff_err_all.npz", teff_err_all)
+np.savez("logg_all.npz", logg_all)
+np.savez("logg_err_all.npz", logg_err_all)
+np.savez("feh_all.npz", feh_all)
+np.savez("feh_err_all.npz", feh_err_all)
+np.savez("cm_all.npz", cm_all)
+np.savez("cm_err_all.npz", cm_err_all)
+np.savez("nm_all.npz", nm_all)
+np.savez("nm_err_all.npz", nm_err_all)
+np.savez("alpha_all.npz", alpha_all)
+np.savez("alpha_err_all.npz", alpha_err_all)
+np.savez("mass_all.npz", mass)
+np.savez("age_all.npz", age)
+np.savez("chisq_all.npz", chisq_all)
+
+tr_feh = np.load("ref_label.npz")['arr_0'][:,2]
+tr_afe = np.load("ref_label.npz")['arr_0'][:,5]
 
 feh_all = np.array(feh_all)
 alpha_all = np.array(alpha_all)
@@ -43,7 +96,7 @@ plt.hist2d(feh_all, alpha_all, norm=LogNorm(), cmap="gray_r", bins=60, range=[[-
 #plt.scatter(feh_all, alpha_all, c=teff_all, edgecolor='none', s=1, vmin=3500, vmax=5500)
 #plt.scatter(tr_feh, tr_afe, edgecolor='none', c='red', s=1, label="training set")
 plt.xlabel("[Fe/H] (dex)" + " from Cannon/LAMOST", fontsize=16)
-plt.ylabel(r"$\mathrm{[\alphaup/M]}$" + " (dex) from Cannon/LAMOST", fontsize=16)
+plt.ylabel(r"$\mathrm{[\alpha/M]}$" + " (dex) from Cannon/LAMOST", fontsize=16)
 plt.ylim(-0.2,0.5)
 plt.tick_params(axis='x', labelsize=14)
 plt.tick_params(axis='y', labelsize=14)
