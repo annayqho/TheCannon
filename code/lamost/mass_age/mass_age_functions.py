@@ -22,6 +22,11 @@ def calc_sum(mh, cm, nm):
     return CplusN
 
 
+def calc_cn(cm, nm):
+    """ This is called [C/N] in Martig 2016 """
+    return(cm / nm)
+
+
 def calc_mass(mh,cm,nm):
     """ Table A1 in Martig 2016 """
     CplusN = calc_sum(mh,cm,nm)

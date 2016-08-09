@@ -25,8 +25,8 @@ mins = [3700, 1.0, -2.0, -0.3, -0.3,-0.11,-0.11]
 maxs = [5500, 4.1, 0.6, 0.38, 0.5, 0.4, 0.4]
 
 print("Loading data")
-#direc = "/Users/annaho/Data/LAMOST"
-direc = "../cn"
+direc = "/Users/annaho/Data/Mass_And_Age"
+#direc = "../cn"
 snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
 apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
 cannon = np.load("%s/xval_cannon_label_vals.npz" %direc)['arr_0']
@@ -47,7 +47,7 @@ for i in range(0, len(names)):
     ax.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
     #ax.legend(fontsize=14)
     #print(np.mean(cannon[:,i]-apogee[:,i]))
-    choose = snr > 50
+    choose = snr > 100
     diff = cannon[:,i][choose] - apogee[:,i][choose]
     bias_raw = np.mean(diff)
     scatter_raw = np.std(diff)

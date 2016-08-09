@@ -11,7 +11,7 @@ plt.rc('font', family='serif')
 import pyfits
 
 # import the data
-hdulist = pyfits.open("../make_lamost_catalog/lamost_catalog_full.fits")
+hdulist = pyfits.open("../cn/lamost_catalog_full.fits")
 tbdata = hdulist[1].data
 # cols = hdulist[1].columns
 # cols.names

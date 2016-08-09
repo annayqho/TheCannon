@@ -1,6 +1,5 @@
 import numpy as np
 
-direc = 
 id_test = np.load("id_all.npz")['arr_0']
 label_test = np.load("label_all.npz")['arr_0'].T
 teff_test = label_test[:,0]

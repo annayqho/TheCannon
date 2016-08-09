@@ -5,11 +5,9 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
+DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
+
 rc('text', usetex=True)
-rc('text.latex', preamble = ','.join('''
-\usepackage{txfonts}
-\usepackage{lmodern}
-'''.split()))
 rc('font', family='serif')
 
 # Load data
@@ -18,9 +16,9 @@ label_names = np.array([r'\mathrm{T}_{\mathrm{eff}}', r'\mathrm{log g}',
 r'[\frac{\mathrm{Fe}}{\mathrm{H}}]', r'[\frac{\mathrm{C}}{\mathrm{M}}]', 
 r'[\frac{\mathrm{N}}{\mathrm{M}}]', r'[\frac{\mathrm{\alpha}}{\mathrm{M}}]', 
 r'\mathrm{A}_{\mathrm{k}}'])
-wl = np.load("wl.npz")['arr_0']
-coeffs = np.load("coeffs.npz")['arr_0']
-scatters = np.load("scatters.npz")['arr_0']
+wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
+scatters = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
 npixels = len(wl)
 nlabels = len(label_names)
 
@@ -33,8 +31,8 @@ for i in range(1,nlabels+1):
     axarr[i].yaxis.set_major_locator(
             MaxNLocator(nbins=nbins, prune='upper'))
 plt.xlabel(r"Wavelength $\lambda (\AA)$", fontsize=14)
-plt.xlim(np.ma.min(wl), np.ma.max(wl))
-#plt.xlim(5760, 5860)
+#plt.xlim(np.ma.min(wl), np.ma.max(wl))
+plt.xlim(np.ma.min(wl), 6000)
 plt.tick_params(axis='x', labelsize=14)
 axarr[-1].locator_params(axis='x', nbins=10)
 
@@ -67,6 +65,7 @@ top = np.max(scatters[scatters<0.5])
 stretch = np.std(scatters[scatters<0.5])
 ax.set_ylim(0, top + stretch)
 ax.step(wl, scatters, where='mid', c='k', linewidth=0.7)
+ax.set_ylim(0, 0.045)
 ax.xaxis.grid(True)
 #for line in vlines:
 #    ax.axvline(x=line, c='r')
