@@ -47,9 +47,9 @@ def calc_logAge(mh,cm,nm,teff,logg):
     """ Table A3 in Martig 2016 """
     CplusN = calc_sum(mh,cm,nm)
     t = teff/4000.
-    return (-54.35 + 6.53*mh + 0.74*mh**2
-            - 19.02*cm + 4.04*cm*mh + 26.90*cm**2
-            - 12.18*nm + 0.76*nm*mh + 13.33*nm*cm - 1.04*nm**2
-            + 37.22*CplusN - 4.94*CplusN*mh - 77.84*CplusN*cm - 17.60*CplusN*nm + 51.24*CplusN**2
-            + 59.58*t - 1.46*t*mh + 48.29*t*cm + 13.99*t*nm - 65.67*t*CplusN + 15.54*t**2
-            + 16.14*logg - 1.56*logg*mh - 13.12*logg*cm - 1.77*logg*nm + 14.24*logg*CplusN - 34.68*logg*t + 4.17*logg**2)
+    return (-54.3489 + 6.5338*mh + 0.7355*mh**2
+            - 19.0157*cm + 4.0400*cm*mh + 26.8989*cm**2
+            - 12.1794*nm + 0.7635*nm*mh + 13.3259*nm*cm - 1.0438*nm**2
+            + 37.2218*CplusN - 4.9437*CplusN*mh - 77.8436*CplusN*cm - 17.5960*CplusN*nm + 51.2421*CplusN**2
+            + 59.5841*t - 1.4592*t*mh + 48.2876*t*cm + 13.9888*t*nm - 65.6666*t*CplusN + 15.5444*t**2
+            + 16.1351*logg - 1.5640*logg*mh - 13.1170*logg*cm - 1.7686*logg*nm + 14.2425*logg*CplusN - 34.6783*logg*t + 4.1677*logg**2)

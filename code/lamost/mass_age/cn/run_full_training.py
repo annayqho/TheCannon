@@ -101,7 +101,7 @@ def train():
     np.savez("./chisqs.npz", m.chisqs)
     np.savez("./pivots.npz", m.pivots)
     m.diagnostics_leading_coeffs(ds)
-    m.diagnostics_leading_coeffs_triangle(ds)
+    #m.diagnostics_leading_coeffs_triangle(ds)
     m.diagnostics_plot_chisq(ds)
 
 
