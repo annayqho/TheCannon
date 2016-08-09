@@ -1,12 +1,14 @@
 """
 Run the test step on all the LAMOST DR2 objects.
+You have to run this script on aida42082
 """
 
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
 import sys
-sys.path.insert(0, '/home/annaho')
+sys.path.insert(0, '/home/annaho/TheCannon')
+#sys.path.insert(0, '/home/annaho')
 #from lamost import load_spectra
 #import dataset
 #import model
@@ -19,6 +21,9 @@ rc('font', family='serif')
 rc('text', usetex=True)
 import os
 
+SPEC_DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels"
+MODEL_DIR = "."
+
 
 def test_step_iteration(ds, m, starting_guess):
     errs, chisq = m.infer_labels(ds, starting_guess)
@@ -26,15 +31,14 @@ def test_step_iteration(ds, m, starting_guess):
 
 
 def test_step(date):
-    direc = "../xcalib_4labels"
-    wl = np.load("%s/wl.npz" %direc)['arr_0']
-    test_ID = np.load("%s/output/%s_ids.npz" %(direc, date))['arr_0']
+    wl = np.load("%s/wl.npz" %MODEL_DIR)['arr_0']
+    test_ID = np.load("%s/output/%s_ids.npz" %(SPEC_DIR, date))['arr_0']
     print(str(len(test_ID)) + " objects")
-    test_flux = np.load("%s/output/%s_norm.npz" %(direc,date))['arr_0']
-    test_ivar = np.load("%s/output/%s_norm.npz" %(direc,date))['arr_1']
+    test_flux = np.load("%s/output/%s_norm.npz" %(SPEC_DIR,date))['arr_0']
+    test_ivar = np.load("%s/output/%s_norm.npz" %(SPEC_DIR,date))['arr_1']
 
-    lamost_label = np.load("%s/output/%s_tr_label.npz" %(direc,date))['arr_0']
-    apogee_label = np.load("./tr_label.npz")['arr_0']
+    lamost_label = np.load("%s/output/%s_tr_label.npz" %(SPEC_DIR,date))['arr_0']
+    apogee_label = np.load("./ref_label.npz")['arr_0']
 
     ds = dataset.Dataset(wl, test_ID, test_flux[0:2,:], test_ivar[0:2,:], 
             lamost_label, test_ID, test_flux, test_ivar)
