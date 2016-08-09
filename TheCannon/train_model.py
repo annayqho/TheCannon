@@ -10,32 +10,33 @@ def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs,
     This is just for a single lambda.
     """
     coeff_m = pars[:-1]
-    scatter_m = pars[-1]
+    scatter_m = pars[-1] 
     nstars = len(ivars_m)
     Delta2 = np.zeros((nstars))
     for n in range(nstars):
-        ldelta2 = np.dot(ldelta[n], ldelta[n])
-        Delta2[n] = np.dot(np.dot(coeff_m[n].T, lvec_derivs[n]), ldelta2 * np.dot(lvec_derivs[n].T, coeff_m[n]))
+        ldelta2 = np.outer(ldelta[n], ldelta[n])    # 4x4 matrix
+        Delta2[n] = np.dot(np.dot(coeff_m.T, lvec_derivs[n]), np.dot(ldelta2, np.dot(lvec_derivs[n].T, coeff_m)))
     inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
-    lnLs = -0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * (fluxes_m - np.dot(coeff_m, lvec))**2 * inv_var
-    return np.sum(lnLs)
+    lnLs = 0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * (fluxes_m - np.dot(coeff_m, lvec.T))**2 * inv_var
+    return -np.sum(lnLs)
 
 def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
-    x0 = np.ones((len(lvec)+1, 4, 15))
-    pars = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta))
-    coeff_m = pars[:-1]
-    scatter_m = pars[-1]
+    x0 = np.zeros((len(lvec_derivs[0])+1,))
+    x0[0] = 1.
+    res = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta), method='Powell')
+    coeff_m = res.x[:-1]
+    scatter_m = res.x[-1]
     
     return coeff_m, scatter_m
    
-def train_model(ds):
+def _train_model_new(ds):
     
     label_vals = ds.tr_label
     lams = ds.wl
     npixels = len(lams)
     fluxes = ds.tr_flux
     ivars = ds.tr_ivar
-    ldelta = np.ones((len(fluxes[0]), len(label_vals[1]))) #ds.tr_delta
+    ldelta = np.zeros((len(fluxes), len(label_vals[1]))) #ds.tr_delta
     
     # for training, ivar can't be zero, otherwise you get singular matrices
     # DWH says: make sure no ivar goes below 1 or 0.01
@@ -43,25 +44,33 @@ def train_model(ds):
 
     pivots = np.mean(label_vals, axis=0)
     lvec, lvec_derivs = _get_lvec(label_vals, pivots, derivs=True)
-    lvec_full = np.array([lvec,] * npixels)
-    lvec_derivs = np.array([lvec_derivs,] * npixels)
-    ldelta = np.array([ldelta,] * npixels)
+#    lvec = np.array([lvec,] * npixels)
+#    lvec_derivs = np.array([lvec_derivs,] * npixels)
+#    ldelta = np.array([ldelta,] * npixels)
 
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
     ivars = ivars.swapaxes(0,1)
     
-    blob = list(map(train_one_wavelength, fluxes, ivars, lvec_full, lvec_derivs, ldelta))
-    coeffs = np.array([b[0] for b in blob])
-    # covs = np.array([np.linalg.inv(b[1]) for b in blob])
-    chis = np.array([b[2] for b in blob])
-    scatters = np.array([b[4] for b in blob])
+    coeffs = []
+    scatters = []
+    for m in range(0, npixels):
+        coeffs_m, scatter_m = train_one_wavelength(fluxes[m], ivars[m], lvec, lvec_derivs, ldelta)
+        coeffs.append(coeffs_m)
+        scatters.append(scatter_m)
+    
+    #blob = list(map(train_one_wavelength, fluxes, ivars, lvec, lvec_derivs, ldelta))
+    #coeffs = np.array([b[0] for b in blob])
+    #covs = np.array([np.linalg.inv(b[1]) for b in blob])
+    #chis = np.array([b[2] for b in blob])
+    #scatters = np.array([b[4] for b in blob])
     
     # Calc chi sq
-    all_chisqs = chis*chis
-    print("Done training model")
+    #all_chisqs = chis*chis
+    all_chisqs = 0
+    print("Done training model (Christina)")
 
-    return coeffs, scatters, all_chisqs, pivots
+    return np.array(coeffs), np.array(scatters), all_chisqs, pivots
 
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
@@ -241,9 +250,12 @@ def _train_model(ds):
     lvec, lvec_derivs = _get_lvec(label_vals, pivots, derivs=True)
     lvec_full = np.array([lvec,] * npixels)
 
+    # print np.shape(ivars), np.shape(fluxes), lvec.shape, lvec_full.shape
+
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
     ivars = ivars.swapaxes(0,1)
+    
     # one per pix
     blob = list(map(_do_one_regression, lams, fluxes, ivars, lvec_full))
     coeffs = np.array([b[0] for b in blob])
@@ -253,6 +265,6 @@ def _train_model(ds):
 
     # Calc chi sq
     all_chisqs = chis*chis
-    print("Done training model")
+    print("Done training model (Anna)")
 
     return coeffs, scatters, all_chisqs, pivots

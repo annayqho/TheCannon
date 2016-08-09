@@ -1,5 +1,6 @@
 from .dataset import Dataset
 from .train_model import _train_model 
+from .train_model import _train_model_new
 from .train_model import _get_lvec
 from .infer_labels import _infer_labels
 from .helpers.corner import corner
@@ -31,7 +32,11 @@ class CannonModel(object):
 
     def train(self, ds):
         """ Run training step: solve for best-fit spectral model """
-        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(ds)
+        # Anna's model
+        #self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(ds)
+
+        # new version
+        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model_new(ds)
 
 
     def diagnostics(self):
@@ -67,7 +72,7 @@ class CannonModel(object):
         ----------
         ds: Dataset object
         """
-        lvec_all = _get_lvec(ds.test_label_vals, self.pivots)
+        lvec_all = _get_lvec(ds.test_label_vals, self.pivots, derivs=False)
         self.model_spectra = np.dot(lvec_all, self.coeffs.T)
 
 
