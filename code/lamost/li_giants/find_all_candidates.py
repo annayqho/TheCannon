@@ -10,12 +10,24 @@ from TheCannon import dataset
 from model_spectra import get_model_spec
 
 DATA_DIR = "/Users/annaho/Data/Li_Giants"
-a = pyfits.open(DATA_DIR + "/" + "apokasc_lamost_overlap.fits")
+a = pyfits.open(DATA_DIR + "/" + "kepler_obj_in_test_set.fits")
 data = a[1].data
 a.close()
 
+'obsdate_1'
+'lamost_id'
+'snrg'
+'cannon_teff'
+'cannon_logg'
+'cannon_m_h'
+'cannon_alpha_m'
+'cannon_a_k'
+'cannon_chisq'
+'cannon_snrg'
+
 wl = np.load("/Users/annaho/Data/LAMOST/wl.npz")['arr_0']
-lamost_id = data['lamost_id_2']
+obsdate = data['obsdate_1']
+lamost_id = data['lamost_id']
 
 
 def get_model():

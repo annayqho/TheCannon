@@ -14,35 +14,22 @@ from TheCannon import dataset
 from TheCannon import model
 from matplotlib.ticker import MaxNLocator
 
-DATA_DIR = "/Users/annaho/Data/LAMOST"
-snr = np.load("%s/tr_snr.npz" %DATA_DIR)['arr_0']
-chisq = np.load("%s/cannon_label_chisq.npz" %DATA_DIR)['arr_0']
 
-wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
-ds = dataset.Dataset(wl, [], [], [], [], [], [], [])
-test_label = np.load("%s/all_cannon_labels.npz" %DATA_DIR)['arr_0']
-ds.test_label_vals = test_label
-tr_flux = np.load("%s/tr_flux.npz" %DATA_DIR)['arr_0']
-tr_ivar = np.load("%s/tr_ivar.npz" %DATA_DIR)['arr_0']
-ds.test_flux = tr_flux
-ds.test_ivar = tr_ivar
+def get_model_spec(wl, label, coeffs, scatters, chisqs, pivots):
+    ds = dataset.Dataset(wl, [], [], [], [], [], [], [])
+    ds.test_label_vals = label
 
-m = model.CannonModel(2)
-m.coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
-m.scatters = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
-m.chisqs = np.load("%s/chisqs.npz" %DATA_DIR)['arr_0']
-m.pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
+    m = model.CannonModel(2)
+    m.coeffs = coeffs
+    m.scatters = scatters
+    m.chisqs = chisqs
+    m.pivots = pivots
 
-m.infer_spectra(ds)
+    m.infer_spectra(ds)
+    return m.model_spectra
 
-choose = np.logical_and(snr > 100, chisq < 4000)
-model_all = m.model_spectra[choose]
-data = ds.test_flux[choose]
-flux = ds.test_flux[choose]
-ivar = ds.test_ivar[choose]
-cannon_label = ds.test_label_vals
 
-def spectral_model(ii):
+def spectral_model(ii, model_spec):
     xmin = 6000
     xmax = 6800
 
