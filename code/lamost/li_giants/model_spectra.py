@@ -76,6 +76,7 @@ def spectral_model(ii):
 
     ax_spectrum.plot(
             wl, f, c='k', alpha=0.7, drawstyle='steps-mid', label="Data")
+    #ax_spectrum.scatter(wl, f, c='k')
     ax_spectrum.plot(
             wl, model, c='r', alpha=0.7, label="The Cannon Model")
     ax_spectrum.fill_between(
@@ -91,7 +92,7 @@ def spectral_model(ii):
     ax_residual.set_ylim(r_ymin,r_ymax)
     ax_residual.set_xlim(ax_spectrum.get_xlim())
     ax_residual.axhline(0, c="k", linestyle=":", zorder=-1)
-    ax_residual.axvline(x=6707, c='r', linewidth=2, linestyle='--')
+    ax_residual.axvline(x=6717, c='r', linewidth=2, linestyle='--')
     ax_residual.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     ax_residual.set_xticklabels([])
 
@@ -113,4 +114,4 @@ def spectral_model(ii):
 
 
 if __name__=="__main__":
-    spectral_model(544)
+    spectral_model(1536)
