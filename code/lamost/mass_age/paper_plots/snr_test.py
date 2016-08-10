@@ -4,58 +4,52 @@ import matplotlib.gridspec as gridspec
 import pyfits
 from matplotlib.colors import LogNorm
 plt.rc('text', usetex=True)
-rc('text.latex', preamble = ','.join('''
-    \usepackage{txfonts}
-    \usepackage{lmodern}
-    '''.split()))
 plt.rc('font', family='serif')
 import numpy as np
 
-#names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}', r'[\alphaup/\mbox{Fe}]', 
-#'\mbox{A}_{\mbox{k}}']
-names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}', r'[\alphaup/\mbox{M}]']
-#units = ['K', 'dex', 'dex', 'dex', 'mag']
-units = ['K', 'dex', 'dex', 'dex']
+names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}',
+'\mbox{[C/M]}', '\mbox{[N/M]}', r'[\alpha/\mbox{M}]']
+units = ['K', 'dex', 'dex', 'dex', 'dex', 'dex']
 
-all_ids = np.load("../run_2_train_on_good/all_ids.npz")['arr_0']
-all_apogee = np.load("../run_2_train_on_good/all_label.npz")['arr_0']
-
-hdulist = pyfits.open("../make_lamost_catalog/lamost_catalog_training.fits")
+hdulist = pyfits.open(
+    "/Users/annaho/Data/Mass_And_Age/lamost_catalog_mass_age.fits")
 tbdata = hdulist[1].data
 hdulist.close()
 snrg = tbdata.field("snrg")
-snri = tbdata.field("snri")
-lamost_id_full = tbdata.field("lamost_id")
-lamost_id = np.array([val.strip() for val in lamost_id_full])
-lamost_teff = tbdata.field("teff_1")
-lamost_logg = tbdata.field("logg_1")
-lamost_feh = tbdata.field("feh")
+is_ref = tbdata.field("is_ref_obj")
+choose = is_ref == 1.
+lamost_id = tbdata.field("LAMOST_ID_1")[choose]
+lamost_teff = tbdata.field("teff_1")[choose]
+lamost_logg = tbdata.field("logg_1")[choose]
+lamost_feh = tbdata.field("feh")[choose]
 lamost = np.vstack((lamost_teff, lamost_logg, lamost_feh)).T
-cannon_teff = tbdata.field("cannon_teff")
-cannon_logg = tbdata.field("cannon_logg")
-cannon_feh = tbdata.field("cannon_m_h")
-cannon_afe = tbdata.field("cannon_alpha_m")
+cannon_teff = tbdata.field("cannon_teff_1")[choose]
+cannon_logg = tbdata.field("cannon_logg_1")[choose]
+cannon_feh = tbdata.field("cannon_mh")[choose]
+cannon_cm = tbdata.field("cannon_cm")[choose]
+cannon_nm = tbdata.field("cannon_nm")[choose]
+cannon_afe = tbdata.field("cannon_afe")[choose]
+apogee_teff = tbdata.field("apogee_teff")[choose]
+apogee_logg = tbdata.field("apogee_logg")[choose]
+apogee_mh = tbdata.field("apogee_mh")[choose]
+apogee_cm = tbdata.field("apogee_cm")[choose]
+apogee_nm = tbdata.field("apogee_nm")[choose]
+apogee_afe = tbdata.field("apogee_afe")[choose]
 
-cannon = np.vstack((cannon_teff, cannon_logg, cannon_feh, cannon_afe)).T
-inds = np.array([np.where(all_ids==val)[0][0] for val in lamost_id])
-apogee = all_apogee[inds]
-
+cannon = np.vstack((
+    cannon_teff, cannon_logg, cannon_feh, cannon_cm, cannon_nm, cannon_afe)).T
+apogee = np.vstack((
+    apogee_teff, apogee_logg, apogee_mh, apogee_cm, apogee_nm, apogee_afe)).T
 
 fig = plt.figure(figsize=(10,8))
-gs = gridspec.GridSpec(2,2, wspace=0.3, hspace=0.3)
+gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
 
-lowsg = [50, 0.10, 0.06, 0.025]
-highsg = [145, 0.40, 0.17, 0.063]
-lowsi = [70, 0.14, 0.07, 0.047]
-highsi = [160, 0.4, 0.2, 0.065]
-offsetsg = np.array([50, 0.1, 0.06, 0.03])
-offsetsi = np.array([70, 0.14, 0.08, 0.045])
+lows = [45, 0.05, 0.03, 0.06, 0.08, 0.025]
+highs = [145, 0.40, 0.17, 0.11, 0.15, 0.06]
+offsets = np.array([50, 0.1, 0.05, 0.06, 0.08, 0.03])
 
-snr = snrg
+snr = snrg[choose]
 snr_label = r"$\sim$\,SNRg"
-lows = lowsg
-highs = highsg
-offsets = offsetsg
 
 obj = []
 
@@ -77,7 +71,7 @@ for i in range(0, len(names)):
             print(i)
             diff_lamost = lamost[:,i][choose]-apogee[:,i][choose]
         else:
-            diff_lamost = np.zeros(len(diff_cannon))
+            diff_lamost = np.zeros(len(diff_cannon)) - 100
         # bootstrap 100 times
         nbs = 100
         nobj = len(diff_cannon)
@@ -91,9 +85,13 @@ for i in range(0, len(names)):
 
     ax = plt.subplot(gs[i])
     ax.scatter(snr_bins, y_lamost)
-    obj.append(ax.errorbar(snr_bins, y_lamost, yerr=yerr_lamost, fmt='.', c='darkorange', label="Cannon from LAMOST spectra"))
+    obj.append(ax.errorbar(
+        snr_bins, y_lamost, yerr=yerr_lamost, fmt='.', 
+        c='darkorange', label="Cannon from LAMOST spectra"))
     ax.scatter(snr_bins, y_cannon)
-    obj.append(ax.errorbar(snr_bins, y_cannon, yerr=yerr_cannon, fmt='.', c='darkorchid', label="Cannon from LAMOST spectra"))
+    obj.append(ax.errorbar(
+        snr_bins, y_cannon, yerr=yerr_cannon, fmt='.', 
+        c='darkorchid', label="Cannon from LAMOST spectra"))
     # a 1/r^2 line
     xfit = np.linspace(0.1, max(snr_bins)*2, 100)
     b = 30
@@ -110,8 +108,10 @@ for i in range(0, len(names)):
     ax.set_xlabel("%s" %snr_label, fontsize=16)
     ax.set_ylabel(r"$\sigma %s \mathrm{(%s)}$" %(name,unit), fontsize=16)
 
-fig.legend((obj[0],obj[1],obj[2]), ("LAMOST", "Cannon", "1/(%s)" %snr_label), fontsize=16)
+fig.legend(
+        (obj[0],obj[1],obj[2]), 
+        ("LAMOST", "Cannon", "1/(%s)" %snr_label), 
+        fontsize=16)
 
 #plt.show()
-#plt.savefig("%s_test_4panel_stretched.png" %snr_label[8:])
-plt.savefig("snr_test_4panel.png")
+plt.savefig("snr_test.png")

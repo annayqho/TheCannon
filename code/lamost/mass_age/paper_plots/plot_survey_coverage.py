@@ -19,7 +19,7 @@ tbdata = hdulist[1].data
 # # cols.names
 ra_lamost = tbdata.field('ra')
 dec_lamost = tbdata.field('dec')
-val_lamost = tbdata.field("age")
+val_lamost = tbdata.field("cannon_age")
 hdulist.close()
 
 hdulist = pyfits.open(
@@ -123,15 +123,16 @@ mask_all[np.setdiff1d(np.arange(len(m_all)), pix_all)] = 1
 m_all.mask = mask_all
 
 # perceptually uniform: inferno, viridis, plasma, magma
-cmap=cm.magma
+#cmap=cm.magma
+cmap = cm.RdYlBu_r
 cmap.set_under('w')
 
 # composite map
 # plot map ('C' means the input coordinates were in the equatorial system)
-rcParams.update({'font.size':16})
+# rcParams.update({'font.size':16})
 # hp.visufunc.mollview(m_apogee, coord=['C','G'], rot=(150, 0, 0), flip='astro',
 #         notext=True, title=r'Age for Ness et al. 2016', cbar=True,
-#         norm=None, min=0, max=12, cmap=cmap, unit = 'Gyr')
+#          norm=None, min=0, max=12, cmap=cmap, unit = 'Gyr')
 #hp.visufunc.mollview(m_lamost, coord=['C','G'], rot=(150, 0, 0), flip='astro',
 #        notext=True, title=r'$\alpha$/M for 500,000 LAMOST giants', cbar=True,
 #        norm=None, min=-0.07, max=0.3, cmap=cmap, unit = r'$\alpha$/M [dex]')
