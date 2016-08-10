@@ -9,49 +9,54 @@ from matplotlib.colors import LogNorm
 plt.rc('text', usetex=True)
 # rc('text.latex', preamble = ','.join('''\usepackage{txfonts}'''.split()))
 plt.rc('font', family='serif')
-from TheCannon import train_model
+#from TheCannon import train_model
+from TheCannon import dataset
+from TheCannon import model
 from matplotlib.ticker import MaxNLocator
 
-DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
+DATA_DIR = "/Users/annaho/Data/LAMOST"
+snr = np.load("%s/tr_snr.npz" %DATA_DIR)['arr_0']
+chisq = np.load("%s/cannon_label_chisq.npz" %DATA_DIR)['arr_0']
 
-def spectral_model():
-    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
-    ref_id = np.load("%s/ref_id.npz" %DATA_DIR)['arr_0']
-    flux = np.load("%s/ref_flux.npz" %DATA_DIR)['arr_0']
-    ivar = np.load("%s/ref_ivar.npz" %DATA_DIR)['arr_0']
-    snr = np.load("%s/ref_snr.npz" %DATA_DIR)['arr_0']
+wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+ds = dataset.Dataset(wl, [], [], [], [], [], [], [])
+test_label = np.load("%s/all_cannon_labels.npz" %DATA_DIR)['arr_0']
+ds.test_label_vals = test_label
+tr_flux = np.load("%s/tr_flux.npz" %DATA_DIR)['arr_0']
+tr_ivar = np.load("%s/tr_ivar.npz" %DATA_DIR)['arr_0']
+ds.test_flux = tr_flux
+ds.test_ivar = tr_ivar
 
-    coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
-    scat = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
-    chisqs = np.load("%s/chisqs.npz" %DATA_DIR)['arr_0']
-    pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
-    cannon_label = np.load("%s/xval_cannon_label_vals.npz" %DATA_DIR)['arr_0']
-    lvec_all = train_model._get_lvec(cannon_label, pivots)
+m = model.CannonModel(2)
+m.coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
+m.scatters = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
+m.chisqs = np.load("%s/chisqs.npz" %DATA_DIR)['arr_0']
+m.pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
 
-    #xmin = min(wl)
-    #xmax = max(wl)
-    xmin = 6200
-    xmax = 7000
+m.infer_spectra(ds)
+
+choose = np.logical_and(snr > 100, chisq < 4000)
+model_all = m.model_spectra[choose]
+data = ds.test_flux[choose]
+flux = ds.test_flux[choose]
+ivar = ds.test_ivar[choose]
+cannon_label = ds.test_label_vals
+
+def spectral_model(ii):
+    xmin = 6000
+    xmax = 6800
 
     r_ymin = -0.05
     r_ymax = 0.05
     ymin = 0.6
     ymax = 1.15
 
-    # cm goes from -0.3 to 0.3
-    # nm goes from -0.3 to 0.4
-    # ii = 174 ## 4842, 2.97, -0.173, -0.209, 0.36, 0.046, 0.045, SNR = 116
-    # ii = 546 ## 4591, 2.85, -0.24, 0.042, -0.0076, 0.0891, 0.00094, SNR = 127
-    # ii = 1099 ## 5510, 3.95, -0.26, 0.277, -0.257, 0.0355, 0.0139, SNR = 112
-    ii = np.where(snr > 110)[0][5]
     f = flux[ii,:]
     iv = ivar[ii,:]
-    label = cannon_label[ii,:]
-    lvec = lvec_all[ii,:]
-    model = np.dot(coeffs, lvec)
+    model = model_all[ii,:]
 
     # err = scat ^2 + uncertainty^2
-
+    scat = m.scatters
     iv_tot = (iv/(scat**2 * iv + 1))
     err = np.ones(len(iv_tot))*1000
     err[iv_tot>0] = 1/iv_tot[iv_tot>0]**0.5
@@ -86,6 +91,8 @@ def spectral_model():
     ax_residual.set_ylim(r_ymin,r_ymax)
     ax_residual.set_xlim(ax_spectrum.get_xlim())
     ax_residual.axhline(0, c="k", linestyle=":", zorder=-1)
+    ax_residual.axvline(x=6707, c='r', linewidth=2, linestyle='--')
+    ax_residual.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     ax_residual.set_xticklabels([])
 
     ax_residual.yaxis.set_major_locator(MaxNLocator(3))
@@ -98,10 +105,12 @@ def spectral_model():
     ax_residual.tick_params(axis="both", labelsize=18)
 
     fig.tight_layout()
+    plt.axvline(x=6707, c='r', linewidth=2, linestyle='--')
+    plt.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     plt.show()
     #plt.savefig("model_spectrum_full.png")
     #plt.savefig("model_spectrum.png")
 
 
 if __name__=="__main__":
-    spectral_model()
+    spectral_model(544)
