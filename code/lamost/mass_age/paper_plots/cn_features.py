@@ -33,11 +33,22 @@ def cannon_normalize(spec_raw):
     return norm_flux[0]
 
 
-def plot_panel(ax, wl, grad_spec, label):
+def plot_cannon(ax, wl, grad_spec):
     ax.plot(
-            wl, grad_spec, c='magenta', alpha=0.3, 
-            label=label, linewidth=2)
-    ax.set_xlim(3900,4400)
+            wl, grad_spec, c='black', label="Cannon Gradient Spectrum", 
+            linewidth=1)
+    ax.set_xlim(4000,4400)
+    ax.set_ylim(-0.2,0.2)
+    ax.legend(loc='lower left')
+    ax.tick_params(axis='x', labelsize=16)
+    ax.tick_params(axis='y', labelsize=16)
+
+
+def plot_model(ax, wl, grad_spec):
+    ax.plot(
+            wl, grad_spec, c='black', label="Model Gradient Spectrum", 
+            linewidth=1, linestyle='--')
+    ax.set_xlim(4000,4400)
     ax.set_ylim(-0.2,0.2)
     ax.legend(loc='lower left')
     ax.tick_params(axis='x', labelsize=16)
@@ -85,9 +96,14 @@ n_grad_spec = gen_cannon_grad_spec(
 # Make a plot
 fig, (ax0,ax1) = plt.subplots(ncols=2, figsize=(12,6), 
                               sharex=True, sharey=True)
-plt.subplots_adjust(wspace=0.3)
-plot_panel(ax0, my_wl, c_grad_spec/2, label="Cannon Grad for C/2")
-plot_panel(ax1, my_wl, n_grad_spec/2, label="Cannon grad for N/2")
+plt.subplots_adjust(wspace=0.2)
+x = 0.05
+y = 0.90
+ax0.text(x, y, "Carbon", transform=ax0.transAxes, fontsize=16)
+ax1.text(x, y, "Nitrogen", transform=ax1.transAxes, fontsize=16)
+
+plot_cannon(ax0, my_wl, c_grad_spec/2)
+plot_cannon(ax1, my_wl, n_grad_spec/2)
 
 # Carbon and nitrogen theoretical gradient spectra
 DATA_DIR = "/Users/annaho/Data/Martell"
@@ -109,14 +125,20 @@ cfe = dat['cfe'][ind]
 dflux = cannon_normalize(dat[ind[-1]][3])-cannon_normalize(dat[ind[0]][3])
 dcfe = cfe[-1]-cfe[0]
 grad_spec = (dflux/dcfe)
-#plot_panel(wl, grad_spec, label="Martell Grad Spec for C")
+plot_model(ax0, wl, grad_spec)
 
 ind = np.where(np.logical_and(dat['cfe']==-0.4, dat['FeH']==-1.41))[0]
 nfe = dat['nfe'][ind]
 dflux = cannon_normalize(dat[ind[-1]][3])-cannon_normalize(dat[ind[0]][3])
 dnfe = nfe[-1]-nfe[0]
 grad_spec = (dflux/dnfe)
-#plot_panel(wl, grad_spec, label="Martell Grad Spec for C")
+plot_model(ax1, wl, grad_spec)
+
+ax0.set_ylim(-0.25, 0.15)
+ax1.set_ylim(-0.25, 0.15)
+ax0.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
+ax1.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
+ax0.set_ylabel("Normalized Flux", fontsize=18)
 
 
 plt.show()
