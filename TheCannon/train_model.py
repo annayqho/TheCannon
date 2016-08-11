@@ -10,15 +10,35 @@ def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs,
     This is just for a single lambda.
     """
     coeff_m = pars[:-1]
-    scatter_m = pars[-1] 
+    scatter_m = pars[-1]    # scatter is the last parameter
     nstars = len(ivars_m)
     Delta2 = np.zeros((nstars))
+    Delta2_deriv = np.zeros((nstars, len(lvec[0])))
     for n in range(nstars):
         ldelta2 = np.outer(ldelta[n], ldelta[n])    # 4x4 matrix
         Delta2[n] = np.dot(np.dot(coeff_m.T, lvec_derivs[n]), np.dot(ldelta2, np.dot(lvec_derivs[n].T, coeff_m)))
+        Delta2_deriv[n, :] = np.dot(coeff_m.T, np.dot(lvec_derivs[n], np.dot(ldelta2, lvec_derivs[n].T)))
     inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
-    lnLs = 0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * (fluxes_m - np.dot(coeff_m, lvec.T))**2 * inv_var
-    return -np.sum(lnLs)
+    resids = fluxes_m - np.dot(coeff_m, lvec.T)
+    lnLs = 0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * resids**2 * inv_var
+    dlnLds = - scatter_m * (inv_var**2 * resids**2 + inv_var) 
+    dlnLdtheta = inv_var[:, None] * ((inv_var[:, None] * Delta2_deriv * resids[:, None]**2) - Delta2_deriv + lvec * resids[:, None])
+    dlnLdpars = np.hstack([dlnLdtheta, dlnLds[:, None]])  # scatter is the last parameter  
+    return -2.*np.sum(lnLs), -2.*np.sum(dlnLdpars, axis=0) 
+    
+def test_training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
+    
+    q, dqdp = training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta)
+    
+    for k in range(len(pars)):
+        pars1 = 1. * pars
+        tiny = 1e-5 * pars[k]
+        pars1[k] += tiny       # MAGIC!
+        q1, foo = training_step_objective_function(pars1, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta)
+        dqdpk = (q1-q) * tiny
+        print k, q, q1, pars[k], dqdp[k], dqdpk, dqdp[k]-dqdpk
+    
+    return True
 
 def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
     x0 = np.zeros((len(lvec_derivs[0])+1,))
@@ -27,7 +47,7 @@ def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
     coeff_m = res.x[:-1]
     scatter_m = res.x[-1]
     
-    return coeff_m, scatter_m
+    return res.x
    
 def _train_model_new(ds):
     
