@@ -37,25 +37,27 @@ def cannon_normalize(spec_raw):
             spec, ivar, cont)
     return norm_flux[0]
 
+def plot_panel(wl, grad_spec, label):
+    plt.plot(
+            wl, grad_spec, c='magenta', alpha=0.3, 
+            label=label, linewidth=2)
+    plt.xlim(3900,4400)
+    plt.ylim(-0.2,0.2)
+    plt.legend(loc='lower left')
+
 ind = np.where(np.logical_and(dat['Nfe']==0.6, dat['FeH']==-1.41))[0]
 cfe = dat['cfe'][ind]
 dflux = cannon_normalize(dat[ind[-1]][3])-cannon_normalize(dat[ind[0]][3])
-#dflux = normalize(dat[ind[-1]][3]) - normalize(dat[ind[0]][3])
 dcfe = cfe[-1]-cfe[0]
 grad_spec = (dflux/dcfe)
-plt.plot(
-        wl, grad_spec, c='magenta', alpha=0.3, label="Martell Grad Spec for C",
-        linewidth=2)
+plot_panel(wl, grad_spec, label="Martell Grad Spec for C")
 
 ind = np.where(np.logical_and(dat['cfe']==-0.4, dat['FeH']==-1.41))[0]
 nfe = dat['nfe'][ind]
 dflux = cannon_normalize(dat[ind[-1]][3])-cannon_normalize(dat[ind[0]][3])
-#dflux = normalize(dat[ind[-1]][3]) - normalize(dat[ind[0]][3])
 dnfe = nfe[-1]-nfe[0]
 grad_spec = (dflux/dnfe)
-plt.plot(
-        wl, grad_spec, c='green', label="Martell Grad Spec for N",
-        alpha=0.3, linewidth=2)
+plot_panel(wl, grad_spec, label="Martell Grad Spec for C")
 
 DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
 my_wl = np.load(DATA_DIR + "/" + "wl.npz")['arr_0']
@@ -96,21 +98,7 @@ n_grad_spec = (model_high_n - model_low_n) / (high_n[4] - low_n[4])
 
 #cn_coeffs = (coeffs[:,4])
 #nm_coeffs = (coeffs[:,5])
-plt.plot(
-        my_wl, c_grad_spec/2, c='magenta', alpha=0.3, 
-        #my_wl, cn_coeffs, c='magenta', alpha=0.7,
-        label="Cannon Grad for C /2", linestyle='--', linewidth=2)
-        #label="Cannon Leading Coeff for C", linestyle='--', linewidth=1)
-plt.plot(
-        my_wl, n_grad_spec/2, c='green', alpha=0.3, 
-        #my_wl, nm_coeffs, c='green', alpha=0.7,
-        label="Cannon Grad for N /2", linestyle='--', linewidth=2)
-        #label="Cannon Leading Coeff for N", linestyle='--', linewidth=1)
-
-#plt.plot(my_wl, (cn_coeffs+0.3)/2, c='r', lw=2)
-plt.xlim(3900,4400)
-plt.ylim(-0.2,0.2)
-
-plt.legend(loc='lower left')
+plot_panel(my_wl, c_grad_spec/2, label="Cannon Grad for C/2")
+plot_panel(my_wl, n_grad_spec/2, label="Cannon grad for N/2")
 
 plt.show()
