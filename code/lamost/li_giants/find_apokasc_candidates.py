@@ -69,7 +69,7 @@ def wget_files():
         if glob.glob(searchfor):
             print("done")
         else:
-            #print(searchfor)
+            print(searchfor)
             os.system(
                     "wget http://dr2.lamost.org/sas/fits/%s" %(filename))
             new_filename = filename.split("_")[0] + "_" + filename.split("_")[2]
