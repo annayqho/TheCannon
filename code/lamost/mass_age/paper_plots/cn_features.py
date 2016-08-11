@@ -80,7 +80,39 @@ def gen_cannon_grad_spec(labels, choose, low, high, coeffs, pivots):
     return grad_spec
 
 
-DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
+def get_model_spec_martell():
+    # Carbon and nitrogen theoretical gradient spectra
+    DATA_DIR = "/Users/annaho/Data/Martell"
+    inputf = "ssg_wv.fits"
+    a = pyfits.open(DATA_DIR + "/" + inputf)
+    wl = a[1].data
+    a.close()
+
+    inputf = "ssg_nowv.fits"
+    a = pyfits.open(DATA_DIR + "/" + inputf)
+    dat = a[1].data
+    a.close()
+
+    ind = np.where(np.logical_and(dat['Nfe']==0.6, dat['FeH']==-1.41))[0]
+    cfe = dat['cfe'][ind]
+    # only step from -0.4 to 0.4
+    #dflux = cannon_normalize(dat[ind[-1]][3])-cannon_normalize(dat[ind[0]][3])
+    dflux = cannon_normalize(dat[ind[9]][3])-cannon_normalize(dat[ind[5]][3])
+    #dcfe = cfe[1]-cfe[0]
+    dcfe = cfe[9]-cfe[5]
+    c_grad_spec = (dflux/dcfe)
+
+    ind = np.where(np.logical_and(dat['cfe']==-0.4, dat['FeH']==-1.41))[0]
+    nfe = dat['nfe'][ind]
+    # only step from -0.4 to 0.4
+    dflux = cannon_normalize(dat[ind[5]][3])-cannon_normalize(dat[ind[1]][3])
+    dnfe = nfe[5]-nfe[1]
+    n_grad_spec = (dflux/dnfe)
+    
+    return wl, c_grad_spec, n_grad_spec
+
+
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
 my_wl = np.load(DATA_DIR + "/" + "wl.npz")['arr_0']
 
 m_coeffs = np.load(DATA_DIR + "/" + "coeffs.npz")['arr_0']
@@ -102,43 +134,17 @@ y = 0.90
 ax0.text(x, y, "Carbon", transform=ax0.transAxes, fontsize=16)
 ax1.text(x, y, "Nitrogen", transform=ax1.transAxes, fontsize=16)
 
-plot_cannon(ax0, my_wl, c_grad_spec/2)
-plot_cannon(ax1, my_wl, n_grad_spec/2)
+plot_cannon(ax0, my_wl, c_grad_spec)
+plot_cannon(ax1, my_wl, n_grad_spec)
 
-# Carbon and nitrogen theoretical gradient spectra
-DATA_DIR = "/Users/annaho/Data/Martell"
-inputf = "ssg_wv.fits"
-a = pyfits.open(DATA_DIR + "/" + inputf)
-wl = a[1].data
-a.close()
+wl, c_grad_spec, n_grad_spec = get_model_spec_martell()
+plot_model(ax0, wl, c_grad_spec)
+plot_model(ax1, wl, n_grad_spec)
 
-inputf = "ssg_nowv.fits"
-a = pyfits.open(DATA_DIR + "/" + inputf)
-dat = a[1].data
-a.close()
-
-# In the paper, the [C/Fe] goes from -1.4 to 0.4
-# [Fe/H] = -1.41, [N/Fe] = 0.6
-# There are 10 gridpoints in [C/Fe] and 14 in [N/Fe]
-ind = np.where(np.logical_and(dat['Nfe']==0.6, dat['FeH']==-1.41))[0]
-cfe = dat['cfe'][ind]
-dflux = cannon_normalize(dat[ind[-1]][3])-cannon_normalize(dat[ind[0]][3])
-dcfe = cfe[-1]-cfe[0]
-grad_spec = (dflux/dcfe)
-plot_model(ax0, wl, grad_spec)
-
-ind = np.where(np.logical_and(dat['cfe']==-0.4, dat['FeH']==-1.41))[0]
-nfe = dat['nfe'][ind]
-dflux = cannon_normalize(dat[ind[-1]][3])-cannon_normalize(dat[ind[0]][3])
-dnfe = nfe[-1]-nfe[0]
-grad_spec = (dflux/dnfe)
-plot_model(ax1, wl, grad_spec)
-
-ax0.set_ylim(-0.25, 0.15)
-ax1.set_ylim(-0.25, 0.15)
+ax0.set_ylim(-0.35, 0.25)
+ax1.set_ylim(-0.35, 0.25)
 ax0.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
 ax1.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
 ax0.set_ylabel("Normalized Flux", fontsize=18)
-
 
 plt.show()
