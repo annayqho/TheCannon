@@ -37,7 +37,7 @@ def plot_panel(wl, grad_spec, label):
     plt.legend(loc='lower left')
 
 
-def gen_cannon_grad_spec(labels, choose, low, high):
+def gen_cannon_grad_spec(labels, choose, low, high, coeffs, pivots):
     """ Generate Cannon gradient spectra
 
     Parameters
@@ -48,13 +48,6 @@ def gen_cannon_grad_spec(labels, choose, low, high):
     high: highest val of cfe or nfe, whatever you're varying
     """
     # Generate Cannon gradient spectra
-    DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
-    my_wl = np.load(DATA_DIR + "/" + "wl.npz")['arr_0']
-
-    coeffs = np.load(DATA_DIR + "/" + "coeffs.npz")['arr_0']
-    pivots = np.load(DATA_DIR + "/" + "pivots.npz")['arr_0']
-    scatter = np.load(DATA_DIR + "/" + "scatters.npz")['arr_0']
-    chisq = np.load(DATA_DIR + "/" + "chisqs.npz")['arr_0']
 
     low_lab = labels
     low_lab[choose] = low
@@ -68,9 +61,19 @@ def gen_cannon_grad_spec(labels, choose, low, high):
 
     return grad_spec
 
+DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
+my_wl = np.load(DATA_DIR + "/" + "wl.npz")['arr_0']
 
-#cn_coeffs = (coeffs[:,4])
-#nm_coeffs = (coeffs[:,5])
+m_coeffs = np.load(DATA_DIR + "/" + "coeffs.npz")['arr_0']
+m_pivots = np.load(DATA_DIR + "/" + "pivots.npz")['arr_0']
+#scatter = np.load(DATA_DIR + "/" + "scatters.npz")['arr_0']
+#chisq = np.load(DATA_DIR + "/" + "chisqs.npz")['arr_0']
+
+labels = [4842, 2.97, -0.173, -0.3, -0.36, 0.046, 0.045]
+c_grad_spec = gen_cannon_grad_spec(
+        labels, 3, -0.3, 0.3, m_coeffs, m_pivots)
+n_grad_spec = gen_cannon_grad_spec(
+        labels, 4, -0.36, 0.36, m_coeffs, m_pivots)
 plot_panel(my_wl, c_grad_spec/2, label="Cannon Grad for C/2")
 plot_panel(my_wl, n_grad_spec/2, label="Cannon grad for N/2")
 
