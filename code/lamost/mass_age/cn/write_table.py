@@ -6,7 +6,7 @@ from astropy.io import ascii
 from mass_age_functions import *
 import glob
 
-DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
 
 print("writing file")
 t = Table()
@@ -67,6 +67,10 @@ for ii,name in enumerate(label_names):
 
 t['cannon_mass'] = np.hstack((ref_mass, test_label[6,:]))
 t['cannon_age'] = np.hstack((ref_age, test_label[7,:]))
+
+# Calculate (C+N)/M
+
+t['cannon_c_plus_n'] = calc_sum(t['cannon_mh'], t['cannon_cm'], t['cannon_nm'])
 
 for ii,name in enumerate(err_names):
     t[name] = np.hstack((cannon_ref_err[:,ii], test_err[ii,:]))

@@ -4,6 +4,7 @@ overlaid with our "gradient spectra" from The Cannon """
 import numpy as np
 import matplotlib.pyplot as plt
 import pyfits
+import copy
 from matplotlib import rc
 rc('font', family='serif')
 rc('text', usetex=True)
@@ -25,7 +26,7 @@ def cannon_normalize(spec_raw):
     spec = np.array([spec_raw])
     wl = np.arange(0, spec.shape[1])
     w = continuum_normalization.gaussian_weight_matrix(wl, L=50)
-    ivar = np.ones(spec.shape)
+    ivar = np.ones(spec.shape)*0.5
     cont = continuum_normalization._find_cont_gaussian_smooth(
             wl, spec, ivar, w)
     norm_flux, norm_ivar = continuum_normalization._cont_norm(
@@ -36,9 +37,7 @@ def cannon_normalize(spec_raw):
 def plot_cannon(ax, wl, grad_spec):
     ax.plot(
             wl, grad_spec, c='black', label="Cannon Gradient Spectrum", 
-            linewidth=1)
-    ax.set_xlim(4000,4400)
-    ax.set_ylim(-0.2,0.2)
+            linewidth=1, drawstyle='steps-mid')
     ax.legend(loc='lower left')
     ax.tick_params(axis='x', labelsize=16)
     ax.tick_params(axis='y', labelsize=16)
@@ -47,15 +46,13 @@ def plot_cannon(ax, wl, grad_spec):
 def plot_model(ax, wl, grad_spec):
     ax.plot(
             wl, grad_spec, c='black', label="Model Gradient Spectrum", 
-            linewidth=1, linestyle='--')
-    ax.set_xlim(4000,4400)
-    ax.set_ylim(-0.2,0.2)
+            linewidth=0.5, drawstyle='steps-mid')#, linestyle='-')
     ax.legend(loc='lower left')
     ax.tick_params(axis='x', labelsize=16)
     ax.tick_params(axis='y', labelsize=16)
 
 
-def gen_cannon_grad_spec(labels, choose, low, high, coeffs, pivots):
+def gen_cannon_grad_spec(base_labels, choose, low, high, coeffs, pivots):
     """ Generate Cannon gradient spectra
 
     Parameters
@@ -66,17 +63,15 @@ def gen_cannon_grad_spec(labels, choose, low, high, coeffs, pivots):
     high: highest val of cfe or nfe, whatever you're varying
     """
     # Generate Cannon gradient spectra
-
-    low_lab = labels
+    low_lab = copy.copy(base_labels)
     low_lab[choose] = low
     lvec = (train_model._get_lvec(np.array([low_lab]), pivots))[0]
     model_low = np.dot(coeffs, lvec)
-    high_lab = labels
+    high_lab = copy.copy(base_labels)
     high_lab[choose] = high
     lvec = (train_model._get_lvec(np.array([high_lab]), pivots))[0]
     model_high = np.dot(coeffs, lvec)
     grad_spec = (model_high - model_low) / (high - low)
-
     return grad_spec
 
 
@@ -112,39 +107,72 @@ def get_model_spec_martell():
     return wl, c_grad_spec, n_grad_spec
 
 
-DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-my_wl = np.load(DATA_DIR + "/" + "wl.npz")['arr_0']
+def get_model_spec_ting(atomic_number):
+    """ 
+    X_u_template[0:2] are teff, logg, vturb in km/s
+    X_u_template[:,3] -> onward, put atomic number 
+    atomic_number is 6 for C, 7 for N
+    """
+    DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+    temp = np.load("%s/X_u_template_KGh_res=1800.npz" %DATA_DIR)
+    X_u_template = temp["X_u_template"]
+    wl = temp["wavelength"]
+    if atomic_number == 6:
+        print("Plotting Carbon")
+    elif atomic_number == 7:
+        print("Plotting Nitrogen")
+    grad_spec = X_u_template[:,atomic_number]
+    return wl, cannon_normalize(grad_spec+1)
 
-m_coeffs = np.load(DATA_DIR + "/" + "coeffs.npz")['arr_0']
-m_pivots = np.load(DATA_DIR + "/" + "pivots.npz")['arr_0']
 
-labels = [4842, 2.97, -0.173, -0.3, -0.36, 0.046, 0.045]
-c_grad_spec = gen_cannon_grad_spec(
-        labels, 3, -0.3, 0.3, m_coeffs, m_pivots)
-n_grad_spec = gen_cannon_grad_spec(
-        labels, 4, -0.36, 0.36, m_coeffs, m_pivots)
+if __name__=="__main__":
+    DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+    my_wl = np.load(DATA_DIR + "/" + "wl.npz")['arr_0']
+
+    m_coeffs = np.load(DATA_DIR + "/" + "coeffs.npz")['arr_0']
+    m_pivots = np.load(DATA_DIR + "/" + "pivots.npz")['arr_0']
+    m_scatters = np.load(DATA_DIR + "/" + "scatters.npz")['arr_0']
+
+    #labels = [4842, 2.97, -0.173, -0.3, -0.36, 0.046, 0.045]
+    # Yuan-Sen: K giant, solar metallicity
+    labels = [4800, 2.5, 0, -0.1, 0.2, 0.05, 0.05]
+    c_grad_spec = gen_cannon_grad_spec(
+            labels, 3, -0.3, 0.3, m_coeffs, m_pivots) 
+    n_grad_spec = gen_cannon_grad_spec(
+            labels, 4, -0.4, 0.4, m_coeffs, m_pivots) 
+
+    wl, c_grad_model = get_model_spec_ting(6)
+    wl, n_grad_model = get_model_spec_ting(7)
+    #wl, c_grad_model, n_grad_model = get_model_spec_martell()
 
 
-# Make a plot
-fig, (ax0,ax1) = plt.subplots(ncols=2, figsize=(12,6), 
-                              sharex=True, sharey=True)
-plt.subplots_adjust(wspace=0.2)
-x = 0.05
-y = 0.90
-ax0.text(x, y, "Carbon", transform=ax0.transAxes, fontsize=16)
-ax1.text(x, y, "Nitrogen", transform=ax1.transAxes, fontsize=16)
+    # Make a plot
+    fig, (ax0,ax1) = plt.subplots(ncols=2, figsize=(12,6), 
+                                  sharex=True, sharey=True)
+    plt.subplots_adjust(wspace=0.1)
+    x = 0.05
+    y = 0.90
+    ax0.text(
+            x, y, r"-0.3 \textless [C/Fe] \textless 0.3", 
+            transform=ax0.transAxes, fontsize=16)
+    ax1.text(x, y, r"-0.4 \textless [N/Fe] \textless 0.4", 
+            transform=ax1.transAxes, fontsize=16)
 
-plot_cannon(ax0, my_wl, c_grad_spec)
-plot_cannon(ax1, my_wl, n_grad_spec)
+    plot_cannon(ax0, my_wl, c_grad_spec)
+    plot_cannon(ax1, my_wl, n_grad_spec)
 
-wl, c_grad_spec, n_grad_spec = get_model_spec_martell()
-plot_model(ax0, wl, c_grad_spec)
-plot_model(ax1, wl, n_grad_spec)
+    plot_model(ax0, wl, c_grad_model-1)
+    plot_model(ax1, wl, n_grad_model-1)
 
-ax0.set_ylim(-0.35, 0.25)
-ax1.set_ylim(-0.35, 0.25)
-ax0.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
-ax1.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
-ax0.set_ylabel("Normalized Flux", fontsize=18)
+    ax0.set_xlim(4050,4400)
+    ax1.set_xlim(4050, 4400)
+    ax0.set_ylim(-0.4, 0.2)
+    ax1.set_ylim(-0.4, 0.2)
+    ax0.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
+    ax1.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
+    ax0.set_ylabel("Normalized Flux", fontsize=18)
+    #ax0.axvline(x=4310, c='r')
+    #ax1.axvline(x=4310, c='r')
 
-plt.show()
+    plt.show()
+    #plt.savefig("cn_features.png")

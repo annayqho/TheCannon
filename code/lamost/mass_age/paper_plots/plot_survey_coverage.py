@@ -13,7 +13,7 @@ import pyfits
 
 # import the data
 hdulist = pyfits.open(
-"/Users/annaho/Data/Mass_And_Age/lamost_catalog_mass_age.fits")
+"/Users/annaho/Data/LAMOST/Mass_And_Age/lamost_catalog_mass_age_with_cuts.fits")
 tbdata = hdulist[1].data
 # # cols = hdulist[1].columns
 # # cols.names
