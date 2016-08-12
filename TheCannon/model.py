@@ -18,6 +18,7 @@ class CannonModel(object):
         self.scatters = None
         self.chisqs = None
         self.pivots = None
+        self.scales = None
         self.order = order
         self.model_spectra = None
 
@@ -33,10 +34,10 @@ class CannonModel(object):
     def train(self, ds):
         """ Run training step: solve for best-fit spectral model """
         # Anna's model
-        #self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(ds)
+        #self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model(ds)
 
         # new version
-        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model_new(ds)
+        self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model_new(ds)
 
 
     def diagnostics(self):

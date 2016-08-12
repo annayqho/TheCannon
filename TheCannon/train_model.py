@@ -8,6 +8,7 @@ import scipy.optimize as op
 def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
     """
     This is just for a single lambda.
+    ldelta is scaled like the linear lvec components
     """
     coeff_m = pars[:-1]
     scatter_m = pars[-1]    # scatter is the last parameter
@@ -21,7 +22,7 @@ def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs,
     inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
     resids = fluxes_m - np.dot(coeff_m, lvec.T)
     lnLs = 0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * resids**2 * inv_var
-    dlnLds = - scatter_m * (inv_var**2 * resids**2 + inv_var) 
+    dlnLds = scatter_m * (inv_var**2 * resids**2 - inv_var) 
     dlnLdtheta = inv_var[:, None] * ((inv_var[:, None] * Delta2_deriv * resids[:, None]**2) - Delta2_deriv + lvec * resids[:, None])
     dlnLdpars = np.hstack([dlnLdtheta, dlnLds[:, None]])  # scatter is the last parameter  
     return -2.*np.sum(lnLs), -2.*np.sum(dlnLdpars, axis=0) 
@@ -32,22 +33,32 @@ def test_training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_de
     
     for k in range(len(pars)):
         pars1 = 1. * pars
-        tiny = 1e-5 * pars[k]
+        tiny = 1e-7 * pars[k]
         pars1[k] += tiny       # MAGIC!
         q1, foo = training_step_objective_function(pars1, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta)
-        dqdpk = (q1-q) * tiny
-        print k, q, q1, pars[k], dqdp[k], dqdpk, dqdp[k]-dqdpk
-    
+        # dqdpk = (q1-q)/tiny
+        # print k, q, q1, pars[k], tiny, dqdp[k], dqdpk, (dqdp[k]-dqdpk)/(dqdp[k]+dqdpk)
+        
     return True
 
 def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
     x0 = np.zeros((len(lvec_derivs[0])+1,))
     x0[0] = 1.
-    res = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta), method='Powell')
-    coeff_m = res.x[:-1]
-    scatter_m = res.x[-1]
+    x0[-1] = .01
+    res = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta), 
+                      method='L-BFGS-B', jac=True, 
+                      options={'gtol':1e-12, 'ftol':1e-12}) # tolerance are magic numbers!
+    # coeff_m = res.x[:-1]
+    # scatter_m = res.x[-1]   
+    return res
     
-    return res.x
+def get_pivots_and_scales(label_vals):
+    
+    qs = np.percentile(label_vals, (2.5, 50, 97.5), axis=0)
+    pivots = qs[1]
+    scales = (qs[2] - qs[0])/4.
+    
+    return pivots, scales
    
 def _train_model_new(ds):
     
@@ -56,17 +67,15 @@ def _train_model_new(ds):
     npixels = len(lams)
     fluxes = ds.tr_flux
     ivars = ds.tr_ivar
-    ldelta = np.zeros((len(fluxes), len(label_vals[1]))) #ds.tr_delta
+    ldelta = ds.tr_delta
     
     # for training, ivar can't be zero, otherwise you get singular matrices
     # DWH says: make sure no ivar goes below 1 or 0.01
     ivars[ivars<0.01] = 0.01
 
-    pivots = np.mean(label_vals, axis=0)
-    lvec, lvec_derivs = _get_lvec(label_vals, pivots, derivs=True)
-#    lvec = np.array([lvec,] * npixels)
-#    lvec_derivs = np.array([lvec_derivs,] * npixels)
-#    ldelta = np.array([ldelta,] * npixels)
+    pivots, scales = get_pivots_and_scales(label_vals) 
+    lvec, lvec_derivs = _get_lvec(label_vals, pivots, scales, derivs=True)
+    scaled_ldelta = ldelta / scales[None, :]
 
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
@@ -75,7 +84,10 @@ def _train_model_new(ds):
     coeffs = []
     scatters = []
     for m in range(0, npixels):
-        coeffs_m, scatter_m = train_one_wavelength(fluxes[m], ivars[m], lvec, lvec_derivs, ldelta)
+        print('Working on pixel {}'.format(m))
+        res = train_one_wavelength(fluxes[m], ivars[m], lvec, lvec_derivs, scaled_ldelta)
+        coeffs_m = res.x[:-1]
+        scatter_m = res.x[-1]
         coeffs.append(coeffs_m)
         scatters.append(scatter_m)
     
@@ -90,7 +102,7 @@ def _train_model_new(ds):
     all_chisqs = 0
     print("Done training model (Christina)")
 
-    return np.array(coeffs), np.array(scatters), all_chisqs, pivots
+    return np.array(coeffs), np.array(scatters), all_chisqs, pivots, scales
 
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
@@ -195,7 +207,7 @@ def _do_one_regression(lams, fluxes, ivars, lvec):
     return _r + (best_scatter, )
 
 
-def _get_lvec(label_vals, pivots, derivs):
+def _get_lvec(label_vals, pivots, scales, derivs):
     """
     Constructs a label vector for an arbitrary number of labels
     Assumes that our model is quadratic in the labels
@@ -206,8 +218,10 @@ def _get_lvec(label_vals, pivots, derivs):
     ----------
     label_vals: numpy ndarray, shape (nstars, nlabels)
         labels 
-    pivots: numpy ndarray
-        mean of the label_vals
+    pivots: numpy ndarray, shape (nlabels, )
+        offset we subtract from the label_vals
+    scales: numpy ndarray, shape (nlabels, )
+        scale we divide out of the label_vals
     derivs: return also the derivatives of the vector wrt the labels
 
     Returns
@@ -216,11 +230,15 @@ def _get_lvec(label_vals, pivots, derivs):
         label vector
     dlvec_dl: numpy ndarray (if derivs)
         label vector derivatives
+        
+    Notes
+    --------
+    lvec_derivs and lvec is now in units of the scaled labels! 
     """
     nlabels = label_vals.shape[1]
     nstars = label_vals.shape[0]
     # specialized to second-order model
-    linear_offsets = label_vals - pivots
+    linear_offsets = (label_vals - pivots[None, :]) /scales[None, :]
     quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)]
                                   for m in (linear_offsets)])
     ones = np.ones((nstars, 1))
@@ -266,11 +284,9 @@ def _train_model(ds):
     # DWH says: make sure no ivar goes below 1 or 0.01
     ivars[ivars<0.01] = 0.01
 
-    pivots = np.mean(label_vals, axis=0)
-    lvec, lvec_derivs = _get_lvec(label_vals, pivots, derivs=True)
+    pivots, scales = get_pivots_and_scales(label_vals)
+    lvec, lvec_derivs = _get_lvec(label_vals, pivots, scales, derivs=True)
     lvec_full = np.array([lvec,] * npixels)
-
-    # print np.shape(ivars), np.shape(fluxes), lvec.shape, lvec_full.shape
 
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
@@ -287,4 +303,4 @@ def _train_model(ds):
     all_chisqs = chis*chis
     print("Done training model (Anna)")
 
-    return coeffs, scatters, all_chisqs, pivots
+    return coeffs, scatters, all_chisqs, pivots, scales

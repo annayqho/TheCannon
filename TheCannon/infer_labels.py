@@ -69,7 +69,6 @@ def _infer_labels(model, dataset, starting_guess=None):
     coeffs_all = model.coeffs
     scatters = model.scatters
     chisqs = model.chisqs
-    pivots = model.pivots
     nlabels = len(dataset.get_plotting_labels())
     fluxes = dataset.test_flux
     ivars = dataset.test_ivar
@@ -107,7 +106,7 @@ def _infer_labels(model, dataset, starting_guess=None):
             covs = np.zeros((len(starting_guess),len(starting_guess)))-9999.
         chi2 = (flux_piv-_func(coeffs, *labels))**2 * ivar / (1 + ivar * scatters**2)
         chisq_all[jj] = sum(chi2)
-        labels_all[jj,:] = labels + pivots
+        labels_all[jj,:] = model.scales * labels + model.pivots
         errs_all[jj,:] = covs.diagonal()
 
     dataset.set_test_label_vals(labels_all)
