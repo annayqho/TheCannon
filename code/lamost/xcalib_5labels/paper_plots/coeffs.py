@@ -50,7 +50,8 @@ vlines = [5173, 5528, 5711, ]
 for i in range(0, nlabels):
     d = errs[i]
     ax = axarr[i] 
-    lbl = r'$\frac{\partial \mbox{f}}{\partial %s} \delta %s$'%(label_names[i], label_names[i])
+    lbl = r'$\frac{\partial \mbox{f}}{\partial %s} \delta %s$'%(
+            label_names[i], label_names[i])
     ax.set_ylabel(lbl, fontsize=14)
     ax.tick_params(axis='y', labelsize=14)
     ax.xaxis.grid(True)

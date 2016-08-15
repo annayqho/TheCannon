@@ -24,7 +24,7 @@ def calc_sum(mh, cm, nm):
 
 def calc_cn(cm, nm):
     """ This is called [C/N] in Martig 2016 """
-    return(cm / nm)
+    return(cm - nm)
 
 
 def calc_mass(mh,cm,nm):

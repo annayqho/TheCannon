@@ -12,9 +12,16 @@ plt.rc('font', family='serif')
 from TheCannon import train_model
 from matplotlib.ticker import MaxNLocator
 
-DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
 
-def spectral_model():
+dibs = [4066, 4180, 4428, 4502, 4726, 4760, 4763, 4780, 4882, 4964, 
+        5173, 5404, 5488, 5494, 5508, 5528, 5545, 5705, 5711, 5778, 
+        5780, 5797, 5844, 5850, 
+        6010, 6177, 6196, 6203, 6234, 6270, 6284, 6376, 6379, 6445, 6533, 
+        6614, 6661, 6699, 6887, 6919, 6993, 7224, 7367, 7562, 8621]
+
+
+def spectral_model(lamost_id, xmin, xmax):
     wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
     ref_id = np.load("%s/ref_id.npz" %DATA_DIR)['arr_0']
     flux = np.load("%s/ref_flux.npz" %DATA_DIR)['arr_0']
@@ -28,22 +35,13 @@ def spectral_model():
     cannon_label = np.load("%s/xval_cannon_label_vals.npz" %DATA_DIR)['arr_0']
     lvec_all = train_model._get_lvec(cannon_label, pivots)
 
-    #xmin = min(wl)
-    #xmax = max(wl)
-    xmin = 6200
-    xmax = 7000
+    r_ymin = -0.06
+    r_ymax = 0.06
+    ymin = 0.75
+    ymax = 1.1
 
-    r_ymin = -0.05
-    r_ymax = 0.05
-    ymin = 0.6
-    ymax = 1.15
-
-    # cm goes from -0.3 to 0.3
-    # nm goes from -0.3 to 0.4
-    # ii = 174 ## 4842, 2.97, -0.173, -0.209, 0.36, 0.046, 0.045, SNR = 116
-    # ii = 546 ## 4591, 2.85, -0.24, 0.042, -0.0076, 0.0891, 0.00094, SNR = 127
-    # ii = 1099 ## 5510, 3.95, -0.26, 0.277, -0.257, 0.0355, 0.0139, SNR = 112
-    ii = np.where(snr > 110)[0][5]
+    ii = np.where(ref_id==lamost_id)[0][0]
+    
     f = flux[ii,:]
     iv = ivar[ii,:]
     label = cannon_label[ii,:]
@@ -58,10 +56,6 @@ def spectral_model():
 
     print("X2 is: " + str(sum((f - model)**2 * iv_tot)))
 
-    # Cinv = ivars / (1 + ivars*scatter**2)
-    # lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
-    # lTCinvf = np.dot(lvec.T, Cinv * fluxes)
-
     # Thanks to David Hogg / Andy Casey for this...
     # I stole it from the Annie's Lasso Github.
     gs = gridspec.GridSpec(2, 1, height_ratios=[1,4])
@@ -75,6 +69,8 @@ def spectral_model():
             wl, model, c='r', alpha=0.7, label="The Cannon Model")
     ax_spectrum.fill_between(
             wl, model+err, model-err, alpha=0.1, color='r')
+    for dib in dibs:
+        ax_spectrum.axvline(x=dib, c='k', lw=0.5)
     ax_spectrum.set_ylim(ymin, ymax)
     ax_spectrum.set_xlim(xmin, xmax)
     ax_spectrum.axhline(1, c="k", linestyle=":", zorder=-1)
@@ -98,10 +94,14 @@ def spectral_model():
     ax_residual.tick_params(axis="both", labelsize=18)
 
     fig.tight_layout()
-    plt.show()
+    return resid, fig
+    #plt.show()
     #plt.savefig("model_spectrum_full.png")
-    #plt.savefig("model_spectrum.png")
+    #plt.savefig("model_spectrum_%s_%s.png" %(ii, xmin))
+    #plt.close()
 
 
 if __name__=="__main__":
-    spectral_model()
+    spectral_model(117, 4000, 5000)
+    #for ii in range(0, 50):
+    #    spectral_model(ii, 5100, 5300)

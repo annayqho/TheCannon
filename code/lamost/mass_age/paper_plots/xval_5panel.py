@@ -25,11 +25,19 @@ mins = [3700, 1.0, -2.0, -0.3, -0.3,-0.11,-0.11]
 maxs = [5500, 4.1, 0.6, 0.38, 0.5, 0.4, 0.4]
 
 print("Loading data")
-direc = "/Users/annaho/Data/Mass_And_Age"
+direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+data_direc = "../cn"
 #direc = "../cn"
-snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
-apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
-cannon = np.load("%s/xval_cannon_label_vals.npz" %direc)['arr_0']
+#snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
+snr = np.load(
+    "%s/all_colors_culled_xval_ref_snr.npz" %data_direc)['arr_0']
+ref_ids = np.load("%s/ref_id.npz" %direc)['arr_0']
+real_ref_ids = np.load("../cn/ref_id_col.npz")['arr_0']
+inds = np.array([np.where(ref_ids==val)[0][0] for val in real_ref_ids])
+apogee = np.load("%s/ref_label.npz" %direc)['arr_0'][inds]
+#cannon = np.load("%s/xval_cannon_label_vals.npz" %direc)['arr_0']
+cannon = np.load(
+    "%s/all_colors_culled_xval_cannon_label_vals.npz" %data_direc)['arr_0']
 
 fig = plt.figure(figsize=(9,10))
 gs = gridspec.GridSpec(4,2, wspace=0.3, hspace=0.3)
@@ -81,5 +89,5 @@ for i in range(0, len(names)):
     ax.set_xlabel(r"$%s$" %name + " (%s) from APOGEE" %unit)
     ax.set_ylabel(r"$%s$" %(name) + " (%s) from Cannon" %unit)
 
-#plt.show()
-plt.savefig("xval_5panel.png")
+plt.show()
+#plt.savefig("xval_5panel.png")

@@ -3,8 +3,6 @@ import glob
 import matplotlib.pyplot as plt
 import sys
 import pyfits
-sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon/TheCannon')
-sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon')
 from TheCannon import dataset
 from TheCannon import model
 from TheCannon import lamost
@@ -14,9 +12,11 @@ from matplotlib import rc
 rc('font', family='serif')
 rc('text', usetex=True)
 import os
+from get_colors import get_colors
 
 
-DATA_DIR = "/Users/annaho/Data/LAMOST"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+SPEC_DIR = "/Users/annaho/Dropbox/Research/TheCannon/code/lamost/mass_age/cn"
 
 
 def test_step_iteration(ds, m, starting_guess):
@@ -37,7 +37,7 @@ def train(ds, leave_out):
     m = model.CannonModel(2)
     m.fit(ds)
     np.savez(
-        "./model_%s.npz" %leave_out, 
+        "./all_colors_culled_model_%s.npz" %leave_out, 
         m.coeffs, m.scatters, m.chisqs, m.pivots) 
     fig = m.diagnostics_leading_coeffs(ds)
     plt.savefig("leading_coeffs_%s.png" %leave_out)
@@ -72,7 +72,7 @@ def validate(ds, m, leave_out):
         best_errs[jj,:] = errs[:,jj,:][val]
 
     np.savez(
-            "test_results_%s.npz" %leave_out, 
+            "all_colors_culled_test_results_%s.npz" %leave_out, 
             best_labels, best_errs, best_chisq) 
 
     ds.test_label_vals = best_labels
@@ -80,10 +80,10 @@ def validate(ds, m, leave_out):
 
 
 def loop(num_sets):
-    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
-    ref_id = np.load("ref_id.npz")['arr_0']
-    ref_flux = np.load("ref_flux.npz")['arr_0']
-    ref_ivar = np.load("ref_ivar.npz")['arr_0']
+    wl = np.load("wl_cols.npz")['arr_0']
+    ref_id = np.load("ref_id_col.npz")['arr_0']
+    ref_flux = np.load("ref_flux_col.npz")['arr_0']
+    ref_ivar = np.load("ref_ivar_col.npz")['arr_0']
     ref_label = np.load("ref_label.npz")['arr_0']
     assignments = np.load("assignments.npz")['arr_0']
     
@@ -95,29 +95,31 @@ def loop(num_sets):
         tr_id = ref_id[training]
         tr_flux = ref_flux[training]
         tr_ivar = ref_ivar[training]
+        tr_ivar[np.isnan(tr_ivar)] = 0.0
         tr_label = ref_label[training]
         np.savez(
-            "tr_set_%s.npz" %leave_out, tr_id, tr_flux, tr_ivar, tr_label)
+            "all_colors_culled_tr_set_%s.npz" %leave_out, 
+            tr_id, tr_flux, tr_ivar, tr_label)
         test_id = ref_id[test]
         test_flux = ref_flux[test]
         test_ivar = ref_ivar[test]
+        test_ivar[np.isnan(test_ivar)] = 0.0
         test_label = ref_label[test]
         np.savez(
-            "test_set_%s.npz" %leave_out, 
+            "all_colors_culled_test_set_%s.npz" %leave_out, 
             test_id, test_flux, test_ivar, test_label)
         ds = dataset.Dataset(
             wl, tr_id, tr_flux, tr_ivar, tr_label, 
             test_id, test_flux, test_ivar)
-        ds.set_label_names(
-            ['T_{eff}', '\log g', '[Fe/H]', '[C/M]', 
-                '[N/M]', '[\\alpha/M]', 'A_k'])
+        print(ds.wl)
+        ds.set_label_names(label_names)
         fig = ds.diagnostics_SNR()
         plt.savefig("SNRdist_%s.png" %leave_out)
         plt.close()
         fig = ds.diagnostics_ref_labels()
         plt.savefig("ref_label_triangle_%s.png" %leave_out)
         plt.close()
-        np.savez("tr_snr_%s.npz" %leave_out, ds.tr_SNR)
+        np.savez("all_colors_culled_tr_snr_%s.npz" %leave_out, ds.tr_SNR)
         
         modelf = "model_%s.npz" %leave_out
         if glob.glob(modelf):

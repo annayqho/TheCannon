@@ -21,7 +21,8 @@ import os
 
 GIT_DIR = "/Users/annaho/Dropbox/Research/TheCannon/"
 DATA_DIR = GIT_DIR + "data/"
-SPEC_DIR = "/Users/annaho/Data/LAMOST"
+SPEC_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+#SPEC_DIR = "."
 
 def load_data():
     print("Loading all data")
@@ -78,31 +79,42 @@ def load_data():
 
 
 def train():
-    wl = np.load("%s/wl.npz" %SPEC_DIR)['arr_0']
-    tr_id = np.load("ref_id.npz")['arr_0']
-    tr_label = np.load("ref_label.npz")['arr_0']
-    tr_flux = np.load("ref_flux.npz")['arr_0']
-    tr_ivar = np.load("ref_ivar.npz")['arr_0']
+    wl = np.load("%s/wl_cols.npz" %SPEC_DIR)['arr_0']
+    tr_id = np.load("%s/ref_id_col.npz" %SPEC_DIR)['arr_0']
+    tr_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0']
+    tr_flux = np.load("%s/ref_flux_col.npz" %SPEC_DIR)['arr_0']
+    tr_ivar = np.load("%s/ref_ivar_col.npz" %SPEC_DIR)['arr_0']
+
+    # real_tr = np.load(
+    #         GIT_DIR + \
+    #         "/code/lamost/mass_age/cn/ref_id_culled.npz")['arr_0']
+    # choose = np.array([np.where(tr_id==val)[0][0] for val in real_tr])
+    # np.savez("ref_id.npz", tr_id[choose])
+    # np.savez("ref_flux.npz", tr_flux[choose])
+    # np.savez("ref_ivar.npz", tr_ivar[choose])
+    # np.savez("ref_label.npz", tr_label[choose])
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label, tr_id, tr_flux, tr_ivar)
+            wl, tr_id, tr_flux, tr_ivar, tr_label, 
+            tr_id, tr_flux, tr_ivar)
     # teff, logg, mh, cm, nm, am, ak
     ds.set_label_names(
             ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
                 '[\\alpha/M]', 'A_k'])
     ds.diagnostics_SNR()
-    #ds.diagnostics_ref_labels()
-    np.savez("ref_snr.npz", ds.tr_SNR)
+    ds.diagnostics_ref_labels()
+    np.savez("culled_ref_snr.npz", ds.tr_SNR)
 
+    print("Training model")
     m = model.CannonModel(2)
     m.fit(ds)
-    np.savez("./coeffs.npz", m.coeffs)
-    np.savez("./scatters.npz", m.scatters)
-    np.savez("./chisqs.npz", m.chisqs)
-    np.savez("./pivots.npz", m.pivots)
+    np.savez("./culled_coeffs.npz", m.coeffs)
+    np.savez("./culled_scatters.npz", m.scatters)
+    np.savez("./culled_chisqs.npz", m.chisqs)
+    np.savez("./culled_pivots.npz", m.pivots)
     m.diagnostics_leading_coeffs(ds)
     #m.diagnostics_leading_coeffs_triangle(ds)
-    m.diagnostics_plot_chisq(ds)
+    #m.diagnostics_plot_chisq(ds)
 
 
 def test_step_iteration(ds, m, starting_guess):
@@ -111,29 +123,36 @@ def test_step_iteration(ds, m, starting_guess):
 
 
 def test_step():
-    wl = np.load("./wl.npz")['arr_0']
-    tr_id = np.load("./tr_id.npz")['arr_0']
-    tr_flux = np.load("./tr_flux.npz")['arr_0']
-    tr_ivar = np.load("./tr_ivar.npz")['arr_0']
-    tr_label = np.load("./tr_label.npz")['arr_0']
+    #wl = np.load("%s/wl.npz" %SPEC_DIR)['arr_0']
+    wl = np.load("wl_cols.npz")['arr_0']
+    test_id = np.load("%s/ref_id.npz" %SPEC_DIR)['arr_0']
+    tr_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0']
+    test_flux = np.load("%s/ref_flux.npz" %SPEC_DIR)['arr_0']
+    test_ivar = np.load("%s/ref_ivar.npz" %SPEC_DIR)['arr_0']
+
+    #tr_id = np.load("./ref_id.npz")['arr_0']
+    #tr_flux = np.load("./ref_flux.npz")['arr_0']
+    #tr_ivar = np.load("./ref_ivar.npz")['arr_0']
+    #tr_label = np.load("./ref_label.npz")['arr_0']
 
     ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label, tr_id, tr_flux, tr_ivar)
+            wl, test_id, test_flux, test_ivar, tr_label, 
+            test_id, test_flux, test_ivar)
     ds.set_label_names(
             ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
                 '[\\alpha/M]', 'A_k'])
 
     m = model.CannonModel(2)
-    m.coeffs = np.load("./coeffs.npz")['arr_0']
-    m.scatters = np.load("./scatters.npz")['arr_0']
-    m.chisqs = np.load("./chisqs.npz")['arr_0']
-    m.pivots = np.load("./pivots.npz")['arr_0']
+    m.coeffs = np.load("./culled_coeffs.npz")['arr_0']
+    m.scatters = np.load("./culled_scatters.npz")['arr_0']
+    m.chisqs = np.load("./culled_chisqs.npz")['arr_0']
+    m.pivots = np.load("./culled_pivots.npz")['arr_0']
 
     nguesses = 10
-    nobj = len(tr_id)
+    nobj = len(ds.test_ID)
     nlabels = len(m.pivots)
     choose = np.random.randint(0,nobj,size=nguesses)    
-    starting_guesses = tr_label[choose]-m.pivots
+    starting_guesses = ds.tr_label[choose]-m.pivots
     labels = np.zeros((nguesses, nobj, nlabels))
     chisq = np.zeros((nguesses, nobj))
     errs = np.zeros(labels.shape)
@@ -144,9 +163,9 @@ def test_step():
         chisq[ii,:] = b
         errs[ii,:] = c
 
-    np.savez("labels_all_starting_vals.npz", labels)
-    np.savez("chisq_all_starting_vals.npz", chisq)
-    np.savez("errs_all_starting_vals.npz", errs)
+    #np.savez("labels_all_starting_vals.npz", labels)
+    #np.savez("chisq_all_starting_vals.npz", chisq)
+    #np.savez("errs_all_starting_vals.npz", errs)
 
     choose = np.argmin(chisq, axis=0)
     best_chisq = np.min(chisq, axis=0)
@@ -156,7 +175,7 @@ def test_step():
         best_labels[jj,:] = labels[:,jj,:][val]
         best_errs[jj,:] = errs[:,jj,:][val]
 
-    np.savez("./all_cannon_labels.npz", best_labels)
+    np.savez("./cannon_label_vals.npz", best_labels)
     np.savez("./cannon_label_chisq.npz", best_chisq)
     np.savez("./cannon_label_errs.npz", best_errs)
 
@@ -167,6 +186,6 @@ def test_step():
 
 if __name__=="__main__":
     #load_data()
-    train()
+    #train()
     #print("test")
-    #test_step()
+    test_step()
