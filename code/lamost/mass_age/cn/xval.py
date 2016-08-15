@@ -81,6 +81,8 @@ def validate(ds, m, leave_out):
 
 def loop(num_sets):
     wl = np.load("wl_cols.npz")['arr_0']
+    label_names = ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
+                            '[\\alpha/M]', 'A_k']
     ref_id = np.load("ref_id_col.npz")['arr_0']
     ref_flux = np.load("ref_flux_col.npz")['arr_0']
     ref_ivar = np.load("ref_ivar_col.npz")['arr_0']
