@@ -1,33 +1,49 @@
 """ Pull out the APOKASC/LAMOST overlap set,
-and create model spectra """
+and create model spectra 
+
+needs to be aida42082
+"""
 
 import pyfits
 import os
 import numpy as np
 import glob
+import sys
+sys.path.append("/home/annaho/TheCannon")
 from TheCannon import lamost
 from TheCannon import dataset
 from model_spectra import get_model_spec
 
-DATA_DIR = "/Users/annaho/Data/Li_Giants"
-a = pyfits.open(DATA_DIR + "/" + "kepler_obj_in_test_set.fits")
+#DATA_DIR = "/Users/annaho/Data/Li_Giants"
+#a = pyfits.open(DATA_DIR + "/" + "kepler_obj_in_test_set.fits")
+a = pyfits.open("kepler_obj_in_test_set.fits")
 data = a[1].data
 a.close()
 
-'obsdate_1'
-'lamost_id'
-'snrg'
-'cannon_teff'
-'cannon_logg'
-'cannon_m_h'
-'cannon_alpha_m'
-'cannon_a_k'
-'cannon_chisq'
-'cannon_snrg'
+#'obsdate_1'
+#'lamost_id'
+#'snrg'
+#'cannon_teff'
+#'cannon_logg'
+#'cannon_m_h'
+#'cannon_alpha_m'
+#'cannon_a_k'
+#'cannon_chisq'
+#'cannon_snrg'
 
-wl = np.load("/Users/annaho/Data/LAMOST/wl.npz")['arr_0']
+#wl = np.load("/Users/annaho/Data/LAMOST/wl.npz")['arr_0']
+wl = np.load("wl.npz")['arr_0']
 obsdate = data['obsdate_1']
 lamost_id = data['lamost_id']
+transfer = []
+
+for ii,date_raw in enumerate(obsdate):
+    date = ''.join(date_raw.split('-'))
+    id_f = date + "_ids.npz"
+    norm_f = date + "_norm.npz"
+    DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels/output"
+    if glob.glob(DIR + "/" + id_f): 
+        transfer.append(id_f)
 
 
 def get_model():
@@ -90,8 +106,8 @@ def wget_files():
             #spec-56094-kepler05B56094_2_sp10-118.fits.gz
 
 
-if __name__=="__main__":
-    wget_files()
+#if __name__=="__main__":
+    #wget_files()
     # labels = get_labels()
     # norm_flux, norm_ivar = get_normed_spectra()
     # coeffs, scatters, chisqs, pivots = get_model()

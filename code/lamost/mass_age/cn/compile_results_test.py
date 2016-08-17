@@ -9,11 +9,13 @@ from matplotlib import rc
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
+SPEC_DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels"
 
 files = glob.glob("output/*all_cannon_labels.npz")
 chisq = glob.glob("output/*cannon_label_chisq.npz")
 errs = glob.glob("output/*cannon_label_errs.npz")
 
+id_all = []
 teff_all = []
 teff_err_all = []
 logg_all = []
@@ -29,6 +31,8 @@ alpha_err_all = []
 chisq_all = []
 
 for i,f in enumerate(files):
+    date = f[7:15]
+    ids = np.load("%s/output/%s_ids.npz" %(SPEC_DIR, date))['arr_0'] 
     labels = np.load(f)['arr_0']
     err = np.load(errs[i])['arr_0']
     teff = labels[:,0]
@@ -43,6 +47,7 @@ for i,f in enumerate(files):
     nm_err = err[:,4]
     alpha = labels[:,5]
     alpha_err = err[:,5]
+    id_all.extend(ids)
     teff_all.extend(teff)
     teff_err_all.extend(teff_err)
     logg_all.extend(logg)
@@ -67,6 +72,13 @@ nm_all = np.array(nm_all)
 mass = calc_mass_2(feh_all, cm_all, nm_all, teff_all, logg_all)
 age = 10.0**calc_logAge(feh_all, cm_all, nm_all, teff_all, logg_all)
 
+np.savez("test_id_all.npz", id_all)
+test_label = np.vstack((
+    teff_all, logg_all, feh_all, cm_all, nm_all, alpha_all, mass, age))
+test_err = np.vstack((
+    teff_err_all, logg_err_all, feh_err_all, cm_err_all, nm_err_all, alpha_err_all))
+np.savez("test_label_all.npz", test_label)
+np.savez("test_err_all.npz", test_err)
 np.savez("teff_all.npz", teff_all)
 np.savez("teff_err_all.npz", teff_err_all)
 np.savez("logg_all.npz", logg_all)
@@ -81,7 +93,7 @@ np.savez("alpha_all.npz", alpha_all)
 np.savez("alpha_err_all.npz", alpha_err_all)
 np.savez("mass_all.npz", mass)
 np.savez("age_all.npz", age)
-np.savez("chisq_all.npz", chisq_all)
+np.savez("test_chisq_all.npz", chisq_all)
 
 tr_feh = np.load("ref_label.npz")['arr_0'][:,2]
 tr_afe = np.load("ref_label.npz")['arr_0'][:,5]
