@@ -31,11 +31,14 @@ def test_step_iteration(ds, m, starting_guess):
 
 
 def test_step(date):
-    wl = np.load("%s/wl.npz" %MODEL_DIR)['arr_0']
+    wl = np.load("%s/wl_cols.npz" %MODEL_DIR)['arr_0']
     test_ID = np.load("%s/output/%s_ids.npz" %(SPEC_DIR, date))['arr_0']
     print(str(len(test_ID)) + " objects")
     test_flux = np.load("%s/output/%s_norm.npz" %(SPEC_DIR,date))['arr_0']
-    test_ivar = np.load("%s/output/%s_norm.npz" %(SPEC_DIR,date))['arr_1']
+    test_ivar_temp = np.load("%s/output/%s_norm.npz" %(SPEC_DIR,date))['arr_1']
+    # Mask
+    mask = np.load("mask.npz")['arr_0']
+    test_ivar = apply_mask(wl[0:3626], test_ivar_temp, mask)
 
     lamost_label = np.load("%s/output/%s_tr_label.npz" %(SPEC_DIR,date))['arr_0']
     apogee_label = np.load("./ref_label.npz")['arr_0']

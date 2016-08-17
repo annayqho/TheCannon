@@ -40,11 +40,11 @@ def load_all_ref():
     np.savez("cn_ref_snr.npz", ds.tr_SNR)
 
 
-def apply_mask(wl, ref_ivar):
+def apply_mask(wl, ref_ivar, mask):
     # Mask out wl
     # Mask out tellurics, DIBs, the Na double, the end of hte spectrum
     print("Applying mask")
-    mask = np.load("%s/mask.npz" %DATA_DIR)['arr_0']
+    #mask = np.load("%s/mask.npz" %DATA_DIR)['arr_0']
     label_names = ['T_{eff}', '\log g', '[M/H]', '[C/M]', '[N/M]', 
             '[\\alpha/M]', 'Ak']
     ref_ivar[:,mask] = 0.0
