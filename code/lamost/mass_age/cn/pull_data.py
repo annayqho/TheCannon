@@ -2,7 +2,7 @@
 
 import pyfits
 import numpy as np
-from TheCannon import dataset
+#from TheCannon import dataset
 from get_colors import get_colors
 
 DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
@@ -34,10 +34,10 @@ def load_all_ref():
     #ds = dataset.Dataset(
     #        wl[0:3626], ref_id_col, ref_flux_col[:,3626], ref_ivar_col[:,3626], 
     #        ref_label, [], [], [])
-    ds = dataset.Dataset(
-            wl[start:end], ref_id_col, ref_flux_col[:,start:end], 
-            ref_ivar_col[:,start:end], ref_label, [], [], [])
-    np.savez("cn_ref_snr.npz", ds.tr_SNR)
+    #ds = dataset.Dataset(
+    #        wl[start:end], ref_id_col, ref_flux_col[:,start:end], 
+    #        ref_ivar_col[:,start:end], ref_label, [], [], [])
+    #np.savez("cn_ref_snr.npz", ds.tr_SNR)
 
 
 def apply_mask(wl, ref_ivar, mask):
