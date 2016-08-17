@@ -4,8 +4,8 @@ import pyfits
 import numpy as np
 from TheCannon import dataset
 import sys
-sys.path.append("/Users/annaho/Dropbox/Research/TheCannon/code/lamost")
-from get_colors import get_colors
+#sys.path.append("/Users/annaho/Dropbox/Research/TheCannon/code/lamost")
+#from get_colors import get_colors
 
 
 def load_all_ref_label():
