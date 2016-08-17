@@ -53,4 +53,4 @@ def get_colors(catalog):
     #bad = col[:,1] < 0.0
     #col_ivar[bad] = 0.0
 
-    return col, col_ivar
+    return all_ids, col, col_ivar
