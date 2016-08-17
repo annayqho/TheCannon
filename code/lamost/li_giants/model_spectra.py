@@ -29,7 +29,7 @@ def get_model_spec(wl, label, coeffs, scatters, chisqs, pivots):
     return m.model_spectra
 
 
-def spectral_model(ii, model_spec):
+def spectral_model(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots):
     xmin = 6000
     xmax = 6800
 
@@ -40,15 +40,21 @@ def spectral_model(ii, model_spec):
 
     f = flux[ii,:]
     iv = ivar[ii,:]
-    model = model_all[ii,:]
+    model_spec = model_all[ii,:]
 
     # err = scat ^2 + uncertainty^2
+    m = model.CannonModel(2)
+    m.coeffs = coeffs
+    m.scatters = scatters
+    m.chisqs = chisqs
+    m.pivots = pivots
+
     scat = m.scatters
     iv_tot = (iv/(scat**2 * iv + 1))
     err = np.ones(len(iv_tot))*1000
     err[iv_tot>0] = 1/iv_tot[iv_tot>0]**0.5
 
-    print("X2 is: " + str(sum((f - model)**2 * iv_tot)))
+    print("X2 is: " + str(sum((f - model_spec)**2 * iv_tot)))
 
     # Cinv = ivars / (1 + ivars*scatter**2)
     # lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
@@ -65,21 +71,21 @@ def spectral_model(ii, model_spec):
             wl, f, c='k', alpha=0.7, drawstyle='steps-mid', label="Data")
     #ax_spectrum.scatter(wl, f, c='k')
     ax_spectrum.plot(
-            wl, model, c='r', alpha=0.7, label="The Cannon Model")
+            wl, model_spec, c='r', alpha=0.7, label="The Cannon Model")
     ax_spectrum.fill_between(
-            wl, model+err, model-err, alpha=0.1, color='r')
+            wl, model_spec+err, model_spec-err, alpha=0.1, color='r')
     ax_spectrum.set_ylim(ymin, ymax)
     ax_spectrum.set_xlim(xmin, xmax)
     ax_spectrum.axhline(1, c="k", linestyle=":", zorder=-1)
     ax_spectrum.legend(loc="lower right")
 
-    resid = f-model
+    resid = f-model_spec
     ax_residual.plot(wl, resid, c='k', alpha=0.8, drawstyle='steps-mid')
     ax_residual.fill_between(wl, resid+err, resid-err, alpha=0.1, color='k')
     ax_residual.set_ylim(r_ymin,r_ymax)
     ax_residual.set_xlim(ax_spectrum.get_xlim())
     ax_residual.axhline(0, c="k", linestyle=":", zorder=-1)
-    ax_residual.axvline(x=6717, c='r', linewidth=2, linestyle='--')
+    ax_residual.axvline(x=6707, c='r', linewidth=2, linestyle='--')
     ax_residual.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     ax_residual.set_xticklabels([])
 
@@ -95,7 +101,9 @@ def spectral_model(ii, model_spec):
     fig.tight_layout()
     plt.axvline(x=6707, c='r', linewidth=2, linestyle='--')
     plt.axvline(x=6103, c='r', linewidth=2, linestyle='--')
-    plt.show()
+    #plt.show()
+    plt.savefig("resid_%s.png" %ii)
+    plt.close()
     #plt.savefig("model_spectrum_full.png")
     #plt.savefig("model_spectrum.png")
 

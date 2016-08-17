@@ -45,8 +45,8 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     except np.linalg.linalg.LinAlgError:
         print("np.linalg.linalg.LinAlgError, do_one_regression_at_fixed_scatter")
         print(lTCinvl, lTCinvf, lams, fluxes)
-    if not np.all(np.isfinite(coeff)):
-        raise RuntimeError('something is wrong with the coefficients')
+    #if not np.all(np.isfinite(coeff)):
+    #    raise RuntimeError('something is wrong with the coefficients')
     chi = np.sqrt(Cinv) * (fluxes - np.dot(lvec, coeff))
     logdet_Cinv = np.sum(np.log(Cinv))
     return (coeff, lTCinvl, chi, logdet_Cinv)

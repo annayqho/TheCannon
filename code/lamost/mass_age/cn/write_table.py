@@ -6,7 +6,7 @@ from astropy.io import ascii
 from mass_age_functions import *
 import glob
 
-DATA_DIR = "/Users/annaho/Data/Mass_And_Age"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
 
 print("writing file")
 t = Table()
@@ -25,6 +25,7 @@ ref_feh = cannon_ref_label[:,2]
 ref_cm = cannon_ref_label[:,3]
 ref_nm = cannon_ref_label[:,4]
 ref_afe = cannon_ref_label[:,5]
+ref_ak = cannon_ref_label[:,6]
 ref_mass = calc_mass_2(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)
 ref_age = 10.0**calc_logAge(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)
 
@@ -52,14 +53,14 @@ t['chisq'] = np.hstack((ref_chisq, test_chisq))
 
 label_names = np.array(
         ['cannon_teff', 'cannon_logg', 'cannon_mh', 
-        'cannon_cm', 'cannon_nm', 'cannon_afe'])
+        'cannon_cm', 'cannon_nm', 'cannon_afe', 'cannon_ak'])
 
 for ii,name in enumerate(label_names):
     t[name] = np.hstack((cannon_ref_label[:,ii], test_label[ii,:]))
 
 label_names = np.array(
         ['apogee_teff', 'apogee_logg', 'apogee_mh', 
-        'apogee_cm', 'apogee_nm', 'apogee_afe'])
+        'apogee_cm', 'apogee_nm', 'apogee_afe', 'apogee_ak'])
 
 for ii,name in enumerate(label_names):
     filler = np.zeros(len(test_id))
@@ -67,6 +68,10 @@ for ii,name in enumerate(label_names):
 
 t['cannon_mass'] = np.hstack((ref_mass, test_label[6,:]))
 t['cannon_age'] = np.hstack((ref_age, test_label[7,:]))
+
+# Calculate (C+N)/M
+
+t['cannon_c_plus_n'] = calc_sum(t['cannon_mh'], t['cannon_cm'], t['cannon_nm'])
 
 for ii,name in enumerate(err_names):
     t[name] = np.hstack((cannon_ref_err[:,ii], test_err[ii,:]))
