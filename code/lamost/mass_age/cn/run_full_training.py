@@ -7,8 +7,8 @@ import glob
 import matplotlib.pyplot as plt
 import sys
 import pyfits
-sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon/TheCannon')
-sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon')
+#sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon/TheCannon')
+#sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon')
 from TheCannon import dataset
 from TheCannon import model
 from TheCannon import lamost
@@ -21,7 +21,7 @@ import os
 
 GIT_DIR = "/Users/annaho/Dropbox/Research/TheCannon/"
 DATA_DIR = GIT_DIR + "data/"
-SPEC_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+SPEC_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
 #SPEC_DIR = "."
 
 def load_data():
@@ -79,20 +79,11 @@ def load_data():
 
 
 def train():
-    wl = np.load("%s/wl_cols.npz" %SPEC_DIR)['arr_0']
-    tr_id = np.load("%s/ref_id_col.npz" %SPEC_DIR)['arr_0']
+    wl = np.load("%s/../wl_cols.npz" %SPEC_DIR)['arr_0']
+    tr_id = np.load("%s/ref_id.npz" %SPEC_DIR)['arr_0']
     tr_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0']
-    tr_flux = np.load("%s/ref_flux_col.npz" %SPEC_DIR)['arr_0']
-    tr_ivar = np.load("%s/ref_ivar_col.npz" %SPEC_DIR)['arr_0']
-
-    # real_tr = np.load(
-    #         GIT_DIR + \
-    #         "/code/lamost/mass_age/cn/ref_id_culled.npz")['arr_0']
-    # choose = np.array([np.where(tr_id==val)[0][0] for val in real_tr])
-    # np.savez("ref_id.npz", tr_id[choose])
-    # np.savez("ref_flux.npz", tr_flux[choose])
-    # np.savez("ref_ivar.npz", tr_ivar[choose])
-    # np.savez("ref_label.npz", tr_label[choose])
+    tr_flux = np.load("%s/ref_flux.npz" %SPEC_DIR)['arr_0']
+    tr_ivar = np.load("%s/ref_ivar.npz" %SPEC_DIR)['arr_0']
 
     ds = dataset.Dataset(
             wl, tr_id, tr_flux, tr_ivar, tr_label, 
@@ -103,15 +94,15 @@ def train():
                 '[\\alpha/M]', 'A_k'])
     ds.diagnostics_SNR()
     ds.diagnostics_ref_labels()
-    np.savez("culled_ref_snr.npz", ds.tr_SNR)
+    np.savez("ref_snr.npz", ds.tr_SNR)
 
     print("Training model")
     m = model.CannonModel(2)
     m.fit(ds)
-    np.savez("./culled_coeffs.npz", m.coeffs)
-    np.savez("./culled_scatters.npz", m.scatters)
-    np.savez("./culled_chisqs.npz", m.chisqs)
-    np.savez("./culled_pivots.npz", m.pivots)
+    np.savez("./coeffs.npz", m.coeffs)
+    np.savez("./scatters.npz", m.scatters)
+    np.savez("./chisqs.npz", m.chisqs)
+    np.savez("./pivots.npz", m.pivots)
     m.diagnostics_leading_coeffs(ds)
     #m.diagnostics_leading_coeffs_triangle(ds)
     #m.diagnostics_plot_chisq(ds)
@@ -186,6 +177,6 @@ def test_step():
 
 if __name__=="__main__":
     #load_data()
-    #train()
+    train()
     #print("test")
-    test_step()
+    #test_step()

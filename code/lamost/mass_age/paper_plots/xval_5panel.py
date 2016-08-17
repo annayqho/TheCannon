@@ -26,18 +26,19 @@ maxs = [5500, 4.1, 0.6, 0.38, 0.5, 0.4, 0.4]
 
 print("Loading data")
 direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-data_direc = "../cn"
-#direc = "../cn"
-#snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
+#data_direc = direc + "/no_colors"
+data_direc = direc + "/with_col_mask/xval_with_cuts_2"
+ref_ids = np.load("%s/ref_id.npz" %data_direc)['arr_0']
 snr = np.load(
-    "%s/all_colors_culled_xval_ref_snr.npz" %data_direc)['arr_0']
-ref_ids = np.load("%s/ref_id.npz" %direc)['arr_0']
-real_ref_ids = np.load("../cn/ref_id_col.npz")['arr_0']
-inds = np.array([np.where(ref_ids==val)[0][0] for val in real_ref_ids])
-apogee = np.load("%s/ref_label.npz" %direc)['arr_0'][inds]
-#cannon = np.load("%s/xval_cannon_label_vals.npz" %direc)['arr_0']
+    #"%s/cn_ref_snr.npz" %direc)['arr_0']
+    "%s/ref_snr.npz" %data_direc)['arr_0']
+#apogee = np.load(
+#    "%s/xval_results/xval_cannon_label_vals.npz" %data_direc)['arr_0']
+apogee = np.load("%s/ref_label.npz" %data_direc)['arr_0']
+#cannon = np.load(
+#    "%s/xval_one_iteration/xval_cannon_label_vals.npz" %data_direc)['arr_0']
 cannon = np.load(
-    "%s/all_colors_culled_xval_cannon_label_vals.npz" %data_direc)['arr_0']
+    "%s/xval_cannon_label_vals.npz" %data_direc)['arr_0']
 
 fig = plt.figure(figsize=(9,10))
 gs = gridspec.GridSpec(4,2, wspace=0.3, hspace=0.3)
@@ -55,16 +56,16 @@ for i in range(0, len(names)):
     ax.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
     #ax.legend(fontsize=14)
     #print(np.mean(cannon[:,i]-apogee[:,i]))
-    choose = snr > 100
-    diff = cannon[:,i][choose] - apogee[:,i][choose]
+    choose = np.logical_and(snr > 100, snr < 500)
+    diff = (cannon[:,i] - apogee[:,i])[choose]
     bias_raw = np.mean(diff)
     scatter_raw = np.std(diff)
     if np.abs(bias_raw) < 1:
-        bias = round_sig(bias_raw, sig=1)
+        bias = round_sig(bias_raw, sig=2)
     else:
         bias = int(bias_raw)
     if np.abs(scatter_raw) < 1:
-        scatter = round_sig(scatter_raw, sig=1)
+        scatter = round_sig(scatter_raw, sig=2)
     else:
         scatter = int(scatter_raw)
     textstr1 = "Bias: %s\nScatter: %s" %(bias, scatter)
@@ -86,8 +87,9 @@ for i in range(0, len(names)):
     ax.set_ylim(low, high)
     ax.tick_params(axis='x', labelsize=14)
     ax.tick_params(axis='y', labelsize=14)
+    #ax.set_xlabel(r"$%s$" %name + " (%s) from Prev. X-Val" %unit)
     ax.set_xlabel(r"$%s$" %name + " (%s) from APOGEE" %unit)
     ax.set_ylabel(r"$%s$" %(name) + " (%s) from Cannon" %unit)
 
-plt.show()
-#plt.savefig("xval_5panel.png")
+#plt.show()
+plt.savefig("xval_5panel.png")

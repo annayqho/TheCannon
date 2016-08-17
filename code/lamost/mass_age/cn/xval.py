@@ -15,8 +15,8 @@ import os
 from get_colors import get_colors
 
 
-DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-SPEC_DIR = "/Users/annaho/Dropbox/Research/TheCannon/code/lamost/mass_age/cn"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts_2"
+SPEC_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask"
 
 
 def test_step_iteration(ds, m, starting_guess):
@@ -25,11 +25,11 @@ def test_step_iteration(ds, m, starting_guess):
 
 
 def create_sets(num_sets):
-    ref_id = np.load("ref_id.npz")['arr_0']
+    ref_id = np.load("%s/ref_id_culled.npz" %DATA_DIR)['arr_0']
     # Assign each object a number between 0 and num_sets
     nobj = len(ref_id)
     assignments = np.random.randint(num_sets, size=nobj)
-    np.savez("assignments.npz", assignments)
+    np.savez("%s/assignments.npz" %DATA_DIR, assignments)
 
 
 def train(ds, leave_out):
@@ -37,7 +37,7 @@ def train(ds, leave_out):
     m = model.CannonModel(2)
     m.fit(ds)
     np.savez(
-        "./all_colors_culled_model_%s.npz" %leave_out, 
+        "./model_%s.npz" %leave_out, 
         m.coeffs, m.scatters, m.chisqs, m.pivots) 
     fig = m.diagnostics_leading_coeffs(ds)
     plt.savefig("leading_coeffs_%s.png" %leave_out)
@@ -72,7 +72,7 @@ def validate(ds, m, leave_out):
         best_errs[jj,:] = errs[:,jj,:][val]
 
     np.savez(
-            "all_colors_culled_test_results_%s.npz" %leave_out, 
+            "test_results_%s.npz" %leave_out, 
             best_labels, best_errs, best_chisq) 
 
     ds.test_label_vals = best_labels
@@ -80,14 +80,25 @@ def validate(ds, m, leave_out):
 
 
 def loop(num_sets):
-    wl = np.load("wl_cols.npz")['arr_0']
+    wl = np.load("%s/wl_cols.npz" %SPEC_DIR)['arr_0']
     label_names = ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
                             '[\\alpha/M]', 'A_k']
-    ref_id = np.load("ref_id_col.npz")['arr_0']
-    ref_flux = np.load("ref_flux_col.npz")['arr_0']
-    ref_ivar = np.load("ref_ivar_col.npz")['arr_0']
-    ref_label = np.load("ref_label.npz")['arr_0']
-    assignments = np.load("assignments.npz")['arr_0']
+    ref_id = np.load("%s/ref_id_col.npz" %SPEC_DIR)['arr_0']
+    ref_choose = np.load("%s/ref_id_culled.npz" %DATA_DIR)['arr_0']
+    inds = np.array([np.where(ref_id==val)[0][0] for val in ref_choose])
+    ref_id = ref_id[inds]
+    ref_flux = np.load("%s/ref_flux_col.npz" %SPEC_DIR)['arr_0'][inds]
+    ref_ivar = np.load("%s/ref_ivar_col.npz" %SPEC_DIR)['arr_0'][inds]
+    np.savez("ref_id.npz", ref_id)
+    np.savez("ref_flux.npz", ref_flux)
+    np.savez("ref_ivar.npz", ref_ivar)
+    ds = dataset.Dataset(wl[0:3626], ref_id, ref_flux[:,0:3626], 
+            ref_ivar[:,0:3626], [], [], [], [])
+    np.savez("ref_snr.npz", ds.tr_SNR)
+    ref_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0'][inds]
+    #ref_label = np.load("%s/xval_cannon_label_vals.npz" %TR_LAB_DIR)['arr_0']
+    np.savez("ref_label.npz", ref_label)
+    assignments = np.load("%s/assignments.npz" %DATA_DIR)['arr_0']
     
     print("looping through %s sets" %num_sets)
     for leave_out in range(0,num_sets):
@@ -100,7 +111,7 @@ def loop(num_sets):
         tr_ivar[np.isnan(tr_ivar)] = 0.0
         tr_label = ref_label[training]
         np.savez(
-            "all_colors_culled_tr_set_%s.npz" %leave_out, 
+            "tr_set_%s.npz" %leave_out, 
             tr_id, tr_flux, tr_ivar, tr_label)
         test_id = ref_id[test]
         test_flux = ref_flux[test]
@@ -108,7 +119,7 @@ def loop(num_sets):
         test_ivar[np.isnan(test_ivar)] = 0.0
         test_label = ref_label[test]
         np.savez(
-            "all_colors_culled_test_set_%s.npz" %leave_out, 
+            "test_set_%s.npz" %leave_out, 
             test_id, test_flux, test_ivar, test_label)
         ds = dataset.Dataset(
             wl, tr_id, tr_flux, tr_ivar, tr_label, 
@@ -121,7 +132,7 @@ def loop(num_sets):
         fig = ds.diagnostics_ref_labels()
         plt.savefig("ref_label_triangle_%s.png" %leave_out)
         plt.close()
-        np.savez("all_colors_culled_tr_snr_%s.npz" %leave_out, ds.tr_SNR)
+        np.savez("tr_snr_%s.npz" %leave_out, ds.tr_SNR)
         
         modelf = "model_%s.npz" %leave_out
         if glob.glob(modelf):
@@ -141,5 +152,6 @@ def loop(num_sets):
         validate(ds, m, leave_out)
 
 if __name__=="__main__":   
+    #print("hi")
     #create_sets(8) 
     loop(8)
