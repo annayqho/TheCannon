@@ -10,8 +10,7 @@ def get_colors(catalog):
     catalog: filename
     """
     print("Get Colors")
-    DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-    a = pyfits.open(DATA_DIR + "/lamost_catalog_colors.fits")
+    a = pyfits.open(catalog)
     data = a[1].data
     a.close()
     all_ids = data['LAMOST_ID_1']
