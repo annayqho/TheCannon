@@ -21,6 +21,7 @@ def load_all_ref_label():
     labels = ['TEFF', 'LOGG', 'AK_WISE',
             'AL_H', 'CA_H', 'C_H', 'FE_H', 'MG_H', 'MN_H',
             'NI_H', 'N_H', 'O_H', 'SI_H', 'TI_H']
+    np.savez("label_names.npz", labels)
     nlabel = len(labels)
     nobj = len(ref_id)
     ref_label = np.zeros((nobj, nlabel))
@@ -105,4 +106,4 @@ def find_colors(ref_id, ref_flux, ref_ivar):
 
 if __name__=="__main__":
     ref_id = load_all_ref_label()
-    load_all_ref_spectra(ref_id)
+    #load_all_ref_spectra(ref_id)

@@ -12,12 +12,16 @@ from matplotlib import rc
 rc('font', family='serif')
 rc('text', usetex=True)
 import os
-sys.path.append("/Users/annaho/Dropbox/Research/TheCannon/code/lamost")
+#sys.path.append("/Users/annaho/Dropbox/Research/TheCannon/code/lamost")
 from get_colors import get_colors
 
 
-DATA_DIR = "/Users/annaho/Data/LAMOST/Abundances"
-SPEC_DIR = "/Users/annaho/Data/LAMOST/Abundances"
+#DATA_DIR = "/Users/annaho/Data/LAMOST/Abundances"
+#SPEC_DIR = "/Users/annaho/Data/LAMOST/Abundances"
+
+# for astro-node2
+DATA_DIR = "/home/annaho/TheCannon/data/LAMOST/abundances"
+SPEC_DIR = DATA_DIR
 
 
 def test_step_iteration(ds, m, starting_guess):
@@ -82,15 +86,15 @@ def validate(ds, m, leave_out):
 
 def loop(num_sets):
     wl = np.load("%s/wl_cols.npz" %SPEC_DIR)['arr_0']
-    label_names = ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
-                            '[\\alpha/M]', 'A_k']
+    #label_names = ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
+    #                        '[\\alpha/M]', 'A_k']
     ref_id = np.load("%s/ref_id.npz" %SPEC_DIR)['arr_0']
     #ref_choose = np.load("%s/ref_id_culled.npz" %DATA_DIR)['arr_0']
     #inds = np.array([np.where(ref_id==val)[0][0] for val in ref_choose])
     #ref_id = ref_id[inds]
-    ref_flux = np.load("%s/ref_flux.npz" %SPEC_DIR)['arr_0'][inds]
-    ref_ivar = np.load("%s/ref_ivar.npz" %SPEC_DIR)['arr_0'][inds]
-    ref_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0'][inds]
+    ref_flux = np.load("%s/ref_flux.npz" %SPEC_DIR)['arr_0']
+    ref_ivar = np.load("%s/ref_ivar.npz" %SPEC_DIR)['arr_0']
+    ref_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0']
     np.savez("ref_label.npz", ref_label)
     assignments = np.load("%s/assignments.npz" %DATA_DIR)['arr_0']
     
@@ -122,9 +126,9 @@ def loop(num_sets):
         fig = ds.diagnostics_SNR()
         plt.savefig("SNRdist_%s.png" %leave_out)
         plt.close()
-        fig = ds.diagnostics_ref_labels()
-        plt.savefig("ref_label_triangle_%s.png" %leave_out)
-        plt.close()
+        #fig = ds.diagnostics_ref_labels()
+        #plt.savefig("ref_label_triangle_%s.png" %leave_out)
+        #plt.close()
         #np.savez("tr_snr_%s.npz" %leave_out, ds.tr_SNR)
         
         modelf = "model_%s.npz" %leave_out
