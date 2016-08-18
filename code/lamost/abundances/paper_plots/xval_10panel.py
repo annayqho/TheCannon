@@ -20,27 +20,37 @@ units_all = ['K']
 for label in label_names_all[1:]:
     units_all.append('dex')
 
-start = 8
-end = len(label_names_all)
+#start = 8
+#end = len(label_names_all)
+start = 3
+end = 8
 names = label_names_all[start:end]
+names = np.array(["%s/Fe" %val for val in names])
 units = units_all[start:end]
 
-all_cannon = np.load(direc + "/xval_cannon_label_vals.npz")['arr_0']
+all_cannon_raw = np.load(direc + "/xval_cannon_label_vals.npz")['arr_0']
 all_ids = np.load(direc + "/ref_id.npz")['arr_0']
-all_apogee = np.load(direc + "/ref_label.npz")['arr_0']
+all_apogee_raw = np.load(direc + "/ref_label.npz")['arr_0']
 
-good = np.min(all_cannon, axis=1) > -500
-all_cannon = all_cannon[good]
-good_id = all_ids[good]
-all_apogee = all_apogee[good]
+cannon_feh = all_cannon_raw[:,6]
+all_cannon = all_cannon_raw - cannon_feh[:,None]
+apogee_feh = all_apogee_raw[:,6]
+all_apogee = all_apogee_raw - apogee_feh[:,None]
+all_apogee[:,6] = all_apogee_raw[:,6]
+all_cannon[:,6] = all_cannon_raw[:,6]
 
-snr = np.load(direc + "/ref_snr.npz")['arr_0'][good]
+#good = np.min(all_cannon, axis=1) > -500
+#all_cannon = all_cannon[good]
+#good_id = all_ids[good]
+#all_apogee = all_apogee[good]
 
-apogee = all_apogee[:,start:end]
-cannon = all_cannon[:,start:end]
+snr = np.load(direc + "/ref_snr.npz")['arr_0']
+
+apogee = all_apogee[:,start:end] 
+cannon = all_cannon[:,start:end] 
 
 fig = plt.figure(figsize=(10,12))
-gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
+gs = gridspec.GridSpec(4,2, wspace=0.3, hspace=0.3)
 
 #lows = [3800, 0, -1.7,-0.08, -1.0, -1.5, -0.8, -1.3, -1.5, -1.0,
 #        -1.0, -1.5, -1.5, -1.2, -0.7, -0.7, -0.7, -1.1, -2.4]
@@ -61,7 +71,7 @@ for i in range(0, len(names)):
     #low = mins[i]
     #high = maxs[i]
     
-    choose = snr > 0
+    choose = snr > 100
     diff_cannon = cannon[:,i][choose]-apogee[:,i][choose]
     scatter = round_sig(np.std(diff_cannon),3)
     bias = round_sig(np.mean(diff_cannon),3)
@@ -93,3 +103,4 @@ for i in range(0, len(names)):
 
 #plt.show()
 plt.savefig("xval_last.png")
+#plt.savefig("xval_first.png")
