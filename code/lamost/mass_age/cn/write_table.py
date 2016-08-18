@@ -6,7 +6,8 @@ from astropy.io import ascii
 from mass_age_functions import *
 import glob
 
-DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+#DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+DATA_DIR = "/home/annaho/TheCannon/data/lamost"
 
 print("writing file")
 t = Table()
