@@ -60,9 +60,9 @@ def test_step(date):
     ds = dataset.Dataset(wl, test_ID, test_flux[0:2,:], test_ivar[0:2,:], 
             lamost_label, test_ID, test_flux, test_ivar)
 
-    np.savez(COL_DIR + "/test_flux.npz", ds.test_flux)
-    np.savez(COL_DIR + "/test_ivar.npz", ds.test_ivar)
-    np.savez(COL_DIR + "/test_snr.npz", ds.test_SNR)
+    np.savez(COL_DIR + "/%s_test_flux.npz" %date, ds.test_flux)
+    np.savez(COL_DIR + "/%s_test_ivar.npz" %date, ds.test_ivar)
+    np.savez(COL_DIR + "/%s_test_snr.npz" %date, ds.test_SNR)
 
     ds.set_label_names(
             ['T_{eff}', '\log g', '[Fe/H]', '[C/M]', '[N/M]', '[\\alpha/Fe]', 'A_k'])
