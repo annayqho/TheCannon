@@ -41,11 +41,11 @@ data = ds.test_flux[choose]
 resid = data-model
 
 #for ii in range(len(resid)):
-for ii in range(1000,1600):
+for ii in range(1120,1121):
     plt.plot(wl, resid[ii])
     plt.xlim(6400,7000)
     plt.ylim(-0.1,0.1)
-    plt.axvline(x=6707, c='r', linestyle='--', linewidth=2)
+    plt.axvline(x=6707.4, c='r', linestyle='--', linewidth=2)
     plt.axvline(x=6103, c='r', linestyle='--', linewidth=2)
-    #plt.savefig("resid_%s.png" %ii)
-    plt.close()
+    plt.savefig("resid_%s.png" %ii)
+    #plt.close()
