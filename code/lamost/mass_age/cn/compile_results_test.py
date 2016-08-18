@@ -12,10 +12,7 @@ plt.rc('font', family='serif')
 SPEC_DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels"
 COL_DIR = "/home/annaho/TheCannon/data/lamost"
 
-lab_f = glob.glob("%s/*all_cannon_labels.npz" %COL_DIR)
-chisq_f = glob.glob("%s/*cannon_label_chisq.npz" %COL_DIR)
-errs_f = glob.glob("%s/*cannon_label_errs.npz" %COL_DIR)
-snr_f = glob.glob("%s/*test_snr.npz" %COL_DIR)
+ids_f = glob.glob("%s/*test_id.npz" %COL_DIR)
 
 id_all = []
 teff_all = []
@@ -35,11 +32,15 @@ ak_err_all = []
 snr_all = []
 chisq_all = []
 
-for i,f in enumerate(lab_f):
-    date = (f.split("/")[-1]).split("_")[0]
-    ids = np.load("%s/output/%s_ids.npz" %(SPEC_DIR, date))['arr_0'] 
-    labels = np.load(f)['arr_0']
-    err = np.load(errs_f[i])['arr_0']
+for i,f in enumerate(ids_f):
+    ids = np.load(f)['arr_0']
+    date = ids[0].split('/')[0]
+    print(date)
+    
+    labels = np.load("%s/%s_all_cannon_labels.npz" %(COL_DIR, date))['arr_0']
+    chisq_val = np.load("%s/%s_cannon_label_chisq.npz" %(COL_DIR, date))['arr_0']
+    err = np.load("%s/%s_cannon_label_errs.npz" %(COL_DIR, date))['arr_0']
+    snr_val = np.load("%s/%s_test_snr.npz" %(COL_DIR, date))['arr_0']
     teff = labels[:,0]
     teff_err = err[:,0]
     logg = labels[:,1]
@@ -69,9 +70,7 @@ for i,f in enumerate(lab_f):
     alpha_err_all.extend(alpha_err)
     ak_all.extend(ak)
     ak_err_all.extend(ak_err)
-    chisq_val = np.load(chisq_f[i])['arr_0']
     chisq_all.extend(chisq_val)
-    snr_val = np.load(snr_f[i])['arr_0']
     snr_all.extend(snr_val)
 
 teff_all = np.array(teff_all)
