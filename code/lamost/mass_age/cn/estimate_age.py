@@ -81,5 +81,5 @@ def estimate_age():
     return ages, age_errs
 
 
-if __name__=="__main__":
-    ages, age_errs = estimate_age()
+#if __name__=="__main__":
+#    ages, age_errs = estimate_age()

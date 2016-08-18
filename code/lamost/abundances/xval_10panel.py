@@ -16,16 +16,21 @@ def round_sig(x, sig=2):
 #label_names_all = ['T_{eff}', '\log g', '[M/H]', '[\\alpha/Fe]', 'Al', 'Ca',
 #               'C', 'Fe', 'K', 'Mg', 'Mn','Na', 'Ni','N', 'O', 'Si', 'S',
 #               'Ti', 'V']
-label_names_all = ['T_{eff}', '\log g', 'Al/Fe', 'Ca/Fe',
-               'C/Fe', 'Fe/H', 'K/Fe', 'Mg/Fe', 'Mn/Fe','Na/Fe', 'Ni/Fe','N/Fe', 'O/Fe', 
-               'Si/Fe', 'S/Fe', 'Ti/Fe', 'V/Fe']
+#label_names_all = ['T_{eff}', '\log g', 'Al/Fe', 'Ca/Fe',
+#               'C/Fe', 'Fe/H', 'K/Fe', 'Mg/Fe', 'Mn/Fe','Na/Fe', 'Ni/Fe','N/Fe', 'O/Fe', 
+#               'Si/Fe', 'S/Fe', 'Ti/Fe', 'V/Fe']
+
+data_dir = "/Users/annaho/Data/LAMOST/Abundances"
+label_names_all = np.load(data_dir + "/label_names.npz")['arr_0']
 
 units_all = ['K']
 for label in label_names_all[1:]:
     units_all.append('dex')
 
-start = 8
-end = 17
+#start = 8
+#end = 17
+start = 0
+end = 8
 names = label_names_all[start:end]
 units = units_all[start:end]
 
