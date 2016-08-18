@@ -86,8 +86,7 @@ def validate(ds, m, leave_out):
 
 def loop(num_sets):
     wl = np.load("%s/wl_cols.npz" %SPEC_DIR)['arr_0']
-    #label_names = ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
-    #                        '[\\alpha/M]', 'A_k']
+    label_names = np.load("%s/label_names.npz" %DATA_DIR)['arr_0']
     ref_id = np.load("%s/ref_id.npz" %SPEC_DIR)['arr_0']
     #ref_choose = np.load("%s/ref_id_culled.npz" %DATA_DIR)['arr_0']
     #inds = np.array([np.where(ref_id==val)[0][0] for val in ref_choose])
