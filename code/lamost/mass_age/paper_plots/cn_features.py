@@ -146,6 +146,7 @@ if __name__=="__main__":
     #wl, c_grad_model, n_grad_model = get_model_spec_martell()
 
 
+def plot_cn():
     # Make a plot
     fig, (ax0,ax1) = plt.subplots(ncols=2, figsize=(12,6), 
                                   sharex=True, sharey=True)

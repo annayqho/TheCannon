@@ -4,22 +4,23 @@ sys.path.append("..")
 from astropy.table import Table, Column
 from astropy.io import ascii
 from mass_age_functions import *
+from estimate_age import estimate_age
+from marie_cuts import get_mask
 import glob
 
-#DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-DATA_DIR = "/home/annaho/TheCannon/data/lamost"
+REF_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/test_step"
 
-print("writing file")
-t = Table()
 
 # Training Values
-ref_id = np.load("%s/ref_id.npz" %DATA_DIR)['arr_0']
-cannon_ref_err = np.load("%s/xval_cannon_label_errs.npz" %DATA_DIR)['arr_0']
-cannon_ref_label = np.load("%s/xval_cannon_label_vals.npz" %DATA_DIR)['arr_0']
-ref_chisq = np.load("%s/xval_cannon_label_chisq.npz" %DATA_DIR)['arr_0']
-ref_label = np.load("%s/ref_label.npz" %DATA_DIR)['arr_0']
+ref_id = np.load("%s/ref_id.npz" %REF_DIR)['arr_0']
+cannon_ref_err = np.load("%s/xval_cannon_label_errs.npz" %REF_DIR)['arr_0']
+cannon_ref_label = np.load("%s/xval_cannon_label_vals.npz" %REF_DIR)['arr_0']
+ref_chisq = np.load("%s/xval_cannon_label_chisq.npz" %REF_DIR)['arr_0']
+ref_label = np.load("%s/ref_label.npz" %REF_DIR)['arr_0']
+ref_snr = np.load("%s/ref_snr.npz" %REF_DIR)['arr_0']
 
-# Calculate mass
+# Calculate mass & age
 ref_teff = cannon_ref_label[:,0]
 ref_logg = cannon_ref_label[:,1]
 ref_feh = cannon_ref_label[:,2]
@@ -27,15 +28,30 @@ ref_cm = cannon_ref_label[:,3]
 ref_nm = cannon_ref_label[:,4]
 ref_afe = cannon_ref_label[:,5]
 ref_ak = cannon_ref_label[:,6]
-ref_mass = calc_mass_2(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)
-ref_age = 10.0**calc_logAge(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)
+ref_mask = get_mask(ref_teff, ref_logg, ref_feh, ref_cm, ref_nm, ref_afe)
+ref_mass = calc_mass_2(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)[ref_mask]
+#ref_age = 10.0**calc_logAge(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)
+ref_age, ref_age_err = estimate_age(
+        ref_label, cannon_ref_label, ref_snr, 
+        ref_label, ref_snr)
 
 # Test Values
 test_id = np.load("%s/test_id_all.npz" %DATA_DIR)['arr_0']
 test_id = np.array([(val.decode('utf-8')).split('/')[-1] for val in test_id])
-test_label = np.load("%s/test_label_all.npz" %DATA_DIR)['arr_0']
-test_err = np.load("%s/test_err_all.npz" %DATA_DIR)['arr_0']
+test_label = np.load("%s/test_label_all.npz" %DATA_DIR)['arr_0'].T
+test_err = np.load("%s/test_err_all.npz" %DATA_DIR)['arr_0'].T
 test_chisq = np.load("%s/test_chisq_all.npz" %DATA_DIR)['arr_0']
+test_snr = np.load("%s/test_snr_all.npz" %DATA_DIR)['arr_0']
+teff = test_label[:,0]
+logg = test_label[:,1]
+feh = test_label[:,2]
+cm = test_label[:,3]
+nm = test_label[:,4]
+afe = test_label[:,5]
+test_mask = get_mask(teff, logg, feh, cm, nm, afe) 
+age, age_err = estimate_age(
+        ref_label, cannon_ref_label, ref_snr,
+        test_label[test_mask], test_snr[test_mask])
 
 nobj = len(ref_id) + len(test_id)
 print(str(nobj) + " objects in total")
@@ -43,10 +59,13 @@ print(str(nobj) + " objects in total")
 ref_flag = np.zeros(nobj)
 ref_flag[0:len(ref_id)] = 1
 
+print("writing file")
+t = Table()
 
 err_names = np.array(
         ['cannon_teff_err', 'cannon_logg_err', 'cannon_feh_err', 
-        'cannon_cm_err', 'cannon_nm_err', 'cannon_afe_err'])
+        'cannon_cm_err', 'cannon_nm_err', 'cannon_afe_err', 'cannon_ak_err'])
+
 
 t['LAMOST_ID'] = np.hstack((ref_id, test_id))
 t['is_ref_obj'] = ref_flag 
@@ -67,8 +86,9 @@ for ii,name in enumerate(label_names):
     filler = np.zeros(len(test_id))
     t[name] = np.hstack((ref_label[:,ii], filler))
 
-t['cannon_mass'] = np.hstack((ref_mass, test_label[6,:]))
-t['cannon_age'] = np.hstack((ref_age, test_label[7,:]))
+#t['cannon_mass'] = np.hstack((ref_mass, )
+t['cannon_age'] = np.hstack((ref_age, age))
+t['cannon_age_err'] = np.hstack((ref_age_err, age_err))
 
 # Calculate (C+N)/M
 
