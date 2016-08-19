@@ -136,13 +136,15 @@ def _get_lvec(label_vals, pivots):
     return lvec
 
 
-def _train_model(ds):
+def _train_model(ds, wl_filter):
     """
     This determines the coefficients of the model using the training data
 
     Parameters
     ----------
     ds: Dataset
+    wl_filter (optional): if not None, is an array of n_tr_lab x n_pixels
+        that dictates which pixels can be used in the model for each label
 
     Returns
     -------
