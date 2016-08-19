@@ -37,6 +37,7 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     logdet_Cinv: float
         inverse of the log determinant of the cov matrix
     """
+    print(lvec.shape)
     Cinv = ivars / (1 + ivars*scatter**2)
     lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
     lTCinvf = np.dot(lvec.T, Cinv * fluxes)

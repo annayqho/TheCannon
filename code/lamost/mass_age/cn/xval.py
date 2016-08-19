@@ -15,7 +15,7 @@ import os
 from get_colors import get_colors
 
 
-DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts_2"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
 SPEC_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask"
 
 
