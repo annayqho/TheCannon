@@ -45,7 +45,7 @@ def plot_cannon(ax, wl, grad_spec):
 
 def plot_model(ax, wl, grad_spec):
     ax.plot(
-            wl, grad_spec, c='black', label="Model Gradient Spectrum", 
+            wl, grad_spec, c='red', label="Model Gradient Spectrum", 
             linewidth=0.5, drawstyle='steps-mid')#, linestyle='-')
     ax.legend(loc='lower left')
     ax.tick_params(axis='x', labelsize=16)
@@ -125,28 +125,7 @@ def get_model_spec_ting(atomic_number):
     return wl, cannon_normalize(grad_spec+1)
 
 
-if __name__=="__main__":
-    DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-    my_wl = np.load(DATA_DIR + "/" + "wl.npz")['arr_0']
-
-    m_coeffs = np.load(DATA_DIR + "/" + "coeffs.npz")['arr_0']
-    m_pivots = np.load(DATA_DIR + "/" + "pivots.npz")['arr_0']
-    m_scatters = np.load(DATA_DIR + "/" + "scatters.npz")['arr_0']
-
-    #labels = [4842, 2.97, -0.173, -0.3, -0.36, 0.046, 0.045]
-    # Yuan-Sen: K giant, solar metallicity
-    labels = [4800, 2.5, 0, -0.1, 0.2, 0.05, 0.05]
-    c_grad_spec = gen_cannon_grad_spec(
-            labels, 3, -0.3, 0.3, m_coeffs, m_pivots) 
-    n_grad_spec = gen_cannon_grad_spec(
-            labels, 4, -0.4, 0.4, m_coeffs, m_pivots) 
-
-    wl, c_grad_model = get_model_spec_ting(6)
-    wl, n_grad_model = get_model_spec_ting(7)
-    #wl, c_grad_model, n_grad_model = get_model_spec_martell()
-
-
-def plot_cn():
+def plot_cn(my_wl, c_grad_spec, n_grad_spec, wl, c_grad_model, n_grad_model):
     # Make a plot
     fig, (ax0,ax1) = plt.subplots(ncols=2, figsize=(12,6), 
                                   sharex=True, sharey=True)
@@ -154,9 +133,13 @@ def plot_cn():
     x = 0.05
     y = 0.90
     ax0.text(
-            x, y, r"-0.3 \textless [C/Fe] \textless 0.3", 
+            x, y, 
+            #r"-0.3 \textless [C/Fe] \textless 0.3", 
+            "Carbon",
             transform=ax0.transAxes, fontsize=16)
-    ax1.text(x, y, r"-0.4 \textless [N/Fe] \textless 0.4", 
+    ax1.text(x, y, 
+            #r"-0.4 \textless [N/Fe] \textless 0.4", 
+            "Nitrogen",
             transform=ax1.transAxes, fontsize=16)
 
     plot_cannon(ax0, my_wl, c_grad_spec)
@@ -167,13 +150,37 @@ def plot_cn():
 
     ax0.set_xlim(4050,4400)
     ax1.set_xlim(4050, 4400)
-    ax0.set_ylim(-0.4, 0.2)
-    ax1.set_ylim(-0.4, 0.2)
+    ax0.set_ylim(-0.4, 0.4)
+    ax1.set_ylim(-0.4, 0.4)
     ax0.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
     ax1.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
     ax0.set_ylabel("Normalized Flux", fontsize=18)
     #ax0.axvline(x=4310, c='r')
     #ax1.axvline(x=4310, c='r')
 
-    plt.show()
-    #plt.savefig("cn_features.png")
+    #plt.show()
+    plt.savefig("cn_features.png")
+
+
+if __name__=="__main__":
+    DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/training_step"
+    my_wl = np.load(DATA_DIR + "/" + "wl_cols.npz")['arr_0']
+
+    m_coeffs = np.load(DATA_DIR + "/" + "coeffs.npz")['arr_0']
+    m_pivots = np.load(DATA_DIR + "/" + "pivots.npz")['arr_0']
+    m_scatters = np.load(DATA_DIR + "/" + "scatters.npz")['arr_0']
+
+    #labels = [4842, 2.97, -0.173, -0.3, -0.36, 0.046, 0.045]
+    # Yuan-Sen: K giant, solar metallicity
+    labels = [4800, 2.5, 0, -0.1, 0.2, 0.05, 0.00]
+    c_grad_spec = gen_cannon_grad_spec(
+            labels, 3, -0.1, 0.1, m_coeffs, m_pivots) 
+    n_grad_spec = gen_cannon_grad_spec(
+            labels, 4, 0, 0.2, m_coeffs, m_pivots) 
+
+    wl, c_grad_model = get_model_spec_ting(6)
+    wl, n_grad_model = get_model_spec_ting(7)
+    plot_cn(my_wl, c_grad_spec, n_grad_spec, wl, c_grad_model, n_grad_model)
+    #wl, c_grad_model, n_grad_model = get_model_spec_martell()
+
+

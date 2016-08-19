@@ -27,7 +27,7 @@ maxs = [5500, 4.1, 0.6, 0.38, 0.5, 0.4, 0.4]
 print("Loading data")
 direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
 #data_direc = direc + "/no_colors"
-data_direc = direc + "/with_col_mask/xval_with_cuts_2"
+data_direc = direc + "/with_col_mask/xval_with_cuts"
 ref_ids = np.load("%s/ref_id.npz" %data_direc)['arr_0']
 snr = np.load(
     #"%s/cn_ref_snr.npz" %direc)['arr_0']
@@ -79,7 +79,8 @@ for i in range(0, len(names)):
     elif i ==6:
         ax.hist2d(
                 apogee[:,i], cannon[:,i], range=[[low,high],[low,high]], 
-                bins=50, norm=LogNorm(), cmap="Purples", alpha=1.0)
+                #bins=50, norm=LogNorm(), cmap="Purples", alpha=1.0)
+                bins=50, norm=LogNorm(), cmap="gray_r", alpha=1.0)
         ax.text(
                 0.05, 0.95, textstr1, transform=ax.transAxes, fontsize=14, 
                 verticalalignment='top', bbox=props2)

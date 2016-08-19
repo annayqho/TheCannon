@@ -11,17 +11,23 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 import pyfits
 
+print("Import data")
 # import the data
 hdulist = pyfits.open(
-"/Users/annaho/Data/LAMOST/Mass_And_Age/lamost_catalog_mass_age_with_cuts.fits")
+"/Users/annaho/Data/LAMOST/Mass_And_Age/catalog_paper.fits")
 tbdata = hdulist[1].data
 # # cols = hdulist[1].columns
 # # cols.names
-ra_lamost = tbdata.field('ra')
-dec_lamost = tbdata.field('dec')
-val_lamost = tbdata.field("cannon_age")
+in_martig_range = tbdata.field("in_martig_range")
+snr = tbdata.field("snr")
+choose = np.logical_and(in_martig_range, snr > 80)
+chisq = tbdata.field("chisq")
+ra_lamost = tbdata.field('ra')[choose]
+dec_lamost = tbdata.field('dec')[choose]
+val_lamost = 10**(tbdata.field("cannon_age")[choose])
 hdulist.close()
 
+print("Getting APOGEE data")
 hdulist = pyfits.open(
     "/Users/annaho/Data/APOGEE/Ness2016_Catalog_Full_DR12_Info.fits")
 tbdata = hdulist[1].data
@@ -39,6 +45,7 @@ ra_both = np.hstack((ra_apogee, ra_lamost))
 dec_both = np.hstack((dec_apogee, dec_lamost))
 val_all = np.hstack((val_apogee, val_lamost))
 
+print("create grid")
 # create a RA and Dec grid
 ra_all = []
 dec_all = []
@@ -71,7 +78,8 @@ phi_all, theta_all = toPhiTheta(ra_both, dec_both)
 ## to plot a 2D histogram in the Mollweide projection
 # define the HEALPIX level
 # NSIDE = 32 # defines the resolution of the map
-NSIDE =  128
+# NSIDE =  128 # from paper 1
+NSIDE = 64
 
 # find the pixel ID for each point
 # pix = hp.pixelfunc.ang2pix(NSIDE, theta, phi)
@@ -130,21 +138,21 @@ cmap.set_under('w')
 # composite map
 # plot map ('C' means the input coordinates were in the equatorial system)
 # rcParams.update({'font.size':16})
-# hp.visufunc.mollview(m_apogee, coord=['C','G'], rot=(150, 0, 0), flip='astro',
-#         notext=True, title=r'Age for Ness et al. 2016', cbar=True,
-#          norm=None, min=0, max=12, cmap=cmap, unit = 'Gyr')
+hp.visufunc.mollview(m_apogee, coord=['C','G'], rot=(150, 0, 0), flip='astro',
+        notext=True, title=r'Ages from Ness et al. 2016', cbar=True,
+        norm=None, min=0, max=12, cmap=cmap, unit = 'Gyr')
 #hp.visufunc.mollview(m_lamost, coord=['C','G'], rot=(150, 0, 0), flip='astro',
 #        notext=True, title=r'$\alpha$/M for 500,000 LAMOST giants', cbar=True,
 #        norm=None, min=-0.07, max=0.3, cmap=cmap, unit = r'$\alpha$/M [dex]')
         #notext=True, title="r-band magnitude for 500,000 LAMOST giants", cbar=True,
         #norm=None, min=11, max=17, cmap=cmap, unit = r"r-band magnitude [mag]")
-hp.visufunc.mollview(m_all, coord=['C','G'], rot=(150, 0, 0), flip='astro',
-        notext=True, title='Age from Ness et al. 2016 + LAMOST giants', 
-        cbar=True, norm=None, min=0.00, max=12, cmap=cmap, unit = 'Gyr')
+#hp.visufunc.mollview(m_all, coord=['C','G'], rot=(150, 0, 0), flip='astro',
+#        notext=True, title='Age from Ness et al. 2016 + LAMOST giants', 
+#        cbar=True, norm=None, min=0.00, max=12, cmap=cmap, unit = 'Gyr')
 hp.visufunc.graticule()
 
 #plt.show()
-plt.savefig("full_age_map.png")
-#plt.savefig("apogee_age_map.png")
+#plt.savefig("full_age_map.png")
+plt.savefig("apogee_age_map.png")
 #plt.savefig("lamost_am_map_magma.png")
 #plt.savefig("lamost_rmag_map.png")

@@ -4,13 +4,12 @@ sys.path.append("..")
 from astropy.table import Table, Column
 from astropy.io import ascii
 from mass_age_functions import *
-from estimate_age import estimate_age
+from estimate_mass_age import estimate_age
 from marie_cuts import get_mask
 import glob
 
 REF_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
 DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/test_step"
-
 
 # Training Values
 ref_id = np.load("%s/ref_id.npz" %REF_DIR)['arr_0']
@@ -29,11 +28,9 @@ ref_nm = cannon_ref_label[:,4]
 ref_afe = cannon_ref_label[:,5]
 ref_ak = cannon_ref_label[:,6]
 ref_mask = get_mask(ref_teff, ref_logg, ref_feh, ref_cm, ref_nm, ref_afe)
-ref_mass = calc_mass_2(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)[ref_mask]
-#ref_age = 10.0**calc_logAge(ref_feh, ref_cm, ref_nm, ref_teff, ref_logg)
-ref_age, ref_age_err = estimate_age(
-        ref_label, cannon_ref_label, ref_snr, 
-        ref_label, ref_snr)
+# some of these are actually outside the mask
+ref_age, ref_age_err, ref_mass, ref_mass_err = estimate_age(
+        ref_label, cannon_ref_label, ref_snr, ref_label, ref_snr)
 
 # Test Values
 test_id = np.load("%s/test_id_all.npz" %DATA_DIR)['arr_0']
@@ -49,7 +46,12 @@ cm = test_label[:,3]
 nm = test_label[:,4]
 afe = test_label[:,5]
 test_mask = get_mask(teff, logg, feh, cm, nm, afe) 
-age, age_err = estimate_age(
+age = np.zeros(len(test_id))
+age_err = np.ones(age.shape)*100
+mass = np.zeros(age.shape)
+mass_err = np.ones(mass.shape)*100
+
+age[test_mask], age_err[test_mask], mass[test_mask], mass_err[test_mask] = estimate_age(
         ref_label, cannon_ref_label, ref_snr,
         test_label[test_mask], test_snr[test_mask])
 
@@ -62,39 +64,34 @@ ref_flag[0:len(ref_id)] = 1
 print("writing file")
 t = Table()
 
+t['lamost_id'] = np.hstack((ref_id, test_id))
+t['is_ref_obj'] = ref_flag 
+t['in_martig_range'] = np.hstack((ref_mask, test_mask))
+
+label_names = np.array(
+        ['cannon_teff', 'cannon_logg', 'cannon_mh', 
+        'cannon_cm', 'cannon_nm', 'cannon_am', 'cannon_ak'])
+
+for ii,name in enumerate(label_names):
+    t[name] = np.hstack((cannon_ref_label[:,ii], test_label[:,ii]))
+
+t['cannon_mass'] = np.hstack((ref_mass, mass))
+t['cannon_age'] = np.hstack((ref_age, age))
+
 err_names = np.array(
         ['cannon_teff_err', 'cannon_logg_err', 'cannon_feh_err', 
         'cannon_cm_err', 'cannon_nm_err', 'cannon_afe_err', 'cannon_ak_err'])
 
+for ii,name in enumerate(err_names):
+    t[name] = np.hstack((cannon_ref_err[:,ii], test_err[:,ii]))
 
-t['LAMOST_ID'] = np.hstack((ref_id, test_id))
-t['is_ref_obj'] = ref_flag 
-t['chisq'] = np.hstack((ref_chisq, test_chisq))
-
-label_names = np.array(
-        ['cannon_teff', 'cannon_logg', 'cannon_mh', 
-        'cannon_cm', 'cannon_nm', 'cannon_afe', 'cannon_ak'])
-
-for ii,name in enumerate(label_names):
-    t[name] = np.hstack((cannon_ref_label[:,ii], test_label[ii,:]))
-
-label_names = np.array(
-        ['apogee_teff', 'apogee_logg', 'apogee_mh', 
-        'apogee_cm', 'apogee_nm', 'apogee_afe', 'apogee_ak'])
-
-for ii,name in enumerate(label_names):
-    filler = np.zeros(len(test_id))
-    t[name] = np.hstack((ref_label[:,ii], filler))
-
-#t['cannon_mass'] = np.hstack((ref_mass, )
-t['cannon_age'] = np.hstack((ref_age, age))
+t['cannon_mass_err'] = np.hstack((ref_mass_err, mass_err))
 t['cannon_age_err'] = np.hstack((ref_age_err, age_err))
 
+t['snr'] = np.hstack((ref_snr, test_snr))
+t['chisq'] = np.hstack((ref_chisq, test_chisq))
+
 # Calculate (C+N)/M
-
-t['cannon_c_plus_n'] = calc_sum(t['cannon_mh'], t['cannon_cm'], t['cannon_nm'])
-
-for ii,name in enumerate(err_names):
-    t[name] = np.hstack((cannon_ref_err[:,ii], test_err[ii,:]))
+#t['cannon_c_plus_n'] = calc_sum(t['cannon_mh'], t['cannon_cm'], t['cannon_nm'])
 
 t.write('lamost_catalog.csv', format='ascii.fast_csv')

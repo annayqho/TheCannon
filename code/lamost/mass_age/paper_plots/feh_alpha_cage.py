@@ -9,52 +9,29 @@ plt.rc('font', family='serif')
 import numpy as np
 
 direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-hdulist = pyfits.open("%s/lamost_catalog_mass_age_with_cuts.fits" %direc)
+hdulist = pyfits.open("%s/catalog_paper.fits" %direc)
 tbdata = hdulist[1].data
 hdulist.close()
-mh = tbdata.field("cannon_mh")
-afe = tbdata.field("cannon_afe")
-age = tbdata.field("cannon_age")
-snr = tbdata.field("cannon_snrg")
-teff = tbdata.field("cannon_teff")
-logg = tbdata.field("cannon_logg")
-cm = tbdata.field("cannon_cm")
-nm = tbdata.field("cannon_nm")
+snr = tbdata.field("snr")
 chisq = tbdata.field("chisq")
+teff = tbdata.field("cannon_teff")
+in_martig_range = tbdata.field("in_martig_range")
+choose = np.logical_and(in_martig_range, snr > 80)
+mh = tbdata.field("cannon_mh")[choose]
+afe = tbdata.field("cannon_am")[choose]
+age = 10**tbdata.field("cannon_age")[choose]
+#logg = tbdata.field("cannon_logg")
+#cm = tbdata.field("cannon_cm")
+#nm = tbdata.field("cannon_nm")
 
-mh = tbdata.field("apogee_mh")
-afe = tbdata.field("apogee_afe")
-age = tbdata.field("cannon_age")
-snr = tbdata.field("cannon_snrg")
-teff = tbdata.field("apogee_teff")
-logg = tbdata.field("apogee_logg") 
-cm = tbdata.field("apogee_cm")
-nm = tbdata.field("apogee_nm")
-
-#cannon = np.vstack((cannon_mh, cannon_afe, cannon_age)).T
-
-low = min(mh)
-high = max(mh)
+low = -0.9
+high = 0.4
 
 low2 = -0.1
-high2 = 0.35
+high2 = 0.4
 
-tr_choose = tbdata.field("is_ref_obj").astype(bool)
-mh = tbdata.field("apogee_mh")
-afe = tbdata.field("apogee_afe")
-
-afe_choose = np.logical_and(afe > -0.03, afe < 0.3)
-more_cuts = np.logical_and(mh < 0.25, afe_choose)
-snr_choose = np.logical_and(snr > 100, snr < 200)
-chisq_choose = np.logical_and(chisq > 300, chisq < 4000)
-choose_quality = np.logical_and(snr_choose, chisq_choose)
-choose = tr_choose
-#choose = np.logical_and(choose_quality, more_cuts)
-
-hist1,x2,y2,temp = plt.hist2d(
-        mh[choose], afe[choose], weights=age[choose], bins=30, cmin = 5)
-hist1_norm,x3,y3,temp = plt.hist2d(
-        mh[choose], afe[choose], bins=30, cmin = 5)
+hist1,x2,y2,temp = plt.hist2d(mh, afe, weights=age, bins=30, cmin = 20)
+hist1_norm,x3,y3,temp = plt.hist2d(mh, afe, bins=30, cmin=20)
 image = np.array(hist1)/np.array(hist1_norm)
 #image = hist1
 image = np.array(image)

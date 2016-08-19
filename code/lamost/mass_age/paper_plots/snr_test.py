@@ -7,49 +7,40 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 import numpy as np
 
-names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[Fe/H]}',
+names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[M/H]}',
 '\mbox{[C/M]}', '\mbox{[N/M]}', r'[\alpha/\mbox{M}]']
 units = ['K', 'dex', 'dex', 'dex', 'dex', 'dex']
 
-hdulist = pyfits.open(
-    "/Users/annaho/Data/Mass_And_Age/lamost_catalog_mass_age.fits")
+direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+data_direc = direc + "/with_col_mask/xval_with_cuts"
+ref_ids = np.load("%s/ref_id.npz" %data_direc)['arr_0']
+snr = np.load("%s/ref_snr.npz" %data_direc)['arr_0']
+apogee = np.load("%s/ref_label.npz" %data_direc)['arr_0']
+cannon = np.load(
+        "%s/xval_cannon_label_vals.npz" %data_direc)['arr_0']
+
+hdulist = pyfits.open(direc + "/catalog_paper.fits")
 tbdata = hdulist[1].data
 hdulist.close()
-snrg = tbdata.field("snrg")
+snrg = tbdata.field("snr")
 is_ref = tbdata.field("is_ref_obj")
 choose = is_ref == 1.
-lamost_id = tbdata.field("LAMOST_ID_1")[choose]
-lamost_teff = tbdata.field("teff_1")[choose]
-lamost_logg = tbdata.field("logg_1")[choose]
-lamost_feh = tbdata.field("feh")[choose]
+lamost_id = tbdata.field("lamost_id_1")[choose]
+inds = np.array([np.where(lamost_id==val)[0][0] for val in ref_ids])
+lamost_teff = tbdata.field("teff")[choose][inds]
+lamost_logg = tbdata.field("logg")[choose][inds]
+lamost_feh = tbdata.field("feh")[choose][inds]
 lamost = np.vstack((lamost_teff, lamost_logg, lamost_feh)).T
-cannon_teff = tbdata.field("cannon_teff_1")[choose]
-cannon_logg = tbdata.field("cannon_logg_1")[choose]
-cannon_feh = tbdata.field("cannon_mh")[choose]
-cannon_cm = tbdata.field("cannon_cm")[choose]
-cannon_nm = tbdata.field("cannon_nm")[choose]
-cannon_afe = tbdata.field("cannon_afe")[choose]
-apogee_teff = tbdata.field("apogee_teff")[choose]
-apogee_logg = tbdata.field("apogee_logg")[choose]
-apogee_mh = tbdata.field("apogee_mh")[choose]
-apogee_cm = tbdata.field("apogee_cm")[choose]
-apogee_nm = tbdata.field("apogee_nm")[choose]
-apogee_afe = tbdata.field("apogee_afe")[choose]
-
-cannon = np.vstack((
-    cannon_teff, cannon_logg, cannon_feh, cannon_cm, cannon_nm, cannon_afe)).T
-apogee = np.vstack((
-    apogee_teff, apogee_logg, apogee_mh, apogee_cm, apogee_nm, apogee_afe)).T
 
 fig = plt.figure(figsize=(10,8))
 gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
 
-lows = [45, 0.05, 0.03, 0.06, 0.08, 0.025]
-highs = [145, 0.40, 0.17, 0.11, 0.15, 0.06]
-offsets = np.array([50, 0.1, 0.05, 0.06, 0.08, 0.03])
+lows = [35, 0.05, 0.03, 0.05, 0.07, 0.025]
+highs = [135, 0.40, 0.17, 0.10, 0.14, 0.055]
+offsets = np.array([40, 0.09, 0.04, 0.05, 0.072, 0.025])
 
 snr = snrg[choose]
-snr_label = r"$\sim$\,SNRg"
+snr_label = r"$\sim$\,SNR"
 
 obj = []
 
