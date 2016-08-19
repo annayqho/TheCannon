@@ -13,6 +13,7 @@ plt.rc('font', family='serif')
 
 class CannonModel(object):
     def __init__(self, order, wl_filter=None):
+        """ wl_filter should have shape nlabels x npixels """
         self.coeffs = None
         self.scatters = None
         self.chisqs = None
