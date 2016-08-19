@@ -37,7 +37,7 @@ def cannon_normalize(spec_raw):
 def plot_cannon(ax, wl, grad_spec):
     ax.plot(
             wl, grad_spec, c='black', label="Cannon Gradient Spectrum", 
-            linewidth=1, drawstyle='steps-mid')
+            linewidth=0.5, drawstyle='steps-mid')
     ax.legend(loc='lower left')
     ax.tick_params(axis='x', labelsize=16)
     ax.tick_params(axis='y', labelsize=16)
@@ -45,14 +45,14 @@ def plot_cannon(ax, wl, grad_spec):
 
 def plot_model(ax, wl, grad_spec):
     ax.plot(
-            wl, grad_spec, c='black', label="Model Gradient Spectrum", 
+            wl, grad_spec, c='red', label="Model Gradient Spectrum", 
             linewidth=0.5, drawstyle='steps-mid')#, linestyle='-')
     ax.legend(loc='lower left')
     ax.tick_params(axis='x', labelsize=16)
     ax.tick_params(axis='y', labelsize=16)
 
 
-def gen_cannon_grad_spec(base_labels, choose, low, high, coeffs, pivots):
+def gen_cannon_grad_spec(choose, coeffs, pivots):
     """ Generate Cannon gradient spectra
 
     Parameters
@@ -62,14 +62,26 @@ def gen_cannon_grad_spec(base_labels, choose, low, high, coeffs, pivots):
     low: lowest val of cfe or nfe, whatever you're varying
     high: highest val of cfe or nfe, whatever you're varying
     """
+    base_labels = [4800, 2.5, 0.03, 0.10, -0.17, -0.17, 0, -0.16,
+            -0.13, -0.15, 0.13, 0.08, 0.17, -0.062]
+    label_names = np.array(
+            ['TEFF', 'LOGG', 'AK', 'Al', 'Ca', 'C', 'Fe', 'Mg', 'Mn',
+            'Ni', 'N', 'O', 'Si', 'Ti'])
+    label_atnum = np.array(
+            [0, 1, -1, 13, 20, 6, 26, 12, 25, 28, 7, 8, 14, 22])
     # Generate Cannon gradient spectra
+    ind = np.where(label_atnum==choose)[0][0]
     low_lab = copy.copy(base_labels)
-    low_lab[choose] = low
+    high = base_labels[ind]
+    if choose > 0:
+        low = base_labels[ind] - 0.2
+    else: #temperature
+        if choose != 0: print("warning...")
+        low = base_labels[ind] - 200
+    low_lab[ind] = low
     lvec = (train_model._get_lvec(np.array([low_lab]), pivots))[0]
     model_low = np.dot(coeffs, lvec)
-    high_lab = copy.copy(base_labels)
-    high_lab[choose] = high
-    lvec = (train_model._get_lvec(np.array([high_lab]), pivots))[0]
+    lvec = (train_model._get_lvec(np.array([base_labels]), pivots))[0]
     model_high = np.dot(coeffs, lvec)
     grad_spec = (model_high - model_low) / (high - low)
     return grad_spec
@@ -117,16 +129,11 @@ def get_model_spec_ting(atomic_number):
     temp = np.load("%s/X_u_template_KGh_res=1800.npz" %DATA_DIR)
     X_u_template = temp["X_u_template"]
     wl = temp["wavelength"]
-    if atomic_number == 6:
-        print("Plotting Carbon")
-    elif atomic_number == 7:
-        print("Plotting Nitrogen")
     grad_spec = X_u_template[:,atomic_number]
     return wl, grad_spec
-    #return wl, cannon_normalize(grad_spec)
 
 
-if __name__=="__main__":
+def get_cannon_model():
     DATA_DIR = "/Users/annaho/Data/LAMOST/Abundances"
     my_wl = np.load(DATA_DIR + "/" + "wl_cols.npz")['arr_0']
     label_names = np.load(DATA_DIR + "/" + "label_names.npz")['arr_0']
@@ -134,9 +141,39 @@ if __name__=="__main__":
     m_coeffs = np.load(DATA_DIR + "/" + "model_0.npz")['arr_0']
     m_pivots = np.load(DATA_DIR + "/" + "model_0.npz")['arr_3']
     m_scatters = np.load(DATA_DIR + "/" + "model_0.npz")['arr_1']
+    return my_wl, label_names, m_coeffs, m_pivots, m_scatters
 
-    #labels = [4842, 2.97, -0.173, -0.3, -0.36, 0.046, 0.045]
-    # Yuan-Sen: K giant, solar metallicity
-    # labels = [4800, 2.5, 0, -0.1, 0.2, 0.05, 0.05]
-    labels = [4800, 2.5, 0.03, 0.10, -0.17, -0.17, 0, -0.16,
-            -0.13, -0.15, 0.13, 0.08, 0.17, -0.062]
+
+def plot_info_content(ax, grad_spec, label):
+    rms = grad_spec**2
+    rms_norm = rms/sum(rms)
+    order = np.argsort(rms_norm)[::-1]
+    rms_norm_sorted = rms_norm[order]
+    foo = np.cumsum(rms_norm_sorted)
+    nelem = len(foo)
+    mark = np.where(foo > 0.8)[0][0]
+    xvals = np.linspace(0,1,nelem)
+    ax.plot(xvals, foo, c='black', linestyle='--')
+    ax.axvline(x=xvals[mark], c='r')
+    ax.set_title("Information Content for: " + label)
+    ax.set_xlabel("Fraction of Spectral Pixels")
+    ax.set_ylabel("Fraction of Information Content")
+
+
+if __name__=="__main__":
+    my_wl, label_names, m_coeffs, m_pivots, m_scatters = get_cannon_model()
+    label_name = "N"
+    ind = 7 # atomic number (0 for temp, 1 for logg)
+    wl, grad_spec_raw = get_model_spec_ting(ind)
+    grad_spec = cannon_normalize(grad_spec_raw+1)-1
+    cannon_grad_spec = gen_cannon_grad_spec(ind, m_coeffs, m_pivots)
+    fig, ax = plt.subplots(1)
+    plot_info_content(ax, grad_spec, label_name)
+    #plot_model(ax, wl, grad_spec)
+    #plot_cannon(ax, my_wl, cannon_grad_spec)
+    #plt.ylim(-0.1, 0.1)
+    #plt.xlabel("Wavelength (Angstroms)", fontsize=20)
+    #plt.ylabel("dFlux/dLabel", fontsize=20)
+    plt.show()
+
+
