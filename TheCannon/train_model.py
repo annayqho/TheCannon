@@ -22,38 +22,44 @@ def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs,
     inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
     resids = fluxes_m - np.dot(coeff_m, lvec.T)
     lnLs = 0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * resids**2 * inv_var
+    # derivatives
     dlnLds = scatter_m * (inv_var**2 * resids**2 - inv_var) 
     dlnLdtheta = inv_var[:, None] * ((inv_var[:, None] * Delta2_deriv * resids[:, None]**2) - Delta2_deriv + lvec * resids[:, None])
     dlnLdpars = np.hstack([dlnLdtheta, dlnLds[:, None]])  # scatter is the last parameter  
     return -2.*np.sum(lnLs), -2.*np.sum(dlnLdpars, axis=0) 
     
 def test_training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
-    
+    '''
+    this tests the derivatives of the training_step_objective_function
+    '''
     q, dqdp = training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta)
     
     for k in range(len(pars)):
         pars1 = 1. * pars
         tiny = 1e-7 * pars[k]
-        pars1[k] += tiny       # MAGIC!
+        pars1[k] += tiny
         q1, foo = training_step_objective_function(pars1, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta)
         # dqdpk = (q1-q)/tiny
         # print k, q, q1, pars[k], tiny, dqdp[k], dqdpk, (dqdp[k]-dqdpk)/(dqdp[k]+dqdpk)
         
     return True
 
-def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
+def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta): 
+    '''
+    optimizes the scatter and the coeffcients at one wavelength 
+    '''
     x0 = np.zeros((len(lvec_derivs[0])+1,))
     x0[0] = 1.
     x0[-1] = .01
     res = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta), 
                       method='L-BFGS-B', jac=True, 
-                      options={'gtol':1e-12, 'ftol':1e-12}) # tolerance are magic numbers!
-    # coeff_m = res.x[:-1]
-    # scatter_m = res.x[-1]   
+                      options={'gtol':1e-12, 'ftol':1e-12}) # tolerances are magic numbers (determined by experiment)!  
     return res
     
 def get_pivots_and_scales(label_vals):
-    
+    '''
+    function scales the labels 
+    '''
     qs = np.percentile(label_vals, (2.5, 50, 97.5), axis=0)
     pivots = qs[1]
     scales = (qs[2] - qs[0])/4.
@@ -77,8 +83,7 @@ def _train_model_new(ds):
     lvec, lvec_derivs = _get_lvec(label_vals, pivots, scales, derivs=True)
     scaled_ldelta = ldelta / scales[None, :]
 
-    # Perform REGRESSIONS
-    fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
+    fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec
     ivars = ivars.swapaxes(0,1)
     
     coeffs = []
@@ -100,7 +105,7 @@ def _train_model_new(ds):
     # Calc chi sq
     #all_chisqs = chis*chis
     all_chisqs = 0
-    print("Done training model (Christina)")
+    print("Done training model with errors on the labels. ")
 
     return np.array(coeffs), np.array(scatters), all_chisqs, pivots, scales
 
@@ -301,6 +306,6 @@ def _train_model(ds):
 
     # Calc chi sq
     all_chisqs = chis*chis
-    print("Done training model (Anna)")
+    print("Done training model. ")
 
     return coeffs, scatters, all_chisqs, pivots, scales

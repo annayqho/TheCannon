@@ -13,7 +13,7 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 class CannonModel(object):
-    def __init__(self, order):
+    def __init__(self, order, useErrors=False):
         self.coeffs = None
         self.scatters = None
         self.chisqs = None
@@ -21,7 +21,7 @@ class CannonModel(object):
         self.scales = None
         self.order = order
         self.model_spectra = None
-
+        self.useErrors = useErrors
 
     def model(self):
         """ Return the model definition or raise an error if not trained """
@@ -33,11 +33,10 @@ class CannonModel(object):
 
     def train(self, ds):
         """ Run training step: solve for best-fit spectral model """
-        # Anna's model
-        #self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model(ds)
-
-        # new version
-        self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model_new(ds)
+        if self.useErrors:
+            self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model_new(ds)
+        else:
+            self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model(ds)
 
 
     def diagnostics(self):
