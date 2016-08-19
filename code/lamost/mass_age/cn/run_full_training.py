@@ -92,12 +92,15 @@ def train():
     ds.set_label_names(
             ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
                 '[\\alpha/M]', 'A_k'])
-    ds.diagnostics_SNR()
-    ds.diagnostics_ref_labels()
-    np.savez("ref_snr.npz", ds.tr_SNR)
+    #ds.diagnostics_SNR()
+    #ds.diagnostics_ref_labels()
+    #np.savez("ref_snr.npz", ds.tr_SNR)
 
     print("Training model")
-    m = model.CannonModel(2)
+    nlab = ds.tr_label.shape[1]
+    npix = len(ds.wl)
+    filt = np.ones((nlab, npix), dtype=bool)
+    m = model.CannonModel(2, wl_filter = filt)
     m.fit(ds)
     np.savez("./coeffs.npz", m.coeffs)
     np.savez("./scatters.npz", m.scatters)
