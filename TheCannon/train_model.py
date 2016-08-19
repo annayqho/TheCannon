@@ -43,8 +43,9 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter, wl_f
     """
     Cinv = ivars / (1 + ivars*scatter**2)
     if wl_filter != None:
-        expanded_wl_filter = _get_lvec(wl_filter, np.zeros(len(wl_filter)))
-        mask = expanded_wl_filter
+        expanded_wl_filter = np.array(
+                _get_lvec(wl_filter, np.zeros(len(wl_filter))))[0]
+        mask = expanded_wl_filter.astype(bool)
         lvec = lvec[:,mask]
     lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
     lTCinvf = np.dot(lvec.T, Cinv * fluxes)
