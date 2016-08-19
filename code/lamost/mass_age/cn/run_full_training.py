@@ -100,6 +100,7 @@ def train():
     nlab = ds.tr_label.shape[1]
     npix = len(ds.wl)
     filt = np.ones((nlab, npix), dtype=bool)
+    filt[-1,0:3626] = 0
     m = model.CannonModel(2, wl_filter = filt)
     m.fit(ds)
     np.savez("./coeffs.npz", m.coeffs)
