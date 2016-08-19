@@ -12,13 +12,15 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 class CannonModel(object):
-    def __init__(self, order):
+    def __init__(self, order, wl_filter=None):
         self.coeffs = None
         self.scatters = None
         self.chisqs = None
         self.pivots = None
         self.order = order
+        self.wl_filter = wl_filter
         self.model_spectra = None
+
 
 
     def model(self):

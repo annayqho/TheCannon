@@ -15,7 +15,7 @@ import os
 from get_colors import get_colors
 
 
-DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/training_step"
 SPEC_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask"
 
 
@@ -84,7 +84,7 @@ def loop(num_sets):
     label_names = ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
                             '[\\alpha/M]', 'A_k']
     ref_id = np.load("%s/ref_id_col.npz" %SPEC_DIR)['arr_0']
-    ref_choose = np.load("%s/ref_id_culled.npz" %DATA_DIR)['arr_0']
+    ref_choose = np.load("%s/ref_id.npz" %DATA_DIR)['arr_0']
     inds = np.array([np.where(ref_id==val)[0][0] for val in ref_choose])
     ref_id = ref_id[inds]
     ref_flux = np.load("%s/ref_flux_col.npz" %SPEC_DIR)['arr_0'][inds]
@@ -98,7 +98,7 @@ def loop(num_sets):
     ref_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0'][inds]
     #ref_label = np.load("%s/xval_cannon_label_vals.npz" %TR_LAB_DIR)['arr_0']
     np.savez("ref_label.npz", ref_label)
-    assignments = np.load("%s/assignments.npz" %DATA_DIR)['arr_0']
+    assignments = np.load("%s/../assignments.npz" %DATA_DIR)['arr_0']
     
     print("looping through %s sets" %num_sets)
     for leave_out in range(0,num_sets):
