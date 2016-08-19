@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pyfits
 import copy
 from matplotlib import rc
+from scipy import interpolate 
 rc('font', family='serif')
 rc('text', usetex=True)
 from matplotlib import cm
@@ -32,6 +33,12 @@ def cannon_normalize(spec_raw):
     norm_flux, norm_ivar = continuum_normalization._cont_norm(
             spec, ivar, cont)
     return norm_flux[0]
+
+
+def resample(grid, wl, flux):
+    """ Resample spectrum onto desired grid """
+    flux_rs = (interpolate.interp1d(wl, flux))(grid)
+    return flux_rs
 
 
 def plot_cannon(ax, wl, grad_spec):
@@ -152,28 +159,55 @@ def plot_info_content(ax, grad_spec, label):
     foo = np.cumsum(rms_norm_sorted)
     nelem = len(foo)
     mark = np.where(foo > 0.8)[0][0]
+    imp = order[0:mark]
+    print(len(imp)/len(order))
     xvals = np.linspace(0,1,nelem)
     ax.plot(xvals, foo, c='black', linestyle='--')
     ax.axvline(x=xvals[mark], c='r')
     ax.set_title("Information Content for: " + label)
     ax.set_xlabel("Fraction of Spectral Pixels")
     ax.set_ylabel("Fraction of Information Content")
+    return imp # index of pix that contain 80% of the info
 
 
 if __name__=="__main__":
+    label_names = np.array(
+            ['TEFF', 'LOGG', 'AK', 'Al', 'Ca', 'C', 'Fe', 'Mg', 'Mn',
+            'Ni', 'N', 'O', 'Si', 'Ti'])
+    label_atnum = np.array(
+            [0, 1, -1, 13, 20, 6, 26, 12, 25, 28, 7, 8, 14, 22])
     my_wl, label_names, m_coeffs, m_pivots, m_scatters = get_cannon_model()
-    label_name = "N"
-    ind = 7 # atomic number (0 for temp, 1 for logg)
-    wl, grad_spec_raw = get_model_spec_ting(ind)
-    grad_spec = cannon_normalize(grad_spec_raw+1)-1
-    cannon_grad_spec = gen_cannon_grad_spec(ind, m_coeffs, m_pivots)
-    fig, ax = plt.subplots(1)
-    plot_info_content(ax, grad_spec, label_name)
-    #plot_model(ax, wl, grad_spec)
-    #plot_cannon(ax, my_wl, cannon_grad_spec)
-    #plt.ylim(-0.1, 0.1)
-    #plt.xlabel("Wavelength (Angstroms)", fontsize=20)
-    #plt.ylabel("dFlux/dLabel", fontsize=20)
-    plt.show()
-
-
+    npix = len(my_wl)
+    for ii,label_name in enumerate(label_names):
+        filt = np.zeros(npix, dtype=bool)
+        #label_name = "Ti"
+        #ind = 22 # atomic number (0 for temp, 1 for logg)
+        label_name = label_name.decode("utf-8")
+        print(label_name)
+        ind = label_atnum[ii]
+        if ind==-1:
+            # for Ak, save a filter that's just the colours
+            filt[3626:] = 1
+            np.savez("%s_filter.npz" %label_name, (my_wl, filt))
+        else:
+            wl, grad_spec_raw = get_model_spec_ting(ind)
+            grad_spec_rs = resample(my_wl, wl, grad_spec_raw)
+            grad_spec = cannon_normalize(grad_spec_rs+1)-1
+            cannon_grad_spec = gen_cannon_grad_spec(ind, m_coeffs, m_pivots)
+            fig, ax = plt.subplots(1, figsize=(15,6))
+            imp_pix = plot_info_content(ax, grad_spec, label_name)
+            plt.savefig("%s_info_content.png" %label_name)
+            plt.close()
+            filt[imp_pix] = 1
+            fig, ax = plt.subplots(1, figsize=(15,6))
+            plot_model(ax, my_wl, grad_spec)
+            ax.scatter(my_wl[filt], grad_spec[filt], s=5, lw=0, c='k')
+            #plot_cannon(ax, my_wl, cannon_grad_spec)
+            plt.ylim(min(grad_spec), max(grad_spec))
+            plt.xlim(min(wl),max(wl))
+            plt.xlabel("Wavelength (Angstroms)", fontsize=20)
+            plt.ylabel("dFlux/d%s" %label_name, fontsize=20)
+            np.savez("%s_filter.npz" %label_name, (my_wl, filt))
+            plt.savefig("%s_filter.png" %label_name)
+            plt.close()
+        #     # plt.show()
