@@ -243,7 +243,7 @@ def _get_lvec(label_vals, pivots, scales, derivs):
     nlabels = label_vals.shape[1]
     nstars = label_vals.shape[0]
     # specialized to second-order model
-    linear_offsets = (label_vals - pivots[None, :]) /scales[None, :]
+    linear_offsets = (label_vals - pivots[None, :]) #/ scales[None, :]
     quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)]
                                   for m in (linear_offsets)])
     ones = np.ones((nstars, 1))
@@ -287,10 +287,10 @@ def _train_model(ds):
     
     # for training, ivar can't be zero, otherwise you get singular matrices
     # DWH says: make sure no ivar goes below 1 or 0.01
-    ivars[ivars<0.01] = 0.01
+    ivars[ivars<0.005] = 0.005
 
     pivots, scales = get_pivots_and_scales(label_vals)
-    lvec, lvec_derivs = _get_lvec(label_vals, pivots, scales, derivs=True)
+    lvec = _get_lvec(label_vals, pivots, scales, derivs=False)
     lvec_full = np.array([lvec,] * npixels)
 
     # Perform REGRESSIONS

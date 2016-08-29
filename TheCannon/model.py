@@ -13,7 +13,7 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 class CannonModel(object):
-    def __init__(self, order, useErrors=False):
+    def __init__(self, order, useErrors):
         self.coeffs = None
         self.scatters = None
         self.chisqs = None
