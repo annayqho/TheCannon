@@ -43,7 +43,8 @@ if __name__=="__main__":
             normed = False, cmin=nmin)
     mean_age = total_age / total_err
 
-    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12,6))
+    #fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12,6))
+    fig = plt.figure(figsize=(10,6))
     # Returns the number of samples in each bin
     #count, xedges, yedges, im1 = plt.hist2d(
     #        mh, am, bins=[nx,ny], normed = False, cmin = 50)
@@ -53,18 +54,18 @@ if __name__=="__main__":
     #age_sqr, xedges, yedges, im3 = plt.hist2d(
     #        mh, am, bins=[nx,ny], weights = (age)**2, normed = False, cmin=50)
 
-    im = ax1.imshow(
+    im = plt.imshow(
             10**mean_age.T, interpolation='nearest', aspect='auto', 
             origin='lower', cmap=cmap, vmin=0, vmax=12, 
             extent=(xedges[0], xedges[-1], yedges[0], yedges[-1]))
-    cbar1 = plt.colorbar(im, ax=ax1, orientation='horizontal')
+    cbar1 = plt.colorbar(im, orientation='horizontal')
     cbar1.set_label("Mean Age [Gyr]", fontsize=20)
     cbar1.ax.tick_params(labelsize=20)
-    ax1.set_xlim(-0.8, 0.35)
-    ax1.set_ylim(-0.08,0.33)
-    ax1.set_ylabel(r"[$\alpha$/M]", fontsize=20)
-    ax1.set_xlabel("[M/H]", fontsize=20)
-    ax1.tick_params(axis='y', labelsize=20)
-    ax1.tick_params(axis='x', labelsize=20)
+    plt.xlim(-0.8, 0.35)
+    plt.ylim(-0.08,0.33)
+    plt.ylabel(r"[$\alpha$/M]", fontsize=20)
+    plt.xlabel("[M/H]", fontsize=20)
+    plt.tick_params(axis='y', labelsize=20)
+    plt.tick_params(axis='x', labelsize=20)
 
     plt.show()
