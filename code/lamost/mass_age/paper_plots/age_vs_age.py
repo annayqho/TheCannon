@@ -6,8 +6,9 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 import numpy as np
 import sys
-sys.path.append("/Users/annaho/Dropbox/Research/TheCannon/code/lamost/mass_age/cn")
-from estimate_age import estimate_age
+import matplotlib.gridspec as gridspec
+#sys.path.append("/Users/annaho/Dropbox/Research/TheCannon/code/lamost/mass_age/cn")
+#from estimate_age import estimate_age
 
 DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
 ids = np.load(DATA_DIR + "/ref_id.npz")['arr_0']
