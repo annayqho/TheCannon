@@ -7,33 +7,37 @@ plt.rc('font', family='serif')
 import numpy as np
 import sys
 import matplotlib.gridspec as gridspec
-#sys.path.append("/Users/annaho/Dropbox/Research/TheCannon/code/lamost/mass_age/cn")
-#from estimate_age import estimate_age
 
-DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
-ids = np.load(DATA_DIR + "/ref_id.npz")['arr_0']
-ages, age_errs = estimate_age()
-a = pyfits.open(
-    "/Users/annaho/Data/LAMOST/Mass_And_Age/age_vs_age_catalog.fits")
-data = a[1].data
-a.close()
-id_all = data['lamost_id']
-id_all = np.array(id_all)
-id_all = np.array([val.strip() for val in id_all])
-keep = np.in1d(ids, id_all)
-ids = ids[keep]
-ln_ages = np.log(10**ages)[keep]
-good = age_errs[keep] < 1
-inds = np.array([np.where(id_all==val)[0][0] for val in ids])
-apogee_id = data['2mass'][inds]
-ness_age = data['lnAge'][inds]
+def load_comparison():
+    direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
+    hdulist = pyfits.open("%s/age_vs_age_catalog.fits" %direc)
+    tbdata = hdulist[1].data
+    hdulist.close()
+    snr = tbdata.field("snr")
+    choose = snr > 0
+    age = tbdata.field("cannon_age")[choose]
+    age_err = tbdata.field("cannon_age_err")[choose]
+    ness_age = tbdata.field("lnAge")[choose]
+    ness_age_err = tbdata.field("e_logAge")[choose]
+    return age, age_err, ness_age, ness_age_err
 
-plt.hist2d(ness_age[good], ln_ages[good], bins=50, norm=LogNorm(), cmap="gray_r")
-plt.plot([-2,5], [-2,5], c='k')
-plt.xlabel("ln(Age) from APOGEE Spectroscopic Mass + Isochrones", fontsize=16)
-plt.ylabel("ln(Age) from LAMOST [C/Fe] and [N/Fe]", fontsize=16)
-plt.tick_params(axis='x', labelsize=16)
-plt.tick_params(axis='y', labelsize=16)
-plt.xlim(-2,4)
-plt.ylim(-2,4)
-plt.savefig("age_vs_age.png")
+if __name__=="__main__":
+    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12,6))
+
+    age, age_err, ness_age, ness_age_err = load_comparison()
+    a,b,c, im = ax2.hist2d(
+            np.log10(np.exp(ness_age)), age,
+            bins=50, norm=LogNorm(), cmap="gray_r")
+    cbar2 = plt.colorbar(im, ax=ax2, orientation='horizontal')
+    cbar2.set_label("Density", fontsize=20)
+    cbar2.ax.tick_params(labelsize=20)
+    ax2.plot([-2,5], [-2,5], c='k')
+    ax2.set_xlabel("log(Age) from APOGEE Masses", fontsize=20)
+    ax2.set_ylabel("log(Age) from LAMOST C and N", fontsize=20)
+    ax2.tick_params(axis='y', labelsize=20)
+    ax2.tick_params(axis='x', labelsize=20)
+    ax2.set_xlim(-0.5,1.5)
+    ax2.set_ylim(-0.5,1.5)
+    plt.tight_layout()
+    plt.savefig("age_density.png")
+    plt.show()
