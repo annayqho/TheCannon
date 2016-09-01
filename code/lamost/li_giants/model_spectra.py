@@ -30,6 +30,7 @@ def get_model_spec(wl, label, coeffs, scatters, chisqs, pivots):
 
 
 def spectral_model(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots):
+    print("Plotting model and residuals")
     xmin = 6000
     xmax = 6800
 
@@ -85,7 +86,8 @@ def spectral_model(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivo
     ax_residual.set_ylim(r_ymin,r_ymax)
     ax_residual.set_xlim(ax_spectrum.get_xlim())
     ax_residual.axhline(0, c="k", linestyle=":", zorder=-1)
-    ax_residual.axvline(x=6707, c='r', linewidth=2, linestyle='--')
+    print("6708")
+    ax_residual.axvline(x=6708, c='r', linewidth=2, linestyle='--')
     ax_residual.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     ax_residual.set_xticklabels([])
 
@@ -99,14 +101,10 @@ def spectral_model(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivo
     ax_residual.tick_params(axis="both", labelsize=18)
 
     fig.tight_layout()
-    plt.axvline(x=6707, c='r', linewidth=2, linestyle='--')
+    plt.axvline(x=6708, c='r', linewidth=2, linestyle='--')
     plt.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     #plt.show()
     plt.savefig("resid_%s.png" %ii)
     plt.close()
     #plt.savefig("model_spectrum_full.png")
     #plt.savefig("model_spectrum.png")
-
-
-if __name__=="__main__":
-    spectral_model(1536)

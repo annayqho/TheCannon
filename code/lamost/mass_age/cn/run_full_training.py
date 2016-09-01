@@ -82,6 +82,7 @@ def train():
     wl = np.load("%s/../wl_cols.npz" %SPEC_DIR)['arr_0']
     tr_id = np.load("%s/ref_id.npz" %SPEC_DIR)['arr_0']
     tr_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0']
+    tr_label = tr_label[:,0:3]
     tr_flux = np.load("%s/ref_flux.npz" %SPEC_DIR)['arr_0']
     tr_ivar = np.load("%s/ref_ivar.npz" %SPEC_DIR)['arr_0']
 
@@ -90,17 +91,20 @@ def train():
             tr_id, tr_flux, tr_ivar)
     # teff, logg, mh, cm, nm, am, ak
     ds.set_label_names(
-            ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
-                '[\\alpha/M]', 'A_k'])
+            ['T_{eff}', '\log g', '[Fe/H]']) #, '[C/M]','[N/M]', 
+                #'[\\alpha/M]', 'A_k'])
     #ds.diagnostics_SNR()
     #ds.diagnostics_ref_labels()
     #np.savez("ref_snr.npz", ds.tr_SNR)
 
     print("Training model")
     nlab = ds.tr_label.shape[1]
+    print(nlab)
     npix = len(ds.wl)
+    print(npix)
     filt = np.ones((nlab, npix), dtype=bool)
-    filt[-1,0:3626] = 0
+    print(filt)
+    #filt[nlab-1,0:500] = 0
     m = model.CannonModel(2, wl_filter = filt)
     m.fit(ds)
     np.savez("./coeffs.npz", m.coeffs)

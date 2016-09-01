@@ -19,6 +19,19 @@ apogee = np.load("%s/ref_label.npz" %data_direc)['arr_0']
 cannon = np.load(
         "%s/xval_cannon_label_vals.npz" %data_direc)['arr_0']
 
+data_direc = direc + "/with_col_mask/excised_obj"
+add_ids = np.load("%s/excised_ids.npz" %data_direc)['arr_0']
+add_snr = np.load(
+            "%s/excised_snr.npz" %data_direc)['arr_0']
+add_apogee = np.load("%s/excised_label.npz" %data_direc)['arr_0']
+add_cannon = np.load(
+            "%s/excised_all_cannon_labels.npz" %data_direc)['arr_0']
+
+ref_ids = np.hstack((ref_ids, add_ids))
+snr = np.hstack((snr, add_snr))
+apogee = np.vstack((apogee, add_apogee))
+cannon = np.vstack((cannon, add_cannon))
+
 hdulist = pyfits.open(direc + "/catalog_paper.fits")
 tbdata = hdulist[1].data
 hdulist.close()
@@ -32,11 +45,13 @@ lamost_logg = tbdata.field("logg")[choose][inds]
 lamost_feh = tbdata.field("feh")[choose][inds]
 lamost = np.vstack((lamost_teff, lamost_logg, lamost_feh)).T
 
+print("Loading excised data")
+
 fig = plt.figure(figsize=(10,8))
 gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
 
-lows = [35, 0.05, 0.03, 0.05, 0.07, 0.025]
-highs = [135, 0.40, 0.17, 0.10, 0.14, 0.055]
+lows = [40, 0.09, 0.04, 0.055, 0.08, 0.025]
+highs = [150, 0.40, 0.17, 0.11, 0.16, 0.06]
 offsets = np.array([40, 0.09, 0.04, 0.05, 0.072, 0.025])
 
 snr = snrg[choose]

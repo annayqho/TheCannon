@@ -45,7 +45,7 @@ def plot_cannon(ax, wl, grad_spec):
 
 def plot_model(ax, wl, grad_spec):
     ax.plot(
-            wl, grad_spec, c='red', label="Model Gradient Spectrum", 
+            wl, grad_spec, c='red', label="Theoretical Gradient Spectrum", 
             linewidth=0.5, drawstyle='steps-mid')#, linestyle='-')
     ax.legend(loc='lower left')
     ax.tick_params(axis='x', labelsize=16)
@@ -150,8 +150,8 @@ def plot_cn(my_wl, c_grad_spec, n_grad_spec, wl, c_grad_model, n_grad_model):
 
     ax0.set_xlim(4050,4400)
     ax1.set_xlim(4050, 4400)
-    ax0.set_ylim(-0.4, 0.4)
-    ax1.set_ylim(-0.4, 0.4)
+    ax0.set_ylim(-0.6, 0.4)
+    ax1.set_ylim(-0.6, 0.4)
     ax0.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
     ax1.set_xlabel(r"Wavelength $\lambda (\AA)$", fontsize=18)
     ax0.set_ylabel("Normalized Flux", fontsize=18)
@@ -170,16 +170,25 @@ if __name__=="__main__":
     m_pivots = np.load(DATA_DIR + "/" + "pivots.npz")['arr_0']
     m_scatters = np.load(DATA_DIR + "/" + "scatters.npz")['arr_0']
 
-    #labels = [4842, 2.97, -0.173, -0.3, -0.36, 0.046, 0.045]
-    # Yuan-Sen: K giant, solar metallicity
-    labels = [4800, 2.5, 0, -0.1, 0.2, 0.05, 0.00]
+    # Yuan-Sen: K giant, teff = 4750, logg=2.5, [X/H] = 0.0
+    # dteff = 200K, dlogg = 0.5, dXH = 0.2
+    labels = [4750, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0]
     c_grad_spec = gen_cannon_grad_spec(
-            labels, 3, -0.1, 0.1, m_coeffs, m_pivots) 
+            labels, 3, 0.0, 0.2, m_coeffs, m_pivots) 
     n_grad_spec = gen_cannon_grad_spec(
-            labels, 4, 0, 0.2, m_coeffs, m_pivots) 
+            labels, 4, 0.0, 0.2, m_coeffs, m_pivots) 
 
-    wl, c_grad_model = get_model_spec_ting(6)
-    wl, n_grad_model = get_model_spec_ting(7)
+    #wl, c_grad_model = get_model_spec_ting(6)
+    #wl, n_grad_model = get_model_spec_ting(7)
+
+    readf = "/Users/annaho/Data/LAMOST/ting_model_spec.npz"
+    wl = np.load(readf)['wavelength']
+    ref = np.load(readf)['flux_spectra'][99,:] 
+    c_dat = np.load(readf)['flux_spectra'][6,:]
+    c_grad_model = (cannon_normalize(c_dat)-cannon_normalize(ref))/0.2 + 1
+    n_dat = np.load(readf)['flux_spectra'][7,:]
+    n_grad_model = (cannon_normalize(n_dat)-cannon_normalize(ref))/0.2 + 1
+
     plot_cn(my_wl, c_grad_spec, n_grad_spec, wl, c_grad_model, n_grad_model)
     #wl, c_grad_model, n_grad_model = get_model_spec_martell()
 

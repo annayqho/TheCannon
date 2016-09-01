@@ -19,6 +19,24 @@ ref_chisq = np.load("%s/xval_cannon_label_chisq.npz" %REF_DIR)['arr_0']
 ref_label = np.load("%s/ref_label.npz" %REF_DIR)['arr_0']
 ref_snr = np.load("%s/ref_snr.npz" %REF_DIR)['arr_0']
 
+# Excised Values
+print("Loading excised data")
+data_direc = REF_DIR + "/../excised_obj"
+add_id = np.load("%s/excised_ids.npz" %data_direc)['arr_0']
+add_err = np.load("%s/excised_cannon_label_errs.npz" %data_direc)['arr_0']
+add_cannon = np.load("%s/excised_all_cannon_labels.npz" %data_direc)['arr_0']
+add_chisq = np.load("%s/excised_cannon_label_chisq.npz" %data_direc)['arr_0']
+add_label = np.load("%s/excised_label.npz" %data_direc)['arr_0']
+add_snr = np.load("%s/excised_snr.npz" %data_direc)['arr_0']
+
+# Add
+ref_id = np.hstack((ref_id, add_id))
+cannon_ref_err = np.vstack((cannon_ref_err, add_err))
+cannon_ref_label = np.vstack((cannon_ref_label, add_cannon))
+ref_chisq = np.hstack((ref_chisq, add_chisq))
+ref_label = np.vstack((ref_label, add_label))
+ref_snr = np.hstack((ref_snr, add_snr))
+
 # Calculate mass & age
 ref_teff = cannon_ref_label[:,0]
 ref_logg = cannon_ref_label[:,1]

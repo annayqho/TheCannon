@@ -83,7 +83,7 @@ def estimate_age(ref_label, cannon_ref_label, ref_snr, test_label, test_snr):
 
         # return the mode and the 68th percentile
         age_samples = calc_logAge(feh, cm, nm, teff, logg)
-        mass_samples = calc_mass_2(feh, cm, nm, teff, logg)
+        mass_samples = np.log10(calc_mass_2(feh, cm, nm, teff, logg)) # in log(Mass)
         #plt.hist(age_samples, bins=20, range=(0,2))
         #plt.show()
         ages[choose_obj] = np.median(age_samples)

@@ -26,22 +26,30 @@ maxs = [5500, 4.1, 0.6, 0.38, 0.5, 0.4, 0.4]
 
 print("Loading data")
 direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-#data_direc = direc + "/no_colors"
 data_direc = direc + "/with_col_mask/xval_with_cuts"
 ref_ids = np.load("%s/ref_id.npz" %data_direc)['arr_0']
 snr = np.load(
-    #"%s/cn_ref_snr.npz" %direc)['arr_0']
     "%s/ref_snr.npz" %data_direc)['arr_0']
-#apogee = np.load(
-#    "%s/xval_results/xval_cannon_label_vals.npz" %data_direc)['arr_0']
 apogee = np.load("%s/ref_label.npz" %data_direc)['arr_0']
-#cannon = np.load(
-#    "%s/xval_one_iteration/xval_cannon_label_vals.npz" %data_direc)['arr_0']
 cannon = np.load(
     "%s/xval_cannon_label_vals.npz" %data_direc)['arr_0']
 
-fig = plt.figure(figsize=(9,10))
-gs = gridspec.GridSpec(4,2, wspace=0.3, hspace=0.3)
+print("Loading excised data")
+data_direc = direc + "/with_col_mask/excised_obj"
+add_ids = np.load("%s/excised_ids.npz" %data_direc)['arr_0']
+add_snr = np.load(
+    "%s/excised_snr.npz" %data_direc)['arr_0']
+add_apogee = np.load("%s/excised_label.npz" %data_direc)['arr_0']
+add_cannon = np.load(
+    "%s/excised_all_cannon_labels.npz" %data_direc)['arr_0']
+
+ref_ids = np.hstack((ref_ids, add_ids))
+snr = np.hstack((snr, add_snr))
+apogee = np.vstack((apogee, add_apogee))
+cannon = np.vstack((cannon, add_cannon))
+
+fig = plt.figure(figsize=(9,11))
+gs = gridspec.GridSpec(4,2, wspace=0.3, hspace=0.5)
 props = dict(boxstyle='round', facecolor='white', alpha=0.3)
 props2 = dict(boxstyle='round', facecolor='white', alpha=0.3)
 
@@ -56,7 +64,7 @@ for i in range(0, len(names)):
     ax.plot([low, high], [low, high], 'k-', linewidth=2.0, label="x=y")
     #ax.legend(fontsize=14)
     #print(np.mean(cannon[:,i]-apogee[:,i]))
-    choose = np.logical_and(snr > 100, snr < 500)
+    choose = snr > 100
     diff = (cannon[:,i] - apogee[:,i])[choose]
     bias_raw = np.mean(diff)
     scatter_raw = np.std(diff)

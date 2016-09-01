@@ -20,7 +20,9 @@ tbdata = hdulist[1].data
 # # cols.names
 in_martig_range = tbdata.field("in_martig_range")
 snr = tbdata.field("snr")
-choose = np.logical_and(in_martig_range, snr > 80)
+#choose = np.logical_and(in_martig_range, snr > 80)
+choose = in_martig_range
+print(sum(choose))
 chisq = tbdata.field("chisq")
 ra_lamost = tbdata.field('ra')[choose]
 dec_lamost = tbdata.field('dec')[choose]
@@ -138,21 +140,21 @@ cmap.set_under('w')
 # composite map
 # plot map ('C' means the input coordinates were in the equatorial system)
 # rcParams.update({'font.size':16})
-hp.visufunc.mollview(m_apogee, coord=['C','G'], rot=(150, 0, 0), flip='astro',
-        notext=True, title=r'Ages from Ness et al. 2016', cbar=True,
-        norm=None, min=0, max=12, cmap=cmap, unit = 'Gyr')
+# hp.visufunc.mollview(m_apogee, coord=['C','G'], rot=(150, 0, 0), flip='astro',
+#         notext=True, title=r'Ages from Ness et al. 2016', cbar=True,
+#         norm=None, min=0, max=12, cmap=cmap, unit = 'Gyr')
 #hp.visufunc.mollview(m_lamost, coord=['C','G'], rot=(150, 0, 0), flip='astro',
 #        notext=True, title=r'$\alpha$/M for 500,000 LAMOST giants', cbar=True,
 #        norm=None, min=-0.07, max=0.3, cmap=cmap, unit = r'$\alpha$/M [dex]')
         #notext=True, title="r-band magnitude for 500,000 LAMOST giants", cbar=True,
         #norm=None, min=11, max=17, cmap=cmap, unit = r"r-band magnitude [mag]")
-#hp.visufunc.mollview(m_all, coord=['C','G'], rot=(150, 0, 0), flip='astro',
-#        notext=True, title='Age from Ness et al. 2016 + LAMOST giants', 
-#        cbar=True, norm=None, min=0.00, max=12, cmap=cmap, unit = 'Gyr')
+hp.visufunc.mollview(m_all, coord=['C','G'], rot=(150, 0, 0), flip='astro',
+        notext=True, title='Ages from Ness et al. 2016 + LAMOST giants', 
+        cbar=True, norm=None, min=0.00, max=12, cmap=cmap, unit = 'Gyr')
 hp.visufunc.graticule()
 
 #plt.show()
-#plt.savefig("full_age_map.png")
-plt.savefig("apogee_age_map.png")
+plt.savefig("full_age_map.png")
+#plt.savefig("apogee_age_map.png")
 #plt.savefig("lamost_am_map_magma.png")
 #plt.savefig("lamost_rmag_map.png")
