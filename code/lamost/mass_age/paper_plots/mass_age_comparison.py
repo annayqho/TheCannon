@@ -33,9 +33,6 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax):
             x, y,
             bins=40, norm=LogNorm(), cmap="gray_r",
             range=([axmin,axmax],[axmin,axmax]))
-    cbar = plt.colorbar(im, ax=ax, orientation='horizontal')
-    cbar.set_label("Density", fontsize=20)
-    cbar.ax.tick_params(labelsize=20)
     ax.plot([axmin,axmax], [axmin,axmax], c='k')
     ax.set_xlabel(xlabel, fontsize=20)
     ax.set_ylabel(ylabel, fontsize=20)
@@ -47,19 +44,23 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax):
             MaxNLocator(nbins=5))
     ax.xaxis.set_major_locator(
             MaxNLocator(nbins=5))
+    return im
 
 
 if __name__=="__main__":
     fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12,6))
     mass, age, ness_mass, ness_age = load_comparison()
-    plot(
+    im = plot(
             ax1, ness_mass, mass,
             "log(Mass) from APOGEE", "log(Mass) from LAMOST C and N",
-            -0.1, 0.4)
-    plot(
+            -0.3, 0.5)
+    im = plot(
             ax2, ness_age, age, 
             "log(Age) from APOGEE Masses", "log(Age) from LAMOST C and N",
             -0.5,1.5)
-    plt.tight_layout()
+    cbar = plt.colorbar(im)
+    cbar.set_label("Density", fontsize=20)
+    cbar.ax.tick_params(labelsize=20)
+    #plt.tight_layout()
     #plt.savefig("age_density.png")
     plt.show()
