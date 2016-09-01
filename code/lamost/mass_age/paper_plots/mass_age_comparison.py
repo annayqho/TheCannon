@@ -28,18 +28,28 @@ def load_comparison():
     return mass, age, ness_mass, ness_age
 
 
-def plot(ax, x, y, xlabel, ylabel, axmin, axmax):
+def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
     a,b,c, im = ax.hist2d(
             x, y,
             bins=40, norm=LogNorm(), cmap="gray_r",
             range=([axmin,axmax],[axmin,axmax]))
     ax.plot([axmin,axmax], [axmin,axmax], c='k')
-    ax.set_xlabel(xlabel, fontsize=20)
-    ax.set_ylabel(ylabel, fontsize=20)
+    #props = dict(boxstyle='round', facecolor='white', pad=0.1)
+    ax.text(
+            0.05, 0.85, text, 
+            horizontalalignment='left', verticalalignment='bottom', 
+            transform=ax.transAxes, fontsize=25)
+
+    ax.set_xlabel(xlabel, fontsize=16)
+    if ax == ax1:
+        ax.set_ylabel(ylabel, fontsize=20)
     ax.tick_params(axis='y', labelsize=20)
     ax.tick_params(axis='x', labelsize=20)
     ax.set_xlim(axmin, axmax)
     ax.set_ylim(axmin, axmax)
+    cbar = plt.colorbar(im, ax=ax, orientation='horizontal')
+    cbar.set_label("Density", fontsize=16)
+    cbar.ax.tick_params(labelsize=16)
     ax.yaxis.set_major_locator(
             MaxNLocator(nbins=5))
     ax.xaxis.set_major_locator(
@@ -52,15 +62,12 @@ if __name__=="__main__":
     mass, age, ness_mass, ness_age = load_comparison()
     im = plot(
             ax1, ness_mass, mass,
-            "log(Mass) from APOGEE", "log(Mass) from LAMOST C and N",
-            -0.3, 0.5)
+            "Via APOGEE Spectra", "Via LAMOST C and N",
+            -0.3, 0.5, "log(Mass)")
     im = plot(
             ax2, ness_age, age, 
-            "log(Age) from APOGEE Masses", "log(Age) from LAMOST C and N",
-            -0.5,1.5)
-    cbar = plt.colorbar(im)
-    cbar.set_label("Density", fontsize=20)
-    cbar.ax.tick_params(labelsize=20)
-    #plt.tight_layout()
-    #plt.savefig("age_density.png")
-    plt.show()
+            "Via APOGEE Spectroscopic Mass + Isochrones", "Via LAMOST C and N",
+            -0.5,1.5, "log(Age)")
+    plt.tight_layout()
+    plt.savefig("mass_age_comparison.png")
+    #plt.show()
