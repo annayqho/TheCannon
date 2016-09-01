@@ -76,8 +76,8 @@ age[test_mask], age_err[test_mask], mass[test_mask], mass_err[test_mask] = estim
 nobj = len(ref_id) + len(test_id)
 print(str(nobj) + " objects in total")
 
-ref_flag = np.zeros(nobj)
-ref_flag[0:len(ref_id)] = 1
+ref_flag = np.zeros(nobj, dtype=bool)
+ref_flag[0:len(ref_id)] = True
 
 print("writing file")
 t = Table()
@@ -93,8 +93,8 @@ label_names = np.array(
 for ii,name in enumerate(label_names):
     t[name] = np.hstack((cannon_ref_label[:,ii], test_label[:,ii]))
 
-t['cannon_mass'] = np.hstack((ref_mass, mass))
-t['cannon_age'] = np.hstack((ref_age, age))
+t['logMass'] = np.hstack((ref_mass, mass))
+t['logAge'] = np.hstack((ref_age, age))
 
 err_names = np.array(
         ['cannon_teff_err', 'cannon_logg_err', 'cannon_feh_err', 
@@ -103,8 +103,8 @@ err_names = np.array(
 for ii,name in enumerate(err_names):
     t[name] = np.hstack((cannon_ref_err[:,ii], test_err[:,ii]))
 
-t['cannon_mass_err'] = np.hstack((ref_mass_err, mass_err))
-t['cannon_age_err'] = np.hstack((ref_age_err, age_err))
+t['MassErr(dex)'] = np.hstack((ref_mass_err, mass_err))
+t['AgeErr(dex)'] = np.hstack((ref_age_err, age_err))
 
 t['snr'] = np.hstack((ref_snr, test_snr))
 t['chisq'] = np.hstack((ref_chisq, test_chisq))
