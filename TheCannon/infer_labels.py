@@ -92,7 +92,7 @@ def _infer_labels(model, dataset, starting_guess=None):
         # where the ivar == 0, set the normalized flux to 1 and the sigma to 100
         bad = ivar == 0
         flux[bad] = 1.0
-        sigma = np.ones(ivar.shape) * 200.0
+        sigma = np.ones(ivar.shape) * 100.0
         sigma[~bad] = np.sqrt(1.0 / ivar[~bad])
 
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
@@ -109,7 +109,7 @@ def _infer_labels(model, dataset, starting_guess=None):
             covs = np.zeros((len(starting_guess),len(starting_guess)))-9999.
         chi2 = (flux_piv-_func(coeffs, *labels))**2 * ivar / (1 + ivar * scatters**2)
         chisq_all[jj] = sum(chi2)
-        labels_all[jj,:] = labels + model.pivots
+        labels_all[jj,:] = model.scales * labels + model.pivots
         errs_all[jj,:] = covs.diagonal()
 
     dataset.set_test_label_vals(labels_all)

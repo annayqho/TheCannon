@@ -25,7 +25,7 @@ def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs,
     # derivatives
     dlnLds = scatter_m * (inv_var**2 * resids**2 - inv_var) 
     dlnLdtheta = inv_var[:, None] * ((inv_var[:, None] * Delta2_deriv * resids[:, None]**2) - Delta2_deriv + lvec * resids[:, None])
-    dlnLdpars = np.hstack([dlnLdtheta, dlnLds[:, None]])  # scatter is the last parameter  
+    dlnLdpars = np.hstack([dlnLdtheta, dlnLds[:, None]])  # scatter is the last parameter 
     return -2.*np.sum(lnLs), -2.*np.sum(dlnLdpars, axis=0) 
     
 def test_training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
@@ -54,7 +54,17 @@ def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
     res = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta), 
                       method='L-BFGS-B', jac=True, 
                       options={'gtol':1e-12, 'ftol':1e-12}) # tolerances are magic numbers (determined by experiment)!  
-    return res
+    
+    coeff_m = res.x[:-1]
+    scatter_m = res.x[-1]
+    for n in range(len(ivars_m)):    
+        ldelta2 = np.outer(ldelta[n], ldelta[n])
+        Delta2 = np.dot(np.dot(coeff_m.T, lvec_derivs[n]), np.dot(ldelta2, np.dot(lvec_derivs[n].T, coeff_m)))
+    inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
+    resids = fluxes_m - np.dot(coeff_m, lvec.T)
+    chis = np.sqrt(inv_var) * resids**2
+    
+    return res, chis
     
 def get_pivots_and_scales(label_vals):
     '''
@@ -88,26 +98,21 @@ def _train_model_new(ds):
     
     coeffs = []
     scatters = []
+    chisqs = []
     for m in range(0, npixels):
         print('Working on pixel {}'.format(m))
-        res = train_one_wavelength(fluxes[m], ivars[m], lvec, lvec_derivs, scaled_ldelta)
+        res, chis_m = train_one_wavelength(fluxes[m], ivars[m], lvec, lvec_derivs, scaled_ldelta)
         coeffs_m = res.x[:-1]
         scatter_m = res.x[-1]
         coeffs.append(coeffs_m)
         scatters.append(scatter_m)
+        chisqs.append(chis_m)
     
-    #blob = list(map(train_one_wavelength, fluxes, ivars, lvec, lvec_derivs, ldelta))
-    #coeffs = np.array([b[0] for b in blob])
-    #covs = np.array([np.linalg.inv(b[1]) for b in blob])
-    #chis = np.array([b[2] for b in blob])
-    #scatters = np.array([b[4] for b in blob])
-    
-    # Calc chi sq
-    #all_chisqs = chis*chis
-    all_chisqs = 0
+    # Calc chi squares
+    chisqs = np.array(chisqs)
     print("Done training model with errors on the labels. ")
 
-    return np.array(coeffs), np.array(scatters), all_chisqs, pivots, scales
+    return np.array(coeffs), np.array(scatters), chisqs, pivots, scales
 
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """
@@ -243,7 +248,7 @@ def _get_lvec(label_vals, pivots, scales, derivs):
     nlabels = label_vals.shape[1]
     nstars = label_vals.shape[0]
     # specialized to second-order model
-    linear_offsets = (label_vals - pivots[None, :]) #/ scales[None, :]
+    linear_offsets = (label_vals - pivots[None, :]) / scales[None, :]
     quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(nlabels)]
                                   for m in (linear_offsets)])
     ones = np.ones((nstars, 1))
@@ -287,7 +292,7 @@ def _train_model(ds):
     
     # for training, ivar can't be zero, otherwise you get singular matrices
     # DWH says: make sure no ivar goes below 1 or 0.01
-    ivars[ivars<0.005] = 0.005
+    ivars[ivars<0.01] = 0.01
 
     pivots, scales = get_pivots_and_scales(label_vals)
     lvec = _get_lvec(label_vals, pivots, scales, derivs=False)
