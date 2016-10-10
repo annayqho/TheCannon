@@ -127,20 +127,36 @@ def get_model_spec_ting(atomic_number):
 
 def plot_cn(my_wl, c_grad_spec, n_grad_spec, wl, c_grad_model, n_grad_model):
     # Make a plot
-    fig, (ax0,ax1) = plt.subplots(ncols=2, figsize=(12,6), 
+    fig, axarr = plt.subplots(ncols=2, figsize=(12,6), 
                                   sharex=True, sharey=True)
+    ax0 = axarr[0]
+    ax1 = axarr[1]
     plt.subplots_adjust(wspace=0.1)
+    props = dict(boxstyle='round', facecolor='white')
     x = 0.05
-    y = 0.90
+    y = 0.92
     ax0.text(
             x, y, 
             #r"-0.3 \textless [C/Fe] \textless 0.3", 
-            "Carbon",
+            "Carbon", bbox=props,
             transform=ax0.transAxes, fontsize=16)
     ax1.text(x, y, 
             #r"-0.4 \textless [N/Fe] \textless 0.4", 
-            "Nitrogen",
+            "Nitrogen", bbox=props,
             transform=ax1.transAxes, fontsize=16)
+
+    # Label some of the molecular absorption features
+    for ax in axarr: 
+        ax.text(
+                0.25, 0.80, 
+                "CN band", 
+                transform=ax.transAxes, fontsize=16)
+    ax0.text(
+            0.65, 0.92,
+            "G band (CH)",
+            transform=ax0.transAxes, fontsize=16)
+
+
 
     plot_cannon(ax0, my_wl, c_grad_spec)
     plot_cannon(ax1, my_wl, n_grad_spec)

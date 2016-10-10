@@ -101,4 +101,4 @@ for i in range(0, len(names)):
     ax.set_ylabel(r"$%s$" %(name) + " (%s) from Cannon" %unit)
 
 #plt.show()
-plt.savefig("xval_5panel.png")
+plt.savefig("xval_5panel.eps")

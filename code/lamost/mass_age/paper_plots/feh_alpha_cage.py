@@ -23,6 +23,7 @@ def load_data():
     teff = tbdata.field("cannon_teff")
     in_martig_range = tbdata.field("in_martig_range")
     choose = np.logical_and(in_martig_range, snr > 80)
+    print(sum(choose))
     mh = tbdata.field("cannon_mh")[choose]
     afe = tbdata.field("cannon_am")[choose]
     age = tbdata.field("cannon_age")[choose]
@@ -44,7 +45,7 @@ if __name__=="__main__":
     mean_age = total_age / total_err
 
     #fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12,6))
-    fig = plt.figure(figsize=(10,6))
+    fig = plt.figure(figsize=(8,4))
     # Returns the number of samples in each bin
     #count, xedges, yedges, im1 = plt.hist2d(
     #        mh, am, bins=[nx,ny], normed = False, cmin = 50)
@@ -58,14 +59,15 @@ if __name__=="__main__":
             10**mean_age.T, interpolation='nearest', aspect='auto', 
             origin='lower', cmap=cmap, vmin=0, vmax=12, 
             extent=(xedges[0], xedges[-1], yedges[0], yedges[-1]))
-    cbar1 = plt.colorbar(im, orientation='horizontal')
+    cbar1 = plt.colorbar(im, orientation='vertical')
     cbar1.set_label("Mean Age [Gyr]", fontsize=20)
     cbar1.ax.tick_params(labelsize=20)
     plt.xlim(-0.8, 0.35)
-    plt.ylim(-0.08,0.33)
+    plt.ylim(-0.05,0.3)
     plt.ylabel(r"[$\alpha$/M]", fontsize=20)
     plt.xlabel("[M/H]", fontsize=20)
     plt.tick_params(axis='y', labelsize=20)
     plt.tick_params(axis='x', labelsize=20)
-
-    plt.show()
+    plt.tight_layout()
+    plt.savefig("mh_am_cage.png")
+    #plt.show()

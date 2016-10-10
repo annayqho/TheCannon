@@ -63,11 +63,11 @@ if __name__=="__main__":
     im = plot(
             ax1, ness_mass, mass,
             "Via APOGEE Spectra", "Via LAMOST C and N",
-            -0.3, 0.5, "log(Mass)")
+            -0.3, 0.5, r"log(Mass/M${}_\odot$)")
     im = plot(
             ax2, ness_age, age, 
             "Via APOGEE Spectroscopic Mass + Isochrones", "Via LAMOST C and N",
-            -0.5,1.5, "log(Age)")
+            -0.5,1.5, r"log(Age/Gyr)")
     plt.tight_layout()
     plt.savefig("mass_age_comparison.png")
     #plt.show()
