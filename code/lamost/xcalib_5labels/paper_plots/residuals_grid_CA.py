@@ -14,13 +14,16 @@ def round_sig(x, sig=2):
 
 names = ['\mbox{T}_{\mbox{eff}},', '\mbox{log g}', '\mbox{[Fe/H]}']
 units = ['\mbox{K}', '\mbox{dex}', '\mbox{dex}']
-snr_str = [r'SNR $\textless$ 50', r'50 $\textless$ SNR $\textless$ 100', r'SNR $\textgreater$ 100']
-snr_str = snr_str[::-1]
-cutoffs = [0, 50, 100, 10000]
-cutoffs = cutoffs[::-1]
+snr_str = r'SNR $\textgreater$ 100'
 y_highs = [300, 0.5, 0.3]
 x_lows = [4000, 1.1, -2.0, -0.08]
 x_highs = [5300, 3.8, 0.5, 0.4]
+
+direc = "/users/annaho/Data/LAMOST/Label_Transfer"
+
+tr_id = np.load("%s/tr_id.npz" %direc)['arr_0']
+tr_id = np.array([val.decode('utf-8') for val in tr_id])
+snr = np.load("%s/tr_snr.npz" %direc)['arr_0']
 
 print("Loading data")
 direc = "/Users/annaho/TheCannon/data/lamost_paper"
