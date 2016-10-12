@@ -23,7 +23,7 @@ y_highs = [300, 0.7, 0.5]
 x_lows = [4000, 1.1, -2.0, -0.08]
 x_highs = [5300, 3.8, 0.5, 0.4]
 
-direc = "../run_9_more_metal_poor"
+direc = "/users/annaho/Data/LAMOST/Label_Transfer"
 
 all_ids = np.load("../run_2_train_on_good/all_ids.npz")['arr_0']
 all_apogee = np.load("../run_2_train_on_good/all_label.npz")['arr_0']
