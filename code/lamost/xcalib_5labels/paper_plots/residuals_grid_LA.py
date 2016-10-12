@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import pyfits
 from matplotlib import rc
 import matplotlib.gridspec as gridspec
 from matplotlib.colors import LogNorm
@@ -25,22 +26,23 @@ x_highs = [5300, 3.8, 0.5, 0.4]
 
 direc = "/users/annaho/Data/LAMOST/Label_Transfer"
 
-all_ids = np.load("../run_2_train_on_good/all_ids.npz")['arr_0']
-all_apogee = np.load("../run_2_train_on_good/all_label.npz")['arr_0']
-good_id = np.load("%s/tr_id.npz" %direc)['arr_0']
-all_snr = np.load("../run_2_train_on_good/SNRs.npz")['arr_0']
-IDs_lamost = np.loadtxt(
-        "../../examples/test_training_overlap/lamost_sorted_by_ra_with_dr2_params.txt",
-        usecols=(0,), dtype=(str))
-labels_all_lamost = np.loadtxt(
-        "../../examples/test_training_overlap/lamost_sorted_by_ra_with_dr2_params.txt",
-        usecols=(3,4,5), dtype=(float))
-inds = np.array([np.where(IDs_lamost==a)[0][0] for a in good_id])
-lamost = labels_all_lamost[inds,:]
+tr_id = np.load("%s/tr_id.npz" %direc)['arr_0']
+tr_id = np.array([val.decode('utf-8') for val in tr_id])
+apogee = np.load("%s/tr_label.npz" %direc)['arr_0']
+snr = np.load("%s/tr_snr.npz" %direc)['arr_0']
 
-choose = np.array([np.where(all_ids==val)[0][0] for val in good_id])
-apogee = all_apogee[choose]
-snr = all_snr[choose]
+a = pyfits.open("%s/../dr2_stellar.fits" %direc)
+dat = a[1].data
+a.close()
+
+all_id = dat['lamost_id']
+all_lamost_teff = dat['teff']
+all_lamost_logg = dat['logg']
+all_lamost_feh = dat['feh']
+
+inds = np.array([np.where(all_lamost_lab==val)[0][0] for val in tr_id])
+lamost = np.vstack(
+        (all_lamost_teff[inds], all_lamost_logg[inds], all_lamost_feh[inds]))
 
 fig = plt.figure(figsize=(15,15))
 gs = gridspec.GridSpec(3,3, wspace=0.3, hspace=0)
