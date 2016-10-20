@@ -6,8 +6,9 @@ from math import log10, floor
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 import numpy as np
+from pylab import rcParams
 
-def round_sig(x, sig=2):
+def round_sig(x, sig=1):
     if x < 0:
         return -round(-x, sig-int(floor(log10(-x)))-1)
     return round(x, sig-int(floor(log10(x)))-1)
@@ -24,55 +25,49 @@ direc = "/users/annaho/Data/LAMOST/Label_Transfer"
 tr_id = np.load("%s/tr_id.npz" %direc)['arr_0']
 tr_id = np.array([val.decode('utf-8') for val in tr_id])
 snr = np.load("%s/tr_snr.npz" %direc)['arr_0']
+apogee = np.load("%s/tr_label.npz" %direc)['arr_0']
+cannon = np.load("%s/all_cannon_labels.npz" %direc)['arr_0']
 
-print("Loading data")
-direc = "/Users/annaho/TheCannon/data/lamost_paper"
-snr = np.load("%s/ref_snr.npz" %direc)['arr_0']
-apogee = np.load("%s/ref_label.npz" %direc)['arr_0']
-cannon = np.load("../all_cannon_label_vals.npz")['arr_0']
-
-fig = plt.figure(figsize=(15,15))
-gs = gridspec.GridSpec(3,3, wspace=0.3, hspace=0)
+fig,axarr = plt.subplots(1,3)#,figsize=(17,7))
 props = dict(boxstyle='round', facecolor='white', alpha=0.3)
 
 for i in range(0, len(names)):
     name = names[i]
     unit = units[i]
 
-    for j in range(0, len(cutoffs)-1):
-        ax = plt.subplot(gs[j,i])
-        ax.axhline(y=0, c='k')
-        #ax.legend(fontsize=14)
-        choose = np.logical_and(snr < cutoffs[j], snr > cutoffs[j+1])
-        diff = (cannon[:,i] - apogee[:,i])[choose]
-        scatter = round_sig(np.std(diff), 3)
-        bias  = round_sig(np.mean(diff), 3)
+    ax = axarr[i]
+    ax.axhline(y=0, c='k')
+    choose = snr > 100
+    diff = (cannon[:,i] - apogee[:,i])[choose]
+    scatter = round_sig(np.std(diff), 1)
+    bias  = round_sig(np.mean(diff), 1)
 
-        ax.hist2d(
-                apogee[:,i][choose], diff, range=[[x_lows[i], x_highs[i]], [-y_highs[i], y_highs[i]]], bins=30, norm=LogNorm(), cmap="gray_r")
+    im = ax.hist2d(
+            apogee[:,i][choose], diff, 
+            range=[[x_lows[i], x_highs[i]], [-y_highs[i], y_highs[i]]], 
+            bins=30, norm=LogNorm(), cmap="gray_r")
 
-        if j < len(cutoffs) - 2:
-            ax.get_xaxis().set_visible(False)
-        ax.locator_params(nbins=5)
+    ax.locator_params(nbins=5)
 
-        ax.tick_params(axis='y', labelsize=20)
-        ax.tick_params(axis='x', labelsize=20)
+    ax.tick_params(axis='y', labelsize=20)
+    ax.tick_params(axis='x', labelsize=20)
 
-        if j == 0:
-            ax.set_title(r"$\Delta %s_{\mbox{C/L-A}}$ [%s]" %(name, unit), fontsize=30)
+    ax.set_title(r"$\Delta %s_{\mbox{C/L-A}}$ [%s]" %(name, unit), fontsize=20)
+    ax.set_xlabel("$%s$ [%s] from APOGEE" %(name, unit), fontsize=20)
 
-        if j == 2:
-            ax.set_xlabel("$%s$ [%s] from APOGEE" %(name, unit), fontsize=20)
+    textstr1 = snr_str
+    ax.text(0.05, 0.95, textstr1, transform=ax.transAxes, 
+            fontsize=20, verticalalignment='top', bbox=props)
+    textstr2 = 'Scatter: %s \nBias: %s' %(scatter, bias)
+    ax.text(0.05, 0.05, textstr2, transform=ax.transAxes, 
+            fontsize=20, verticalalignment='bottom', bbox=props)
 
-        textstr1 = '%s' %(snr_str[j])
-        ax.text(0.05, 0.95, textstr1, transform=ax.transAxes, 
-                fontsize=20, verticalalignment='top', bbox=props)
-        textstr2 = 'Scatter: %s \nBias: %s' %(scatter, bias)
-        ax.text(0.05, 0.05, textstr2, transform=ax.transAxes, 
-                fontsize=20, verticalalignment='bottom', bbox=props)
-        #ax.set_xlabel(r"APOGEE %s $(%s)$" %(name, unit))
-        #ax.set_ylabel(r"Cannon-LAMOST %s $(%s)$" %(name, unit))
-
-plt.savefig("residuals_grid_5label.png")
-#plt.show()
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.1, 0.02, 0.8])
+cbar = plt.colorbar(im[3], cax=cbar_ax)
+cbar.ax.tick_params(labelsize=16)
+cbar.set_label("Number of Objects", size=16)
+rcParams['figure.figsize'] = 8,3
+#plt.savefig("residuals_grid_5label.png")
+plt.show()
 

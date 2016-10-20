@@ -7,8 +7,9 @@ from math import log10, floor
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 import numpy as np
+from pylab import rcParams
 
-def round_sig(x, sig=2):
+def round_sig(x, sig=1):
     if x < 0:
         return -round(-x, sig-int(floor(log10(-x)))-1)
     return round(x, sig-int(floor(log10(x)))-1)
@@ -45,22 +46,22 @@ all_lamost_feh = dat['feh']
 
 lamost = np.load("tr_label_lamost.npz")['arr_0'].T
 
-fig = plt.figure(figsize=(12,5))
-gs = gridspec.GridSpec(1,3)#, wspace=0.3)
+fig,axarr = plt.subplots(1,3)#,figsize=(17,7))
 props = dict(boxstyle='round', facecolor='white', alpha=0.3)
 
 for i in range(0, len(names)):
     name = names[i]
     unit = units[i]
 
-    ax = plt.subplot(gs[i])
+    ax = axarr[i]
     ax.axhline(y=0, c='k')
     choose = snr > 100
+    print(sum(choose))
     diff = (lamost[:,i] - apogee[:,i])[choose]
-    scatter = round_sig(np.std(diff), 2)
-    bias  = round_sig(np.mean(diff), 2)
+    scatter = round_sig(np.std(diff), 1)
+    bias  = round_sig(np.mean(diff), 1)
 
-    ax.hist2d(
+    im = ax.hist2d(
             apogee[:,i][choose], diff, 
             range=[[x_lows[i], x_highs[i]], [-y_highs[i], y_highs[i]]], 
             bins=30, norm=LogNorm(), cmap="gray_r")
@@ -70,7 +71,7 @@ for i in range(0, len(names)):
     ax.tick_params(axis='y', labelsize=20)
     ax.tick_params(axis='x', labelsize=20)
 
-    ax.set_title(r"$\Delta %s_{\mbox{L-A}}$ [%s]" %(name, unit), fontsize=30)
+    ax.set_title(r"$\Delta %s_{\mbox{L-A}}$ [%s]" %(name, unit), fontsize=20)
     ax.set_xlabel("$%s$ [%s] from APOGEE" %(name, unit), fontsize=20)
 
     textstr1 = '%s' %(snr_str)
@@ -80,7 +81,13 @@ for i in range(0, len(names)):
     ax.text(0.05, 0.05, textstr2, transform=ax.transAxes, 
             fontsize=20, verticalalignment='bottom', bbox=props)
 
-plt.tight_layout()
-plt.savefig("residuals_grid_la.png")
-#plt.show()
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.1, 0.02, 0.8])
+cbar = plt.colorbar(im[3], cax=cbar_ax)
+cbar.ax.tick_params(labelsize=16)
+cbar.set_label("Number of Objects", size=16)
+rcParams['figure.figsize'] = 8,3
+#plt.tight_layout()
+#plt.savefig("residuals_grid_la.png")
+plt.show()
 
