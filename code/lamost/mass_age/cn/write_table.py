@@ -8,6 +8,12 @@ from estimate_mass_age import estimate_age
 from marie_cuts import get_mask
 import glob
 
+
+def snr_lookup():
+    """ Get approximate scatters from SNR
+    as determined in the code, snr_test.py """
+
+
 REF_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
 DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/test_step"
 
