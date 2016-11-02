@@ -55,7 +55,7 @@ highs = [150, 0.40, 0.17, 0.11, 0.16, 0.06]
 offsets = np.array([40, 0.09, 0.04, 0.05, 0.072, 0.025])
 
 snr = snrg[choose]
-snr_label = r"$\sim$\,SNR"
+snr_label = r"S/N"
 
 obj = []
 
