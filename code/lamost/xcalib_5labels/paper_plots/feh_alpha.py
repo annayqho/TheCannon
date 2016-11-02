@@ -22,6 +22,8 @@ am = a['cannon_alpha_m']
 snr = a['snrg']
 
 choose = snr > 20
+print(sum(choose))
+print(len(choose))
 
 fig, ax = plt.subplots(1,1, sharex=True, sharey=True, figsize=(8,5))
 hist2d(feh[choose], am[choose], ax=ax, bins=100, range=[[-2.2,.9],[-0.2,0.5]])
