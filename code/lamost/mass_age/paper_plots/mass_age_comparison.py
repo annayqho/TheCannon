@@ -58,7 +58,7 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
 
 def plot_marginal_hist(ax, val, val_min, val_max):
     ax.hist(
-            val, bins=20, orientation='horizontal',
+            val, bins=30, orientation='horizontal',
             range=(val_min, val_max), color='black', alpha=0.5,
             histtype='stepfilled')
     ax.set_xlabel("Number of Objects", fontsize=16)
