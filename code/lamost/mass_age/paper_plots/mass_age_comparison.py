@@ -36,7 +36,7 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
     ax.plot([axmin,axmax], [axmin,axmax], c='k')
     #props = dict(boxstyle='round', facecolor='white', pad=0.1)
     ax.text(
-            0.05, 0.85, text, 
+            0.05, 0.8, text, 
             horizontalalignment='left', verticalalignment='bottom', 
             transform=ax.transAxes, fontsize=25)
 
