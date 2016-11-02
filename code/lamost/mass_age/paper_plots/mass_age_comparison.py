@@ -46,9 +46,6 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
     ax.tick_params(axis='x', labelsize=20)
     ax.set_xlim(axmin, axmax)
     ax.set_ylim(axmin, axmax)
-    #cbar = plt.colorbar(im, ax=ax, orientation='horizontal')
-    #cbar.set_label("Density", fontsize=16)
-    cbar.ax.tick_params(labelsize=16)
     ax.yaxis.set_major_locator(
             MaxNLocator(nbins=5))
     ax.xaxis.set_major_locator(
@@ -73,7 +70,8 @@ def plot_marginal_hist(ax, val, val_min, val_max):
 
 
 if __name__=="__main__":
-    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
+    fig, (ax1, ax2) = plt.subplots(
+            nrows=2, ncols=1, figsize=(10,10))
     mass, age, ness_mass, ness_age = load_comparison()
     mass_min = -0.3
     mass_max = 0.5
@@ -87,14 +85,16 @@ if __name__=="__main__":
             ax2, ness_age, age, 
             "Via APOGEE Spectroscopic Mass + Isochrones", "Via LAMOST C and N",
             age_min,age_max, r"log(Age/Gyr)")
-    plt.subplots_adjust(right=0.6)
+    plt.subplots_adjust(right=0.6, bottom=0.2, hspace=0.3)
     # left, bottom, width, height
-    new_ax = fig.add_axes([0.65, 0.65, 0.25, 0.25])
+    new_ax = fig.add_axes([0.65, 0.60, 0.25, 0.30])
     hist1 = plot_marginal_hist(new_ax, mass, mass_min, mass_max)
-    new_ax = fig.add_axes([0.65, 0.21, 0.25, 0.25])
+    new_ax = fig.add_axes([0.65, 0.20, 0.25, 0.30])
     hist2 = plot_marginal_hist(new_ax, age, age_min, age_max)
     #plt.tight_layout()
-    cbar = plt.colorbar(im, ax=ax, orientation='horizontal')
+    cbar_ax = fig.add_axes([0.12, 0.09, 0.48, 0.03])
+    cbar = plt.colorbar(im, cax=cbar_ax, orientation='horizontal')
     cbar.set_label("Density", fontsize=16)
-    #plt.savefig("mass_age_comparison.png")
-    plt.show()
+    cbar.ax.tick_params(labelsize=16)
+    plt.savefig("mass_age_comparison.png")
+    #plt.show()
