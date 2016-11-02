@@ -56,11 +56,29 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
     return im
 
 
+def plot_marginal_hist(ax, val, val_min, val_max):
+    ax.hist(
+            val, bins=20, orientation='horizontal',
+            range=(val_min, val_max), color='black', alpha=0.5,
+            histtype='stepfilled')
+    ax.set_xlabel("Number of Objects", fontsize=16)
+    ax.set_ylim(val_min, val_max)
+    ax.tick_params(axis='x', labelsize=20)
+    ax.xaxis.set_major_locator(
+            MaxNLocator(nbins=5))
+    ax.yaxis.set_major_locator(
+            MaxNLocator(nbins=5))
+    ax.set_yticklabels([])
+    return ax
+
+
 if __name__=="__main__":
     fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
     mass, age, ness_mass, ness_age = load_comparison()
     mass_min = -0.3
     mass_max = 0.5
+    age_min = -0.5
+    age_max = 1.5
     im = plot(
             ax1, ness_mass, mass,
             "Via APOGEE Spectra", "Via LAMOST C and N",
@@ -68,22 +86,13 @@ if __name__=="__main__":
     im = plot(
             ax2, ness_age, age, 
             "Via APOGEE Spectroscopic Mass + Isochrones", "Via LAMOST C and N",
-            -0.5,1.5, r"log(Age/Gyr)")
+            age_min,age_max, r"log(Age/Gyr)")
     plt.subplots_adjust(right=0.6)
     # left, bottom, width, height
-    hist1 = fig.add_axes([0.65, 0.65, 0.25, 0.25])
-    hist1.hist(
-            mass, bins=20, orientation='horizontal',
-            range=(mass_min, mass_max), color='black', alpha=0.5,
-            histtype='stepfilled')
-    hist1.set_xlabel("Number of Objects", fontsize=16)
-    hist1.set_ylim(mass_min, mass_max)
-    hist1.tick_params(axis='x', labelsize=20)
-    hist1.xaxis.set_major_locator(
-            MaxNLocator(nbins=5))
-    hist1.yaxis.set_major_locator(
-            MaxNLocator(nbins=5))
-    hist1.set_yticklabels([])
+    new_ax = fig.add_axes([0.65, 0.65, 0.25, 0.25])
+    hist1 = plot_marginal_hist(new_ax, mass, mass_min, mass_max)
+    new_ax = fig.add_axes([0.65, 0.21, 0.25, 0.25])
+    hist2 = plot_marginal_hist(new_ax, age, age_min, age_max)
     #plt.tight_layout()
     #plt.savefig("mass_age_comparison.png")
     plt.show()
