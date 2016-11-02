@@ -52,7 +52,7 @@ gs = gridspec.GridSpec(3,2, wspace=0.3, hspace=0.3)
 
 lows = [40, 0.09, 0.04, 0.055, 0.08, 0.025]
 highs = [150, 0.40, 0.17, 0.11, 0.16, 0.06]
-offsets = np.array([40, 0.09, 0.04, 0.05, 0.072, 0.025])
+offsets = np.array([45, 0.09, 0.04, 0.05, 0.072, 0.025])
 
 snr = snrg[choose]
 snr_label = r"S/N"
@@ -116,7 +116,7 @@ for i in range(0, len(names)):
 
 fig.legend(
         (obj[0],obj[1],obj[2]), 
-        ("LAMOST", "Cannon", "1/(%s)" %snr_label), 
+        ("LAMOST", "Cannon", r"$\propto \,(\mathrm{%s})^{-1}$" %snr_label), 
         fontsize=16)
 
 #plt.show()
