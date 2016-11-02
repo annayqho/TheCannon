@@ -9,15 +9,22 @@ from marie_cuts import get_mask
 import glob
 
 
-def snr_lookup():
+def get_err(snr):
     """ Get approximate scatters from SNR
-    as determined in the code, snr_test.py """
+    as determined in the code, snr_test.py
+    Order: Teff, logg, MH, CM, NM, alpha """
 
+    quad_terms = np.array(
+            [3.11e-3, 1.10e-5, 6.95e-6, 5.05e-6, 4.65e-6, 4.10e-6])
+    lin_terms = np.array(
+            [-0.869, -2.07e-3, -1.40e-3, -1.03e-3, 1.13e-3, -7.29e-4])
+    consts = np.array([104, 0.200, 0.117, 0.114, 0.156, 0.0624])
+    err = quad_terms * snr**2 + lin_terms * snr + consts
+    return err
 
 REF_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
 DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/test_step"
 
-# Training Values
 ref_id = np.load("%s/ref_id.npz" %REF_DIR)['arr_0']
 cannon_ref_err = np.load("%s/xval_cannon_label_errs.npz" %REF_DIR)['arr_0']
 cannon_ref_label = np.load("%s/xval_cannon_label_vals.npz" %REF_DIR)['arr_0']
@@ -113,6 +120,8 @@ t['MassErr(dex)'] = np.hstack((ref_mass_err, mass_err))
 t['AgeErr(dex)'] = np.hstack((ref_age_err, age_err))
 
 t['snr'] = np.hstack((ref_snr, test_snr))
+print(t['snr'].shape)
+#t['scatter'] = get_err(t['snr'])[0]
 t['chisq'] = np.hstack((ref_chisq, test_chisq))
 
 # Calculate (C+N)/M
