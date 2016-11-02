@@ -58,7 +58,7 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
 
 
 if __name__=="__main__":
-    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12,6))
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(6,12))
     mass, age, ness_mass, ness_age = load_comparison()
     im = plot(
             ax1, ness_mass, mass,
@@ -69,5 +69,5 @@ if __name__=="__main__":
             "Via APOGEE Spectroscopic Mass + Isochrones", "Via LAMOST C and N",
             -0.5,1.5, r"log(Age/Gyr)")
     plt.tight_layout()
-    plt.savefig("mass_age_comparison.png")
-    #plt.show()
+    #plt.savefig("mass_age_comparison.png")
+    plt.show()
