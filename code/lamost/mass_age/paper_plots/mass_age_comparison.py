@@ -59,10 +59,12 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
 if __name__=="__main__":
     fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(10,10))
     mass, age, ness_mass, ness_age = load_comparison()
+    mass_min = -0.3
+    mass_max = 0.5
     im = plot(
             ax1, ness_mass, mass,
             "Via APOGEE Spectra", "Via LAMOST C and N",
-            -0.3, 0.5, r"log(Mass/M${}_\odot$)")
+            mass_min, mass_max, r"log(Mass/M${}_\odot$)")
     im = plot(
             ax2, ness_age, age, 
             "Via APOGEE Spectroscopic Mass + Isochrones", "Via LAMOST C and N",
@@ -70,7 +72,18 @@ if __name__=="__main__":
     plt.subplots_adjust(right=0.6)
     # left, bottom, width, height
     hist1 = fig.add_axes([0.65, 0.65, 0.25, 0.25])
-    hist1.hist(mass, bins=20, orientation='horizontal')
+    hist1.hist(
+            mass, bins=20, orientation='horizontal',
+            range=(mass_min, mass_max), color='black', alpha=0.5,
+            histtype='stepfilled')
+    hist1.set_xlabel("Number of Objects", fontsize=16)
+    hist1.set_ylim(mass_min, mass_max)
+    hist1.tick_params(axis='x', labelsize=20)
+    hist1.xaxis.set_major_locator(
+            MaxNLocator(nbins=5))
+    hist1.yaxis.set_major_locator(
+            MaxNLocator(nbins=5))
+    hist1.set_yticklabels([])
     #plt.tight_layout()
     #plt.savefig("mass_age_comparison.png")
     plt.show()
