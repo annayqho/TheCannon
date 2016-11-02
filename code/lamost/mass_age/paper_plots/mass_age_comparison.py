@@ -94,5 +94,5 @@ if __name__=="__main__":
     new_ax = fig.add_axes([0.65, 0.21, 0.25, 0.25])
     hist2 = plot_marginal_hist(new_ax, age, age_min, age_max)
     #plt.tight_layout()
-    #plt.savefig("mass_age_comparison.png")
-    plt.show()
+    plt.savefig("mass_age_comparison.png")
+    #plt.show()
