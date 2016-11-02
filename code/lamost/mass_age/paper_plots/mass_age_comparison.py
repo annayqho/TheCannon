@@ -41,8 +41,7 @@ def plot(ax, x, y, xlabel, ylabel, axmin, axmax, text):
             transform=ax.transAxes, fontsize=25)
 
     ax.set_xlabel(xlabel, fontsize=16)
-    if ax == ax1:
-        ax.set_ylabel(ylabel, fontsize=20)
+    ax.set_ylabel(ylabel, fontsize=20)
     ax.tick_params(axis='y', labelsize=20)
     ax.tick_params(axis='x', labelsize=20)
     ax.set_xlim(axmin, axmax)
