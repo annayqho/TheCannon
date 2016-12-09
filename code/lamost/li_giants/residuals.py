@@ -27,18 +27,22 @@ def get_residuals(ds, m):
     return resid
 
 
-def load_model():
+def load_model(direc):
     """ Load the model 
+
+    Parameters
+    ----------
+    direc: directory with all of the model files
     
     Returns
     -------
     m: model object
     """
     m = model.CannonModel(2)
-    m.coeffs = np.load("./coeffs.npz")['arr_0']
-    m.scatters = np.load("./scatters.npz")['arr_0']
-    m.chisqs = np.load("./chisqs.npz")['arr_0']
-    m.pivots = np.load("./pivots.npz")['arr_0']
+    m.coeffs = np.load(direc + "/coeffs.npz")['arr_0']
+    m.scatters = np.load(direc + "/scatters.npz")['arr_0']
+    m.chisqs = np.load(direc + "/chisqs.npz")['arr_0']
+    m.pivots = np.load(direc + "/pivots.npz")['arr_0']
     return m
 
 
@@ -94,4 +98,15 @@ def run_all_data():
 
 
 if __name__=="__main__":
-
+    DIR = "/Users/annaho/Data/LAMOST/Label_Transfer"
+    wl = np.load(DIR + "/wl.npz")['arr_0']
+    ids = np.load(DIR + "/tr_id.npz")['arr_0']
+    flux = np.load(DIR + "/tr_flux.npz")['arr_0']
+    ivar = np.load(DIR + "/tr_ivar.npz")['arr_0']
+    label = np.load(DIR + "/all_cannon_labels.npz")['arr_0']
+    ds = dataset.Dataset(wl, [], [], [], [], ids, flux, ivar)
+    ds.test_label_vals = label
+    m = load_model(DIR)
+    print(ds.test_flux.shape)
+    print(m.coeffs.shape)
+    resid = get_residuals(ds, m)
