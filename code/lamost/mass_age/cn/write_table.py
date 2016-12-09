@@ -17,10 +17,11 @@ def get_err(snr):
     quad_terms = np.array(
             [3.11e-3, 1.10e-5, 6.95e-6, 5.05e-6, 4.65e-6, 4.10e-6])
     lin_terms = np.array(
-            [-0.869, -2.07e-3, -1.40e-3, -1.03e-3, 1.13e-3, -7.29e-4])
+            [-0.869e-1, -2.07e-3, -1.40e-3, -1.03e-3, -1.13e-3, -7.29e-4])
     consts = np.array([104, 0.200, 0.117, 0.114, 0.156, 0.0624])
-    err = quad_terms * snr**2 + lin_terms * snr + consts
+    err = quad_terms[:,None] * snr**2 + lin_terms[:,None] * snr + consts[:,None]
     return err
+
 
 REF_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/xval_with_cuts"
 DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/test_step"
@@ -120,8 +121,14 @@ t['MassErr(dex)'] = np.hstack((ref_mass_err, mass_err))
 t['AgeErr(dex)'] = np.hstack((ref_age_err, age_err))
 
 t['snr'] = np.hstack((ref_snr, test_snr))
-print(t['snr'].shape)
-#t['scatter'] = get_err(t['snr'])[0]
+scatters = get_err(t['snr'])
+print(scatters.shape)
+t['teff_scatter'] = scatters[0]
+t['logg_scatter'] = scatters[1]
+t['mh_scatter'] = scatters[2]
+t['cm_scatter'] = scatters[3]
+t['nm_scatter'] = scatters[4]
+t['am_scatter'] = scatters[5]
 t['chisq'] = np.hstack((ref_chisq, test_chisq))
 
 # Calculate (C+N)/M
