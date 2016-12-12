@@ -15,21 +15,7 @@ from TheCannon import model
 from matplotlib.ticker import MaxNLocator
 
 
-def get_model_spec(wl, label, coeffs, scatters, chisqs, pivots):
-    ds = dataset.Dataset(wl, [], [], [], [], [], [], [])
-    ds.test_label_vals = label
-
-    m = model.CannonModel(2)
-    m.coeffs = coeffs
-    m.scatters = scatters
-    m.chisqs = chisqs
-    m.pivots = pivots
-
-    m.infer_spectra(ds)
-    return m.model_spectra
-
-
-def spectral_model(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots):
+def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots):
     print("Plotting model and residuals")
     xmin = 6000
     xmax = 6800
