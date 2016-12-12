@@ -12,6 +12,8 @@ import sys
 sys.path.insert(0, '/home/annaho/TheCannon')
 from TheCannon import model
 from TheCannon import dataset
+from 
+
 
 def get_residuals(ds, m):
     """ Using the dataset and model object, calculate the residuals and return
