@@ -8,6 +8,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.colors import LogNorm
 plt.rc('text', usetex=True)
 from matplotlib.ticker import MaxNLocator
+from astropy.modeling import models, fitting
 import sys
 sys.path.insert(0, '/home/annaho/TheCannon')
 from TheCannon import model
@@ -67,15 +68,25 @@ def load_dataset(date):
     -------
     ds: the dataset object
     """
-    DATA_DIR = "/home/annaho/TheCannon/data/lamost"
+    LAB_DIR = "/home/annaho/TheCannon/data/lamost"
     WL_DIR = "/home/annaho/TheCannon/code/lamost/mass_age/cn"
-    wl = np.load(WL_DIR + "/wl_cols.npz")['arr_0']
+    SPEC_DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels/output"
+    wl = np.load(WL_DIR + "/wl_cols.npz")['arr_0'][0:3626] # no cols
     ds = dataset.Dataset(wl, [], [], [], [], [], [], [])
-    test_label = np.load("%s/%s_all_cannon_labels.npz" %(DATA_DIR,date))['arr_0']
+    test_label = np.load("%s/%s_all_cannon_labels.npz" %(LAB_DIR,date))['arr_0']
     ds.test_label_vals = test_label
-    ds.test_flux = np.load("%s/%s_test_flux.npz" %(DATA_DIR,date))['arr_0']
-    ds.test_ivar = np.load("%s/%s_test_ivar.npz" %(DATA_DIR,date))['arr_0']
+    a = np.load("%s/%s_norm.npz" %(SPEC_DIR,date))
+    ds.test_flux = a['arr_0']
+    ds.test_ivar = a['arr_1']
     return ds
+
+
+def fit_gaussian(x, y):
+    """ Fit a Gaussian to the data """
+    g_init = models.Gaussian1D(amplitude=1.2, mean=6707, stddev=0.5)
+    fit_g = fitting.LevMarLSQFitter()
+    g = fit_g(g_init, x, y)
+    return g
 
 
 def run_all_data():
@@ -98,6 +109,8 @@ if __name__=="__main__":
     m = load_model()
     model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
-    plot(
-            0, ds.wl, ds.test_flux, ds.test_ivar, model_spec, 
-            m.coeffs, m.scatters, m.chisqs, m.pivots)
+    #for ii in np.arange(len(ds.test_flux)):
+    #for ii in np.arange(660, 661):
+    #    plot(
+    #            ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec, 
+    #            m.coeffs, m.scatters, m.chisqs, m.pivots)
