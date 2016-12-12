@@ -96,5 +96,8 @@ if __name__=="__main__":
     # load a spectrum
     ds = load_dataset("20121006")
     m = load_model()
+    model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
-    plot(0, ds.wl, ds.test_flux, ds.test_ivar, m.
+    plot(
+            0, ds.wl, ds.test_flux, ds.test_ivar, model_spec, 
+            m.coeffs, m.scatters, m.chisqs, m.pivots)
