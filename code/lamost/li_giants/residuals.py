@@ -8,6 +8,8 @@ import matplotlib.gridspec as gridspec
 from matplotlib.colors import LogNorm
 plt.rc('text', usetex=True)
 from matplotlib.ticker import MaxNLocator
+import sys
+sys.path.insert(0, '/home/annaho/TheCannon')
 from TheCannon import model
 from TheCannon import dataset
 
