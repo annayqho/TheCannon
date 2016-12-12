@@ -71,18 +71,6 @@ def load_dataset(date):
     return ds
 
 
-
-def plot_fit():
-    plt.plot(wl, resid[ii])
-    plt.xlim(6400,7000)
-    plt.ylim(-0.1,0.1)
-    plt.axvline(x=6707.8, c='r', linestyle='--', linewidth=2)
-    plt.axvline(x=6103, c='r', linestyle='--', linewidth=2)
-    plt.show()
-    plt.savefig("resid_%s.png" %ii)
-    plt.close()
-
-
 def run_all_data():
     """ Load the data that we're using to search for Li-rich giants.
     Store it in dataset and model objects. """
@@ -100,7 +88,5 @@ def run_all_data():
 if __name__=="__main__":
     # load a spectrum
     ds = load_dataset("20121006")
-    #m = load_model()
-    #print(ds.test_flux.shape)
-    #print(m.coeffs.shape)
-    #resid = get_residuals(ds, m)
+    m = load_model()
+    resid = get_residuals(ds, m)
