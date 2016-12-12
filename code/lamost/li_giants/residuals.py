@@ -27,7 +27,7 @@ def get_residuals(ds, m):
     return resid
 
 
-def load_model(direc):
+def load_model():
     """ Load the model 
 
     Parameters
@@ -38,6 +38,7 @@ def load_model(direc):
     -------
     m: model object
     """
+    direc = "/home/annaho/TheCannon/code/lamost_mass_age/cn"
     m = model.CannonModel(2)
     m.coeffs = np.load(direc + "/coeffs.npz")['arr_0']
     m.scatters = np.load(direc + "/scatters.npz")['arr_0']
@@ -57,19 +58,16 @@ def load_dataset(date):
     -------
     ds: the dataset object
     """
+    DATA_DIR = "/home/annaho/TheCannon/data/lamost"
+    WL_DIR = "/home/annaho/TheCannon/code/lamost_mass_age/cn"
+    wl = np.load(WL_DIR + "/wl_cols.npz")['arr_0']
     ds = dataset.Dataset(wl, [], [], [], [], [], [], [])
-    test_label = np.load("%s/xval_cannon_label_vals.npz" %DATA_DIR)['arr_0']
+    test_label = np.load("%s/%s_all_cannon_labels.npz" %(DATA_DIR,date))['arr_0']
     ds.test_label_vals = test_label
-    tr_flux = np.load("%s/ref_flux.npz" %DATA_DIR)['arr_0']
-    tr_ivar = np.load("%s/ref_ivar.npz" %DATA_DIR)['arr_0']
-    ds.test_flux = tr_flux
-    ds.test_ivar = tr_ivar
-    test_label = np.load("%s/xval_cannon_label_vals.npz" %DATA_DIR)['arr_0']
-    ds.test_label_vals = test_label
-    tr_flux = np.load("%s/ref_flux.npz" %DATA_DIR)['arr_0']
-    tr_ivar = np.load("%s/ref_ivar.npz" %DATA_DIR)['arr_0']
-    ds.test_flux = tr_flux
-    ds.test_ivar = tr_ivar
+    ds.test_flux = np.load("%s/%s_test_flux.npz" %(DATA_DIR,date))['arr_0']
+    ds.test_ivar = np.load("%s/%s_test_ivar.npz" %(DATA_DIR,date))['arr_0']
+    return ds
+
 
 
 def plot_fit():
@@ -98,15 +96,9 @@ def run_all_data():
 
 
 if __name__=="__main__":
-    DIR = "/Users/annaho/Data/LAMOST/Label_Transfer"
-    wl = np.load(DIR + "/wl.npz")['arr_0']
-    ids = np.load(DIR + "/tr_id.npz")['arr_0']
-    flux = np.load(DIR + "/tr_flux.npz")['arr_0']
-    ivar = np.load(DIR + "/tr_ivar.npz")['arr_0']
-    label = np.load(DIR + "/all_cannon_labels.npz")['arr_0']
-    ds = dataset.Dataset(wl, [], [], [], [], ids, flux, ivar)
-    ds.test_label_vals = label
-    m = load_model(DIR)
-    print(ds.test_flux.shape)
-    print(m.coeffs.shape)
-    resid = get_residuals(ds, m)
+    # load a spectrum
+    ds = load_dataset("20121006")
+    #m = load_model()
+    #print(ds.test_flux.shape)
+    #print(m.coeffs.shape)
+    #resid = get_residuals(ds, m)
