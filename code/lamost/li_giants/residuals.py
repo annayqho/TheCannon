@@ -124,6 +124,7 @@ def plot_fit(fit, x, y, yerr, figname='fit.png'):
     plt.xlabel("Wavelength (Angstroms)", fontsize=16)
     plt.ylabel("Normalized Flux", fontsize=16)
     plt.savefig(figname)
+    plt.close()
      
 
 
@@ -160,9 +161,10 @@ if __name__=="__main__":
         else:
             amp = fit[0][0]
             amp_err = fit[1][0,0]
+            plot_fit(fit, x, y, yerr, figname="%s_fit.png" %ii)
         amps[ii] = amp
         amp_errs[ii] = amp_err
-    np.savez("%s_fit_amplitudes.npz" %date, ds.test_ID, amps, amp_err)
+    np.savez("%s_fit_amplitudes.npz" %date, ds.test_ID, amps, amp_errs)
     #plot_fit(fit, x, y, yerr)
     #for ii in np.arange(len(ds.test_flux)):
     #for ii in np.arange(660, 661):
