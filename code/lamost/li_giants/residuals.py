@@ -84,25 +84,47 @@ def load_dataset(date):
     a = np.load("%s/%s_norm.npz" %(SPEC_DIR,date))
     ds.test_flux = a['arr_0']
     ds.test_ivar = a['arr_1']
+    ds.test_ID = np.load("%s/%s_ids.npz" %(SPEC_DIR,date))['arr_0']
     return ds
 
 
 def fit_gaussian(x, y, yerr, p0):
     """ Fit a Gaussian to the data """
-    popt, pcov = curve_fit(gaussian, x, y, sigma=yerr, p0=p0)
-    return popt, pcov
+    try:
+        fit = curve_fit(gaussian, x, y, sigma=yerr, p0=p0)
+    except RuntimeError:
+        return 0
+    return fit
 
 
-def fit_li(ds, m, resid):
+def fit_li(x, y, yerr):
+    p0 = [-0.1, 6707, 1]
+    fit = fit_gaussian(
+            x, y, yerr, p0)
+    return fit
+
+
+def get_data_to_fit(ii, ds, m, resid):
     scat = m.scatters
     iv_tot = (ds.test_ivar/(scat**2 * ds.test_ivar + 1))
     err = np.ones(iv_tot.shape)*1000
     err[iv_tot > 0] = 1/iv_tot[iv_tot>0]**0.5
-    inds = np.logical_and(ds.wl >= 6700, ds.wl <= 6714)
-    p0 = [-0.1, 6707, 1]
-    popt, pcov = fit_gaussian(
-            ds.wl[inds], resid[660,inds], yerr=err[660,inds], p0=p0)
-    return popt, pcov
+    inds = np.logical_and(ds.wl >= 6700, ds.wl <= 6720)
+    x = ds.wl[inds]
+    y = resid[ii,inds]
+    yerr=err[ii,inds]
+    return x, y, yerr
+
+
+def plot_fit(fit, x, y, yerr, figname='fit.png'):
+    popt, pcov = fit
+    plt.errorbar(x, y, yerr=yerr, fmt='.', c='k')
+    xpts = np.linspace(min(x), max(x), 1000)
+    plt.plot(xpts, gaussian(xpts, popt[0], popt[1], popt[2]), c='r', lw=2)
+    plt.xlabel("Wavelength (Angstroms)", fontsize=16)
+    plt.ylabel("Normalized Flux", fontsize=16)
+    plt.savefig(figname)
+     
 
 
 def run_all_data():
@@ -121,11 +143,27 @@ def run_all_data():
 
 if __name__=="__main__":
     # load a spectrum
-    ds = load_dataset("20121006")
+    date = '20121006'
+    ds = load_dataset(date)
+    amps = np.zeros(len(ds.test_ID))
+    amp_errs = np.zeros(amps.shape)
     m = load_model()
     model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
-    popt, pcov = fit_li(ds, m, resid)
+    for ii in np.arange(len(amps)):
+        print(ii)
+        x, y, yerr = get_data_to_fit(ii, ds, m, resid)
+        fit = fit_li(x, y, yerr)
+        if fit == 0:
+            amp = 999
+            amp_err = 999
+        else:
+            amp = fit[0][0]
+            amp_err = fit[1][0,0]
+        amps[ii] = amp
+        amp_errs[ii] = amp_err
+    np.savez("%s_fit_amplitudes.npz" %date, ds.test_ID, amps, amp_err)
+    #plot_fit(fit, x, y, yerr)
     #for ii in np.arange(len(ds.test_flux)):
     #for ii in np.arange(660, 661):
     #    plot(
