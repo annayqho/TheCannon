@@ -40,7 +40,7 @@ def load_model():
     -------
     m: model object
     """
-    direc = "/home/annaho/TheCannon/code/lamost_mass_age/cn"
+    direc = "/home/annaho/TheCannon/code/lamost/mass_age/cn"
     m = model.CannonModel(2)
     m.coeffs = np.load(direc + "/coeffs.npz")['arr_0']
     m.scatters = np.load(direc + "/scatters.npz")['arr_0']
@@ -61,7 +61,7 @@ def load_dataset(date):
     ds: the dataset object
     """
     DATA_DIR = "/home/annaho/TheCannon/data/lamost"
-    WL_DIR = "/home/annaho/TheCannon/code/lamost_mass_age/cn"
+    WL_DIR = "/home/annaho/TheCannon/code/lamost/mass_age/cn"
     wl = np.load(WL_DIR + "/wl_cols.npz")['arr_0']
     ds = dataset.Dataset(wl, [], [], [], [], [], [], [])
     test_label = np.load("%s/%s_all_cannon_labels.npz" %(DATA_DIR,date))['arr_0']
