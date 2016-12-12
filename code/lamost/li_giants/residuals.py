@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, '/home/annaho/TheCannon')
 from TheCannon import model
 from TheCannon import dataset
-from 
+from plot_residual import plot
 
 
 def get_residuals(ds, m):
@@ -26,9 +26,14 @@ def get_residuals(ds, m):
     ------
     residuals: array of residuals, spec minus model spec
     """
-    m.infer_spectra(ds)
-    resid = ds.test_flux - m.model_spectra
+    model_spectra = get_model_spectra(ds, m)
+    resid = ds.test_flux - model_spectra
     return resid
+
+
+def get_model_spectra(ds, m):
+    m.infer_spectra(ds)
+    return m.model_spectra
 
 
 def load_model():
@@ -92,3 +97,4 @@ if __name__=="__main__":
     ds = load_dataset("20121006")
     m = load_model()
     resid = get_residuals(ds, m)
+    plot(0, ds.wl, ds.test_flux, ds.test_ivar, m.
