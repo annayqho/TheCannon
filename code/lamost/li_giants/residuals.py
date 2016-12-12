@@ -1,5 +1,6 @@
 """ Calculate residuals """
 
+from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 from math import log10, floor
@@ -14,6 +15,11 @@ sys.path.insert(0, '/home/annaho/TheCannon')
 from TheCannon import model
 from TheCannon import dataset
 from plot_residual import plot
+
+
+def gaussian(x, a, b, c):
+    val = a * np.exp(-(x-b)**2 / c**2)
+    return val
 
 
 def get_residuals(ds, m):
@@ -50,9 +56,9 @@ def load_model():
     """
     direc = "/home/annaho/TheCannon/code/lamost/mass_age/cn"
     m = model.CannonModel(2)
-    m.coeffs = np.load(direc + "/coeffs.npz")['arr_0']
-    m.scatters = np.load(direc + "/scatters.npz")['arr_0']
-    m.chisqs = np.load(direc + "/chisqs.npz")['arr_0']
+    m.coeffs = np.load(direc + "/coeffs.npz")['arr_0'][0:3626,:] # no cols
+    m.scatters = np.load(direc + "/scatters.npz")['arr_0'][0:3626] # no cols
+    m.chisqs = np.load(direc + "/chisqs.npz")['arr_0'][0:3626] # no cols
     m.pivots = np.load(direc + "/pivots.npz")['arr_0']
     return m
 
@@ -81,12 +87,22 @@ def load_dataset(date):
     return ds
 
 
-def fit_gaussian(x, y):
+def fit_gaussian(x, y, yerr, p0):
     """ Fit a Gaussian to the data """
-    g_init = models.Gaussian1D(amplitude=1.2, mean=6707, stddev=0.5)
-    fit_g = fitting.LevMarLSQFitter()
-    g = fit_g(g_init, x, y)
-    return g
+    popt, pcov = curve_fit(gaussian, x, y, sigma=yerr, p0=p0)
+    return popt, pcov
+
+
+def fit_li(ds, m, resid):
+    scat = m.scatters
+    iv_tot = (ds.test_ivar/(scat**2 * ds.test_ivar + 1))
+    err = np.ones(iv_tot.shape)*1000
+    err[iv_tot > 0] = 1/iv_tot[iv_tot>0]**0.5
+    inds = np.logical_and(ds.wl >= 6700, ds.wl <= 6714)
+    p0 = [-0.1, 6707, 1]
+    popt, pcov = fit_gaussian(
+            ds.wl[inds], resid[660,inds], yerr=err[660,inds], p0=p0)
+    return popt, pcov
 
 
 def run_all_data():
@@ -109,6 +125,7 @@ if __name__=="__main__":
     m = load_model()
     model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
+    popt, pcov = fit_li(ds, m, resid)
     #for ii in np.arange(len(ds.test_flux)):
     #for ii in np.arange(660, 661):
     #    plot(
