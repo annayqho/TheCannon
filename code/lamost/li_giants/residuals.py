@@ -98,7 +98,7 @@ def fit_gaussian(x, y, yerr, p0):
 
 
 def fit_li(x, y, yerr):
-    p0 = [-0.1, 6707, 1]
+    p0 = [-0.1, 6707, 2]
     fit = fit_gaussian(
             x, y, yerr, p0)
     return fit
@@ -129,7 +129,7 @@ def plot_fit(fit, x, y, yerr, figname='fit.png'):
 
 def select(yerrs, amps, amp_errs):
     """ criteria for keeping an object """
-    keep = np.logical_and(amps > yerrs, amp_errs < amps)
+    keep = np.logical_and(np.abs(amps) > yerrs, amp_errs < np.abs(amps))
     return keep
 
 
@@ -169,10 +169,11 @@ if __name__=="__main__":
         else:
             amp = fit[0][0]
             amp_err = fit[1][0,0]
-            plot_fit(fit, x, y, yerr, figname="%s_fit.png" %ii)
         amps[ii] = amp
         amp_errs[ii] = amp_err
-    keep = select(med_err, amps, amp_errs)
+        if select(np.median(yerr), amp, amp_err): 
+            plot_fit(fit, x, y, yerr, figname="%s_fit.png" %ii)
+
     #np.savez("%s_fit_amplitudes.npz" %date, ds.test_ID, amps, amp_errs)
     #plot_fit(fit, x, y, yerr)
     #for ii in np.arange(len(ds.test_flux)):
