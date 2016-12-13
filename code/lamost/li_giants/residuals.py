@@ -127,6 +127,12 @@ def plot_fit(fit, x, y, yerr, figname='fit.png'):
     plt.close()
      
 
+def select(yerrs, amps, amp_errs):
+    """ criteria for keeping an object """
+    keep = np.logical_and(amps > yerrs, amp_errs < amps)
+    return keep
+
+
 
 def run_all_data():
     """ Load the data that we're using to search for Li-rich giants.
@@ -151,9 +157,11 @@ if __name__=="__main__":
     m = load_model()
     model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
+    med_err = np.zeros(amps.shape)
     for ii in np.arange(len(amps)):
         print(ii)
         x, y, yerr = get_data_to_fit(ii, ds, m, resid)
+        med_err[ii] = np.median(yerr)
         fit = fit_li(x, y, yerr)
         if fit == 0:
             amp = 999
@@ -164,7 +172,8 @@ if __name__=="__main__":
             plot_fit(fit, x, y, yerr, figname="%s_fit.png" %ii)
         amps[ii] = amp
         amp_errs[ii] = amp_err
-    np.savez("%s_fit_amplitudes.npz" %date, ds.test_ID, amps, amp_errs)
+    keep = select(med_err, amps, amp_errs)
+    #np.savez("%s_fit_amplitudes.npz" %date, ds.test_ID, amps, amp_errs)
     #plot_fit(fit, x, y, yerr)
     #for ii in np.arange(len(ds.test_flux)):
     #for ii in np.arange(660, 661):
