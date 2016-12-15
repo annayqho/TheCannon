@@ -16,7 +16,6 @@ from matplotlib.ticker import MaxNLocator
 
 
 def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, figname):
-    print("Plotting model and residuals")
     xmin = 6000
     xmax = 6800
 
@@ -41,7 +40,7 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, fignam
     err = np.ones(len(iv_tot))*1000
     err[iv_tot>0] = 1/iv_tot[iv_tot>0]**0.5
 
-    print("X2 is: " + str(sum((f - model_spec)**2 * iv_tot)))
+    #print("X2 is: " + str(sum((f - model_spec)**2 * iv_tot)))
 
     # Cinv = ivars / (1 + ivars*scatter**2)
     # lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
@@ -72,7 +71,6 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, fignam
     ax_residual.set_ylim(r_ymin,r_ymax)
     ax_residual.set_xlim(ax_spectrum.get_xlim())
     ax_residual.axhline(0, c="k", linestyle=":", zorder=-1)
-    print("6708")
     ax_residual.axvline(x=6708, c='r', linewidth=2, linestyle='--')
     ax_residual.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     ax_residual.set_xticklabels([])

@@ -161,6 +161,7 @@ def run_one_date(date):
         if fit == 0:
             amp = 999
             amp_err = 999
+            width = 999
         else:
             amp = fit[0][0]
             amp_err = fit[1][0,0]
@@ -193,5 +194,8 @@ if __name__=="__main__":
     dates = np.delete(dates, np.where(dates=='dr2.lis')[0][0])
 
     for date in dates:
-        print("running %s" %date)
-        run_one_date(date)
+        if glob.glob("*%s*.txt" %date):
+            print("%s done" %date)
+        else:
+            print("running %s" %date)
+            run_one_date(date)
