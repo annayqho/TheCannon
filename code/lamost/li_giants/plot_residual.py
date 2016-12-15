@@ -15,7 +15,7 @@ from TheCannon import model
 from matplotlib.ticker import MaxNLocator
 
 
-def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots):
+def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, figname):
     print("Plotting model and residuals")
     xmin = 6000
     xmax = 6800
@@ -90,7 +90,7 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots):
     plt.axvline(x=6708, c='r', linewidth=2, linestyle='--')
     plt.axvline(x=6103, c='r', linewidth=2, linestyle='--')
     #plt.show()
-    plt.savefig("resid_%s.png" %ii)
+    plt.savefig(figname)
     plt.close()
     #plt.savefig("model_spectrum_full.png")
     #plt.savefig("model_spectrum.png")

@@ -1,6 +1,7 @@
 """ Calculate residuals """
 
 from scipy.optimize import curve_fit
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from math import log10, floor
@@ -127,39 +128,33 @@ def plot_fit(fit, x, y, yerr, figname='fit.png'):
     plt.close()
      
 
-def select(yerrs, amps, amp_errs):
+def select(yerrs, amps, amp_errs, widths):
     """ criteria for keeping an object """
-    keep = np.logical_and(np.abs(amps) > yerrs, amp_errs < np.abs(amps))
+    keep_1 = np.logical_and(amps < 0, widths > 1)
+    keep_2 = np.logical_and(np.abs(amps) > 3*yerrs, amp_errs < 3*np.abs(amps))
+    keep = np.logical_and(keep_1, keep_2)
     return keep
 
 
 
-def run_all_data():
-    """ Load the data that we're using to search for Li-rich giants.
-    Store it in dataset and model objects. """
-    DATA_DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels"
-    dates = os.listdir("/home/share/LAMOST/DR2/DR2_release")
-    dates = np.array(dates)
-    dates = np.delete(dates, np.where(dates=='.directory')[0][0])
-    dates = np.delete(dates, np.where(dates=='all_folders.list')[0][0])
-    dates = np.delete(dates, np.where(dates=='dr2.lis')[0][0])
-    for date in dates:
-        print ("loading data for %s" %date)
-        load_date(date)
+def get_name(filename):
+    temp = filename.split('/')[-1]
+    return temp.split('.')[0]
 
 
-if __name__=="__main__":
+
+def run_one_date(date):
     # load a spectrum
-    date = '20121006'
+    li_rich_candidates = []
     ds = load_dataset(date)
     amps = np.zeros(len(ds.test_ID))
+    widths = np.zeros(amps.shape)
     amp_errs = np.zeros(amps.shape)
     m = load_model()
     model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
     med_err = np.zeros(amps.shape)
     for ii in np.arange(len(amps)):
-        print(ii)
         x, y, yerr = get_data_to_fit(ii, ds, m, resid)
         med_err[ii] = np.median(yerr)
         fit = fit_li(x, y, yerr)
@@ -169,15 +164,34 @@ if __name__=="__main__":
         else:
             amp = fit[0][0]
             amp_err = fit[1][0,0]
+            width = fit[0][2]
+        widths[ii] = width
         amps[ii] = amp
         amp_errs[ii] = amp_err
-        if select(np.median(yerr), amp, amp_err): 
-            plot_fit(fit, x, y, yerr, figname="%s_fit.png" %ii)
+        if select(np.median(yerr), amp, amp_err, width):
+            name = get_name(ds.test_ID[ii])
+            li_rich_candidates.append(name)
+            plot_fit(fit, x, y, yerr, figname="%s_%s_fit.png" %(date,name))
+            plot(
+                    ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec,
+                    m.coeffs, m.scatters, m.chisqs, m.pivots, 
+                    figname="%s_%s_spec.png" %(date,name))) 
+    outf = open('%s_candidates.txt' %date, 'w')
+    outf.write("%s Candidates Total\n" %len(ds.test_ID))
+    for val in li_rich_candidates: outf.write("%s.fits\n" %val)
+    outf.close()
 
-    #np.savez("%s_fit_amplitudes.npz" %date, ds.test_ID, amps, amp_errs)
-    #plot_fit(fit, x, y, yerr)
-    #for ii in np.arange(len(ds.test_flux)):
-    #for ii in np.arange(660, 661):
-    #    plot(
-    #            ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec, 
-    #            m.coeffs, m.scatters, m.chisqs, m.pivots)
+
+if __name__=="__main__":
+    """ Load the data that we're using to search for Li-rich giants.
+    Store it in dataset and model objects. """
+    DATA_DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels"
+    dates = os.listdir("/home/share/LAMOST/DR2/DR2_release")
+    dates = np.array(dates)
+    dates = np.delete(dates, np.where(dates=='.directory')[0][0])
+    dates = np.delete(dates, np.where(dates=='all_folders.list')[0][0])
+    dates = np.delete(dates, np.where(dates=='dr2.lis')[0][0])
+
+    for date in dates:
+        print("running %s" %date)
+        run_one_date(date)
