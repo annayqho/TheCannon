@@ -175,7 +175,7 @@ def run_one_date(date):
             plot(
                     ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec,
                     m.coeffs, m.scatters, m.chisqs, m.pivots, 
-                    figname="%s_%s_spec.png" %(date,name))) 
+                    figname="%s_%s_spec.png" %(date,name))
     outf = open('%s_candidates.txt' %date, 'w')
     outf.write("%s Candidates Total\n" %len(ds.test_ID))
     for val in li_rich_candidates: outf.write("%s.fits\n" %val)
