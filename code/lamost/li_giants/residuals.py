@@ -106,15 +106,15 @@ def fit_li(x, y, yerr):
     return popt, pcov
 
 
-def get_data_to_fit(ii, ds, m, resid):
+def get_data_to_fit(ds, m, resid):
     scat = m.scatters
     iv_tot = (ds.test_ivar/(scat**2 * ds.test_ivar + 1))
     err = np.ones(iv_tot.shape)*1000
     err[iv_tot > 0] = 1/iv_tot[iv_tot>0]**0.5
     inds = np.logical_and(ds.wl >= 6700, ds.wl <= 6720)
     x = ds.wl[inds]
-    y = resid[ii,inds]
-    yerr=err[ii,inds]
+    y = resid[:,inds]
+    yerr=err[:,inds]
     return x, y, yerr
 
 
@@ -155,12 +155,9 @@ def run_one_date(date):
     resid = get_residuals(ds, m)
 
     print("get data to fit")
-    dat = np.array([get_data_to_fit(i,ds,m,resid) for i in np.arange(nobj)])
-    x = dat[:,0,:]
-    y = dat[:,1,:]
-    yerr = dat[:,2,:]
+    x,y,yerr = get_data_to_fit(ds,m,resid)
     print("fit Gaussian")
-    fits = np.array([fit_li(xval,yval,yerrval) for xval,yval,yerrval in zip(x,y,yerr)])
+    fits = np.array([fit_li(x,yval,yerrval) for yval,yerrval in zip(y,yerr)])
     popt = fits[:,0]
     pcov = fits[:,1]
 
@@ -231,4 +228,5 @@ def run_all():
 
 
 if __name__=="__main__":
+    #run_one_date("20140522")
     run_all()
