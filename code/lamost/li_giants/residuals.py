@@ -1,6 +1,7 @@
 """ Calculate residuals """
 
 from scipy.optimize import curve_fit
+import glob
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -92,17 +93,17 @@ def load_dataset(date):
 def fit_gaussian(x, y, yerr, p0):
     """ Fit a Gaussian to the data """
     try:
-        fit = curve_fit(gaussian, x, y, sigma=yerr, p0=p0)
+        popt, pcov = curve_fit(gaussian, x, y, sigma=yerr, p0=p0)
     except RuntimeError:
-        return 0
-    return fit
+        return 0,0
+    return popt, pcov
 
 
 def fit_li(x, y, yerr):
     p0 = [-0.1, 6707, 2]
-    fit = fit_gaussian(
+    popt, pcov = fit_gaussian(
             x, y, yerr, p0)
-    return fit
+    return popt, pcov
 
 
 def get_data_to_fit(ii, ds, m, resid):
@@ -145,45 +146,48 @@ def get_name(filename):
 
 def run_one_date(date):
     # load a spectrum
-    li_rich_candidates = []
     ds = load_dataset(date)
-    amps = np.zeros(len(ds.test_ID))
-    widths = np.zeros(amps.shape)
-    amp_errs = np.zeros(amps.shape)
+    nobj = len(ds.test_ID)
     m = load_model()
     model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
-    med_err = np.zeros(amps.shape)
-    for ii in np.arange(len(amps)):
-        x, y, yerr = get_data_to_fit(ii, ds, m, resid)
-        med_err[ii] = np.median(yerr)
-        fit = fit_li(x, y, yerr)
-        if fit == 0:
-            amp = 999
-            amp_err = 999
-            width = 999
-        else:
-            amp = fit[0][0]
-            amp_err = fit[1][0,0]
-            width = fit[0][2]
-        widths[ii] = width
-        amps[ii] = amp
-        amp_errs[ii] = amp_err
-        if select(np.median(yerr), amp, amp_err, width):
-            name = get_name(ds.test_ID[ii])
-            li_rich_candidates.append(name)
-            plot_fit(fit, x, y, yerr, figname="%s_%s_fit.png" %(date,name))
-            plot(
-                    ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec,
-                    m.coeffs, m.scatters, m.chisqs, m.pivots, 
-                    figname="%s_%s_spec.png" %(date,name))
-    outf = open('%s_candidates.txt' %date, 'w')
-    outf.write("%s Candidates Total\n" %len(ds.test_ID))
-    for val in li_rich_candidates: outf.write("%s.fits\n" %val)
-    outf.close()
+
+    dat = np.array([get_data_to_fit(i,ds,m,resid) for i in np.arange(nobj)])
+    x = dat[:,0,:]
+    y = dat[:,1,:]
+    yerr = dat[:,2,:]
+    med_err = np.median(yerr, axis=1)
+    fits = np.array([fit_li(xval,yval,yerrval) for xval,yval,yerrval in zip(x,y,yerr)])
+    popt = fits[:,0]
+    pcov = fits[:,1]
+    amps = 
+
+    #     if fit == 0:
+    #         amp = 999
+    #         amp_err = 999
+    #         width = 999
+    #     else:
+    #         amp = fit[0][0]
+    #         amp_err = fit[1][0,0]
+    #         width = fit[0][2]
+    #     widths[ii] = width
+    #     amps[ii] = amp
+    #     amp_errs[ii] = amp_err
+    #     if select(np.median(yerr), amp, amp_err, width):
+    #         name = get_name(ds.test_ID[ii])
+    #         li_rich_candidates.append(name)
+    #         plot_fit(fit, x, y, yerr, figname="%s_%s_fit.png" %(date,name))
+    #         plot(
+    #                 ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec,
+    #                 m.coeffs, m.scatters, m.chisqs, m.pivots, 
+    #                 figname="%s_%s_spec.png" %(date,name))
+    # outf = open('%s_candidates.txt' %date, 'w')
+    # outf.write("%s Candidates Total\n" %len(ds.test_ID))
+    # for val in li_rich_candidates: outf.write("%s.fits\n" %val)
+    # outf.close()
 
 
-if __name__=="__main__":
+def run_all():
     """ Load the data that we're using to search for Li-rich giants.
     Store it in dataset and model objects. """
     DATA_DIR = "/home/annaho/TheCannon/code/apogee_lamost/xcalib_4labels"
