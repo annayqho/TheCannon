@@ -92,10 +92,13 @@ def load_dataset(date):
 
 def fit_gaussian(x, y, yerr, p0):
     """ Fit a Gaussian to the data """
+    nparams = len(p0)
+    popt = np.zeros(nparams)
+    pcov = np.zeros((nparams,nparams))
     try:
         popt, pcov = curve_fit(gaussian, x, y, sigma=yerr, p0=p0)
     except RuntimeError:
-        return 0,0
+        return popt,pcov
     return popt, pcov
 
 
@@ -160,7 +163,6 @@ def run_one_date(date):
     fits = np.array([fit_li(xval,yval,yerrval) for xval,yval,yerrval in zip(x,y,yerr)])
     popt = fits[:,0]
     pcov = fits[:,1]
-    amps = 
 
     #     if fit == 0:
     #         amp = 999
