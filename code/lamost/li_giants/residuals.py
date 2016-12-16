@@ -92,13 +92,10 @@ def load_dataset(date):
 
 def fit_gaussian(x, y, yerr, p0):
     """ Fit a Gaussian to the data """
-    nparams = len(p0)
-    popt = np.zeros(nparams)
-    pcov = np.zeros((nparams,nparams))
     try:
-        popt, pcov = curve_fit(gaussian, x, y, sigma=yerr, p0=p0)
+        popt, pcov = curve_fit(gaussian, x, y, sigma=yerr, p0=p0, absolute_sigma=True)
     except RuntimeError:
-        return popt,pcov
+        return [0],[0]
     return popt, pcov
 
 
@@ -121,8 +118,7 @@ def get_data_to_fit(ii, ds, m, resid):
     return x, y, yerr
 
 
-def plot_fit(fit, x, y, yerr, figname='fit.png'):
-    popt, pcov = fit
+def plot_fit(popt, pcov, x, y, yerr, figname='fit.png'):
     plt.errorbar(x, y, yerr=yerr, fmt='.', c='k')
     xpts = np.linspace(min(x), max(x), 1000)
     plt.plot(xpts, gaussian(xpts, popt[0], popt[1], popt[2]), c='r', lw=2)
@@ -150,6 +146,7 @@ def get_name(filename):
 def run_one_date(date):
     # load a spectrum
     ds = load_dataset(date)
+    names = np.array([get_name(val) for val in ds.test_ID])
     nobj = len(ds.test_ID)
     m = load_model()
     model_spec = get_model_spectra(ds, m)
@@ -159,34 +156,50 @@ def run_one_date(date):
     x = dat[:,0,:]
     y = dat[:,1,:]
     yerr = dat[:,2,:]
-    med_err = np.median(yerr, axis=1)
     fits = np.array([fit_li(xval,yval,yerrval) for xval,yval,yerrval in zip(x,y,yerr)])
     popt = fits[:,0]
     pcov = fits[:,1]
 
-    #     if fit == 0:
-    #         amp = 999
-    #         amp_err = 999
-    #         width = 999
-    #     else:
-    #         amp = fit[0][0]
-    #         amp_err = fit[1][0,0]
-    #         width = fit[0][2]
-    #     widths[ii] = width
-    #     amps[ii] = amp
-    #     amp_errs[ii] = amp_err
-    #     if select(np.median(yerr), amp, amp_err, width):
-    #         name = get_name(ds.test_ID[ii])
-    #         li_rich_candidates.append(name)
-    #         plot_fit(fit, x, y, yerr, figname="%s_%s_fit.png" %(date,name))
+    # get rid of the failed fits
+    lens = np.array([len(val) for val in popt])
+    bad = np.where(lens==1)[0]
+    names_keep = np.delete(names, bad)
+    x_keep = np.delete(x, bad, axis=0)
+    y_keep = np.delete(y, bad, axis=0)
+    yerr_keep = np.delete(yerr, bad, axis=0)
+    med_err = np.median(yerr_keep, axis=1)
+    popt_keep = np.array([x for x in popt if np.array(x).any() != [0]])
+    pcov_keep = np.array([x for x in pcov if np.array(x).any() != [0]])
+
+    amps = popt_keep[:,0]
+    amp_err = np.sqrt(pcov_keep[:,0,0])
+    center = popt_keep[:,1]
+    width = popt_keep[:,2]
+
+    keep = select(med_err, amps, amp_err, width)
+
+    cands = names_keep[keep]
+    outf = open('%s_candidates.txt' %date, 'w')
+    outf.write("%s Candidates Total\n" %len(ds.test_ID))
+    for val in cands: outf.write("%s.fits\n" %val)
+    outf.close()
+
+    popt_cands = popt_keep[keep]
+    pcov_cands = pcov_keep[keep]
+    x_cands = x_keep[keep]
+    y_cands = y_keep[keep]
+    yerr_cands = yerr_keep[keep]
+    
+    out = [plot_fit(
+            popt_val, pcov_val, x_val, y_val, yerr_val,
+            figname="%s_%s_fit.png" %(date, name_val)) for
+            popt_val, pcov_val, x_val, y_val, yerr_val, name_val in 
+            zip(popt_cands, pcov_cands, x_cands, y_cands, yerr_cands, cands)]
+
     #         plot(
     #                 ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec,
     #                 m.coeffs, m.scatters, m.chisqs, m.pivots, 
     #                 figname="%s_%s_spec.png" %(date,name))
-    # outf = open('%s_candidates.txt' %date, 'w')
-    # outf.write("%s Candidates Total\n" %len(ds.test_ID))
-    # for val in li_rich_candidates: outf.write("%s.fits\n" %val)
-    # outf.close()
 
 
 def run_all():
