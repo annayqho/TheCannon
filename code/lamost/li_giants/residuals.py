@@ -148,22 +148,28 @@ def run_one_date(date):
     ds = load_dataset(date)
     names = np.array([get_name(val) for val in ds.test_ID])
     nobj = len(ds.test_ID)
+    print("%s obj" %nobj)
+    inds = np.arange(nobj)
     m = load_model()
     model_spec = get_model_spectra(ds, m)
     resid = get_residuals(ds, m)
 
+    print("get data to fit")
     dat = np.array([get_data_to_fit(i,ds,m,resid) for i in np.arange(nobj)])
     x = dat[:,0,:]
     y = dat[:,1,:]
     yerr = dat[:,2,:]
+    print("fit Gaussian")
     fits = np.array([fit_li(xval,yval,yerrval) for xval,yval,yerrval in zip(x,y,yerr)])
     popt = fits[:,0]
     pcov = fits[:,1]
 
     # get rid of the failed fits
+    print("purge failed tests")
     lens = np.array([len(val) for val in popt])
     bad = np.where(lens==1)[0]
     names_keep = np.delete(names, bad)
+    inds_keep = np.delete(inds, bad)
     x_keep = np.delete(x, bad, axis=0)
     y_keep = np.delete(y, bad, axis=0)
     yerr_keep = np.delete(yerr, bad, axis=0)
@@ -176,6 +182,7 @@ def run_one_date(date):
     center = popt_keep[:,1]
     width = popt_keep[:,2]
 
+    print("find candidates")
     keep = select(med_err, amps, amp_err, width)
 
     cands = names_keep[keep]
@@ -184,22 +191,25 @@ def run_one_date(date):
     for val in cands: outf.write("%s.fits\n" %val)
     outf.close()
 
+    inds_cands = inds_keep[keep]
     popt_cands = popt_keep[keep]
     pcov_cands = pcov_keep[keep]
     x_cands = x_keep[keep]
     y_cands = y_keep[keep]
     yerr_cands = yerr_keep[keep]
     
+    print("first plot")
     out = [plot_fit(
             popt_val, pcov_val, x_val, y_val, yerr_val,
             figname="%s_%s_fit.png" %(date, name_val)) for
             popt_val, pcov_val, x_val, y_val, yerr_val, name_val in 
             zip(popt_cands, pcov_cands, x_cands, y_cands, yerr_cands, cands)]
 
-    #         plot(
-    #                 ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec,
-    #                 m.coeffs, m.scatters, m.chisqs, m.pivots, 
-    #                 figname="%s_%s_spec.png" %(date,name))
+    print("second plot")
+    out = [plot(
+            ii, ds.wl, ds.test_flux, ds.test_ivar, model_spec,
+            m.coeffs, m.scatters, m.chisqs, m.pivots, 
+            figname="%s_%s_spec.png" %(date,name)) for ii,name in zip(inds_cands, cands)]
 
 
 def run_all():
@@ -218,3 +228,7 @@ def run_all():
         else:
             print("running %s" %date)
             run_one_date(date)
+
+
+if __name__=="__main__":
+    run_all()
