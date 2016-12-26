@@ -5,7 +5,10 @@ This is the code associated with *The Cannon*, a data-driven method for
 determining stellar labels (physical parameters and chemical abundances) from
 stellar spectra in the context of large spectroscopic surveys. It closely 
 follows the method outlined in Ness et al. 2015, although some minor changes 
-have been made. A description of these changes is outlined in Ho et al. 2016.
+have been made. A description of these changes is outlined in Ho et al. 2016 (arXiv:1602.00303).
+
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.221367.svg
+   :target: https://doi.org/10.5281/zenodo.221367
 
 Documentation for The Cannon can be found here_. 
 
