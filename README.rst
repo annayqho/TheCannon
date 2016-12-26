@@ -31,4 +31,5 @@ Ness et al. 2015 (arXiv:1501.07604) and Ho et al. 2016 (arXiv:1602.00303).
 Projects
 --------
 
-* Survey Cross-Calibration with The Cannon: Apogee-scale Stellar Labels from Lamost Spectra
+* Label Transfer from APOGEE to LAMOST: Precise Stellar Parameters for 450,000 LAMOST Giants
+* Masses and Ages for 230,000 LAMOST Giants, via Their Carbon and Nitrogen Abundances
