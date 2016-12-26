@@ -16,7 +16,7 @@ Authors
 
 * **Anna Ho** (MPIA)
 * **Melissa Ness** (MPIA)
-* **David W. Hogg** (NYU CCPP)(MPIA)
+* **David W. Hogg** (SCDA NYU MPIA)
 * **Hans-Walter Rix** (MPIA)
 
 License and Citation
