@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>TheCannon.apogee &mdash; TheCannon 0.5.6 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="TheCannon 0.5.6 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> TheCannon
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.6
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../input_requirements.html">Requirements for Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Reference/API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">TheCannon</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>TheCannon.apogee</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for TheCannon.apogee</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; Functions for reading in APOGEE spectra and training labels &quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">opt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">ascii</span>
+<span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># python 3 special</span>
+<span class="n">PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="nb">range</span> <span class="o">=</span> <span class="nb">xrange</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyfits</span>
+
+<div class="viewcode-block" id="get_pixmask"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.get_pixmask">[docs]</a><span class="k">def</span> <span class="nf">get_pixmask</span><span class="p">(</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">flux_errs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create and return a bad pixel mask for an APOGEE spectrum</span>
+
+<span class="sd">    Bad pixels are defined as follows: fluxes or errors are not finite, or </span>
+<span class="sd">    reported errors are &lt;= 0</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fluxes: ndarray</span>
+<span class="sd">        Flux data values </span>
+
+<span class="sd">    flux_errs: ndarray</span>
+<span class="sd">        Flux uncertainty data values </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mask: ndarray</span>
+<span class="sd">        Bad pixel mask, value of True corresponds to bad pixels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bad_flux</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">fluxes</span><span class="p">))</span> 
+    <span class="n">bad_err</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">flux_errs</span><span class="p">))</span> <span class="o">|</span> <span class="p">(</span><span class="n">flux_errs</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">bad_pix</span> <span class="o">=</span> <span class="n">bad_err</span> <span class="o">|</span> <span class="n">bad_flux</span>
+    <span class="k">return</span> <span class="n">bad_pix</span></div>
+
+
+<div class="viewcode-block" id="get_starmask"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.get_starmask">[docs]</a><span class="k">def</span> <span class="nf">get_starmask</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">aspcapflag</span><span class="p">,</span> <span class="n">paramflag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Identifies which APOGEE objects have unreliable physical parameters,</span>
+<span class="sd">    as laid out in Holzman et al 2015 and on the APOGEE DR12 website</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: np array</span>
+<span class="sd">        all APOGEE DR12 IDs and labels</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bad: np array</span>
+<span class="sd">        mask where 1 corresponds to a star with unreliable parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># teff outside range (4000,6000) K and logg &lt; 0</span>
+    <span class="n">teff</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+    <span class="n">bad_teff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">teff</span> <span class="o">&lt;</span> <span class="mi">4000</span><span class="p">,</span> <span class="n">teff</span> <span class="o">&gt;</span> <span class="mi">6000</span><span class="p">)</span>
+    <span class="n">logg</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+    <span class="n">bad_logg</span> <span class="o">=</span> <span class="n">logg</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="n">cuts</span> <span class="o">=</span> <span class="n">bad_teff</span> <span class="o">|</span> <span class="n">bad_logg</span>
+
+    <span class="c1"># STAR_WARN flag set (TEFF, LOGG, CHI2, COLORTE, ROTATION, SN)</span>
+    <span class="c1"># M_H_WARN, ALPHAFE_WARN not included in the above, so do them separately</span>
+    <span class="n">star_warn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">star_bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">23</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">feh_warn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">alpha_warn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">aspcapflag</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">aspcapflag_bad</span> <span class="o">=</span> <span class="n">star_warn</span> <span class="o">|</span> <span class="n">star_bad</span> <span class="o">|</span> <span class="n">feh_warn</span> <span class="o">|</span> <span class="n">alpha_warn</span>
+
+    <span class="c1"># separate element flags</span>
+    <span class="n">teff_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">logg_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">feh_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">alpha_flag</span> <span class="o">=</span> <span class="n">paramflag</span><span class="p">[:,</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="n">paramflag_bad</span> <span class="o">=</span> <span class="n">teff_flag</span> <span class="o">|</span> <span class="n">logg_flag</span> <span class="o">|</span> <span class="n">feh_flag</span> <span class="o">|</span> <span class="n">alpha_flag</span>
+
+    <span class="k">return</span> <span class="n">cuts</span> <span class="o">|</span> <span class="n">aspcapflag_bad</span> <span class="o">|</span> <span class="n">paramflag_bad</span> </div>
+
+
+<div class="viewcode-block" id="load_spectra"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.load_spectra">[docs]</a><span class="k">def</span> <span class="nf">load_spectra</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Reads wavelength, flux, and flux uncertainty data from apogee fits files</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_dir: str</span>
+<span class="sd">        Name of the directory containing all of the data files</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wl: ndarray</span>
+<span class="sd">        Rest-frame wavelength vector</span>
+
+<span class="sd">    fluxes: ndarray</span>
+<span class="sd">        Flux data values</span>
+
+<span class="sd">    ivars: ndarray</span>
+<span class="sd">        Inverse variance values corresponding to flux values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Loading spectra from directory </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span>
+             <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)]))</span>
+    <span class="n">nstars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>  
+    <span class="k">for</span> <span class="n">jj</span><span class="p">,</span> <span class="n">fits_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+        <span class="n">file_in</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fits_file</span><span class="p">)</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">file_in</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">jj</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">npixels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span>
+            <span class="n">fluxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nstars</span><span class="p">,</span> <span class="n">npixels</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">ivars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">fluxes</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">start_wl</span> <span class="o">=</span> <span class="n">file_in</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CRVAL1&#39;</span><span class="p">]</span>
+            <span class="n">diff_wl</span> <span class="o">=</span> <span class="n">file_in</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CDELT1&#39;</span><span class="p">]</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">diff_wl</span> <span class="o">*</span> <span class="p">(</span><span class="n">npixels</span><span class="p">)</span> <span class="o">+</span> <span class="n">start_wl</span>
+            <span class="n">wl_full_log</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start_wl</span><span class="p">,</span><span class="n">val</span><span class="p">,</span> <span class="n">diff_wl</span><span class="p">)</span>
+            <span class="n">wl_full</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span> <span class="o">**</span> <span class="n">aval</span> <span class="k">for</span> <span class="n">aval</span> <span class="ow">in</span> <span class="n">wl_full_log</span><span class="p">]</span>
+            <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wl_full</span><span class="p">)</span>
+        <span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">file_in</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">badpix</span> <span class="o">=</span> <span class="n">get_pixmask</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="p">)</span>
+        <span class="n">ivar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">npixels</span><span class="p">)</span>
+        <span class="n">ivar</span><span class="p">[</span><span class="o">~</span><span class="n">badpix</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">flux_err</span><span class="p">[</span><span class="o">~</span><span class="n">badpix</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">flux</span>
+        <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">ivar</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Spectra loaded&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">files</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span></div>
+
+
+<div class="viewcode-block" id="load_labels"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.load_labels">[docs]</a><span class="k">def</span> <span class="nf">load_labels</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Extracts reference labels from a file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename: str</span>
+<span class="sd">        Name of the file containing the table of reference labels</span>
+
+<span class="sd">    ids: array</span>
+<span class="sd">        The IDs of stars to retrieve labels for</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    labels: ndarray</span>
+<span class="sd">        Reference label values for all reference objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Loading reference labels from file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span>
+    <span class="n">inds</span> <span class="o">=</span> <span class="n">ids</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="n">teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Teff_{corr}&#39;</span><span class="p">]</span>
+    <span class="n">teff</span> <span class="o">=</span> <span class="n">teff</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="n">logg</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;logg_{corr}&#39;</span><span class="p">]</span>
+    <span class="n">logg</span> <span class="o">=</span> <span class="n">logg</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="n">mh</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;[M/H]_{corr}&#39;</span><span class="p">]</span>
+    <span class="n">mh</span> <span class="o">=</span> <span class="n">mh</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">teff</span><span class="p">,</span><span class="n">logg</span><span class="p">,</span><span class="n">mh</span><span class="p">))</span><span class="o">.</span><span class="n">T</span> </div>
+
+
+<div class="viewcode-block" id="continuum_normalize_training"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.continuum_normalize_training">[docs]</a><span class="k">def</span> <span class="nf">continuum_normalize_training</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Continuum normalize the training set, using an iterative Cannon approach</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds: dataset object</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    updated dataset object</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># To initialize the continuum-pixel determination, we define a</span>
+    <span class="c1"># preliminary pseudo-continuum-normalization by using a polynomial</span>
+    <span class="c1"># fit to an upper quantile (in this case 90%) of the spectra, determined</span>
+    <span class="c1"># from a running median</span>
+    <span class="c1"># this is SNR-dependent</span>
+    <span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize_training_q</span><span class="p">(</span>
+            <span class="n">q</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">pseudo_tr_flux</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">pseudo_tr_ivar</span>
+
+    <span class="c1"># Run the training step</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+    <span class="c1"># Baseline spectrum</span>
+    <span class="n">baseline_spec</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Flux cut: 1 +/- 0.15 (0.985 - 1.015)</span>
+    <span class="n">fcut</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">baseline_spec</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.15</span><span class="p">)</span>
+
+    <span class="c1"># Smallest percentiles of the first order coefficients</span>
+    <span class="n">ccut_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1.0e-5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ccut_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.0045</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ccut_3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">3</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.0085</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ccut12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">ccut_1</span><span class="p">,</span> <span class="n">ccut_2</span><span class="p">)</span>
+    <span class="n">ccut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">ccut12</span><span class="p">,</span> <span class="n">ccut_3</span><span class="p">)</span>
+
+    <span class="c1"># Choose the continuum pixels</span>
+    <span class="n">contpix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">fcut</span><span class="p">,</span> <span class="n">ccut</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">set_continuum</span><span class="p">(</span><span class="n">contpix</span><span class="p">)</span>
+
+    <span class="c1"># Fit a sinusoid to these pixels, using the inverse variance weighting</span>
+    <span class="c1"># Adding an additional error term that is set to 0 for continuum pixels</span>
+    <span class="c1"># and a large error value for all other pixels so that the new error </span>
+    <span class="c1"># term becomes </span>
+    <span class="c1">#err2 = err1 + err[0 OR LARGE]</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">fit_continuum</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;sinusoid&quot;</span><span class="p">)</span>
+    <span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> \
+            <span class="n">dataset</span><span class="o">.</span><span class="n">continuum_normalize</span><span class="p">(</span><span class="n">cont</span><span class="p">)</span>
+   
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">norm_tr_flux</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">norm_tr_ivar</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">norm_test_flux</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">norm_test_ivar</span>
+
+    <span class="k">return</span> <span class="n">ds</span></div>
+
+<span class="k">if</span>  <span class="n">__name__</span> <span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">make_apogee_label_file</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Anna Ho.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.5.6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
