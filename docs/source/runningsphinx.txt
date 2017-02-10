@@ -10,18 +10,22 @@ gv _build/latex/TheCannon.pdf
 (or)
 firefox _build/html/index.html
 
-# workflow for the gh-pages
+# workflow
 
-edit and commit code as usual
+In the TheCannon directory, edit and commit code in the TheCannon and code
+directory as usual.
+Edit sphinx documentation in the TheCannon/docs directory
 document stuff in README.rst, commit it as usual
 document stuff that will be in the documentation but not on the main page, 
 in other .rst files in the docs directory
-change to docs dir and run 'make html' to generate html docs in docs repo
+
+In the docs directory, run 'make html' to generate html docs 
 make latexpdf, push that commit that if you want
 git push origin master
-change to the docs repo
 
-in the docs repo, html dir
+change to the TheCannon-docs repo, html directory
 git branch to make sure you're on gh-pages
 git commit -am "rebuilt docs"
 git push origin gh-pages
+
+done!
