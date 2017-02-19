@@ -13,7 +13,8 @@ plt.rc('font', family='serif')
 import pyfits
 
 # import the LAMOST data
-hdulist = pyfits.open("../../make_lamost_catalog/lamost_catalog_full.fits")
+hdulist = pyfits.open("lamost_catalog_full.fits")
+#hdulist = pyfits.open("../../make_lamost_catalog/lamost_catalog_full.fits")
 tbdata = hdulist[1].data
 ra_lamost = tbdata.field('ra')
 dec_lamost = tbdata.field('dec')
@@ -22,7 +23,8 @@ rmag_lamost = tbdata.field("mag3")
 hdulist.close()
 
 # import the APOGEE data
-hdulist = pyfits.open("/home/annaho/aida41040/annaho/TheCannon/data/apogee_DR12/labels/allStar-v603.fits")
+# hdulist = pyfits.open("/home/annaho/aida41040/annaho/TheCannon/data/apogee_DR12/labels/allStar-v603.fits")
+hdulist = pyfits.open("allStar-v603.fits")
 tbdata = hdulist[1].data
 ra_apogee_all = tbdata['RA']
 dec_apogee_all = tbdata['DEC']
