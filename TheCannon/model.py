@@ -12,13 +12,16 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 class CannonModel(object):
-    def __init__(self, order):
+    def __init__(self, order, wl_filter=None):
+        """ wl_filter should have shape nlabels x npixels """
         self.coeffs = None
         self.scatters = None
         self.chisqs = None
         self.pivots = None
         self.order = order
+        self.wl_filter = wl_filter
         self.model_spectra = None
+
 
 
     def model(self):
@@ -31,7 +34,8 @@ class CannonModel(object):
 
     def train(self, ds):
         """ Run training step: solve for best-fit spectral model """
-        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(ds)
+        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(
+                ds, self.wl_filter)
 
 
     def diagnostics(self):

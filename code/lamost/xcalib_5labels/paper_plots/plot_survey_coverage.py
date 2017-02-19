@@ -13,23 +13,23 @@ plt.rc('font', family='serif')
 import pyfits
 
 # import the LAMOST data
-hdulist = pyfits.open("lamost_catalog_full.fits")
-#hdulist = pyfits.open("../../make_lamost_catalog/lamost_catalog_full.fits")
+lamost_dir = "/Users/annaho/Data/LAMOST"
+hdulist = pyfits.open("%s/Ho_et_all_catalog_v2.fits" %lamost_dir)
 tbdata = hdulist[1].data
 ra_lamost = tbdata.field('ra')
 dec_lamost = tbdata.field('dec')
 am_lamost = tbdata.field("cannon_alpha_m")
-rmag_lamost = tbdata.field("mag3")
 hdulist.close()
 
 # import the APOGEE data
-# hdulist = pyfits.open("/home/annaho/aida41040/annaho/TheCannon/data/apogee_DR12/labels/allStar-v603.fits")
-hdulist = pyfits.open("allStar-v603.fits")
+hdulist = pyfits.open("/home/annaho/aida41040/annaho/TheCannon/data/apogee_DR12/labels/allStar-v603.fits")
+#hdulist = pyfits.open("allStar-v603.fits")
+apogee_dir = "/Users/annaho/Data/APOGEE"
+hdulist = pyfits.open("%s/allStar-v603.fits" %apogee_dir)
 tbdata = hdulist[1].data
 ra_apogee_all = tbdata['RA']
 dec_apogee_all = tbdata['DEC']
 am_apogee_all = tbdata['PARAM_ALPHA_M']
-#ak_apogee_all = tbdata['AK_WISE']
 
 # select values
 good_coords = np.logical_and(ra_apogee_all > -90, dec_apogee_all > -90)
@@ -90,10 +90,8 @@ mask_lamost = np.zeros(hp.nside2npix(NSIDE), dtype='bool')
 for pix_val in np.unique(pix_lamost):
     choose = np.where(pix_lamost==pix_val)[0]
     if len(choose) == 1:
-        #m_lamost[pix_val] = rmag_lamost[choose[0]]
         m_lamost[pix_val] = am_lamost[choose[0]]
     else:
-        #m_lamost[pix_val] = np.median(rmag_lamost[choose])
         m_lamost[pix_val] = np.median(am_lamost[choose])
 
 mask_lamost[np.setdiff1d(np.arange(len(m_lamost)), pix_lamost)] = 1

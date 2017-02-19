@@ -6,9 +6,8 @@ import sys
 from TheCannon import dataset
 from TheCannon import model
 
-
+DATA_DIR = '/Users/annaho/Data/AAOmega/Run_13_July'
 SMALL = 1.0 / 1000000000.0
-DATA_DIR = '/Users/annaho/Data/AAOmega'
 
 
 def test_step_iteration(ds, md, starting_guess):
@@ -18,15 +17,11 @@ def test_step_iteration(ds, md, starting_guess):
 
 def choose_reference_set():
     wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
-    all_id = np.load("%s/id_all.npz" %DATA_DIR)['arr_0']
-    all_flux = np.load("flux_all.npz")['arr_0']
-    all_scat = np.load("spec_scat_all.npz")['arr_0']
-    # all_ivar = np.load("ivar_all.npz")['arr_0']
-    all_ivar = np.ones(all_flux.shape) / all_scat[:,None]**2
-    bad = np.logical_or(all_flux <= 0, all_flux > 1.1)
-    all_ivar[bad] = SMALL
-    np.savez("%s/my_ivar_all.npz" %DATA_DIR, all_ivar)
-    all_label = np.load("label_all.npz")['arr_0']
+    all_id = np.load("%s/ref_id_all.npz" %DATA_DIR)['arr_0']
+    all_flux = np.load("%s/ref_flux_all.npz" %DATA_DIR)['arr_0']
+    all_scat = np.load("%s/ref_spec_scat_all.npz" %DATA_DIR)['arr_0']
+    all_label = np.load("%s/ref_label_all.npz" %DATA_DIR)['arr_0']
+    all_ivar = np.load("%s/ref_ivar_corr.npz" %DATA_DIR)['arr_0']
 
     # choose reference objects
     good_teff = np.logical_and(
@@ -55,57 +50,54 @@ def choose_reference_set():
     np.savez("%s/ref_label.npz" %DATA_DIR, ref_label)
 
 
-def normalize_ref_set():
-    wl = np.load("wl.npz")['arr_0']
-    ref_id = np.load("ref_id.npz")['arr_0']
-    ref_flux = np.load("ref_flux.npz")['arr_0']
-    ref_ivar = np.load("ref_ivar.npz")['arr_0']
-    ref_label = np.load("ref_label.npz")['arr_0']
-
-    # contpix = np.load("wl_contpix_old.npz")['arr_0']
+def update_cont():
+    contpix = np.load("wl_contpix_old.npz")['arr_0']
     # this array is a bit too long, clip it off
-    # contpix_new = contpix[np.logical_and(contpix>8420, contpix<8700)]
+    contpix_new = contpix[np.logical_and(contpix>8420, contpix<8700)]
 
-    # inds = np.zeros(contpix_new.shape, dtype=int)
-    # for i,val in enumerate(contpix_new):
+    inds = np.zeros(contpix_new.shape, dtype=int)
+    for i,val in enumerate(contpix_new):
         # find the nearest pixel
-    #    inds[i] = int(np.argmin(np.abs(wl-val)))
+        inds[i] = int(np.argmin(np.abs(wl-val)))
         
-    #contmask = np.zeros(len(wl), dtype=bool)
-    #contmask[inds] = 1
-    #np.savez("wl_contmask.npz", contmask)
-    #print("SAVED")
-    contmask = np.load("wl_contmask.npz")['arr_0']
-    
+    contmask = np.zeros(len(wl), dtype=bool)
+    contmask[inds] = 1
+    np.savez("wl_contmask.npz", contmask)
+    print("SAVED")
+
+
+
+def normalize_ref_set():
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    ref_id = np.load("%s/ref_id.npz" %DATA_DIR)['arr_0']
+    ref_flux = np.load("%s/ref_flux.npz" %DATA_DIR)['arr_0']
+    ref_ivar = np.load("%s/ref_ivar.npz" %DATA_DIR)['arr_0']
+    ref_label = np.load("%s/ref_label.npz" %DATA_DIR)['arr_0']
+
     ds = dataset.Dataset(
             wl, ref_id, ref_flux, ref_ivar, ref_label, 
             ref_id, ref_flux, ref_ivar)
+    contmask = np.load("%s/wl_contmask.npz" %DATA_DIR)['arr_0']
     ds.set_continuum(contmask)
 
     cont = ds.fit_continuum(3, "sinusoid")
     np.savez("%s/ref_cont.npz" %DATA_DIR, cont)
     norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
             ds.continuum_normalize(cont)
-    bad = np.logical_or(norm_tr_flux <= 0, norm_tr_flux > 1.1)
+    bad = np.logical_or(ref_flux <= 0, ref_flux > 1.1)
     norm_tr_ivar[bad] = 0.0
     np.savez("%s/ref_flux_norm.npz" %DATA_DIR, norm_tr_flux)
     np.savez("%s/ref_ivar_norm.npz" %DATA_DIR, norm_tr_ivar)
 
 
 def normalize_test_set():
-    wl = np.load("wl.npz")['arr_0']
-    test_id = np.load("test_id.npz")['arr_0']
-    test_flux = np.load("test_flux.npz")['arr_0']
-    test_scat = np.load("test_spec_scat.npz")['arr_0']
-    test_ivar = np.ones(test_flux.shape) / test_scat[:,None]**2
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    test_id = np.load("%s/test_id.npz" %DATA_DIR)['arr_0']
+    test_flux = np.load("%s/test_flux.npz" %DATA_DIR)['arr_0']
+    test_ivar = np.load("%s/test_ivar_corr.npz" %DATA_DIR)['arr_0']
+    test_scat = np.load("%s/test_spec_scat.npz" %DATA_DIR)['arr_0']
 
-    # for bad pixels (flux <= 0), set the ivar = 0
-    # bad = np.logical_or(test_flux <= 0, test_flux >= 1.2)
-    bad = test_flux <= 0
-    test_ivar[bad] = SMALL
-    np.savez("%s/test_ivar.npz" %DATA_DIR, test_ivar)
-
-    contmask = np.load("wl_contmask.npz")['arr_0']
+    contmask = np.load("%s/wl_contmask.npz" %DATA_DIR)['arr_0']
 
     ds = dataset.Dataset(
             wl, test_id[0:2], test_flux[0:2], test_ivar[0:2], wl, 
@@ -125,18 +117,17 @@ def normalize_test_set():
     np.savez("%s/test_cont.npz" %DATA_DIR, cont)
     norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
             ds.continuum_normalize(cont)
-    # bad = np.logical_or(norm_test_flux <= 0, norm_test_flux >= 1.2)
-    bad = norm_test_flux <= 0
+    bad = np.logical_or(test_flux <= 0, test_flux > 1.1)
     norm_test_ivar[bad] = 0.0
     np.savez("%s/test_flux_norm.npz" %DATA_DIR, norm_test_flux)
     np.savez("%s/test_ivar_norm.npz" %DATA_DIR, norm_test_ivar)
 
 
 def choose_training_set():
-    ref_id = np.load("ref_id.npz")['arr_0']
-    ref_flux = np.load("ref_flux_norm.npz")['arr_0']
-    ref_ivar = np.load("ref_ivar_norm.npz")['arr_0']
-    ref_label = np.load("ref_label.npz")['arr_0']
+    ref_id = np.load("%s/ref_id.npz" %DATA_DIR)['arr_0']
+    ref_flux = np.load("%s/ref_flux_norm.npz" %DATA_DIR)['arr_0']
+    ref_ivar = np.load("%s/ref_ivar_norm.npz" %DATA_DIR)['arr_0']
+    ref_label = np.load("%s/ref_label.npz" %DATA_DIR)['arr_0']
     
     # randomly pick 80% of the objects to be the training set
     nobj = len(ref_id)
@@ -328,10 +319,10 @@ def test():
     ds.test_label_vals = best_labels
 
 if __name__=="__main__":
-    # choose_reference_set()
-    # normalize_ref_set()
-    # choose_training_set()
-    # train()
-    # normalize_test_set()
-    validate()
-    # test()
+    #choose_reference_set()
+    #normalize_ref_set()
+    #normalize_test_set()
+    #choose_training_set()
+    #train()
+    #validate()
+    test()

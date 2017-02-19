@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from .helpers.compatibility import range, map
 from .helpers.corner import corner
 
-def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
+def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter, wl_filter):
     """
     Parameters
     ----------
@@ -23,6 +23,10 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     scatter: float
         fixed scatter value
 
+    wl_filter: numpy ndarray
+        the mask across labels for this particular wavelength
+        length num_labels
+
     Returns
     ------
     coeff: ndarray
@@ -38,6 +42,11 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
         inverse of the log determinant of the cov matrix
     """
     Cinv = ivars / (1 + ivars*scatter**2)
+    if wl_filter != None:
+        expanded_wl_filter = np.array(
+                _get_lvec(wl_filter, np.zeros(len(wl_filter))))[0]
+        mask = expanded_wl_filter.astype(bool)
+        lvec[:,mask] = 0
     lTCinvl = np.dot(lvec.T, Cinv[:, None] * lvec)
     lTCinvf = np.dot(lvec.T, Cinv * fluxes)
     try:
@@ -52,7 +61,7 @@ def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     return (coeff, lTCinvl, chi, logdet_Cinv)
 
 
-def _do_one_regression(lams, fluxes, ivars, lvec):
+def _do_one_regression(lams, fluxes, ivars, lvec, wl_filter):
     """
     Optimizes to find the scatter associated with the best-fit model.
 
@@ -73,6 +82,10 @@ def _do_one_regression(lams, fluxes, ivars, lvec):
     lvec = numpy ndarray 
         the label vector
 
+    wl_filter = numpy ndarray
+        the wavelength filters for all of the training labels
+        length n_tr_lab (this is just for one pixel)
+
     Output
     -----
     output of do_one_regression_at_fixed_scatter
@@ -83,18 +96,18 @@ def _do_one_regression(lams, fluxes, ivars, lvec):
     for jj, ln_scatter_val in enumerate(ln_scatter_vals):
         coeff, lTCinvl, chi, logdet_Cinv = \
             _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
-                                               scatter=np.exp(ln_scatter_val))
+                                               np.exp(ln_scatter_val), wl_filter)
         chis_eval[jj] = np.sum(chi*chi) - logdet_Cinv
     if np.any(np.isnan(chis_eval)):
         best_scatter = np.exp(ln_scatter_vals[-1])
         _r = _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
-                                                scatter=best_scatter)
+                                                best_scatter, wl_filter)
         return _r + (best_scatter, )
     lowest = np.argmin(chis_eval)
     if (lowest == 0) or (lowest == len(ln_scatter_vals) - 1):
         best_scatter = np.exp(ln_scatter_vals[lowest])
         _r = _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
-                                                scatter=best_scatter)
+                                                best_scatter, wl_filter)
         return _r + (best_scatter, )
     ln_scatter_vals_short = ln_scatter_vals[np.array(
         [lowest-1, lowest, lowest+1])]
@@ -103,7 +116,7 @@ def _do_one_regression(lams, fluxes, ivars, lvec):
     fit_pder = np.polyder(z)
     best_scatter = np.exp(np.roots(fit_pder)[0])
     _r = _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec,
-                                            scatter=best_scatter)
+                                            best_scatter, wl_filter)
     return _r + (best_scatter, )
 
 
@@ -124,6 +137,8 @@ def _get_lvec(label_vals, pivots):
     lvec: numpy ndarray
         label vector
     """
+    if len(label_vals.shape) == 1:
+        label_vals = np.array([label_vals])
     nlabels = label_vals.shape[1]
     nstars = label_vals.shape[0]
     # specialized to second-order model
@@ -135,13 +150,15 @@ def _get_lvec(label_vals, pivots):
     return lvec
 
 
-def _train_model(ds):
+def _train_model(ds, wl_filter):
     """
     This determines the coefficients of the model using the training data
 
     Parameters
     ----------
     ds: Dataset
+    wl_filter (optional): if not None, is an array of n_tr_lab x n_pixels
+        that dictates which pixels can be used in the model for each label
 
     Returns
     -------
@@ -160,14 +177,15 @@ def _train_model(ds):
     ivars[ivars<0.01] = 0.01
 
     pivots = np.mean(label_vals, axis=0)
-    lvec = _get_lvec(label_vals, pivots)
+    lvec = _get_lvec(label_vals, pivots) # n_tr_obj x n_lab_vec
     lvec_full = np.array([lvec,] * npixels)
 
     # Perform REGRESSIONS
     fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec_full
     ivars = ivars.swapaxes(0,1)
     # one per pix
-    blob = list(map(_do_one_regression, lams, fluxes, ivars, lvec_full))
+    blob = list(map(
+        _do_one_regression, lams, fluxes, ivars, lvec_full, wl_filter.T))
     coeffs = np.array([b[0] for b in blob])
     covs = np.array([np.linalg.inv(b[1]) for b in blob])
     chis = np.array([b[2] for b in blob])

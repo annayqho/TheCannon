@@ -10,7 +10,7 @@ from TheCannon import train_model
 import matplotlib.gridspec as gridspec
 
 
-DATA_DIR = '/Users/annaho/Data/AAOmega'
+DATA_DIR = '/Users/annaho/Data/AAOmega/Run_13_July'
 
 
 def round_sig(x, sig=2):
@@ -20,18 +20,18 @@ def round_sig(x, sig=2):
 
 def validation():
     orig = np.load("%s/val_label.npz" %DATA_DIR)['arr_0']
-    cannon = np.load("%s/val_labels.npz" %DATA_DIR)['arr_0']
+    cannon = np.load("%s/val_cannon_labels.npz" %DATA_DIR)['arr_0']
     snr = np.load("%s/val_SNR.npz" %DATA_DIR)['arr_0']
     choose = snr > 50
 
-    labels = ["$\mathrm{T}_{\mathrm{eff}}$ (K)", "$\log g$ (dex)", "[M/H]"]
-    mins = [4000, 0.5, -2.5]
-    maxs = [5500, 3.5, 0.0]
+    labels = ["$\mathrm{T}_{\mathrm{eff}}$ (K)", "$\log g$ (dex)", "[M/H]", "[a/Fe]"]
+    mins = [4000, 0.5, -2.5, -0.1]
+    maxs = [5500, 3.5, 0.0, 0.5]
 
-    fig,axarr = plt.subplots(3,1, figsize=(4,10))#, sharey=True)
+    fig,axarr = plt.subplots(4,1, figsize=(4,10))#, sharey=True)
     props = dict(boxstyle='round', facecolor='white')
 
-    for i in range(0,3):
+    for i in range(0,4):
         diff = cannon[:,i][choose] - orig[:,i][choose]
         bias = np.mean(diff)
         scat = np.std(diff)
@@ -92,13 +92,13 @@ def chisq_dist():
     plt.savefig("chisq_dist.png")
 
 def spectral_model():
-    wl = np.load("../wl.npz")['arr_0']
-    flux = np.load("../val_flux_norm.npz")['arr_0']
-    ivar = np.load("../val_ivar_norm.npz")['arr_0']
-    scat = np.load("../scatters.npz")['arr_0']
-    coeffs = np.load("../coeffs.npz")['arr_0']
-    pivots = np.load("../pivots.npz")['arr_0']
-    cannon_label = np.load("../val_labels.npz")['arr_0']
+    wl = np.load("%s/wl.npz" %DATA_DIR)['arr_0']
+    flux = np.load("%s/val_flux_norm.npz" %DATA_DIR)['arr_0']
+    ivar = np.load("%s/val_ivar_norm.npz" %DATA_DIR)['arr_0']
+    scat = np.load("%s/scatters.npz" %DATA_DIR)['arr_0']
+    coeffs = np.load("%s/coeffs.npz" %DATA_DIR)['arr_0']
+    pivots = np.load("%s/pivots.npz" %DATA_DIR)['arr_0']
+    cannon_label = np.load("%s/val_cannon_labels.npz" %DATA_DIR)['arr_0']
     lvec_all = train_model._get_lvec(cannon_label, pivots)
 
     #xmin = min(wl)
@@ -169,4 +169,6 @@ def spectral_model():
 
 
 if __name__=="__main__":
-    chisq_dist()
+    validation()
+    #spectral_model()
+    #chisq_dist()

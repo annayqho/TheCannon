@@ -3,8 +3,6 @@ import glob
 import matplotlib.pyplot as plt
 import sys
 import pyfits
-sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon/TheCannon')
-sys.path.insert(0, '/home/annaho/aida41040/annaho/TheCannon')
 from TheCannon import dataset
 from TheCannon import model
 from TheCannon import lamost
@@ -14,6 +12,11 @@ from matplotlib import rc
 rc('font', family='serif')
 rc('text', usetex=True)
 import os
+from get_colors import get_colors
+
+
+DATA_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask/training_step"
+SPEC_DIR = "/Users/annaho/Data/LAMOST/Mass_And_Age/with_col_mask"
 
 
 def test_step_iteration(ds, m, starting_guess):
@@ -22,11 +25,11 @@ def test_step_iteration(ds, m, starting_guess):
 
 
 def create_sets(num_sets):
-    ref_id = np.load("ref_id.npz")['arr_0']
+    ref_id = np.load("%s/ref_id_culled.npz" %DATA_DIR)['arr_0']
     # Assign each object a number between 0 and num_sets
     nobj = len(ref_id)
     assignments = np.random.randint(num_sets, size=nobj)
-    np.savez("assignments.npz", assignments)
+    np.savez("%s/assignments.npz" %DATA_DIR, assignments)
 
 
 def train(ds, leave_out):
@@ -68,41 +71,61 @@ def validate(ds, m, leave_out):
         best_labels[jj,:] = labels[:,jj,:][val]
         best_errs[jj,:] = errs[:,jj,:][val]
 
-    np.savez("test_results_%s.npz" %leave_out, best_labels, best_errs, best_chisq) 
+    np.savez(
+            "test_results_%s.npz" %leave_out, 
+            best_labels, best_errs, best_chisq) 
 
     ds.test_label_vals = best_labels
     ds.diagnostics_1to1(figname="1to1_test_label_%s" %leave_out)
 
 
 def loop(num_sets):
-    wl = np.load("wl.npz")['arr_0']
-    ref_id = np.load("ref_id.npz")['arr_0']
-    ref_flux = np.load("ref_flux.npz")['arr_0']
-    ref_ivar = np.load("ref_ivar.npz")['arr_0']
-    ref_label = np.load("ref_label.npz")['arr_0']
-    assignments = np.load("assignments.npz")['arr_0']
+    wl = np.load("%s/wl_cols.npz" %SPEC_DIR)['arr_0']
+    label_names = ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', 
+                            '[\\alpha/M]', 'A_k']
+    ref_id = np.load("%s/ref_id_col.npz" %SPEC_DIR)['arr_0']
+    ref_choose = np.load("%s/ref_id.npz" %DATA_DIR)['arr_0']
+    inds = np.array([np.where(ref_id==val)[0][0] for val in ref_choose])
+    ref_id = ref_id[inds]
+    ref_flux = np.load("%s/ref_flux_col.npz" %SPEC_DIR)['arr_0'][inds]
+    ref_ivar = np.load("%s/ref_ivar_col.npz" %SPEC_DIR)['arr_0'][inds]
+    np.savez("ref_id.npz", ref_id)
+    np.savez("ref_flux.npz", ref_flux)
+    np.savez("ref_ivar.npz", ref_ivar)
+    ds = dataset.Dataset(wl[0:3626], ref_id, ref_flux[:,0:3626], 
+            ref_ivar[:,0:3626], [], [], [], [])
+    np.savez("ref_snr.npz", ds.tr_SNR)
+    ref_label = np.load("%s/ref_label.npz" %SPEC_DIR)['arr_0'][inds]
+    #ref_label = np.load("%s/xval_cannon_label_vals.npz" %TR_LAB_DIR)['arr_0']
+    np.savez("ref_label.npz", ref_label)
+    assignments = np.load("%s/../assignments.npz" %DATA_DIR)['arr_0']
     
     print("looping through %s sets" %num_sets)
-    for leave_out in range(1,num_sets):
+    for leave_out in range(0,num_sets):
         print("leaving out %s" %leave_out)
         training = assignments != leave_out
         test = assignments == leave_out
         tr_id = ref_id[training]
         tr_flux = ref_flux[training]
         tr_ivar = ref_ivar[training]
+        tr_ivar[np.isnan(tr_ivar)] = 0.0
         tr_label = ref_label[training]
         np.savez(
-            "tr_set_%s.npz" %leave_out, tr_id, tr_flux, tr_ivar, tr_label)
+            "tr_set_%s.npz" %leave_out, 
+            tr_id, tr_flux, tr_ivar, tr_label)
         test_id = ref_id[test]
         test_flux = ref_flux[test]
         test_ivar = ref_ivar[test]
+        test_ivar[np.isnan(test_ivar)] = 0.0
         test_label = ref_label[test]
         np.savez(
-            "test_set_%s.npz" %leave_out, test_id, test_flux, test_ivar, test_label)
+            "test_set_%s.npz" %leave_out, 
+            test_id, test_flux, test_ivar, test_label)
         ds = dataset.Dataset(
-            wl, tr_id, tr_flux, tr_ivar, tr_label, test_id, test_flux, test_ivar)
-        ds.set_label_names(
-            ['T_{eff}', '\log g', '[Fe/H]', '[C/M]','[N/M]', '[\\alpha/M]', 'A_k'])
+            wl, tr_id, tr_flux, tr_ivar, tr_label, 
+            test_id, test_flux, test_ivar)
+        print(ds.wl)
+        ds.set_label_names(label_names)
         fig = ds.diagnostics_SNR()
         plt.savefig("SNRdist_%s.png" %leave_out)
         plt.close()
@@ -129,5 +152,6 @@ def loop(num_sets):
         validate(ds, m, leave_out)
 
 if __name__=="__main__":   
+    #print("hi")
     #create_sets(8) 
     loop(8)

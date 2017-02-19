@@ -7,16 +7,19 @@ rc('text', usetex=True)
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
+
 def calc_dist(lamost_point, training_points, coeffs):
     """ avg dist from one lamost point to nearest 10 training points """
     diff2 = (training_points - lamost_point)**2
     dist = np.sqrt(np.sum(diff2*coeffs, axis=1))
     return np.mean(dist[dist.argsort()][0:10])
 
+
 def dist(lamost_point, cannon_point, coeffs):
     diff2 = (lamost_point - cannon_point)**2
     dist = np.sqrt(np.sum(diff2*coeffs,axis=1))
     return dist
+
 
 coeffs = 1./(np.array([100,0.2,0.1])**2)
 
@@ -51,11 +54,12 @@ feh = np.loadtxt(
         dtype='float', usecols=(3,), skiprows=1)
 
 lamost_points = np.vstack((teff,logg,feh)).T
+
 # calculate distances
-training_dist = np.array([calc_dist(p, training_points, coeffs) for p in lamost_points])
+training_dist = np.array(
+        [calc_dist(p, training_points, coeffs) for p in lamost_points])
 
 # plot all
-
 plt.figure(figsize=(10,8))
 plt.hist2d(teff_all,logg_all,bins=1000,norm=LogNorm(), cmap="Greys")
 plt.ylim(1.5,5)
