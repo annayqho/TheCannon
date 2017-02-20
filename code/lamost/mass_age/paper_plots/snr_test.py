@@ -8,15 +8,18 @@ plt.rc('font', family='serif')
 import numpy as np
 
 
-def quad_fit(x, y, yerr):
+def quad_fit(x, y, yerr, name, unit):
     """ Fit a qudratic to the SNR to make a lookup error table """
+    print("performing quad fit")
     qfit = np.polyfit(x, y, deg=2, w = 1 / yerr)
     plt.figure()
-    plt.scatter(x, y)
-    plt.errorbar(x, y, yerr=yerr)
+    #plt.scatter(x, y)
+    plt.errorbar(x, y, yerr=yerr, fmt='.', c='k')
     xvals = np.linspace(min(x), max(x), 100)
     yvals = qfit[2] + qfit[1]*xvals + qfit[0]*xvals**2
     plt.plot(xvals, yvals, color='r', lw=2)
+    plt.xlabel("%s" %snr_label, fontsize=16)
+    plt.ylabel(r"$\sigma %s \mathrm{(%s)}$" %(name,unit), fontsize=16)
     plt.show()
     print(qfit)
 
@@ -113,7 +116,7 @@ for i in range(0, len(names)):
     obj.append(ax.errorbar(
         snr_bins, y_cannon, yerr=yerr_cannon, fmt='.', 
         c='darkorchid', label="Cannon from LAMOST spectra"))
-    quad_fit(snr_bins, y_cannon, yerr_cannon)
+    quad_fit(snr_bins, y_cannon, yerr_cannon, name, unit)
     # a 1/r^2 line
     xfit = np.linspace(0.1, max(snr_bins)*2, 100)
     b = 30

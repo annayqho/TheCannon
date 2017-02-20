@@ -96,13 +96,12 @@ ref_flag[0:len(ref_id)] = True
 print("writing file")
 t = Table()
 
-t['lamost_id'] = np.hstack((ref_id, test_id))
+t['LAMOST_ID'] = np.hstack((ref_id, test_id))
 t['is_ref_obj'] = ref_flag 
 t['in_martig_range'] = np.hstack((ref_mask, test_mask))
 
 label_names = np.array(
-        ['cannon_teff', 'cannon_logg', 'cannon_mh', 
-        'cannon_cm', 'cannon_nm', 'cannon_am', 'cannon_ak'])
+        ['Teff', 'logg', 'MH', 'CM', 'NM', 'AM', 'Ak'])
 
 for ii,name in enumerate(label_names):
     t[name] = np.hstack((cannon_ref_label[:,ii], test_label[:,ii]))
@@ -111,27 +110,24 @@ t['logMass'] = np.hstack((ref_mass, mass))
 t['logAge'] = np.hstack((ref_age, age))
 
 err_names = np.array(
-        ['cannon_teff_err', 'cannon_logg_err', 'cannon_feh_err', 
-        'cannon_cm_err', 'cannon_nm_err', 'cannon_afe_err', 'cannon_ak_err'])
+        ['Teff_err', 'logg_err', 'MH_err', 
+        'CM_err', 'NM_err', 'AM_err', 'Ak_err'])
 
 for ii,name in enumerate(err_names):
     t[name] = np.hstack((cannon_ref_err[:,ii], test_err[:,ii]))
 
-t['MassErr(dex)'] = np.hstack((ref_mass_err, mass_err))
-t['AgeErr(dex)'] = np.hstack((ref_age_err, age_err))
+t['logMass_err'] = np.hstack((ref_mass_err, mass_err))
+t['logAge_err'] = np.hstack((ref_age_err, age_err))
 
-t['snr'] = np.hstack((ref_snr, test_snr))
-scatters = get_err(t['snr'])
+t['SNR'] = np.hstack((ref_snr, test_snr))
+scatters = get_err(t['SNR'])
 print(scatters.shape)
-t['teff_scatter'] = scatters[0]
+t['Teff_scatter'] = scatters[0]
 t['logg_scatter'] = scatters[1]
-t['mh_scatter'] = scatters[2]
-t['cm_scatter'] = scatters[3]
-t['nm_scatter'] = scatters[4]
-t['am_scatter'] = scatters[5]
-t['chisq'] = np.hstack((ref_chisq, test_chisq))
-
-# Calculate (C+N)/M
-#t['cannon_c_plus_n'] = calc_sum(t['cannon_mh'], t['cannon_cm'], t['cannon_nm'])
+t['MH_scatter'] = scatters[2]
+t['CM_scatter'] = scatters[3]
+t['NM_scatter'] = scatters[4]
+t['AM_scatter'] = scatters[5]
+t['chisq'] = np.hstack((ref_chisq, test_chisq)) / 1800.0
 
 t.write('lamost_catalog.csv', format='ascii.fast_csv')
