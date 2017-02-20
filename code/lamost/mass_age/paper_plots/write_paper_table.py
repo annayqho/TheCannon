@@ -1,31 +1,67 @@
 import pyfits
 import numpy as np
+from sigfig import round_sig
+
+def ndec(num):
+    dec = str(num).split('.')[-1]
+    return len(dec)
+
+def fmt_id(id_val):
+    split_val = id_val.split('_')
+    return split_val[0] + "\_" + split_val[1]
 
 inputf = pyfits.open("/Users/annaho/Data/LAMOST/Mass_And_Age/Ho2016b_Catalog.fits")
 dat = inputf[1].data
 inputf.close()
-lamost_id = dat['LAMOST_ID']
-ra = dat['RA']
-dec = dat['Dec']
-teff = dat['Teff']
-logg = dat['logg']
-mh = dat['MH']
-cm = dat['CM']
-nm = dat['NM']
-am = dat['AM']
-ak = dat['Ak']
-teff_err = dat['Teff_err']
-logg_err = dat['logg_err']
-mh_err = dat['MH_err']
-cm_err = dat['CM_err']
-nm_err = dat['NM_err']
-am_err = dat['AM_err']
-ak_err = dat['Ak_err']
+choose = dat['in_martig_range']
+lamost_id = dat['LAMOST_ID'][choose]
+lamost_id = np.array([fmt_id(val) for val in lamost_id])
+ra = dat['RA'][choose]
+dec = dat['Dec'][choose]
+teff = dat['Teff'][choose]
+logg = dat['logg'][choose]
+mh = dat['MH'][choose]
+cm = dat['CM'][choose]
+nm = dat['NM'][choose]
+am = dat['AM'][choose]
+ak = dat['Ak'][choose]
+mass = dat['Mass'][choose]
+logAge = dat['logAge'][choose]
+
+teff = np.array([int(val) for val in teff])
+logg = np.array([round_sig(val,3) for val in logg])
+mh = np.array([round_sig(val, 3) for val in mh])
+cm = np.array([round_sig(val, 3) for val in cm])
+nm = np.array([round_sig(val, 3) for val in nm])
+am = np.array([round_sig(val, 3) for val in am])
+ak = np.array([round_sig(val, 3) for val in ak])
+mass = np.array([round_sig(val, 2) for val in mass])
+logAge = np.array([round_sig(val, 2) for val in logAge])
+
+teff_err = dat['Teff_err'][choose]
+logg_err = dat['logg_err'][choose]
+mh_err = dat['MH_err'][choose]
+cm_err = dat['CM_err'][choose]
+nm_err = dat['NM_err'][choose]
+am_err = dat['AM_err'][choose]
+ak_err = dat['Ak_err'][choose]
+
+teff_scat = dat['Teff_scatter'][choose]
+logg_scat = dat['logg_scatter'][choose]
+mh_scat = dat['MH_scatter'][choose]
+cm_scat = dat['CM_scatter'][choose]
+nm_scat = dat['NM_scatter'][choose]
+am_scat = dat['AM_scatter'][choose]
+
+mass_err = dat['Mass_err'][choose]
+logAge_err = dat['logAge_err'][choose]
+snr = dat['SNR'][choose]
+chisq =dat['Red_Chisq'][choose]
 
 content = '''\\begin{tabular}{cccccccccc} 
 \\tableline\\tableline 
-LAMOST ID  & RA & Dec & \\teff\ & \logg\ & \mh\ & \cm\ & \\nm\ & \\alpham\ & \\ak\ \\ 
-& (deg) & (deg) & (K) & (dex) & (dex) & (dex) & (dex) & (dex) & mag \\    
+LAMOST ID  & RA & Dec & \\teff\ & \logg\ & \mh\ & \cm\ & \\nm\ & \\alpham\ & \\ak\ \\\\
+& (deg) & (deg) & (K) & (dex) & (dex) & (dex) & (dex) & (dex) & mag \\\\    
 \\tableline
 '''
 
@@ -34,68 +70,98 @@ outputf.write(content)
 
 for i in range(0,4):
     outputf.write(
-    '%s & %s & %s & %s & %s & %s & %s & %s & %s & %s \\'
-    %(lamost_id[i], ra[i], dec[i], teff[i], logg[i], mh[i], cm[i], nm[i], am[i], ak[i]))
+    '%s & %s & %s & %s & %s & %s & %s & %s & %s & %s \\\ '
+    %(lamost_id[i], np.round(ra[i], 2), np.round(dec[i], 2), 
+    teff[i], logg[i], mh[i], cm[i], nm[i], am[i], ak[i]))
+        #int(teff[i]), round_sig(logg[i], 3), round_sig(mh[i], 3),
+    #round_sig(cm[i], 3), round_sig(nm[i], 3), round_sig(am[i], 3), 
+    #round_sig(ak[i], 3)))
 
+content = '''\\tableline
+\end{tabular}}
+\end{table}
 
+\\begin{table}[H]
+\caption{
+Continued from Table 1: Formal Errors}
+{\scriptsize
+\\begin{tabular}{cccccccc}
+\\tableline\\tableline
+LAMOST ID  & $\sigma$(\\teff) & $\sigma$(\logg) & $\sigma$(\mh) & $\sigma$(\cm) & $\sigma$(\\nm) & $\sigma$(\\alpham) & $\sigma$(\\ak) \\\\
+& (K) & (dex) & (dex) & (dex) & (dex) & (dex) & (mag) \\\\
+\\tableline
+'''
 
-# content = '''\\tableline
-# \end{tabular}}
-# \end{table}
-# 
-# \\begin{table}[H]
-# \caption{
-# Continued from Table 1: Formal Errors}
-# {\scriptsize
-# \\begin{tabular}{cccccccc}
-# \\tableline\\tableline
-# LAMOST ID  & $\sigma$(\\teff) & $\sigma$(\logg) & $\sigma$(\mh) & $\sigma$(\cm) & $\sigma$(\\nm) & $\sigma$(\\alpham) & $\sigma$(\\ak) \\
-# & (K) & (dex) & (dex) & (dex) & (dex) & (dex) & (mag) \\
-# \\tableline
-# spec-55859-F5902\_sp01... & 3290 & 0.010 & 0.0027 & 0.0043 & 0.0089 & 
-# 0.00066 & 0.00036  \\
-# spec-55859-F5902\_sp03... & 73.8 &  0.00031 & 8.0e-5 & 0.00012 & 0.0003 & 2.67e-5 & 5.2e-5 \\
-# spec-55859-F5902\_sp06... & 65.0 & 0.0004 & 0.0001 & 7.9e-5 & 0.00014 & 
-# 4.93e-5 & 7.0e-5 \\
-# spec-55859-F5902\_sp08... & 5150 & 0.016 & 0.0047 & 0.0042 & 0.0058 & 
-# 0.0015 & 0.00041 \\
-# \\tableline
-# \end{tabular}}
-# \end{table}
-# 
-# \\begin{table}[H]
-# \caption{
-# Continued from Table 2: Estimated Error (Scatter)}
-# {\scriptsize
-# \\begin{tabular}{cccccccccc}
-# \\tableline\\tableline
-# LAMOST ID  & $s$(\\teff) & $s$(\logg) & $s$(\mh) & $s$(\cm) & $s$(\\nm) & $s$(\\alpham) \\
-# & (K) & (dex) & (dex) & (dex) & (dex) & (dex) \\   
-# \\tableline
-# spec-55859-F5902\_sp01-034 & 78 & 0.14 & 0.078 & 0.085 & 0.20 & 0.043  \\
-# spec-55859-F5902\_sp03-209 & 46 &  0.16 & 0.078 & 0.084 & 0.48 & 0.056 \\
-# spec-55859-F5902\_sp06-160 & 44 & 0.12 & 0.053 & 0.066 & 0.38 & 0.037 \\
-# spec-55859-F5902\_sp08-146 & 88 & 0.16 & 0.092 & 0.095 & 0.18 & 0.050 \\
-# \\tableline
-# \end{tabular}}
-# \end{table}
-# 
-# \\begin{table}[H]
-# \caption{
-# Continued from Table 3}
-# {\scriptsize
-# \\begin{tabular}{ccccccc}
-# \\tableline\\tableline
-# LAMOST ID & Mass & log(Age) & $\sigma$(Mass) & $\sigma$(log(Age)) & SNR & Red. \\
-# & ($M_\odot$) & dex & ($M_\odot$) & (dex) & & $\chi^2$ \\    
-# \\tableline
-# spec-55859-F5902\_sp01-034 &  0.78 & 1.0 & 0.33 & 0.34 & 33.7 & 0.44 \\
-# spec-55859-F5902\_sp03-209 &  1.0 & 0.85 & 0.097 & 0.12 & 169 & 1.7 \\
-# spec-55859-F5902\_sp06-160 & 0.43 & 0.34 & 1.3 & 0.66 & 130 & 1.2 \\
-# spec-55859-F5902\_sp08-146 & 0.47 & 0.45 & 1.2 & 0.65 & 19.9 & 0.51 \\
-# \\tableline
-# \end{tabular}}
-# \end{table}
-# '''
+outputf.write(content)
 
+for i in range(0,4):
+    outputf.write(
+    '%s & %s & %s & %s & %s & %s & %s & %s \\\\ '
+    %(lamost_id[i], int(teff_err[i]), 
+    np.round(logg_err[i], ndec(logg[i])),
+    np.round(mh_err[i], ndec(mh[i])),
+    np.round(cm_err[i], ndec(cm[i])),
+    np.round(nm_err[i], ndec(nm[i])),
+    np.round(am_err[i], ndec(am[i])),
+    np.round(ak_err[i], ndec(ak[i]))))
+ 
+
+content = '''\\tableline
+\end{tabular}}
+\end{table}
+
+\\begin{table}[H]
+\caption{
+Continued from Table 2: Estimated Error (Scatter)}
+{\scriptsize
+\\begin{tabular}{cccccccccc}
+\\tableline\\tableline
+LAMOST ID  & $s$(\\teff) & $s$(\logg) & $s$(\mh) & $s$(\cm) & $s$(\\nm) & $s$(\\alpham) \\\\
+& (K) & (dex) & (dex) & (dex) & (dex) & (dex) \\\\   
+\\tableline
+'''
+
+outputf.write(content)
+
+for i in range(0,4):
+    outputf.write(
+    '%s & %s & %s & %s & %s & %s & %s \\\\ '
+    %(lamost_id[i], int(teff_scat[i]), 
+    np.round(logg_scat[i], ndec(logg[i])),
+    np.round(mh_scat[i], ndec(mh[i])),
+    np.round(cm_scat[i], ndec(cm[i])),
+    np.round(nm_scat[i], ndec(nm[i])),
+    np.round(am_scat[i], ndec(am[i]))))
+
+content = '''\\tableline
+\end{tabular}}
+\end{table}
+
+\\begin{table}[H]
+\caption{
+Continued from Table 3}
+{\scriptsize
+\\begin{tabular}{ccccccc}
+\\tableline\\tableline
+LAMOST ID & Mass & log(Age) & $\sigma$(Mass) & $\sigma$(log(Age)) & SNR & Red. \\\\
+& ($M_\odot$) & dex & ($M_\odot$) & (dex) & & $\chi^2$ \\\\    
+\\tableline
+'''
+
+outputf.write(content)
+
+for i in range(0,4):
+    outputf.write(
+    '%s & %s & %s & %s & %s & %s & %s \\\\ '
+    %(lamost_id[i], mass[i], logAge[i],
+    np.round(mass_err[i], ndec(mass_err[i])),
+    np.round(logAge_err[i], ndec(logAge[i])),
+    round_sig(snr[i], 3), round_sig(chisq[i], 2)))
+ 
+content = '''\\tableline
+\end{tabular}}
+\end{table}
+'''
+
+outputf.write(content)
 outputf.close()
