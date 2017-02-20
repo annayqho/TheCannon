@@ -106,7 +106,7 @@ label_names = np.array(
 for ii,name in enumerate(label_names):
     t[name] = np.hstack((cannon_ref_label[:,ii], test_label[:,ii]))
 
-t['logMass'] = np.hstack((ref_mass, mass))
+t['Mass'] = np.hstack((ref_mass, mass))
 t['logAge'] = np.hstack((ref_age, age))
 
 err_names = np.array(
@@ -116,7 +116,7 @@ err_names = np.array(
 for ii,name in enumerate(err_names):
     t[name] = np.hstack((cannon_ref_err[:,ii], test_err[:,ii]))
 
-t['logMass_err'] = np.hstack((ref_mass_err, mass_err))
+t['Mass_err'] = np.hstack((ref_mass_err, mass_err))
 t['logAge_err'] = np.hstack((ref_age_err, age_err))
 
 t['SNR'] = np.hstack((ref_snr, test_snr))
