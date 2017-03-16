@@ -19,6 +19,7 @@ class CannonModel(object):
         self.chisqs = None
         self.pivots = None
         self.scales = None
+        self.new_tr_labels = None
         self.order = order
         self.model_spectra = None
         self.useErrors = useErrors
@@ -34,7 +35,7 @@ class CannonModel(object):
     def train(self, ds):
         """ Run training step: solve for best-fit spectral model """
         if self.useErrors:
-            self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model_new(ds)
+            self.coeffs, self.scatters, self.new_tr_labels, self.chisqs, self.pivots, self.scales = _train_model_new(ds)
         else:
             self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model(ds)
 
@@ -72,7 +73,7 @@ class CannonModel(object):
         ----------
         ds: Dataset object
         """
-        lvec_all = _get_lvec(ds.test_label_vals, self.pivots, derivs=False)
+        lvec_all = _get_lvec(ds.test_label_vals, self.pivots, self.scales, derivs=False)
         self.model_spectra = np.dot(lvec_all, self.coeffs.T)
 
 

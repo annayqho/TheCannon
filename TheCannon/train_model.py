@@ -5,64 +5,113 @@ from .helpers.compatibility import range, map
 from .helpers.corner import corner
 import scipy.optimize as op
 
-def training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
+def training_step_objective_function(pars, fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix):
     """
     This is just for a single lambda.
     ldelta is scaled like the linear lvec components
     """
-    coeff_m = pars[:-1]
+    # OLD CODE!
+    '''coeff_m = pars[:-1]
     scatter_m = pars[-1]    # scatter is the last parameter
-    nstars = len(ivars_m)
+    nstars = len(ivars)
     Delta2 = np.zeros((nstars))
     Delta2_deriv = np.zeros((nstars, len(lvec[0])))
     for n in range(nstars):
         ldelta2 = np.outer(ldelta[n], ldelta[n])    # 4x4 matrix
         Delta2[n] = np.dot(np.dot(coeff_m.T, lvec_derivs[n]), np.dot(ldelta2, np.dot(lvec_derivs[n].T, coeff_m)))
         Delta2_deriv[n, :] = np.dot(coeff_m.T, np.dot(lvec_derivs[n], np.dot(ldelta2, lvec_derivs[n].T)))
-    inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
-    resids = fluxes_m - np.dot(coeff_m, lvec.T)
+    inv_var = ivars / (1. + ivars * (Delta2 + scatter_m ** 2))
+    resids = fluxes - np.dot(coeff_m, lvec.T)
     lnLs = 0.5 * np.log(inv_var / (2. * np.pi)) - 0.5 * resids**2 * inv_var
-    # derivatives
+#    # derivatives
     dlnLds = scatter_m * (inv_var**2 * resids**2 - inv_var) 
     dlnLdtheta = inv_var[:, None] * ((inv_var[:, None] * Delta2_deriv * resids[:, None]**2) - Delta2_deriv + lvec * resids[:, None])
     dlnLdpars = np.hstack([dlnLdtheta, dlnLds[:, None]])  # scatter is the last parameter 
-    return -2.*np.sum(lnLs), -2.*np.sum(dlnLdpars, axis=0) 
+    return -2.*np.sum(lnLs), -2.*np.sum(dlnLdpars, axis=0)'''
     
-def test_training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta):
+    # NEW CODE!
+    
+    # flat parameter array (matrix didn't seem to work...)
+    coeff = np.reshape(pars[:(Npix*Nlabels)], (Npix, Nlabels))
+    scatter = pars[(Npix*Nlabels):(Npix*(Nlabels+1))]
+    labels = np.reshape(pars[(Npix*(Nlabels+1)):], (Nstars, Nlabels))
+   
+    # second part of likleihood function (sum over k labels)    
+    ldelta2 = ldelta_vec**2    
+    lnL_labels = np.sum( -0.5 * (labels - lvec)** 2 / ldelta2 - 0.5 * np.log(2. * np.pi * ldelta2) )
+    #lnL_labels = np.sum( -0.5 * (labels[1:4] - lvec[1:4])** 2 / ldelta2[1:4] - 0.5 * np.log(2. * np.pi * ldelta2[1:4]) )
+    
+    # first part of likelihood function (sum over i pixels)    
+    inv_var = (ivars.T / (1. + ivars.T * scatter ** 2)).T
+    resids = fluxes - np.dot(coeff, labels.T)
+    lnL_pixels = np.sum( -0.5 * resids ** 2 * inv_var + 0.5 * (np.log(inv_var / (2. * np.pi))) )
+            
+    lnLs = lnL_pixels + lnL_labels
+    
+    # derivatives of likelihood function with respect to s, theta, vec(l)
+    dlnLds = np.sum( scatter[:, None] * (inv_var**2 * resids**2 - inv_var ), axis = 1)       
+    dlnLdtheta = np.reshape( np.dot(inv_var * resids, lvec), (Npix * Nlabels,) )
+    dlnLdlabels = np.reshape( np.dot((resids * inv_var).T, coeff) - ((labels - lvec) / ldelta2) , (Nstars*Nlabels, ) )
+    dlnLdpars = np.hstack([dlnLdtheta, dlnLds, dlnLdlabels])  
+    
+    print (lnL_labels, lnL_pixels, -2. * lnLs) 
+    
+    return -2. * lnLs, -2. * dlnLdpars
+    
+    
+def test_training_step_objective_function(pars, fluxes, ivars, lvec, lvec_derivs, ldelta, Nstars, Nlabels, Npix):
     '''
     this tests the derivatives of the training_step_objective_function
     '''
-    q, dqdp = training_step_objective_function(pars, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta)
+    q, dqdp = training_step_objective_function(pars, fluxes, ivars, lvec, lvec_derivs, ldelta, Nstars, Nlabels, Npix)
     
     for k in range(len(pars)):
         pars1 = 1. * pars
         tiny = 1e-7 * pars[k]
         pars1[k] += tiny
-        q1, foo = training_step_objective_function(pars1, fluxes_m, ivars_m, lvec, lvec_derivs, ldelta)
-        # dqdpk = (q1-q)/tiny
-        # print k, q, q1, pars[k], tiny, dqdp[k], dqdpk, (dqdp[k]-dqdpk)/(dqdp[k]+dqdpk)
+        q1, foo = training_step_objective_function(pars1, fluxes, ivars, lvec, lvec_derivs, ldelta, Nstars, Nlabels, Npix)
+        dqdpk = (q1-q)/tiny
+        print (k, q, q1, dqdpk, dqdp[k], pars[k], (dqdp[k]-dqdpk)/(dqdp[k]+dqdpk) )
         
     return True
 
-def train_one_wavelength(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta): 
+def train_all_wavelength(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix): 
     '''
     optimizes the scatter and the coeffcients at one wavelength 
     '''
-    x0 = np.zeros((len(lvec_derivs[0])+1,))
-    x0[0] = 1.
-    x0[-1] = .01
-    res = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta), 
-                      method='L-BFGS-B', jac=True, 
-                      options={'gtol':1e-12, 'ftol':1e-12}) # tolerances are magic numbers (determined by experiment)!  
+    # OLD CODE!
+#    x0 = np.zeros((len(lvec_derivs[0])+1,))
+#    x0[0] = 1.
+#    x0[-1] = .01
+#    res = op.minimize(training_step_objective_function, x0, args=(fluxes_m, ivars_m, lvec, lvec_derivs, ldelta), 
+#                      method='L-BFGS-B', jac=True, 
+#                      options={'gtol':1e-12, 'ftol':1e-12})  
+#    coeff_m = res.x[:-1]
+#    scatter_m = res.x[-1]
+#    for n in range(len(ivars_m)):    
+#        ldelta2 = np.outer(ldelta[n], ldelta[n])
+#        Delta2 = np.dot(np.dot(coeff_m.T, lvec_derivs[n]), np.dot(ldelta2, np.dot(lvec_derivs[n].T, coeff_m)))
+#    inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
+#    resids = fluxes_m - np.dot(coeff_m, lvec.T)
+#    chis = np.sqrt(inv_var) * resids**2
+    chis = 0
     
-    coeff_m = res.x[:-1]
-    scatter_m = res.x[-1]
-    for n in range(len(ivars_m)):    
-        ldelta2 = np.outer(ldelta[n], ldelta[n])
-        Delta2 = np.dot(np.dot(coeff_m.T, lvec_derivs[n]), np.dot(ldelta2, np.dot(lvec_derivs[n].T, coeff_m)))
-    inv_var = ivars_m / (1. + ivars_m * (Delta2 + scatter_m ** 2))
-    resids = fluxes_m - np.dot(coeff_m, lvec.T)
-    chis = np.sqrt(inv_var) * resids**2
+    
+    # NEW CODE!   
+    # try flat parameter array...
+    x0 = np.zeros((Npix * (Nlabels + 1) + Nlabels * Nstars,))
+    
+    x0[:Npix] = 1.                                # first coefficient 
+    x0[Npix*Nlabels : Npix*(Nlabels+1)] = .1     # scatter
+    x0[Npix * (Nlabels + 1):] = np.reshape(lvec, (Nlabels * Nstars,)) #* 1.01 # best guess for labels should be lvec?!
+    
+    # testing... 
+    # test_training_step_objective_function(x0, fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix)    
+    
+    res = op.minimize(training_step_objective_function, x0, args=(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix), method='L-BFGS-B', 
+                      jac=True, options={'gtol':1e-12, 'ftol':1e-12}) # tolerances are magic numbers (determined by experiment)!  
+                      
+    print (res.success)
     
     return res, chis
     
@@ -79,8 +128,8 @@ def get_pivots_and_scales(label_vals):
 def _train_model_new(ds):
     
     label_vals = ds.tr_label
-    lams = ds.wl
-    npixels = len(lams)
+    #lams = ds.wl
+    #npixels = len(lams)
     fluxes = ds.tr_flux
     ivars = ds.tr_ivar
     ldelta = ds.tr_delta
@@ -92,27 +141,50 @@ def _train_model_new(ds):
     pivots, scales = get_pivots_and_scales(label_vals) 
     lvec, lvec_derivs = _get_lvec(label_vals, pivots, scales, derivs=True)
     scaled_ldelta = ldelta / scales[None, :]
-
-    fluxes = fluxes.swapaxes(0,1)  # for consistency with lvec
-    ivars = ivars.swapaxes(0,1)
     
-    coeffs = []
-    scatters = []
-    chisqs = []
-    for m in range(0, npixels):
-        print('Working on pixel {}'.format(m))
-        res, chis_m = train_one_wavelength(fluxes[m], ivars[m], lvec, lvec_derivs, scaled_ldelta)
-        coeffs_m = res.x[:-1]
-        scatter_m = res.x[-1]
-        coeffs.append(coeffs_m)
-        scatters.append(scatter_m)
-        chisqs.append(chis_m)
+    
+    # NEW CODE! 
+    
+    fluxes = fluxes.swapaxes(0, 1)  # for consistency with lvec
+    ivars = ivars.swapaxes(0, 1)
+    
+    # all pixels need to be optimized at once!    
+    Npix = len(fluxes)
+    Nlabels = len(lvec[0])
+    Nstars = len(fluxes[0])
+    
+    # this gives delta_nk; same as lvec, but for uncertainties on lables
+    linear_offsets = scaled_ldelta
+    quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(label_vals.shape[1])]for m in (linear_offsets)])
+    ones = np.ones((Nstars, 1)) * 0.001
+    ldelta_vec = np.hstack((ones, linear_offsets, quadratic_offsets))
+
+
+    # OLD CODE!
+#    coeffs = []
+#    scatters = []
+#    chisqs = []
+#    for m in range(1000, 1001): #npixels):
+#        print('Working on pixel {}'.format(m))
+#        res, chis_m = train_one_wavelength(fluxes[m], ivars[m], lvec, lvec_derivs, scaled_ldelta)
+#        coeffs_m = res.x[:-1]
+#        scatter_m = res.x[-1]
+#        coeffs.append(coeffs_m)
+#        scatters.append(scatter_m)
+#        chisqs.append(chis_m)
+        
+    
+    res, chisqs = train_all_wavelength(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix)
+    
+    coeffs = np.reshape(res.x[:Npix*Nlabels], (Npix, Nlabels))
+    scatters = res.x[Npix*Nlabels:Npix*(Nlabels+1)]
+    new_labels = np.reshape(res.x[Npix*(Nlabels+1):], (Nstars, Nlabels))
     
     # Calc chi squares
     chisqs = np.array(chisqs)
     print("Done training model with errors on the labels. ")
 
-    return np.array(coeffs), np.array(scatters), chisqs, pivots, scales
+    return np.array(coeffs), np.array(scatters), np.array(new_labels), chisqs, pivots, scales
 
 def _do_one_regression_at_fixed_scatter(lams, fluxes, ivars, lvec, scatter):
     """

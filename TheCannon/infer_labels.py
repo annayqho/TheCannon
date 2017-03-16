@@ -68,7 +68,7 @@ def _infer_labels(model, dataset, starting_guess=None):
     print("Inferring Labels")
     coeffs_all = model.coeffs
     scatters = model.scatters
-    chisqs = model.chisqs
+    #chisqs = model.chisqs
     nlabels = len(dataset.get_plotting_labels())
     fluxes = dataset.test_flux
     ivars = dataset.test_ivar
