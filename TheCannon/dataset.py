@@ -37,7 +37,7 @@ else:
 class Dataset(object):
     """ A class to represent Cannon input: a dataset of spectra and labels """
 
-    def __init__(self, wl, tr_ID, tr_flux, tr_ivar, tr_label, tr_delta, test_ID, test_flux, test_ivar):
+    def __init__(self, wl, tr_ID, tr_flux, tr_ivar, tr_label, tr_delta, test_ID, test_flux, test_ivar, coeff_old, scatter_old):
         print("Loading dataset")
         print("This may take a while...")
         self.wl = wl
@@ -49,6 +49,8 @@ class Dataset(object):
         self.test_ID = test_ID
         self.test_flux = test_flux
         self.test_ivar = test_ivar
+        self.coeff_old = coeff_old
+        self.scatter_old = scatter_old
         self._label_names = None
         self.ranges = None
         

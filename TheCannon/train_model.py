@@ -75,7 +75,7 @@ def test_training_step_objective_function(pars, fluxes, ivars, lvec, lvec_derivs
         
     return True
 
-def train_all_wavelength(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix): 
+def train_all_wavelength(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix, coeff_old, scatter_old): 
     '''
     optimizes the scatter and the coeffcients at one wavelength 
     '''
@@ -101,9 +101,11 @@ def train_all_wavelength(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, N
     # try flat parameter array...
     x0 = np.zeros((Npix * (Nlabels + 1) + Nlabels * Nstars,))
     
-    x0[:Npix] = 1.                                # first coefficient 
-    x0[Npix*Nlabels : Npix*(Nlabels+1)] = .1     # scatter
-    x0[Npix * (Nlabels + 1):] = np.reshape(lvec, (Nlabels * Nstars,)) #* 1.01 # best guess for labels should be lvec?!
+#    x0[:Npix] = 1.                                # first coefficient 
+#    x0[Npix*Nlabels : Npix*(Nlabels+1)] = .1     # scatter
+    x0[:(Npix*Nlabels)] = np.reshape(coeff_old, (Npix*Nlabels, ))                                # first coefficient 
+    x0[Npix*Nlabels : Npix*(Nlabels+1)] = scatter_old     # scatter
+    x0[Npix * (Nlabels + 1):] = np.reshape(lvec, (Nlabels * Nstars,)) #* 0.99 # best guess for labels should be lvec?!
     
     # testing... 
     # test_training_step_objective_function(x0, fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix)    
@@ -155,7 +157,7 @@ def _train_model_new(ds):
     
     # this gives delta_nk; same as lvec, but for uncertainties on lables
     linear_offsets = scaled_ldelta
-    quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(label_vals.shape[1])]for m in (linear_offsets)])
+    quadratic_offsets = np.array([np.outer(m, m)[np.triu_indices(label_vals.shape[1])]for m in (linear_offsets)]) * 10
     ones = np.ones((Nstars, 1)) * 0.001
     ldelta_vec = np.hstack((ones, linear_offsets, quadratic_offsets))
 
@@ -174,7 +176,7 @@ def _train_model_new(ds):
 #        chisqs.append(chis_m)
         
     
-    res, chisqs = train_all_wavelength(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix)
+    res, chisqs = train_all_wavelength(fluxes, ivars, lvec, lvec_derivs, ldelta_vec, Nstars, Nlabels, Npix, ds.coeff_old, ds.scatter_old)
     
     coeffs = np.reshape(res.x[:Npix*Nlabels], (Npix, Nlabels))
     scatters = res.x[Npix*Nlabels:Npix*(Nlabels+1)]
