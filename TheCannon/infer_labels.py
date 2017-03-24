@@ -22,7 +22,7 @@ def _get_lvec(labels):
     """
     nlabels = len(labels)
     # specialized to second-order model
-    linear_terms = labels
+    linear_terms = labels 
     quadratic_terms = np.outer(linear_terms, 
                                linear_terms)[np.triu_indices(nlabels)]
     lvec = np.hstack((linear_terms, quadratic_terms))
@@ -68,8 +68,7 @@ def _infer_labels(model, dataset, starting_guess=None):
     print("Inferring Labels")
     coeffs_all = model.coeffs
     scatters = model.scatters
-    chisqs = model.chisqs
-    pivots = model.pivots
+    #chisqs = model.chisqs
     nlabels = len(dataset.get_plotting_labels())
     fluxes = dataset.test_flux
     ivars = dataset.test_ivar
@@ -79,6 +78,7 @@ def _infer_labels(model, dataset, starting_guess=None):
                                coeffs_all.shape[1]-1.))
     errs_all = np.zeros((nstars, nlabels))
     chisq_all = np.zeros(nstars)
+    scales = model.scales
 
     if starting_guess == None:
         starting_guess = np.ones(nlabels)
@@ -87,6 +87,7 @@ def _infer_labels(model, dataset, starting_guess=None):
     for jj in range(nstars):
         flux = fluxes[jj,:]
         ivar = ivars[jj,:]
+        
 
         # where the ivar == 0, set the normalized flux to 1 and the sigma to 100
         bad = ivar == 0
@@ -97,6 +98,7 @@ def _infer_labels(model, dataset, starting_guess=None):
         flux_piv = flux - coeffs_all[:,0] * 1.  # pivot around the leading term
         errbar = np.sqrt(sigma**2 + scatters**2)
         coeffs = np.delete(coeffs_all, 0, axis=1)  # take pivot into account
+        
         try:
             labels, covs = opt.curve_fit(_func, coeffs, flux_piv,
                                          p0 = starting_guess,
@@ -107,8 +109,14 @@ def _infer_labels(model, dataset, starting_guess=None):
             covs = np.zeros((len(starting_guess),len(starting_guess)))-9999.
         chi2 = (flux_piv-_func(coeffs, *labels))**2 * ivar / (1 + ivar * scatters**2)
         chisq_all[jj] = sum(chi2)
-        labels_all[jj,:] = labels + pivots
+        labels_all[jj,:] = model.scales * labels + model.pivots
         errs_all[jj,:] = covs.diagonal()
 
     dataset.set_test_label_vals(labels_all)
     return errs_all, chisq_all
+    
+    
+    
+    
+    
+    

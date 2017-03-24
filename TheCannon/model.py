@@ -1,5 +1,6 @@
 from .dataset import Dataset
 from .train_model import _train_model 
+from .train_model import _train_model_new
 from .train_model import _get_lvec
 from .infer_labels import _infer_labels
 from .helpers.corner import corner
@@ -12,16 +13,17 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 class CannonModel(object):
-    def __init__(self, order, wl_filter=None):
-        """ wl_filter should have shape nlabels x npixels """
+    def __init__(self, order, useErrors):
         self.coeffs = None
         self.scatters = None
         self.chisqs = None
         self.pivots = None
+        self.scales = None
+        self.new_tr_labels = None
         self.order = order
         self.wl_filter = wl_filter
         self.model_spectra = None
-
+        self.useErrors = useErrors
 
 
     def model(self):
@@ -34,9 +36,10 @@ class CannonModel(object):
 
     def train(self, ds):
         """ Run training step: solve for best-fit spectral model """
-        self.coeffs, self.scatters, self.chisqs, self.pivots = _train_model(
-                ds, self.wl_filter)
-
+        if self.useErrors:
+            self.coeffs, self.scatters, self.new_tr_labels, self.chisqs, self.pivots, self.scales = _train_model_new(ds)
+        else:
+            self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model(ds)
 
     def diagnostics(self):
         """ Produce a set of diagnostics plots about the model. """
@@ -71,7 +74,7 @@ class CannonModel(object):
         ----------
         ds: Dataset object
         """
-        lvec_all = _get_lvec(ds.test_label_vals, self.pivots)
+        lvec_all = _get_lvec(ds.test_label_vals, self.pivots, self.scales, derivs=False)
         self.model_spectra = np.dot(lvec_all, self.coeffs.T)
 
 
