@@ -22,6 +22,8 @@ am_lamost = tbdata.field("cannon_alpha_m")
 hdulist.close()
 
 # import the APOGEE data
+hdulist = pyfits.open("/home/annaho/aida41040/annaho/TheCannon/data/apogee_DR12/labels/allStar-v603.fits")
+#hdulist = pyfits.open("allStar-v603.fits")
 apogee_dir = "/Users/annaho/Data/APOGEE"
 hdulist = pyfits.open("%s/allStar-v603.fits" %apogee_dir)
 tbdata = hdulist[1].data

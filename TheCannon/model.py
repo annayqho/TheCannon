@@ -21,8 +21,10 @@ class CannonModel(object):
         self.scales = None
         self.new_tr_labels = None
         self.order = order
+        self.wl_filter = wl_filter
         self.model_spectra = None
         self.useErrors = useErrors
+
 
     def model(self):
         """ Return the model definition or raise an error if not trained """
@@ -38,7 +40,6 @@ class CannonModel(object):
             self.coeffs, self.scatters, self.new_tr_labels, self.chisqs, self.pivots, self.scales = _train_model_new(ds)
         else:
             self.coeffs, self.scatters, self.chisqs, self.pivots, self.scales = _train_model(ds)
-
 
     def diagnostics(self):
         """ Produce a set of diagnostics plots about the model. """

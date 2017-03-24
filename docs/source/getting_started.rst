@@ -217,7 +217,7 @@ shown below.
 If the test set is simply equivalent to the training set, 
 as in this example, then one final diagnostic plot can be produced:  
 
->>> dset.diagnostics_1to1()
+>>> ds.diagnostics_1to1()
 
 .. image:: images/1to1_label_0.png
 

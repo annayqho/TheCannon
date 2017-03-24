@@ -184,5 +184,5 @@ def make_full_ivar():
 
 
 if __name__=="__main__":
-    #load_data()
+    load_data()
     make_full_ivar()

@@ -3,80 +3,57 @@ import glob
 from TheCannon import apogee
 from TheCannon import dataset
 from TheCannon import model 
-import pickle
 
 # (1) PREPARE DATA
 
 tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
+tr_label = apogee.load_labels("example_DR10/reference_labels.csv")
+
 # doing a 1-to-1 test for simplicity
 test_ID = tr_ID
 test_flux = tr_flux 
 test_ivar = tr_ivar
-all_labels = apogee.load_labels("example_DR10/reference_labels.csv")
+tr_label = apogee.load_labels("example_DR10/reference_labels.csv")
+
 # choose labels and make a new array 
-teff_corr = all_labels[:,2] 
-logg_corr = all_labels[:,4]
-mh_corr = all_labels[:,6]
-tr_label = np.vstack((teff_corr, logg_corr, mh_corr)).T
-dataset = dataset.Dataset(wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
-# apogee spectra come in three segments, corresponding to the three chips
-dataset.ranges = [[371,3192], [3697,5997], [6461,8255]]
+ds = dataset.Dataset(
+        wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 
 # set LaTeX label names for making diagnostic plots
-dataset.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
+ds.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
 
 # Plot SNR distributions and triangle plot of reference labels
-dataset.diagnostics_SNR()
-dataset.diagnostics_ref_labels()
+fig = ds.diagnostics_SNR()
+fig = ds.diagnostics_ref_labels()
 
 # (2) IDENTIFY CONTINUUM PIXELS
+pseudo_tr_flux, pseudo_tr_ivar = ds.continuum_normalize_training_q(
+        q=0.90, delta_lambda=50)
 
-# pseudo continuum normalize the spectrum using a running quantile
-if glob.glob('pseudo_spec.p'):
-    (pseudo_tr_flux, pseudo_tr_ivar) = pickle.load(open('pseudo_spec.p', 'r'))
-else:
-    pseudo_tr_flux, pseudo_tr_ivar = dataset.continuum_normalize_training_q(
-            q=0.90, delta_lambda=50)
-    pickle.dump((pseudo_tr_flux, pseudo_tr_ivar), open("pseudo_spec.p", 'w'))
+ds.ranges = [[371,3192], [3697,5500], [5500,5997], [6461,8255]]
+contmask = ds.make_contmask(
+        pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
 
-# in each region of the pseudo cont normed tr spectrum, 
-# identify the best 7% of continuum pix
-if glob.glob('contmask.p'):
-    contmask = pickle.load(open('contmask.p', 'r'))
-else:
-    contmask = dataset.make_contmask(pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
-    pickle.dump(contmask, open('contmask.p', 'w'))
+ds.set_continuum(contmask)
+cont = ds.fit_continuum(3, "sinusoid")
 
-dataset.set_continuum(contmask)
-
-# fit a sinusoid through the continuum pixels
-if glob.glob('cont.p'):
-    cont = pickle.load(open('cont.p', 'r')) 
-else:
-    cont = dataset.fit_continuum(3, "sinusoid")
-    pickle.dump(cont, open('cont.p', 'w'))
-
-# (3) CONTINUUM NORMALIZE
 norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
-        dataset.continuum_normalize(cont)
+        ds.continuum_normalize(cont)
 
-# replace with normalized values
-dataset.tr_flux = norm_tr_flux
-dataset.tr_ivar = norm_tr_ivar
-dataset.test_flux = norm_test_flux
-dataset.test_ivar = norm_test_ivar
+ds.tr_flux = norm_tr_flux
+ds.tr_ivar = norm_tr_ivar
+ds.test_flux = norm_test_flux
+ds.test_ivar = norm_test_ivar
 
-# (4) TRAINING STEP
+from TheCannon import model
+md = model.CannonModel(2)
+md.fit(ds)
+md.diagnostics_contpix(ds)
+md.diagnostics_leading_coeffs(ds)
+md.diagnostics_plot_chisq(ds)
 
-# learn the model from the reference_set
-model = model.CannonModel(dataset, 2) # 2 = quadratic model
-model.fit() # model.train would work equivalently.
-model.diagnostics()
-
-# (5) TEST STEP
-
-# infer labels with the new model for the test_set
-label_errs = model.infer_labels(dataset)
-dataset.diagnostics_test_step_flagstars()
-dataset.diagnostics_survey_labels()
-dataset.diagnostics_1to1()
+label_errs = md.infer_labels(ds)
+test_labels = ds.test_label_vals
+ds.diagnostics_test_step_flagstars()
+ds.diagnostics_survey_labels()
+dset.diagnostics_1to1()
