@@ -141,7 +141,7 @@ cmap.set_under('w')
 # plot map ('C' means the input coordinates were in the equatorial system)
 # rcParams.update({'font.size':16})
 hp.visufunc.mollview(m_apogee, coord=['C','G'], rot=(150, 0, 0), flip='astro',
-        notext=True, title=r'Ages from Ness et al. 2016 (APOGEE)', cbar=True,
+        notext=False, title=r'Ages from Ness et al. 2016 (APOGEE)', cbar=True,
         norm=None, min=0, max=12, cmap=cmap, unit = 'Gyr')
 #hp.visufunc.mollview(m_lamost, coord=['C','G'], rot=(150, 0, 0), flip='astro',
 #        notext=True, title=r'$\alpha$/M for 500,000 LAMOST giants', cbar=True,
@@ -153,8 +153,8 @@ hp.visufunc.mollview(m_apogee, coord=['C','G'], rot=(150, 0, 0), flip='astro',
 #         cbar=True, norm=None, min=0.00, max=12, cmap=cmap, unit = 'Gyr')
 hp.visufunc.graticule()
 
-#plt.show()
+plt.show()
 #plt.savefig("full_age_map.png")
-plt.savefig("apogee_age_map.png")
+#plt.savefig("apogee_age_map.png")
 #plt.savefig("lamost_am_map_magma.png")
 #plt.savefig("lamost_rmag_map.png")
