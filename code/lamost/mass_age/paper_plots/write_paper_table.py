@@ -71,7 +71,7 @@ outputf.write(content)
 for i in range(0,4):
     outputf.write(
     '%s & %s & %s & %s & %s & %s & %s & %s & %s & %s \\\ '
-    %(lamost_id[i], np.round(ra[i], 2), np.round(dec[i], 2), 
+    %(lamost_id[i], np.round(ra[i], 5), np.round(dec[i], 5), 
     teff[i], logg[i], mh[i], cm[i], nm[i], am[i], ak[i]))
         #int(teff[i]), round_sig(logg[i], 3), round_sig(mh[i], 3),
     #round_sig(cm[i], 3), round_sig(nm[i], 3), round_sig(am[i], 3), 
@@ -82,8 +82,9 @@ content = '''\\tableline
 \end{table}
 
 \\begin{table}[H]
+\\tablenum{1}
 \caption{
-Continued from Table 1: Formal Errors}
+\\textbf{continued: Formal Errors}}
 {\scriptsize
 \\begin{tabular}{cccccccc}
 \\tableline\\tableline
@@ -111,8 +112,9 @@ content = '''\\tableline
 \end{table}
 
 \\begin{table}[H]
+\\tablenum{1}
 \caption{
-Continued from Table 2: Estimated Error (Scatter)}
+\\textbf{continued: Estimated Error (Scatter)}}
 {\scriptsize
 \\begin{tabular}{cccccccccc}
 \\tableline\\tableline
@@ -138,8 +140,9 @@ content = '''\\tableline
 \end{table}
 
 \\begin{table}[H]
+\\tablenum{1}
 \caption{
-Continued from Table 3}
+\\textbf{continued}}
 {\scriptsize
 \\begin{tabular}{ccccccc}
 \\tableline\\tableline
@@ -154,7 +157,7 @@ for i in range(0,4):
     outputf.write(
     '%s & %s & %s & %s & %s & %s & %s \\\\ '
     %(lamost_id[i], mass[i], logAge[i],
-    np.round(mass_err[i], ndec(mass_err[i])),
+    np.round(mass_err[i], ndec(mass[i])),
     np.round(logAge_err[i], ndec(logAge[i])),
     round_sig(snr[i], 3), round_sig(chisq[i], 2)))
  

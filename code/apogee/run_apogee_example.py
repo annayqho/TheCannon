@@ -1,5 +1,7 @@
 import numpy as np
 import glob
+import sys
+sys.path.append("/Users/annaho/Dropbox/Research/TheCannon")
 from TheCannon import apogee
 from TheCannon import dataset
 from TheCannon import model 

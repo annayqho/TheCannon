@@ -102,6 +102,7 @@ def load_spectra(data_dir):
     ivars: ndarray
         Inverse variance values corresponding to flux values
     """
+    print("This is the right version")
     print("Loading spectra from directory %s" %data_dir)
     files = list(sorted([data_dir + "/" + filename
              for filename in os.listdir(data_dir) if filename.endswith('fits')]))
