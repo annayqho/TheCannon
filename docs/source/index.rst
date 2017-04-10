@@ -1,8 +1,8 @@
 ****************************
 *The Cannon* (``TheCannon``)
 ****************************
-Stellar Labels from Large Spectroscopic Datasets
-************************************************
+Data-Driven Modeling of Large Datasets of Stellar Spectra
+*********************************************************
 
 Welcome to the documentation for *The Cannon*!
 
