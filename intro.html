@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; TheCannon 0.3.4 documentation</title>
+  <title>Introduction &mdash; TheCannon 0.5.6 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="TheCannon 0.3.4 documentation" href="index.html"/>
+    <link rel="top" title="TheCannon 0.5.6 documentation" href="index.html"/>
         <link rel="next" title="Requirements for Input" href="input_requirements.html"/>
         <link rel="prev" title="The Cannon (TheCannon)" href="index.html"/> 
 
@@ -45,17 +45,27 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-        
-          <a href="index.html" class="icon icon-home"> TheCannon
-        
+          
+            <a href="index.html" class="icon icon-home"> TheCannon
+          
 
-        
-        </a>
+          
+          </a>
 
-        
+          
+            
+            
+              <div class="version">
+                0.5.6
+              </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -64,21 +74,24 @@
   </form>
 </div>
 
-        
-      </div>
+          
+        </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-          
-              <ul>
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a></li>
 </ul>
 
+            
           
-        
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -93,11 +106,17 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>&lt;no title&gt;</li>
+    <li>Introduction</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -108,11 +127,37 @@
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
-  <p><a class="reference internal" href="index.html"><em>The Cannon (TheCannon)</em></a></p>
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal"><span class="pre">TheCannon</span></code> provides functionality for <em>The Cannon</em>,
+a data-driven approach to determining stellar labels (parameters
+and abundances) from stellar spectra in the context of large
+spectroscopic surveys.</p>
+<p>For a detailed overview of <em>The Cannon</em> and a description of its
+successful application to determining labels for APOGEE DR10 spectra,
+see <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>.
+For an application of <em>The Cannon</em> to bringing two spectroscopic surveys
+(APOGEE and LAMOST) onto the same physical scale,
+see <a class="reference external" href="https://arxiv.org/abs/1602.00303">Ho et al. 2016</a>.</p>
+<p>Features include:</p>
+<ul class="simple">
+<li>Diagnostic output to help the user monitor and evaluate the process</li>
+<li>SNR-independent continuum normalization</li>
+<li>Training step: fit for the spectral model given training spectra and labels,
+with the polynomial order for the spectral model decided by the user</li>
+<li>Test step: infer labels for the test spectra</li>
+</ul>
+<p>This documentation includes a very simple example for implementation
+using APOGEE spectra in which the test set is identical to the training set.</p>
+<p>The code is open source and <a class="reference external" href="https://github.com/annayqho/TheCannon">available on github</a>. It is compatible with
+Python 2 and 3, numpy versions 1.7-1.9 and scipy versions 0.13-0.15.</p>
+</div>
 
 
+           </div>
           </div>
           <footer>
   
@@ -131,9 +176,10 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, Anna Ho.
+
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -151,7 +197,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.4',
+            VERSION:'0.5.6',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
