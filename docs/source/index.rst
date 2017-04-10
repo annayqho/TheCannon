@@ -42,6 +42,7 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
+   index
    input_requirements
    getting_started 
    api 
