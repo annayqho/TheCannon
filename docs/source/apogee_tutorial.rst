@@ -1,3 +1,5 @@
+.. _apogee_tutorial:
+
 *********************************
 Tutorial with APOGEE DR10 Spectra
 *********************************
