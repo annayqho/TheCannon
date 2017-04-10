@@ -24,7 +24,6 @@
 *.save
 examples/*
 build/*
-docs/*
 dist/*
 TheCannon.egg-info/*
 cont_fit_experiments/*
