@@ -16,6 +16,8 @@ Navigate into the spectra directory and count the number of files using
 
 There should be 11058 files, corresponding to 11058 stellar spectra.
 
+Next, download the reference labels by clicking :download:`here <lamost_labels.fits>`.
+
 This file contains the following:
 
 * ``Data``: a folder with .fits data files
