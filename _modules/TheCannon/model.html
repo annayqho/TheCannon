@@ -131,6 +131,7 @@
   <h1>Source code for TheCannon.model</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">.train_model</span> <span class="kn">import</span> <span class="n">_train_model</span> 
+<span class="kn">from</span> <span class="nn">.train_model</span> <span class="kn">import</span> <span class="n">_train_model_new</span>
 <span class="kn">from</span> <span class="nn">.train_model</span> <span class="kn">import</span> <span class="n">_get_lvec</span>
 <span class="kn">from</span> <span class="nn">.infer_labels</span> <span class="kn">import</span> <span class="n">_infer_labels</span>
 <span class="kn">from</span> <span class="nn">.helpers.corner</span> <span class="kn">import</span> <span class="n">corner</span>
@@ -143,16 +144,17 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;serif&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CannonModel"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel">[docs]</a><span class="k">class</span> <span class="nc">CannonModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">wl_filter</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; wl_filter should have shape nlabels x npixels &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">useErrors</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scales</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_tr_labels</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wl_filter</span> <span class="o">=</span> <span class="n">wl_filter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_spectra</span> <span class="o">=</span> <span class="bp">None</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">useErrors</span> <span class="o">=</span> <span class="n">useErrors</span>
 
 
 <div class="viewcode-block" id="CannonModel.model"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.model">[docs]</a>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -165,9 +167,10 @@
 
 <div class="viewcode-block" id="CannonModel.train"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run training step: solve for best-fit spectral model &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span> <span class="o">=</span> <span class="n">_train_model</span><span class="p">(</span>
-                <span class="n">ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wl_filter</span><span class="p">)</span></div>
-
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useErrors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_tr_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scales</span> <span class="o">=</span> <span class="n">_train_model_new</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chisqs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scales</span> <span class="o">=</span> <span class="n">_train_model</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CannonModel.diagnostics"><a class="viewcode-back" href="../../api.html#TheCannon.model.CannonModel.diagnostics">[docs]</a>    <span class="k">def</span> <span class="nf">diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Produce a set of diagnostics plots about the model. &quot;&quot;&quot;</span>
@@ -202,7 +205,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        ds: Dataset object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">lvec_all</span> <span class="o">=</span> <span class="n">_get_lvec</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span><span class="p">)</span>
+        <span class="n">lvec_all</span> <span class="o">=</span> <span class="n">_get_lvec</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">test_label_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pivots</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scales</span><span class="p">,</span> <span class="n">derivs</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_spectra</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lvec_all</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
