@@ -12,16 +12,19 @@ and unzip it using the command
 
 Navigate into the spectra directory and count the number of files using
 
-    $ ls -l | wc -l
+    $ ls | wc -l
 
-There should be 11058 files, corresponding to 11058 stellar spectra.
+There should be 11057 files, corresponding to 11057 stellar spectra.
 
 Next, download the reference labels by clicking :download:`here <lamost_labels.fits>`.
+Let's use the ``astropy`` module to examine the contents of this file.
 
-This file contains the following:
+>>> from astropy.table import Table
+>>> data = Table.read("lamost_labels.fits")
+>>> data.colnames
 
-* ``Data``: a folder with .fits data files
-* ``reference_labels.csv``: a table with reference label values for the training step
+You'll see that the first column is called ``LAMOST_ID``,
+the second and third give ``RA`` and ``DEC``, and blah blah.
 
 Before the data can be run through ``TheCannon``, it must be prepared
 according to the specifications laid out in the "Requirements for Input"
