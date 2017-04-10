@@ -15,5 +15,4 @@ Table of Contents
    intro
    input_requirements
    getting_started 
-      apogee_tutorial
    api 
