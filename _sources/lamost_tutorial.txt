@@ -4,11 +4,19 @@
 Tutorial with LAMOST DR2 Spectra
 *********************************
 
-To run this example, download the file ``example_lamost.tar.gz`` by clicking 
-:download:`here <example_DR10.tar.gz>`
+To run this example, download the folder ``lamost_spectra`` by clicking 
+:download:`here <lamost_spectra.zip>`
 and unzip it using the command
 
-    $ tar -zxvf example_DR10.tar.gz
+    $ unzip lamost_spectra.zip
+
+Navigate into the spectra directory and count the number of files using
+
+    $ ls -l | wc -l
+
+There should be 11058 files, corresponding to 11058 stellar spectra.
+
+Next, download the reference labels by clicking :download:`here <lamost_labels.fits>`.
 
 This file contains the following:
 
