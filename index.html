@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>The Cannon (TheCannon) &mdash; TheCannon 0.5.6 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="TheCannon 0.5.6 documentation" href="#"/>
+        <link rel="next" title="Requirements for Input" href="input_requirements.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> TheCannon
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.6
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">TheCannon</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li><em>The Cannon</em> (<code class="docutils literal"><span class="pre">TheCannon</span></code>)</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="the-cannon-thecannon">
+<h1><em>The Cannon</em> (<code class="docutils literal"><span class="pre">TheCannon</span></code>)<a class="headerlink" href="#the-cannon-thecannon" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="stellar-labels-from-large-spectroscopic-datasets">
+<h2>Stellar Labels from Large Spectroscopic Datasets<a class="headerlink" href="#stellar-labels-from-large-spectroscopic-datasets" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">TheCannon</span></code> provides functionality for <em>The Cannon</em>,
+a data-driven approach to determining stellar labels (parameters
+and abundances) from stellar spectra in the context of large
+spectroscopic surveys.</p>
+<p>For a detailed overview of <em>The Cannon</em> and a description of its
+successful application to determining labels for APOGEE DR10 spectra,
+see <a class="reference external" href="http://arxiv.org/abs/1501.07604">Ness et al. 2015</a>.
+For an application of <em>The Cannon</em> to bringing two spectroscopic surveys
+(APOGEE and LAMOST) onto the same physical scale,
+see <a class="reference external" href="https://arxiv.org/abs/1602.00303">Ho et al. 2016</a>.</p>
+<p>Features include:</p>
+<ul class="simple">
+<li>Diagnostic output to help the user monitor and evaluate the process</li>
+<li>SNR-independent continuum normalization</li>
+<li>Training step: fit for the spectral model given training spectra and labels,
+with the polynomial order for the spectral model decided by the user</li>
+<li>Test step: infer labels for the test spectra</li>
+</ul>
+<p>This documentation includes a very simple example for implementation
+using APOGEE spectra in which the test set is identical to the training set.</p>
+<p>The code is open source and <a class="reference external" href="https://github.com/annayqho/TheCannon">available on github</a>. It is compatible with
+Python 2 and 3, numpy versions 1.7-1.9 and scipy versions 0.13-0.15.</p>
+</div>
+<div class="section" id="table-of-contents">
+<h3>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#apogee-data">APOGEE Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#model">Model</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="input_requirements.html" class="btn btn-neutral float-right" title="Requirements for Input" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Anna Ho.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.5.6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
