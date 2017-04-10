@@ -4,7 +4,7 @@
 Stellar Labels from Large Spectroscopic Datasets
 ************************************************
 
-Welcome to the documentation for ``The Cannon``!
+Welcome to the documentation for *The Cannon*!
 
 Table of Contents
 =================
