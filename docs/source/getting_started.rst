@@ -6,8 +6,11 @@ Getting Started
 
     $ pip install TheCannon
 
-Here is an overview of the basic workflow using a simple illustration 
-with APOGEE DR10 data in which the test set is identical to the training set.
+Here is an overview of the basic workflow using two simple illustrations:
+one with APOGEE DR10 data in which the test set is identical to the training set,
+and one with LAMOST data in which we perform a leave-1/8-out cross-validation
+(as in `Ho et al. 2016`_).
+
 To run this example, download the file ``example_DR10.tar.gz`` by clicking 
 :download:`here <example_DR10.tar.gz>`
 and unzip it using the command
@@ -224,3 +227,6 @@ as in this example, then one final diagnostic plot can be produced:
 .. image:: images/1to1_label_1.png
 
 .. image:: images/1to1_label_2.png
+
+.. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
+
