@@ -14,4 +14,4 @@ and one with LAMOST data in which we perform a leave-1/8-out cross-validation
 .. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
 
 :ref:`apogee_tutorial`
----------------------
+----------------------
