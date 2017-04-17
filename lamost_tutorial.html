@@ -130,6 +130,14 @@
             
   <div class="section" id="tutorial-with-lamost-dr2-spectra">
 <span id="lamost-tutorial"></span><h1>Tutorial with LAMOST DR2 Spectra<a class="headerlink" href="#tutorial-with-lamost-dr2-spectra" title="Permalink to this headline">¶</a></h1>
+<p>Today we&#8217;re going to use The Cannon to transfer labels from APOGEE to LAMOST. More specifically, we&#8217;re going to model LAMOST spectra as a function of five labels from APOGEE DR12 (the 12th data release): effective temperature T_eff, surface gravity logg, metallicity [Fe/H], alpha enhancement [alpha/Fe], and K-band extinction A_k. This will enable us to determine APOGEE-scale labels from any new LAMOST spectrum (provided that it falls within the range of the training set).</p>
+<p>In total, there are 11,057 objects measured in common between APOGEE and LAMOST.
+For the cross-calibration paper (transferring labels to the full set of 450,000 objects)
+I used 9594 of these objects, since there were problems (flags, etc) with some of the data.
+Today, to keep things simple (and fast) we&#8217;re going to use the highest SNR subset of the LAMOST spectra.
+I applied a signal to noise cut of SNR &gt; 100, which left 1936 objects.</p>
+<p>We&#8217;re also going to take some more time today to examine the leading coefficients of each of the five labels, to see whether they are astrophysically sensible.</p>
+<p>If you&#8217;re interested in the full application, see the <code class="docutils literal"><span class="pre">paper_</span></code>:</p>
 <p>To run this example, download the folder <code class="docutils literal"><span class="pre">lamost_spectra</span></code> by clicking
 <a class="reference download internal" href="_downloads/lamost_spectra.zip"><code class="xref download docutils literal"><span class="pre">here</span></code></a>
 and unzip it using the command</p>
@@ -143,11 +151,33 @@ and unzip it using the command</p>
 Let&#8217;s use the <code class="docutils literal"><span class="pre">astropy</span></code> module to examine the contents of this file.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;lamost_labels.fits&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">colnames</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">colnames</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You&#8217;ll see that the first column is called <code class="docutils literal"><span class="pre">LAMOST_ID</span></code>,
-the second and third give <code class="docutils literal"><span class="pre">RA</span></code> and <code class="docutils literal"><span class="pre">DEC</span></code>, and blah blah.</p>
+and the rest are <code class="docutils literal"><span class="pre">RA</span></code>, <code class="docutils literal"><span class="pre">Dec</span></code>, <code class="docutils literal"><span class="pre">APOGEE_ID</span></code>,
+<code class="docutils literal"><span class="pre">TEFF</span></code>, <code class="docutils literal"><span class="pre">LOGG</span></code>, <code class="docutils literal"><span class="pre">PARAM_M_H</span></code> and <code class="docutils literal"><span class="pre">PARAM_ALPHA_M</span></code>.
+All of these stars were observed by both LAMOST and APOGEE,
+which is why they have a LAMOST ID as well as an APOGEE ID.
+The Teff, logg, [M/H], and [alpha/M] values are taken from
+APOGEE. In this tutorial, we will use the APOGEE values because
+it is the higher quality (higher SNR, higher resolution) survey.
+For our model, we will be using LAMOST spectra and APOGEE labels,
+and modeling the LAMOST spectra as a function of APOGEE labels.</p>
+<p>Next, let&#8217;s plot one spectrum. We will use the <code class="docutils literal"><span class="pre">load_spectra</span></code>
+module in <code class="docutils literal"><span class="pre">TheCannon</span></code> code.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon.lamost</span> <span class="kn">import</span> <span class="n">load_spectra</span>
+</pre></div>
+</div>
+<p>The filenames of the spectra correspond to the IDs in the LAMOST_ID column
+described above. Let&#8217;s pick the first one:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LAMOST_ID&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>And now load the spectrum by feeding the filename into the function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
 <p>Before the data can be run through <code class="docutils literal"><span class="pre">TheCannon</span></code>, it must be prepared
 according to the specifications laid out in the &#8220;Requirements for Input&#8221;
 section. One of the requirements is for data to be continuum normalized
