@@ -97,7 +97,7 @@ def load_spectrum(filename, grid):
     return flux_rs, ivar_rs, npix, SNR
 
 
-def load_spectra(filenames, input_grid=None):
+def load_spectra(inputf, input_grid=None):
     """
     Extracts spectra (wavelengths, fluxes, fluxerrs) from lamost fits files
 
@@ -127,19 +127,20 @@ def load_spectra(filenames, input_grid=None):
     """
     print("Loading spectra...")
 
-    if isinstance(filenames, str):
+    onestar = isinstance(inputf, str)
+    if onestar:
         nstars = 1
-        inputf = filenames
-    elif isinstance(filenames, list):
-        nstars = len(filenames)
-        inputf = filenames[0]
     else:
-        print("Your input needs to be either a string or a list of strings."
+        nstars = len(inputf)
+
     npix = np.zeros(nstars) # count num of good (ivar>0) pix in each object
 
     if input_grid is None:
         # use first file as template
-        file_in = pyfits.open(inputf) 
+        if onestar:
+            file_in = pyfits.open(inputf) 
+        else:
+            file_in = pyfits.open(inputf[0])
         grid_all = np.array(file_in[0].data[2])
         middle = np.logical_and(grid_all > 3905, grid_all < 9000)
         grid = grid_all[middle]
@@ -149,17 +150,20 @@ def load_spectra(filenames, input_grid=None):
         grid = input_grid
 
     # grid is the template onto which everything is interpolated
-    npixels = len(grid)
-    SNRs = np.zeros(nstars, dtype=float)
-    fluxes = np.zeros((nstars, npixels), dtype=float)
-    ivars = np.zeros(fluxes.shape, dtype=float)
+    if onestar:
+        fluxes, ivars, npix, SNRs = load_spectrum(inputf, grid)
 
-    for jj, fits_file in enumerate(filenames):
-        flux_rs, ivar_rs, npix_val, SNR = load_spectrum(fits_file, grid)
-        fluxes[jj,:] = flux_rs
-        ivars[jj,:] = ivar_rs
-        npix[jj] = npix_val
-        SNRs[jj] = SNR
+    else:
+        npixels = len(grid)
+        SNRs = np.zeros(nstars, dtype=float)
+        fluxes = np.zeros((nstars, npixels), dtype=float)
+        ivars = np.zeros(fluxes.shape, dtype=float)
+        for jj, fits_file in enumerate(filenames):
+            flux_rs, ivar_rs, npix_val, SNR = load_spectrum(fits_file, grid)
+            fluxes[jj,:] = flux_rs
+            ivars[jj,:] = ivar_rs
+            npix[jj] = npix_val
+            SNRs[jj] = SNR
 
     print("Spectra loaded")
     return grid, fluxes, ivars, npix, SNRs
