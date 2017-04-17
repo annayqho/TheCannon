@@ -21,10 +21,32 @@ Let's use the ``astropy`` module to examine the contents of this file.
 
 >>> from astropy.table import Table
 >>> data = Table.read("lamost_labels.fits")
->>> data.colnames
+>>> print(data.colnames)
 
 You'll see that the first column is called ``LAMOST_ID``,
-the second and third give ``RA`` and ``DEC``, and blah blah.
+and the rest are ``RA``, ``Dec``, ``APOGEE_ID``,
+``TEFF``, ``LOGG``, ``PARAM_M_H`` and ``PARAM_ALPHA_M``.
+All of these stars were observed by both LAMOST and APOGEE,
+which is why they have a LAMOST ID as well as an APOGEE ID.
+The Teff, logg, [M/H], and [alpha/M] values are taken from
+APOGEE. In this tutorial, we will use the APOGEE values because
+it is the higher quality (higher SNR, higher resolution) survey.
+For our model, we will be using LAMOST spectra and APOGEE labels,
+and modeling the LAMOST spectra as a function of APOGEE labels.
+
+Next, let's plot one spectrum. We will use the ``load_spectra``
+module in ``TheCannon`` code.
+
+>>> from TheCannon.lamost import load_spectra
+
+The filenames of the spectra correspond to the IDs in the LAMOST_ID column
+described above. Let's pick the first one:
+
+>>> filename = data['LAMOST_ID'][0]
+
+And now load the spectrum by feeding the filename into the function:
+
+>>> 
 
 Before the data can be run through ``TheCannon``, it must be prepared
 according to the specifications laid out in the "Requirements for Input"
