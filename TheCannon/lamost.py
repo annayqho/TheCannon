@@ -84,9 +84,9 @@ def load_spectrum(filename, grid):
     wl = np.array(file_in[0].data[2])
     flux = np.array(file_in[0].data[0])
     ivar = np.array((file_in[0].data[1]))
-    npix[jj] = sum(ivar>0)
+    npix = sum(ivar>0)
     # SNR should be calculated ignoring bad pixels
-    SNRs[jj] = np.median(flux[ivar>0]*ivar[ivar>0]**0.5)
+    SNR = np.median(flux[ivar>0]*ivar[ivar>0]**0.5)
     # correct for radial velocity of star
     redshift = file_in[0].header['Z']
     wl_shifted = wl - redshift * wl
@@ -94,7 +94,7 @@ def load_spectrum(filename, grid):
     flux_rs = (interpolate.interp1d(wl_shifted, flux))(grid)
     ivar_rs = (interpolate.interp1d(wl_shifted, ivar))(grid)
     ivar_rs[ivar_rs < 0] = 0. # in interpolating you can end up with neg
-    return flux_rs, ivar_rs
+    return flux_rs, ivar_rs, npix, SNR
 
 
 def load_spectra(filenames, input_grid=None):
@@ -155,9 +155,11 @@ def load_spectra(filenames, input_grid=None):
     ivars = np.zeros(fluxes.shape, dtype=float)
 
     for jj, fits_file in enumerate(filenames):
-        flux_rs, ivar_rs = load_spectrum(fits_file, grid)
+        flux_rs, ivar_rs, npix_val, SNR = load_spectrum(fits_file, grid)
         fluxes[jj,:] = flux_rs
         ivars[jj,:] = ivar_rs
+        npix[jj] = npix_val
+        SNRs[jj] = SNR
 
     print("Spectra loaded")
     return grid, fluxes, ivars, npix, SNRs
