@@ -4,6 +4,18 @@
 Tutorial with LAMOST DR2 Spectra
 *********************************
 
+Today we're going to use The Cannon to transfer labels from APOGEE to LAMOST. More specifically, we're going to model LAMOST spectra as a function of five labels from APOGEE DR12 (the 12th data release): effective temperature T_eff, surface gravity logg, metallicity [Fe/H], alpha enhancement [alpha/Fe], and K-band extinction A_k. This will enable us to determine APOGEE-scale labels from any new LAMOST spectrum (provided that it falls within the range of the training set).
+
+In total, there are 11,057 objects measured in common between APOGEE and LAMOST.
+For the cross-calibration paper (transferring labels to the full set of 450,000 objects)
+I used 9594 of these objects, since there were problems (flags, etc) with some of the data.
+Today, to keep things simple (and fast) we're going to use the highest SNR subset of the LAMOST spectra.
+I applied a signal to noise cut of SNR > 100, which left 1936 objects.
+
+We're also going to take some more time today to examine the leading coefficients of each of the five labels, to see whether they are astrophysically sensible.
+
+If you're interested in the full application, see the ``paper_``:
+
 To run this example, download the folder ``lamost_spectra`` by clicking 
 :download:`here <lamost_spectra.zip>`
 and unzip it using the command
