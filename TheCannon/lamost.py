@@ -103,7 +103,7 @@ def load_spectra(inputf, input_grid=None):
 
     Parameters
     ----------
-    filenames: np ndarray
+    inputf: np ndarray
         files from which to extract spectra
 
     input_grid: np ndarray
@@ -158,7 +158,7 @@ def load_spectra(inputf, input_grid=None):
         SNRs = np.zeros(nstars, dtype=float)
         fluxes = np.zeros((nstars, npixels), dtype=float)
         ivars = np.zeros(fluxes.shape, dtype=float)
-        for jj, fits_file in enumerate(filenames):
+        for jj, fits_file in enumerate(inputf):
             flux_rs, ivar_rs, npix_val, SNR = load_spectrum(fits_file, grid)
             fluxes[jj,:] = flux_rs
             ivars[jj,:] = ivar_rs
