@@ -148,7 +148,7 @@ def load_spectra(inputf, input_grid=None):
 
     # grid is the template onto which everything is interpolated
     if onestar:
-        fluxes, ivars, npix, SNRs = load_spectrum(inputf, grid)
+        fluxes, ivars = load_spectrum(inputf, grid)
 
     else:
         npixels = len(grid)
