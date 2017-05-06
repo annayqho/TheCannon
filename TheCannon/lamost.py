@@ -151,16 +151,12 @@ def load_spectra(inputf, input_grid=None):
         fluxes, ivars = load_spectrum(inputf, grid)
 
     else:
-        npixels = len(grid)
-        SNRs = np.zeros(nstars, dtype=float)
         fluxes = np.zeros((nstars, npixels), dtype=float)
         ivars = np.zeros(fluxes.shape, dtype=float)
         for jj, fits_file in enumerate(inputf):
             flux_rs, ivar_rs  = load_spectrum(fits_file, grid)
             fluxes[jj,:] = flux_rs
             ivars[jj,:] = ivar_rs
-            npix[jj] = npix_val
-            SNRs[jj] = SNR
 
     print("Spectra loaded")
     return grid, fluxes, ivars
