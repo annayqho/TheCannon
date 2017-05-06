@@ -38,6 +38,19 @@ class Dataset(object):
     """ A class to represent Cannon input: a dataset of spectra and labels """
 
     def __init__(self, wl, tr_ID, tr_flux, tr_ivar, tr_label, tr_delta, test_ID, test_flux, test_ivar):
+        """ Initiate a Dataset object
+
+        Parameters
+        ----------
+        wl: grid of wavelength values, onto which all spectra are mapped
+        tr_ID: array of IDs of training objects
+        tr_flux: array of flux values for training objects, [nobj, npix]
+        tr_ivar: array [nobj, npix] of inverse variance values for training objects
+        tr_label: array [nobj, nlabel]
+        test_ID: array [nobj[ of IDs of test objects
+        test_flux: array [nobj, npix] of flux values for test objects
+        test_ivar: array [nobj, npix] of inverse variance values for test objects
+        """
         print("Loading dataset")
         print("This may take a while...")
         self.wl = wl
