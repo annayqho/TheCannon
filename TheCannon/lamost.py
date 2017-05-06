@@ -84,9 +84,6 @@ def load_spectrum(filename, grid):
     wl = np.array(file_in[0].data[2])
     flux = np.array(file_in[0].data[0])
     ivar = np.array((file_in[0].data[1]))
-    npix = sum(ivar>0)
-    # SNR should be calculated ignoring bad pixels
-    SNR = np.median(flux[ivar>0]*ivar[ivar>0]**0.5)
     # correct for radial velocity of star
     redshift = file_in[0].header['Z']
     wl_shifted = wl - redshift * wl
@@ -94,7 +91,7 @@ def load_spectrum(filename, grid):
     flux_rs = (interpolate.interp1d(wl_shifted, flux))(grid)
     ivar_rs = (interpolate.interp1d(wl_shifted, ivar))(grid)
     ivar_rs[ivar_rs < 0] = 0. # in interpolating you can end up with neg
-    return flux_rs, ivar_rs, npix, SNR
+    return flux_rs, ivar_rs
 
 
 def load_spectra(inputf, input_grid=None):
@@ -166,7 +163,7 @@ def load_spectra(inputf, input_grid=None):
             SNRs[jj] = SNR
 
     print("Spectra loaded")
-    return grid, fluxes, ivars, npix, SNRs
+    return grid, fluxes, ivars
 
 
 def load_labels(lamost_ids, filename='lamost_labels_all_dates.csv'):
