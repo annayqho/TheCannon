@@ -45,7 +45,6 @@ class Dataset(object):
         self.tr_flux = tr_flux
         self.tr_ivar = tr_ivar
         self.tr_label = tr_label
-        self.tr_delta = tr_delta
         self.test_ID = test_ID
         self.test_flux = test_flux
         self.test_ivar = test_ivar
