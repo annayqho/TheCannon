@@ -85,7 +85,7 @@ class Dataset(object):
         -------
         SNR: float
         """
-        take = ivar != 0
+        take = ivar > 0
         SNR = float(np.median(flux[take]*(ivar[take]**0.5)))
         return SNR  
 
