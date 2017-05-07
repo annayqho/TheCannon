@@ -151,6 +151,7 @@ def load_spectra(inputf, input_grid=None):
         fluxes, ivars = load_spectrum(inputf, grid)
 
     else:
+        npixels = len(grid)
         fluxes = np.zeros((nstars, npixels), dtype=float)
         ivars = np.zeros(fluxes.shape, dtype=float)
         for jj, fits_file in enumerate(inputf):
