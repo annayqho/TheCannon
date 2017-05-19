@@ -21,7 +21,6 @@ class CannonModel(object):
         self.scales = None
         self.new_tr_labels = None
         self.order = order
-        self.wl_filter = wl_filter
         self.model_spectra = None
         self.useErrors = useErrors
 
