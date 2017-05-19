@@ -75,7 +75,7 @@ def _infer_labels(model, dataset, starting_guess=None):
     nstars = fluxes.shape[0]
     labels_all = np.zeros((nstars, nlabels))
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1] - 1,
-                               coeffs_all.shape[1]-1.))
+                               coeffs_all.shape[1] - 1))
     errs_all = np.zeros((nstars, nlabels))
     chisq_all = np.zeros(nstars)
     scales = model.scales
