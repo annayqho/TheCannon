@@ -4,12 +4,21 @@
 Tutorial with LAMOST DR2 Spectra
 *********************************
 
-Today we're going to use The Cannon to transfer labels from APOGEE to LAMOST. More specifically, we're going to model LAMOST spectra as a function of five labels from APOGEE DR12 (the 12th data release): effective temperature T_eff, surface gravity logg, metallicity [Fe/H], alpha enhancement [alpha/Fe], and K-band extinction A_k. This will enable us to determine APOGEE-scale labels from any new LAMOST spectrum (provided that it falls within the range of the training set).
+Today we're going to use The Cannon to transfer labels from APOGEE to LAMOST. 
+More specifically, we're going to model LAMOST spectra as a function of 
+five labels from APOGEE DR12 (the 12th data release): 
+effective temperature T_eff, surface gravity logg, metallicity [Fe/H], 
+alpha enhancement [alpha/Fe], and K-band extinction A_k. 
+This will enable us to determine APOGEE-scale labels from any new 
+LAMOST spectrum (provided that it falls within the range of the training set).
 
 In total, there are 11,057 objects measured in common between APOGEE and LAMOST.
-For the cross-calibration paper (transferring labels to the full set of 450,000 objects)
-I used 9594 of these objects, since there were problems (flags, etc) with some of the data.
-Today, to keep things simple (and fast) we're going to use the highest SNR subset of the LAMOST spectra.
+For the cross-calibration paper 
+(transferring labels to the full set of 450,000 objects)
+I used 9594 of these objects, since there were problems 
+(flags, etc) with some of the data.
+Today, to keep things simple (and fast) 
+we're going to use the highest SNR subset of the LAMOST spectra.
 I applied a signal to noise cut of SNR > 100, which left 1936 objects.
 
 We're also going to take some more time today to examine the leading coefficients of each of the five labels, to see whether they are astrophysically sensible.
@@ -56,9 +65,54 @@ described above. Let's pick the first one:
 
 >>> filename = data['LAMOST_ID'][0]
 
+To get rid of trailing white spaces:
+
+>>> filename = data['LAMOST_ID'][0].strip()
+
 And now load the spectrum by feeding the filename into the function:
 
->>> 
+>>> specdir = "spectra"
+>>> wl, flux, ivar = load_spectra("%s/" %specdir + filename)
+
+Now, plot the thing
+
+>>> plt.step(wl, flux, where='mid', linewidth=0.5, color='k')
+>>> plt.xlabel("Wavelength (Angstroms)")
+>>> plt.ylabel("Flux")
+>>> plt.show()
+
+Now, get all of the files
+
+>>> filenames = np.array([val.strip() for val in data['LAMOST_ID']])
+>>> filenames_full = np.array([specdir+"/"+val.strip() for val in filenames])
+>>> wl, flux, ivar = load_spectra(filenames_full)
+
+We'll use the first 1000 stars as the training set.
+
+>>> tr_flux = flux[0:1000]
+>>> tr_ivar = ivar[0:1000]
+>>> tr_ID = filenames[0:1000]
+
+>>> inds = np.array([np.where(filenames==val)[0][0] for val in tr_ID])
+>>> tr_teff = data['TEFF'][inds]
+>>> tr_logg = data['LOGG'][inds]
+>>> tr_mh = data['PARAM_M_H'][inds]
+>>> tr_alpham = data['PARAM_ALPHA_M'][inds]
+
+Let's look at the teff-logg diagram of the training labels,
+color-coded by metallicity.
+
+>>> plt.scatter(tr_teff, tr_logg, c=tr_mh, lw=0, s=7, cmap="viridis")
+>>> plt.gca().invert_xaxis()
+>>> plt.xlabel("Teff")
+>>> plt.ylabel("logg")
+>>> plt.colorbar(label="M/H")
+>>> plt.savefig("teff_logg_training.png")
+>>> plt.close()
+
+Note that there are very few stars at low metallicity,
+so it will probably be challenging to do as good of a job
+or get as precise results here.
 
 Before the data can be run through ``TheCannon``, it must be prepared
 according to the specifications laid out in the "Requirements for Input"
@@ -72,36 +126,85 @@ The procedure for reading in spectra and training labels of course depends on
 the survey, the file type, etc, and it is up to the user to package this
 all appropriately before feeding it into ``TheCannon``.
 
->>> from TheCannon import apogee
->>> tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
->>> tr_label = apogee.load_labels("example_DR10/reference_labels.csv")
+>>> filenames = np.array([val.strip() for val in data['LAMOST_ID']])
+>>> filenames_full = np.array([specdir+"/"+val.strip() for val in filenames])
+>>> wl, flux, ivar = load_spectra(filenames_full)
 
-There should be 548 spectra with 8575 pixels each. 
+There should be XXXX spectra with 3626 pixels each. 
+We'll choose the first 1000 stars for the training set, 
+and use the rest for the test set.
 
-For simplicity, we set the test set is set as equal to the training set, so that
-``TheCannon`` is simply re-determining labels for the reference objects. In
-practice, the test IDs, fluxes, and inverse variances would be read in 
-separately.
+>>> tr_flux = flux[0:1000]
+>>> tr_ivar = ivar[0:1000]
+>>> tr_ID = filenames[0:1000]
 
->>> test_ID = tr_ID
->>> test_flux = tr_flux
->>> test_ivar = tr_ivar
+Let's get the reference labels
+
+>>> inds = np.array([np.where(filenames==val)[0][0] for val in tr_ID])
+>>> tr_teff = data['TEFF'][inds]
+>>> tr_logg = data['LOGG'][inds]
+>>> tr_mh = data['PARAM_M_H'][inds]
+>>> tr_alpham = data['PARAM_ALPHA_M'][inds]
+
+Take a look at the teff-logg diagram, color-coded by metallicity
+>>> plt.scatter(tr_teff, tr_logg, c=tr_mh, lw=0, s=7, cmap="viridis")
+>>> plt.gca().invert_xaxis()
+>>> plt.xlabel("Teff")
+>>> plt.ylabel("logg")
+>>> plt.colorbar(label="M/H")
+>>> plt.savefig("teff_logg_training.png")
+>>> plt.close()
+
+Note that there are very few stars at low metallicity,
+so it will probably be challenging to do as good of a job
+or get as precise results here.
+
+>>> print(wl.shape)
+>>> print(tr_ID.shape)
+>>> print(tr_flux.shape)
+>>> print(tr_ivar.shape)
+
+[num_training_objects, num_pixels]
+(1339, 3626)
+Fine. Not normalized yet, but we will do that later.
+
+Now we need a block of training labels
+[num_training_objects, num_labels]
+Right now we have them separate, combine into an array of this shape:
+
+>>> tr_label = np.vstack((tr_teff, tr_logg, tr_mh, tr_alpham))
+
+Note that that gives us (4,1339) which is (num_labels, num_tr_obj),
+So we need to take the transpose
+
+Now we need to define our "test set": a bunch of other
+spectra whose labels we want to determine and don't know yet.
+Let's use some of the other spectra in the dataset
+Say, the ones with 80 < SNR < 100
+>>> test_ID = filenames[1000:]
+>>> test_flux = flux[1000:]
+>>> test_ivar = ivar[1000:]
+
+Check the sizes
+>>> print(test_ID.shape)
+>>> print(test_flux.shape)
+>>> print(test_ivar.shape)
+
 
 Now, all the input data has been packaged properly, and we can begin running
 ``TheCannon.``
 
 The first step is to initialize a ``Dataset`` object:
 
-    >>> from TheCannon import dataset
-    >>> ds = dataset.Dataset(
-    >>> ...wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
+>>> ds = dataset.Dataset(
+>>> ...wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 
 ``TheCannon`` has a number of optional diagnostic plots built-in, to help the
 user visualize the results. Some of these plots require knowing the names
 of the labels. If the user wants to produce these diagnostic plots, he or
 she must specify the label names in LaTeX format: 
 
-    >>> ds.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
+>>> ds.set_label_names(['T_{eff}', '\log g', '[M/H]', '[alpha/M]'])
 
 At this stage, two diagnotic plots can already be produced, 
 one with the distribution
@@ -112,7 +215,7 @@ every label's set of training values against every other.
 
     >>> fig = ds.diagnostics_SNR()
 
-.. image:: images/SNRdist.png
+.. image:: images_lamost/SNRdist.png
 
 We can also plot the reference labels against each other:
 
@@ -120,88 +223,22 @@ We can also plot the reference labels against each other:
 
 That figure should look like this:
 
-.. image:: images/ref_labels_triangle.png
+.. image:: images_lamost/ref_labels.png
 
-Again, ``TheCannon`` requires incoming spectra to be continuum normalized
+Again, ``TheCannon`` requires incoming spectra to be normalized
 in a way that is independent of signal to noise. If the data does not satisfy
-this criteria already, the user can use the continuum identification and
-normalization functions built into ``TheCannon``. 
+this criteria already, the user can use the 
+functions built into ``TheCannon``. 
 
-First, continuum pixels are identified from a pseudo-continuum normalized
-version of the training set spectra. Pseudo-continuum normalization is
-performed using a running quantile. In this case, the
-window size for calculating the median is set to 50 Angstroms and the quantile
-level is set to 90\%. APOGEE spectra come in three chunks, and we want to
-perform continuum normalization for each chunk separately. For ``TheCannon``
-to treat spectra in chunks, the ``ranges`` attribute must be set:
+>>> ds.continuum_normalize_gaussian_smoothing(L=50)
 
-    >>> ds.ranges = [[371,3192], [3697,5997], [6461,8255]]
+Let's take a look at a normalized spectrum.
 
-Even if a spectral dataset do not consist of chunks separated by gaps, one can
-imagine other reasons for wanting to treat a spectrum as though it had gaps:
-for example, if different regions of a spectrum behave very differently, it
-might be sensible to treat each of them separately in continuum normalization.
-The user should make sure to examine the results of continuum normalization, 
-for example plotting fifty sample continuum fits and continuum normalized 
-spectra.
+>>> plt.step(ds.wl, ds.tr_flux[0], where='mid', linewidth=0.5, color='k')
+>>> plt.xlabel("Wavelength (Angstroms)")
+>>> plt.ylabel("Flux")
 
-Pseudo continuum normalization can then be performed as follows:
-
-    >>> pseudo_tr_flux, pseudo_tr_ivar = ds.continuum_normalize_training_q(
-    >>> ...q=0.90, delta_lambda=50)
-
-Once the pseudo continuum has been calculated, a continuum mask is created:
-True values correspond to pixels that are continuum, False to those that are
-not. "True" continuum pixels are identified using a median and variance flux
-cut across the training objects: in other words, continuum pixels are those
-that consistently have values close to 1 in all of the training spectra. The
-user specifies what fraction of pixels to identify as continuum, and the
-flux and variance cuts are determined appropriately. If the ``ds.ranges``
-attribute is set, then continuum pixels are identified separately for each
-region (in this case, three regions). This enables the user to control how
-evenly spread the pixels are.
-
-In this case, we choose 7% of the pixels in the spectrum as continuum, but the
-best value should be determined through experimentation.
-
-    >>> contmask = ds.make_contmask(
-    >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
-
-At this stage, the user should plot spectra overlaid with the identified
-continuum pixels to ensure that they look reasonable and that they roughly
-evenly cover the spectrum. Large gaps in continuum pixels could result in
-poor continuum normalization in those regions. If the continuum pixels
-do not look evenly sampled enough, the range can be changed and the process
-repeated. For this example, we change it as follows:
-
-    >>> ds.ranges = [[371,3192], [3697,5500], [5500,5997], [6461,8255]]
-    >>> contmask = ds.make_contmask(
-    >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
-
-Once a satisfactory set of continuum pixels has been identified, the dataset's
-continuum mask attribute is set as follows:
-
-    >>> ds.set_continuum(contmask)
-
-Once the dataset has a continuum mask, the continuum is fit for using either
-a sinusoid or chebyshev function. In this case, we use a sinusoid; the user
-can specify the desired order. Again, this is 3 for this simple illustration,
-but should be determined through experimentation.
-
-    >>> cont = ds.fit_continuum(3, "sinusoid")
-
-Once a satisfactory continuum has been fit, the normalized training and test
-spectra can be calculated:
-
-    >>> norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
-    >>> ds.continuum_normalize(cont)
-
-If these normalized spectra look acceptable, then they can be set:
-
-    >>> ds.tr_flux = norm_tr_flux
-    >>> ds.tr_ivar = norm_tr_ivar
-    >>> ds.test_flux = norm_test_flux
-    >>> ds.test_ivar = norm_test_ivar
+.. image:: images_lamost/norm_spec.png
 
 Now, the data munging is over and we're ready to run ``TheCannon``!
 
@@ -209,36 +246,25 @@ For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model. 
 In this case, we use a quadratic model: order = 2
 
->>> from TheCannon import model
->>> md = model.CannonModel(2) 
->>> md.fit(ds) 
+>>> m = model.CannonModel(2, useErrors=False) 
+>>> m.fit(ds) 
 
 At this stage, more optional diagnostic plots can be produced to examine
 the spectral model:
 
->>> md.diagnostics_contpix(ds)
->>> md.diagnostics_leading_coeffs(ds)
->>> md.diagnostics_plot_chisq(ds)
-
-The first is a series of plots showing the full baseline (first-order) model
-spectrum with continuum pixels overplotted. 
-
-.. image:: images/contpix.gif
+>>> m.diagnostics_leading_coeffs(ds)
 
 The second is a plot of the leading coefficients and scatter of the model
 as a function of wavelength
 
-.. image:: images/leading_coeffs.png
-
-The third is a histogram of the reduced chi squareds of the model fit. 
-
-.. image:: images/modelfit_chisqs.png
+.. image:: images_lamost/leading_coeffs.png
 
 If the model fitting worked, then we can proceed to the test step. This 
 command automatically updates the dataset with the fitted-for test labels,
 and returns the corresponding covariance matrix.
 
->>> label_errs = md.infer_labels(ds)
+>>> starting_guess = np.mean(ds.tr_label,axis=0)-m.pivots
+>>> errs, chisq = m.infer_labels(ds, starting_guess)
 
 You can access the new labels as follows:
 
@@ -246,25 +272,30 @@ You can access the new labels as follows:
 
 A set of diagnostic output:
 
->>> ds.diagnostics_test_step_flagstars()
 >>> ds.diagnostics_survey_labels()
 
-The first generates one text file for each label, called ``flagged_stars.txt``. 
 The second generates a triangle plot of the survey (Cannon) labels,
 shown below.
 
-.. image:: images/survey_labels_triangle.png
+.. image:: images_lamost/survey_labels.png
 
-If the test set is simply equivalent to the training set, 
-as in this example, then one final diagnostic plot can be produced:  
+Now we can compare the "real" values to the Cannon values, for the test objects.
+
+>>> inds = np.array([np.where(filenames==val)[0][0] for val in ds.test_ID])
+>>> test_teff = data['TEFF'][inds]
+>>> test_logg = data['LOGG'][inds]
+>>> test_mh = data['PARAM_M_H'][inds]
+>>> test_alpham = data['PARAM_ALPHA_M'][inds]
+>>> test_label = np.vstack((test_teff, test_logg, test_mh, test_alpham)).T
+>>> ds.tr_label = test_label
 
 >>> ds.diagnostics_1to1()
 
-.. image:: images/1to1_label_0.png
+.. image:: images_lamost/1to1_label_0.png
 
-.. image:: images/1to1_label_1.png
+.. image:: images_lamost/1to1_label_1.png
 
-.. image:: images/1to1_label_2.png
+.. image:: images_lamost/1to1_label_2.png
 
 .. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
 

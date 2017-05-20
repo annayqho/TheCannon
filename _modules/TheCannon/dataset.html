@@ -169,7 +169,20 @@
 <div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../api.html#TheCannon.dataset.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A class to represent Cannon input: a dataset of spectra and labels &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">tr_delta</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">,</span> <span class="n">coeff_old</span><span class="p">,</span> <span class="n">scatter_old</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initiate a Dataset object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wl: grid of wavelength values, onto which all spectra are mapped</span>
+<span class="sd">        tr_ID: array of IDs of training objects</span>
+<span class="sd">        tr_flux: array of flux values for training objects, [nobj, npix]</span>
+<span class="sd">        tr_ivar: array [nobj, npix] of inverse variance values for training objects</span>
+<span class="sd">        tr_label: array [nobj, nlabel]</span>
+<span class="sd">        test_ID: array [nobj[ of IDs of test objects</span>
+<span class="sd">        test_flux: array [nobj, npix] of flux values for test objects</span>
+<span class="sd">        test_ivar: array [nobj, npix] of inverse variance values for test objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Loading dataset&quot;</span><span class="p">)</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;This may take a while...&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wl</span> <span class="o">=</span> <span class="n">wl</span>
@@ -177,12 +190,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">tr_flux</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">tr_ivar</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">tr_label</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tr_delta</span> <span class="o">=</span> <span class="n">tr_delta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">test_ID</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">test_flux</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">test_ivar</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coeff_old</span> <span class="o">=</span> <span class="n">coeff_old</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scatter_old</span> <span class="o">=</span> <span class="n">scatter_old</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_label_names</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="bp">None</span>
         
@@ -207,7 +217,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        SNR: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">take</span> <span class="o">=</span> <span class="n">ivar</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="n">take</span> <span class="o">=</span> <span class="n">ivar</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="n">SNR</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">flux</span><span class="p">[</span><span class="n">take</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">ivar</span><span class="p">[</span><span class="n">take</span><span class="p">]</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">SNR</span>  
 
