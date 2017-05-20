@@ -301,5 +301,5 @@ Now we can compare the "real" values to the Cannon values, for the test objects.
 
 .. image:: images_lamost/1to1_label_2.png
 
-.. _Ho et al. 2017: https://arxiv.org/abs/1602.00303
+.. _Ho et al. 2017: http://iopscience.iop.org/article/10.3847/1538-4357/836/1/5/pdf
 
