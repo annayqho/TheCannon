@@ -130,23 +130,29 @@
             
   <div class="section" id="tutorial-with-lamost-dr2-spectra">
 <span id="lamost-tutorial"></span><h1>Tutorial with LAMOST DR2 Spectra<a class="headerlink" href="#tutorial-with-lamost-dr2-spectra" title="Permalink to this headline">¶</a></h1>
-<p>Today we&#8217;re going to use The Cannon to transfer labels from APOGEE to LAMOST.
+<p>In this tutorial, we&#8217;re going to use The Cannon
+to transfer a system of labels from APOGEE to LAMOST.
 More specifically, we&#8217;re going to model LAMOST spectra as a function of
-five labels from APOGEE DR12 (the 12th data release):
+four labels from APOGEE DR12 (the 12th data release):
 effective temperature T_eff, surface gravity logg, metallicity [Fe/H],
-alpha enhancement [alpha/Fe], and K-band extinction A_k.
-This will enable us to determine APOGEE-scale labels from any new
-LAMOST spectrum (provided that it falls within the range of the training set).</p>
-<p>In total, there are 11,057 objects measured in common between APOGEE and LAMOST.
-For the cross-calibration paper
-(transferring labels to the full set of 450,000 objects)
-I used 9594 of these objects, since there were problems
-(flags, etc) with some of the data.
-Today, to keep things simple (and fast)
-we&#8217;re going to use the highest SNR subset of the LAMOST spectra.
-I applied a signal to noise cut of SNR &gt; 100, which left 1936 objects.</p>
-<p>We&#8217;re also going to take some more time today to examine the leading coefficients of each of the five labels, to see whether they are astrophysically sensible.</p>
-<p>If you&#8217;re interested in the full application, see the <code class="docutils literal"><span class="pre">paper_</span></code>:</p>
+and alpha enhancement [alpha/Fe].
+To fit this model, we will use a <em>reference set</em>,
+a set of stars observed in common between APOGEE
+and LAMOST.
+We will then be able to use this model
+to determine these four APOGEE-scale labels
+from any new LAMOST spectrum,
+provided that the parameters of that star falls
+within the range of the reference set.
+For more details on this procedure,
+see the accompanying paper <a class="reference external" href="https://arxiv.org/abs/1602.00303">Ho et al. 2017</a>.</p>
+<p>As described in that paper,
+there are 11,057 objects measured in common between APOGEE and LAMOST.
+In our work, we used around 10,000 of those objects,
+after making cuts due to poor-quality data (flags, etc).
+For the purpose of this tutorial, to speed things up,
+I provide only the highest-SNR subset of the LAMOST spectra,
+those with SNR &gt; 100. This SNR cut leaves 1936 stars.</p>
 <p>To run this example, download the folder <code class="docutils literal"><span class="pre">lamost_spectra</span></code> by clicking
 <a class="reference download internal" href="_downloads/lamost_spectra.zip"><code class="xref download docutils literal"><span class="pre">here</span></code></a>
 and unzip it using the command</p>

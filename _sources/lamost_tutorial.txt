@@ -4,26 +4,30 @@
 Tutorial with LAMOST DR2 Spectra
 *********************************
 
-Today we're going to use The Cannon to transfer labels from APOGEE to LAMOST. 
+In this tutorial, we're going to use The Cannon 
+to transfer a system of labels from APOGEE to LAMOST. 
 More specifically, we're going to model LAMOST spectra as a function of 
-five labels from APOGEE DR12 (the 12th data release): 
+four labels from APOGEE DR12 (the 12th data release): 
 effective temperature T_eff, surface gravity logg, metallicity [Fe/H], 
-alpha enhancement [alpha/Fe], and K-band extinction A_k. 
-This will enable us to determine APOGEE-scale labels from any new 
-LAMOST spectrum (provided that it falls within the range of the training set).
+and alpha enhancement [alpha/Fe].
+To fit this model, we will use a *reference set*,
+a set of stars observed in common between APOGEE
+and LAMOST.
+We will then be able to use this model 
+to determine these four APOGEE-scale labels
+from any new LAMOST spectrum, 
+provided that the parameters of that star falls 
+within the range of the reference set.
+For more details on this procedure,
+see the accompanying paper `Ho et al. 2017`_.
 
-In total, there are 11,057 objects measured in common between APOGEE and LAMOST.
-For the cross-calibration paper 
-(transferring labels to the full set of 450,000 objects)
-I used 9594 of these objects, since there were problems 
-(flags, etc) with some of the data.
-Today, to keep things simple (and fast) 
-we're going to use the highest SNR subset of the LAMOST spectra.
-I applied a signal to noise cut of SNR > 100, which left 1936 objects.
-
-We're also going to take some more time today to examine the leading coefficients of each of the five labels, to see whether they are astrophysically sensible.
-
-If you're interested in the full application, see the ``paper_``:
+As described in that paper,
+there are 11,057 objects measured in common between APOGEE and LAMOST.
+In our work, we used around 10,000 of those objects,
+after making cuts due to poor-quality data (flags, etc).
+For the purpose of this tutorial, to speed things up,
+I provide only the highest-SNR subset of the LAMOST spectra,
+those with SNR > 100. This SNR cut leaves 1936 stars.
 
 To run this example, download the folder ``lamost_spectra`` by clicking 
 :download:`here <lamost_spectra.zip>`
@@ -297,5 +301,5 @@ Now we can compare the "real" values to the Cannon values, for the test objects.
 
 .. image:: images_lamost/1to1_label_2.png
 
-.. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
+.. _Ho et al. 2017: https://arxiv.org/abs/1602.00303
 
