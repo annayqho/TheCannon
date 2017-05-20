@@ -23,25 +23,39 @@ see the accompanying paper `Ho et al. 2017`_.
 
 As described in that paper,
 there are 11,057 objects measured in common between APOGEE and LAMOST.
-In our work, we used around 10,000 of those objects,
-after making cuts due to poor-quality data (flags, etc).
 For the purpose of this tutorial, to speed things up,
-I provide only the highest-SNR subset of the LAMOST spectra,
+we're only going to use the highest-SNR subset of the LAMOST spectra,
 those with SNR > 100. This SNR cut leaves 1936 stars.
 
-To run this example, download the folder ``lamost_spectra`` by clicking 
-:download:`here <lamost_spectra.zip>`
-and unzip it using the command
+The spectra for those 1936 stars can be found in the folder
+``lamost_spectra``, which you can download by clicking
+`here <lamost_spectra.zip>`. You can unzip the files using
+the command
 
     $ unzip lamost_spectra.zip
 
-Navigate into the spectra directory and count the number of files using
+Next, navigate into the spectra directory and count the number of files using
 
     $ ls | wc -l
 
-There should be 11057 files, corresponding to 11057 stellar spectra.
+There should be 1936 files, one for each SNR > 100 spectrum.
 
-Next, download the reference labels by clicking :download:`here <lamost_labels.fits>`.
+Since all of these stars were observed both by APOGEE and by LAMOST,
+they both have a spectrum measured by APOGEE, a spectrum measured by
+LAMOST, and a set of parameters from each survey's corresponding pipeline.
+In this tutorial, our goal is to use the *LAMOST* spectra to measure a set
+of parameters consistent with those measured by the *APOGEE* pipeline,
+whcih only used *APOGEE* spectra. Thus, this amounts to a kind of
+cross-calibration between the two surveys.
+We will use 1000 of these stars to train the model
+(these 1000 stars constitute our *reference set*)
+then test the model on the remaining 936 objects
+(these 936 stars constitutes our *test set*).
+At the end, we will check our Cannon values for the
+test set by comparing them to the actual APOGEE values
+for these 936 objects.
+
+Next, download the APOGEE labels for these 1936 objects by clicking :download:`here <lamost_labels.fits>`.
 Let's use the ``astropy`` module to examine the contents of this file.
 
 >>> from astropy.table import Table
