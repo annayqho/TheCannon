@@ -215,7 +215,7 @@ every label's set of training values against every other.
 
     >>> fig = ds.diagnostics_SNR()
 
-.. image:: images/SNRdist.png
+.. image:: images_lamost/SNRdist.png
 
 We can also plot the reference labels against each other:
 
@@ -223,7 +223,7 @@ We can also plot the reference labels against each other:
 
 That figure should look like this:
 
-.. image:: images/ref_labels.png
+.. image:: images_lamost/ref_labels.png
 
 Again, ``TheCannon`` requires incoming spectra to be normalized
 in a way that is independent of signal to noise. If the data does not satisfy
@@ -238,7 +238,7 @@ Let's take a look at a normalized spectrum.
 >>> plt.xlabel("Wavelength (Angstroms)")
 >>> plt.ylabel("Flux")
 
-.. image:: images/norm_spec.png
+.. image:: images_lamost/norm_spec.png
 
 Now, the data munging is over and we're ready to run ``TheCannon``!
 
@@ -257,7 +257,7 @@ the spectral model:
 The second is a plot of the leading coefficients and scatter of the model
 as a function of wavelength
 
-.. image:: images/leading_coeffs.png
+.. image:: images_lamost/leading_coeffs.png
 
 If the model fitting worked, then we can proceed to the test step. This 
 command automatically updates the dataset with the fitted-for test labels,
@@ -277,7 +277,7 @@ A set of diagnostic output:
 The second generates a triangle plot of the survey (Cannon) labels,
 shown below.
 
-.. image:: images/survey_labels.png
+.. image:: images_lamost/survey_labels.png
 
 Now we can compare the "real" values to the Cannon values, for the test objects.
 
@@ -291,11 +291,11 @@ Now we can compare the "real" values to the Cannon values, for the test objects.
 
 >>> ds.diagnostics_1to1()
 
-.. image:: images/1to1_label_0.png
+.. image:: images_lamost/1to1_label_0.png
 
-.. image:: images/1to1_label_1.png
+.. image:: images_lamost/1to1_label_1.png
 
-.. image:: images/1to1_label_2.png
+.. image:: images_lamost/1to1_label_2.png
 
 .. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
 
