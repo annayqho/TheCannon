@@ -225,13 +225,17 @@ and an array of corresponding inverse variance values at each wavelength.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Flux&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can look at the spectrum either using
-&gt;&gt;&gt; plt.show()</p>
+<p>You can look at the spectrum either using</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>Or by saving the file and then opening it using whatever you usually use
-to view .png files:
-&gt;&gt;&gt; plt.savefig(&#8220;sample_spectrum.png&#8221;)</p>
+to view .png files:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;sample_spectrum.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>This is what it should look like:</p>
-<img alt="images_lamost/sample_spec.png" src="images_lamost/sample_spec.png" />
+<img alt="_images/sample_spec.png" src="_images/sample_spec.png" />
 <p>Now, get all of the files</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">filenames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LAMOST_ID&#39;</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filenames_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">specdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">])</span>
