@@ -29,7 +29,7 @@ those with SNR > 100. This SNR cut leaves 1936 stars.
 
 The spectra for those 1936 stars can be found in the folder
 ``lamost_spectra``, which you can download by clicking
-`here <lamost_spectra.zip>`. You can unzip the files using
+:download:`here <lamost_spectra.zip>`. You can unzip the files using
 the command
 
     $ unzip lamost_spectra.zip
@@ -55,7 +55,8 @@ At the end, we will check our Cannon values for the
 test set by comparing them to the actual APOGEE values
 for these 936 objects.
 
-Next, download the APOGEE labels for these 1936 objects by clicking :download:`here <lamost_labels.fits>`.
+Next, download the APOGEE labels for these 1936 objects by clicking 
+:download:`here <lamost_labels.fits>`.
 Let's use the ``astropy`` module to examine the contents of this file.
 
 >>> from astropy.table import Table

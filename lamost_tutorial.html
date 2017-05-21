@@ -153,7 +153,7 @@ we&#8217;re only going to use the highest-SNR subset of the LAMOST spectra,
 those with SNR &gt; 100. This SNR cut leaves 1936 stars.</p>
 <p>The spectra for those 1936 stars can be found in the folder
 <code class="docutils literal"><span class="pre">lamost_spectra</span></code>, which you can download by clicking
-<cite>here &lt;lamost_spectra.zip&gt;</cite>. You can unzip the files using
+<a class="reference download internal" href="_downloads/lamost_spectra.zip"><code class="xref download docutils literal"><span class="pre">here</span></code></a>. You can unzip the files using
 the command</p>
 <blockquote>
 <div>$ unzip lamost_spectra.zip</div></blockquote>
@@ -175,7 +175,8 @@ then test the model on the remaining 936 objects
 At the end, we will check our Cannon values for the
 test set by comparing them to the actual APOGEE values
 for these 936 objects.</p>
-<p>Next, download the APOGEE labels for these 1936 objects by clicking <a class="reference download internal" href="_downloads/lamost_labels.fits"><code class="xref download docutils literal"><span class="pre">here</span></code></a>.
+<p>Next, download the APOGEE labels for these 1936 objects by clicking
+<a class="reference download internal" href="_downloads/lamost_labels.fits"><code class="xref download docutils literal"><span class="pre">here</span></code></a>.
 Let&#8217;s use the <code class="docutils literal"><span class="pre">astropy</span></code> module to examine the contents of this file.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;lamost_labels.fits&quot;</span><span class="p">)</span>
