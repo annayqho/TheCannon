@@ -225,6 +225,7 @@ Now, all the input data has been packaged properly, and we can begin running
 
 The first step is to initialize a ``Dataset`` object:
 
+>>> from TheCannon import dataset
 >>> ds = dataset.Dataset(
 >>> ...wl, ref_ID, ref_flux, ref_ivar, ref_label, test_ID, test_flux, test_ivar)
 
@@ -278,6 +279,7 @@ incorporate error bars on the reference values, but for now we
 turn that off by using ``useErrors=False``.
 In this case, we use a quadratic model: order = 2
 
+>>> from TheCannon import model
 >>> m = model.CannonModel(2, useErrors=False) 
 >>> m.fit(ds) 
 
