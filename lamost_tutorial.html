@@ -300,17 +300,19 @@ color-coded by metallicity.</p>
 so it will probably be challenging to do as good of a job
 or get as precise results here.</p>
 <p>According to the <a class="reference external" href="https://annayqho.github.io/TheCannon/input_requirements.html">Requirements for Input</a> section,
-we need a block of training labels of dimensions
-[num_training_objects, num_labels].
-Right now we have them in separate arrays,
+we need a block of reference labels of dimensions
+[num_reference_objects, num_labels].
+Right now we have the values for each label in separate arrays,
 so we combine into an array of the appropriate shape:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">ref_teff</span><span class="p">,</span> <span class="n">ref_logg</span><span class="p">,</span> <span class="n">ref_mh</span><span class="p">,</span> <span class="n">ref_alpham</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ref_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">ref_teff</span><span class="p">,</span> <span class="n">ref_logg</span><span class="p">,</span> <span class="n">ref_mh</span><span class="p">,</span> <span class="n">ref_alpham</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
 </div>
 <p>Check the shape to make sure it matches [num_training_objects, num_labels]:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Indeed, (1000,4) corresponds to the number of reference objects (1000)
+and the number of reference labels (4).</p>
 <p>For the test set, we will use the remaining spectra.
 Recall that we used the first thousand for the reference set.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="mi">1000</span><span class="p">:]</span>

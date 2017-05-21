@@ -191,16 +191,19 @@ so it will probably be challenging to do as good of a job
 or get as precise results here.
 
 According to the `Requirements for Input`_ section,
-we need a block of training labels of dimensions
-[num_training_objects, num_labels].
-Right now we have them in separate arrays,
+we need a block of reference labels of dimensions
+[num_reference_objects, num_labels].
+Right now we have the values for each label in separate arrays,
 so we combine into an array of the appropriate shape:
 
->>> tr_label = np.vstack((ref_teff, ref_logg, ref_mh, ref_alpham)).T
+>>> ref_label = np.vstack((ref_teff, ref_logg, ref_mh, ref_alpham)).T
 
 Check the shape to make sure it matches [num_training_objects, num_labels]:
 
 >>> print(tr_label.shape)
+
+Indeed, (1000,4) corresponds to the number of reference objects (1000)
+and the number of reference labels (4).
 
 For the test set, we will use the remaining spectra.
 Recall that we used the first thousand for the reference set.
