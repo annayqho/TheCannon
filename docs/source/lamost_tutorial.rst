@@ -34,7 +34,8 @@ the command
 
     $ unzip lamost_spectra.zip
 
-Next, navigate into the spectra directory and count the number of files using
+Next, navigate into the ``lamost_spectra`` directory
+and count the number of files using
 
     $ ls | wc -l
 
