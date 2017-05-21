@@ -65,7 +65,7 @@ So, in summary: in addition to the spectra from LAMOST that we already downloade
 we need reference labels from APOGEE DR12,
 
 Before the data can be run through ``TheCannon``, it must be prepared
-according to the specifications laid out in the "Requirements for Input"
+according to the specifications laid out in the `Requirements for Input`_
 section. One of the requirements is for data to be normalized
 in a SNR-independent way. ``TheCannon`` has built-in 
 options for normalizing spectra, and we illustrate that in this tutorial.
@@ -168,7 +168,7 @@ Note that there are very few stars at low metallicity,
 so it will probably be challenging to do as good of a job
 or get as precise results here.
 
-According to the Requirements for Input section,
+According to the `Requirements for Input`_ section,
 we need a block of training labels of dimensions
 [num_training_objects, num_labels].
 Right now we have them in separate arrays,
@@ -300,4 +300,5 @@ Now we can compare the "real" values to the Cannon values, for the test objects.
 .. image:: lamost_images/lamost_1to1_label_3.png
 
 .. _Ho et al. 2017: http://iopscience.iop.org/article/10.3847/1538-4357/836/1/5/pdf
+.. _Requirements for Input: https://annayqho.github.io/TheCannon/input_requirements.html
 
