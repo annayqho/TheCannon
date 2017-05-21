@@ -110,10 +110,12 @@ Plot the spectrum, first importing ``matplotlib``:
 >>> plt.ylabel("Flux")
 
 You can look at the spectrum either using 
+
 >>> plt.show()
 
 Or by saving the file and then opening it using whatever you usually use
 to view .png files:
+
 >>> plt.savefig("sample_spectrum.png")
 
 This is what it should look like:
