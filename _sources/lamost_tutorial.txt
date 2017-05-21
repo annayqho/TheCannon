@@ -120,36 +120,43 @@ to view .png files:
 
 This is what it should look like:
 
-.. image:: lamost_sample_spec.png
+.. image:: lamost_images/lamost_sample_spec.png
 
-Now, get all of the files
+Now, instead of loading only one spectrum 
+we'll load the whole set of 1387 spectra.
 
->>> filenames = np.array([val.strip() for val in data['LAMOST_ID']])
->>> filenames_full = np.array([specdir+"/"+val.strip() for val in filenames])
->>> wl, flux, ivar = load_spectra(filenames_full)
+>>> filenames = np.array([specdir+"/"+val.strip() for val in data['LAMOST_ID'])
+>>> wl, flux, ivar = load_spectra(filenames)
 
-We'll use the first 1000 stars as the training set.
+We'll use the first 1000 stars as the reference set.
+Let's define the IDs of the reference set objects,
+and pull out their flux values and corresponding inverse variance values.
 
->>> tr_flux = flux[0:1000]
->>> tr_ivar = ivar[0:1000]
->>> tr_ID = filenames[0:1000]
+>>> ref_ID = filenames[0:1000]
+>>> ref_flux = flux[0:1000]
+>>> ref_ivar = ivar[0:1000]
+
+Now, let's get the corresponding reference labels.
 
 >>> inds = np.array([np.where(filenames==val)[0][0] for val in tr_ID])
->>> tr_teff = data['TEFF'][inds]
->>> tr_logg = data['LOGG'][inds]
->>> tr_mh = data['PARAM_M_H'][inds]
->>> tr_alpham = data['PARAM_ALPHA_M'][inds]
+>>> ref_teff = data['TEFF'][inds]
+>>> ref_logg = data['LOGG'][inds]
+>>> ref_mh = data['PARAM_M_H'][inds]
+>>> ref_alpham = data['PARAM_ALPHA_M'][inds]
 
-Let's look at the teff-logg diagram of the training labels,
+Let's look at the teff-logg diagram of the reference labels,
 color-coded by metallicity.
 
->>> plt.scatter(tr_teff, tr_logg, c=tr_mh, lw=0, s=7, cmap="viridis")
+>>> plt.scatter(ref_teff, ref_logg, c=ref_mh, lw=0, s=7, cmap="viridis")
 >>> plt.gca().invert_xaxis()
 >>> plt.xlabel("Teff")
 >>> plt.ylabel("logg")
 >>> plt.colorbar(label="M/H")
->>> plt.savefig("teff_logg_training.png")
->>> plt.close()
+>>> plt.savefig("ref_teff_logg.png")
+
+This is what this should look like:
+
+.. image:: lamost_images/lamost_ref_teff_logg.png
 
 Note that there are very few stars at low metallicity,
 so it will probably be challenging to do as good of a job

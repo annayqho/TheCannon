@@ -236,36 +236,40 @@ to view .png files:</p>
 </div>
 <p>This is what it should look like:</p>
 <img alt="_images/lamost_sample_spec.png" src="_images/lamost_sample_spec.png" />
-<p>Now, get all of the files</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">filenames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LAMOST_ID&#39;</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filenames_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">specdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span> <span class="o">=</span> <span class="n">load_spectra</span><span class="p">(</span><span class="n">filenames_full</span><span class="p">)</span>
+<p>Now, instead of loading only one spectrum
+we&#8217;ll load the whole set of 1387 spectra.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">filenames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">specdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LAMOST_ID&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span> <span class="o">=</span> <span class="n">load_spectra</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We&#8217;ll use the first 1000 stars as the training set.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_ID</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+<p>We&#8217;ll use the first 1000 stars as the reference set.
+Let&#8217;s define the IDs of the reference set objects,
+and pull out their flux values and corresponding inverse variance values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ref_ID</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref_flux</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref_ivar</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
 </pre></div>
 </div>
+<p>Now, let&#8217;s get the corresponding reference labels.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">filenames</span><span class="o">==</span><span class="n">val</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">tr_ID</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TEFF&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_logg</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LOGG&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_mh</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;PARAM_M_H&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_alpham</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;PARAM_ALPHA_M&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref_teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TEFF&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref_logg</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LOGG&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref_mh</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;PARAM_M_H&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref_alpham</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;PARAM_ALPHA_M&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Let&#8217;s look at the teff-logg diagram of the training labels,
+<p>Let&#8217;s look at the teff-logg diagram of the reference labels,
 color-coded by metallicity.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tr_teff</span><span class="p">,</span> <span class="n">tr_logg</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">tr_mh</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ref_teff</span><span class="p">,</span> <span class="n">ref_logg</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">ref_mh</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Teff&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;logg&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;M/H&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;teff_logg_training.png&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;ref_teff_logg.png&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>This is what this should look like:</p>
+<img alt="_images/lamost_ref_teff_logg.png" src="_images/lamost_ref_teff_logg.png" />
 <p>Note that there are very few stars at low metallicity,
 so it will probably be challenging to do as good of a job
 or get as precise results here.</p>
