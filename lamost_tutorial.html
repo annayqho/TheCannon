@@ -150,8 +150,8 @@ see the accompanying paper <a class="reference external" href="http://iopscience
 there are 11,057 objects measured in common between APOGEE and LAMOST.
 For the purpose of this tutorial, to speed things up,
 we&#8217;re only going to use the highest-SNR subset of the LAMOST spectra,
-those with SNR &gt; 100. This SNR cut leaves 1936 stars.</p>
-<p>The spectra for those 1936 stars can be found in the folder
+those with SNR &gt; 100. This SNR cut leaves 1387 stars.</p>
+<p>The spectra for those 1387 stars can be found in the folder
 <code class="docutils literal"><span class="pre">lamost_spectra</span></code>, which you can download by clicking
 <a class="reference download internal" href="_downloads/lamost_spectra.zip"><code class="xref download docutils literal"><span class="pre">here</span></code></a>. You can unzip the files using
 the command</p>
@@ -161,7 +161,7 @@ the command</p>
 and count the number of files using</p>
 <blockquote>
 <div>$ ls | wc -l</div></blockquote>
-<p>There should be 1936 files, one for each SNR &gt; 100 spectrum.</p>
+<p>There should be 1387 files, one for each SNR &gt; 100 spectrum.</p>
 <p>Since all of these stars were observed both by APOGEE and by LAMOST,
 they both have a spectrum measured by APOGEE, a spectrum measured by
 LAMOST, and a set of parameters from each survey&#8217;s corresponding pipeline.
@@ -171,12 +171,12 @@ whcih only used <em>APOGEE</em> spectra. Thus, this amounts to a kind of
 cross-calibration between the two surveys.
 We will use 1000 of these stars to train the model
 (these 1000 stars constitute our <em>reference set</em>)
-then test the model on the remaining 936 objects
-(these 936 stars constitutes our <em>test set</em>).
+then test the model on the remaining 387 objects
+(these 387 stars constitutes our <em>test set</em>).
 At the end, we will check our Cannon values for the
 test set by comparing them to the actual APOGEE values
-for these 936 objects.</p>
-<p>Next, download the APOGEE labels for these 1936 objects by clicking
+for these 387 objects.</p>
+<p>Next, download the APOGEE labels for these 1387 objects by clicking
 <a class="reference download internal" href="_downloads/lamost_labels.fits"><code class="xref download docutils literal"><span class="pre">here</span></code></a>.
 Let&#8217;s use the <code class="docutils literal"><span class="pre">astropy</span></code> module to examine the contents of this file.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
