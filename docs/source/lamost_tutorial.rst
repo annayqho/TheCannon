@@ -138,7 +138,7 @@ This is what it should look like:
 Now, instead of loading only one spectrum 
 we'll load the whole set of 1387 spectra.
 
->>> filenames = np.array([specdir+"/"+val.strip() for val in data['LAMOST_ID'])
+>>> filenames = np.array(["spectra/"+val.strip() for val in data['LAMOST_ID'])
 >>> wl, flux, ivar = load_spectra(filenames)
 
 Let's check the shape of the wl array:
