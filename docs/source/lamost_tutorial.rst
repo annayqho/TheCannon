@@ -66,9 +66,16 @@ we need reference labels from APOGEE DR12,
 
 Before the data can be run through ``TheCannon``, it must be prepared
 according to the specifications laid out in the `Requirements for Input`_
-section. One of the requirements is for data to be normalized
-in a SNR-independent way. ``TheCannon`` has built-in 
-options for normalizing spectra, and we illustrate that in this tutorial.
+section. 
+As you can see on that page, the wavelength grid, reference set,
+and test set all need to have particular dimensions.
+Furthermore, the data must be normalized
+in a SNR-independent way.
+Shaping the data to the right dimensions is left to the user,
+as it depends on the particular application.
+Here we provide some simple functions particular to LAMOST spectra.
+We also illustrate a build-in option from ``TheCannon`` 
+for normalizing LAMOST spectra.
 
 You can download the APOGEE labels for these 1387 objects by clicking 
 :download:`here <lamost_labels.fits>`.
@@ -134,6 +141,21 @@ we'll load the whole set of 1387 spectra.
 >>> filenames = np.array([specdir+"/"+val.strip() for val in data['LAMOST_ID'])
 >>> wl, flux, ivar = load_spectra(filenames)
 
+Let's check the shape of the wl array:
+
+>>> print(wl.shape)
+
+This gives (3626), which tells us that there are 3626 pixels in each LAMOST spectrum.
+Next, let's check the shape of the flux and ivar arrays (they should be the same,
+since each inverse variance value corresponds to a flux value):
+
+>>> print(flux.shape)
+>>> print(ivar.shape)
+
+The shape is [1387, 3626]: [number of objects, number of pixels].
+Note that this is consistent with the requirements for the training
+and test sets outlined in the documentation.
+
 We'll use the first 1000 stars as the reference set.
 Let's define the IDs of the reference set objects,
 and pull out their flux values and corresponding inverse variance values.
@@ -174,7 +196,11 @@ we need a block of training labels of dimensions
 Right now we have them in separate arrays,
 so we combine into an array of the appropriate shape:
 
->>> tr_label = np.vstack((ref_teff, ref_logg, ref_mh, ref_alpham))
+>>> tr_label = np.vstack((ref_teff, ref_logg, ref_mh, ref_alpham)).T
+
+Check the shape to make sure it matches [num_training_objects, num_labels]:
+
+>>> print(tr_label.shape)
 
 For the test set, we will use the remaining spectra.
 Recall that we used the first thousand for the reference set.
@@ -244,24 +270,30 @@ Now, the data munging is over and we're ready to run ``TheCannon``!
 
 For the training step (fitting for the spectral model) all the user needs to 
 specify is the desired polynomial order of the spectral model. 
+There is also a new functionality in the works that will let the user
+incorporate error bars on the reference values, but for now we
+turn that off by using ``useErrors=False``.
 In this case, we use a quadratic model: order = 2
 
 >>> m = model.CannonModel(2, useErrors=False) 
 >>> m.fit(ds) 
 
-At this stage, more optional diagnostic plots can be produced to examine
-the spectral model:
+At this stage, you can plot the leading coefficients and scatter
+of the model as a function of wavelength:
 
 >>> m.diagnostics_leading_coeffs(ds)
-
-The second is a plot of the leading coefficients and scatter of the model
-as a function of wavelength
+>>> plt.savefig("lamost_leading_coeffs.png")
 
 .. image:: lamost_images/lamost_leading_coeffs.png
 
 If the model fitting worked, then we can proceed to the test step. This 
 command automatically updates the dataset with the fitted-for test labels,
 and returns the corresponding covariance matrix.
+It's good to use a physical starting guess, which we do below.
+In practice, particularly if you are fitting for many parameters,
+you should loop through a number of different starting guesses
+dsitributed widely through parameter space, and pick the one
+that results in the best fit. This will help you get around local minima.
 
 >>> starting_guess = np.mean(ds.tr_label,axis=0)-m.pivots
 >>> errs, chisq = m.infer_labels(ds, starting_guess)
@@ -270,16 +302,16 @@ You can access the new labels as follows:
 
 >>> test_labels = ds.test_label_vals
 
-A set of diagnostic output:
+And plot them against each other using a triangle plot as follows:
 
 >>> ds.diagnostics_survey_labels()
-
-The second generates a triangle plot of the survey (Cannon) labels,
-shown below.
+>>> plt.savefig("lamost_survey_labels.png")
 
 .. image:: lamost_images/lamost_survey_labels.png
 
 Now we can compare the "real" values to the Cannon values, for the test objects.
+To do that (this is a bit hack-ish at the moment, sorry) you can set the ``tr_label``
+attribute to the "real" label values for the test set.
 
 >>> inds = np.array([np.where(filenames==val)[0][0] for val in ds.test_ID])
 >>> test_teff = data['TEFF'][inds]
@@ -288,6 +320,8 @@ Now we can compare the "real" values to the Cannon values, for the test objects.
 >>> test_alpham = data['PARAM_ALPHA_M'][inds]
 >>> test_label = np.vstack((test_teff, test_logg, test_mh, test_alpham)).T
 >>> ds.tr_label = test_label
+
+You can now use a built-in function to produce the 1-to-1 comparison plots:
 
 >>> ds.diagnostics_1to1()
 
