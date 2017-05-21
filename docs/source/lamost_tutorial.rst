@@ -156,7 +156,7 @@ color-coded by metallicity.
 
 This is what this should look like:
 
-.. image:: lamost_images/lamost_ref_teff_logg.png
+.. image:: lamost_ref_teff_logg.png 
 
 Note that there are very few stars at low metallicity,
 so it will probably be challenging to do as good of a job
