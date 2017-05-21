@@ -120,7 +120,7 @@ to view .png files:
 
 This is what it should look like:
 
-.. image:: images_lamost/sample_spec.png
+.. image:: lamostplots/sample_spec.png
 
 Now, get all of the files
 
@@ -256,7 +256,7 @@ every label's set of training values against every other.
 
     >>> fig = ds.diagnostics_SNR()
 
-.. image:: images_lamost/SNRdist.png
+.. image:: lamostplots/SNRdist.png
 
 We can also plot the reference labels against each other:
 
