@@ -231,11 +231,11 @@ and an array of corresponding inverse variance values at each wavelength.</p>
 </div>
 <p>Or by saving the file and then opening it using whatever you usually use
 to view .png files:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;sample_spectrum.png&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;lamost_sample_spectrum.png&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This is what it should look like:</p>
-<img alt="_images/sample_spec.png" src="_images/sample_spec.png" />
+<img alt="lamost_sample_spec.png" src="lamost_sample_spec.png" />
 <p>Now, get all of the files</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">filenames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LAMOST_ID&#39;</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filenames_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">specdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">])</span>
@@ -362,13 +362,13 @@ every label&#8217;s set of training values against every other.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_SNR</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="images_lamost/SNRdist.png" src="images_lamost/SNRdist.png" />
+<img alt="lamostplots/SNRdist.png" src="lamostplots/SNRdist.png" />
 <p>We can also plot the reference labels against each other:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>That figure should look like this:</p>
-<img alt="_images/ref_labels.png" src="_images/ref_labels.png" />
+<img alt="images_lamost/ref_labels.png" src="images_lamost/ref_labels.png" />
 <p>Again, <code class="docutils literal"><span class="pre">TheCannon</span></code> requires incoming spectra to be normalized
 in a way that is independent of signal to noise. If the data does not satisfy
 this criteria already, the user can use the
@@ -382,7 +382,7 @@ functions built into <code class="docutils literal"><span class="pre">TheCannon<
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Flux&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/norm_spec.png" src="_images/norm_spec.png" />
+<img alt="images_lamost/norm_spec.png" src="images_lamost/norm_spec.png" />
 <p>Now, the data munging is over and we&#8217;re ready to run <code class="docutils literal"><span class="pre">TheCannon</span></code>!</p>
 <p>For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model.
@@ -398,7 +398,7 @@ the spectral model:</p>
 </div>
 <p>The second is a plot of the leading coefficients and scatter of the model
 as a function of wavelength</p>
-<img alt="_images/leading_coeffs1.png" src="_images/leading_coeffs1.png" />
+<img alt="images_lamost/leading_coeffs.png" src="images_lamost/leading_coeffs.png" />
 <p>If the model fitting worked, then we can proceed to the test step. This
 command automatically updates the dataset with the fitted-for test labels,
 and returns the corresponding covariance matrix.</p>
@@ -416,7 +416,7 @@ and returns the corresponding covariance matrix.</p>
 </div>
 <p>The second generates a triangle plot of the survey (Cannon) labels,
 shown below.</p>
-<img alt="_images/survey_labels.png" src="_images/survey_labels.png" />
+<img alt="images_lamost/survey_labels.png" src="images_lamost/survey_labels.png" />
 <p>Now we can compare the &#8220;real&#8221; values to the Cannon values, for the test objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">filenames</span><span class="o">==</span><span class="n">val</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">test_ID</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TEFF&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
@@ -430,9 +430,9 @@ shown below.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="_images/1to1_label_01.png" src="_images/1to1_label_01.png" />
-<img alt="_images/1to1_label_11.png" src="_images/1to1_label_11.png" />
-<img alt="_images/1to1_label_21.png" src="_images/1to1_label_21.png" />
+<img alt="images_lamost/1to1_label_0.png" src="images_lamost/1to1_label_0.png" />
+<img alt="images_lamost/1to1_label_1.png" src="images_lamost/1to1_label_1.png" />
+<img alt="images_lamost/1to1_label_2.png" src="images_lamost/1to1_label_2.png" />
 </div>
 
 

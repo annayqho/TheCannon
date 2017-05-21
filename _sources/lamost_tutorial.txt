@@ -116,11 +116,11 @@ You can look at the spectrum either using
 Or by saving the file and then opening it using whatever you usually use
 to view .png files:
 
->>> plt.savefig("sample_spectrum.png")
+>>> plt.savefig("lamost_sample_spectrum.png")
 
 This is what it should look like:
 
-.. image:: images_lamost/sample_spec.png
+.. image:: lamost_sample_spec.png
 
 Now, get all of the files
 
@@ -256,7 +256,7 @@ every label's set of training values against every other.
 
     >>> fig = ds.diagnostics_SNR()
 
-.. image:: images_lamost/SNRdist.png
+.. image:: lamostplots/SNRdist.png
 
 We can also plot the reference labels against each other:
 
