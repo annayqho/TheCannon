@@ -16,7 +16,6 @@ wl, flux, ivar = load_spectra("%s/" %specdir + filename)
 #plt.step(wl, flux, where='mid', linewidth=0.5, color='k')
 #plt.xlabel("Wavelength (Angstroms)")
 #plt.ylabel("Flux")
-jjjjj
 # Now, do all of the files
 filenames = np.array([val.strip() for val in data['LAMOST_ID']])
 filenames_full = np.array([specdir+"/"+val.strip() for val in filenames])

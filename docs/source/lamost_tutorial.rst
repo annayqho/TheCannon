@@ -25,9 +25,9 @@ As described in that paper,
 there are 11,057 objects measured in common between APOGEE and LAMOST.
 For the purpose of this tutorial, to speed things up,
 we're only going to use the highest-SNR subset of the LAMOST spectra,
-those with SNR > 100. This SNR cut leaves 1936 stars.
+those with SNR > 100. This SNR cut leaves 1387 stars.
 
-The spectra for those 1936 stars can be found in the folder
+The spectra for those 1387 stars can be found in the folder
 ``lamost_spectra``, which you can download by clicking
 :download:`here <lamost_spectra.zip>`. You can unzip the files using
 the command
@@ -39,7 +39,7 @@ and count the number of files using
 
     $ ls | wc -l
 
-There should be 1936 files, one for each SNR > 100 spectrum.
+There should be 1387 files, one for each SNR > 100 spectrum.
 
 Since all of these stars were observed both by APOGEE and by LAMOST,
 they both have a spectrum measured by APOGEE, a spectrum measured by
@@ -50,13 +50,13 @@ whcih only used *APOGEE* spectra. Thus, this amounts to a kind of
 cross-calibration between the two surveys.
 We will use 1000 of these stars to train the model
 (these 1000 stars constitute our *reference set*)
-then test the model on the remaining 936 objects
-(these 936 stars constitutes our *test set*).
+then test the model on the remaining 387 objects
+(these 387 stars constitutes our *test set*).
 At the end, we will check our Cannon values for the
 test set by comparing them to the actual APOGEE values
-for these 936 objects.
+for these 387 objects.
 
-Next, download the APOGEE labels for these 1936 objects by clicking 
+Next, download the APOGEE labels for these 1387 objects by clicking 
 :download:`here <lamost_labels.fits>`.
 Let's use the ``astropy`` module to examine the contents of this file.
 
