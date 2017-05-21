@@ -95,7 +95,7 @@ print(test_ivar.shape)
 ds = dataset.Dataset(
         wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 
-ds.set_label_names(['T_{eff}', '\log g', '[M/H]', '[alpha/M]'])
+ds.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/M]'])
 fig = ds.diagnostics_SNR()
 plt.savefig("SNR_hist.png")
 plt.close()

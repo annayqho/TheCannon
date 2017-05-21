@@ -230,7 +230,7 @@ user visualize the results. Some of these plots require knowing the names
 of the labels. If the user wants to produce these diagnostic plots, he or
 she must specify the label names in LaTeX format: 
 
->>> ds.set_label_names(['T_{eff}', '\log g', '[M/H]', '[alpha/M]'])
+>>> ds.set_label_names(['T_{eff}', '\log g', '[M/H]', '[\\alpha/M]'])
 
 At this stage, two diagnotic plots can already be produced, 
 one with the distribution

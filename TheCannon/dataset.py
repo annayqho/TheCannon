@@ -482,7 +482,7 @@ class Dataset(object):
             npoints = len(diff)
             mu = np.mean(diff)
             sig = np.std(diff)
-            ax2.hist(diff)
+            ax2.hist(diff, orientation='horizontal')
             #ax2.hist(diff, range=[-3*sig,3*sig], color='k', bins=np.sqrt(npoints),
             #        orientation='horizontal', alpha=0.3, histtype='stepfilled')
             ax2.tick_params(axis='x', labelsize=14)
