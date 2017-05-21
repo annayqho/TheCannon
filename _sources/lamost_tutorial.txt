@@ -200,7 +200,7 @@ so we combine into an array of the appropriate shape:
 
 Check the shape to make sure it matches [num_training_objects, num_labels]:
 
->>> print(tr_label.shape)
+>>> print(ref_label.shape)
 
 Indeed, (1000,4) corresponds to the number of reference objects (1000)
 and the number of reference labels (4).
