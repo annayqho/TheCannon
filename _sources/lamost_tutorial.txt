@@ -166,7 +166,7 @@ and pull out their flux values and corresponding inverse variance values.
 
 Now, let's get the corresponding reference labels.
 
->>> inds = np.array([np.where(filenames==val)[0][0] for val in tr_ID])
+>>> inds = np.array([np.where(filenames==val)[0][0] for val in ref_ID])
 >>> ref_teff = data['TEFF'][inds]
 >>> ref_logg = data['LOGG'][inds]
 >>> ref_mh = data['PARAM_M_H'][inds]
@@ -179,7 +179,7 @@ color-coded by metallicity.
 >>> plt.gca().invert_xaxis()
 >>> plt.xlabel("Teff")
 >>> plt.ylabel("logg")
->>> plt.colorbar(label="M/H")
+>>> plt.colorbar(label="[M/H]")
 >>> plt.savefig("ref_teff_logg.png")
 
 This is what this should look like:
