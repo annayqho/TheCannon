@@ -116,11 +116,11 @@ You can look at the spectrum either using
 Or by saving the file and then opening it using whatever you usually use
 to view .png files:
 
->>> plt.savefig("sample_spectrum.png")
+>>> plt.savefig("lamost_sample_spec.png")
 
 This is what it should look like:
 
-.. image:: lamostplots/sample_spec.png
+.. image:: lamost_sample_spec.png
 
 Now, get all of the files
 
