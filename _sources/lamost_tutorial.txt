@@ -64,6 +64,12 @@ for these 387 objects.
 So, in summary: in addition to the spectra from LAMOST that we already downloaded,
 we need reference labels from APOGEE DR12,
 
+Before the data can be run through ``TheCannon``, it must be prepared
+according to the specifications laid out in the "Requirements for Input"
+section. One of the requirements is for data to be normalized
+in a SNR-independent way. ``TheCannon`` has built-in 
+options for normalizing spectra, and we illustrate that in this tutorial.
+
 You can download the APOGEE labels for these 1387 objects by clicking 
 :download:`here <lamost_labels.fits>`.
 Let's use the ``astropy`` module to examine the contents of this file.
@@ -162,82 +168,28 @@ Note that there are very few stars at low metallicity,
 so it will probably be challenging to do as good of a job
 or get as precise results here.
 
-Before the data can be run through ``TheCannon``, it must be prepared
-according to the specifications laid out in the "Requirements for Input"
-section. One of the requirements is for data to be continuum normalized
-in a SNR-independent way. ``TheCannon`` does have built-in 
-options for continuum normalizing spectra, and we illustrate that here.
+According to the Requirements for Input section,
+we need a block of training labels of dimensions
+[num_training_objects, num_labels].
+Right now we have them in separate arrays,
+so we combine into an array of the appropriate shape:
 
-Here are the steps for reading in the data. In practice, the user would
-write his own code; for this example, we provide the module ``apogee.py``. 
-The procedure for reading in spectra and training labels of course depends on
-the survey, the file type, etc, and it is up to the user to package this
-all appropriately before feeding it into ``TheCannon``.
+>>> tr_label = np.vstack((ref_teff, ref_logg, ref_mh, ref_alpham))
 
->>> filenames = np.array([val.strip() for val in data['LAMOST_ID']])
->>> filenames_full = np.array([specdir+"/"+val.strip() for val in filenames])
->>> wl, flux, ivar = load_spectra(filenames_full)
+For the test set, we will use the remaining spectra.
+Recall that we used the first thousand for the reference set.
 
-There should be XXXX spectra with 3626 pixels each. 
-We'll choose the first 1000 stars for the training set, 
-and use the rest for the test set.
-
->>> tr_flux = flux[0:1000]
->>> tr_ivar = ivar[0:1000]
->>> tr_ID = filenames[0:1000]
-
-Let's get the reference labels
-
->>> inds = np.array([np.where(filenames==val)[0][0] for val in tr_ID])
->>> tr_teff = data['TEFF'][inds]
->>> tr_logg = data['LOGG'][inds]
->>> tr_mh = data['PARAM_M_H'][inds]
->>> tr_alpham = data['PARAM_ALPHA_M'][inds]
-
-Take a look at the teff-logg diagram, color-coded by metallicity
->>> plt.scatter(tr_teff, tr_logg, c=tr_mh, lw=0, s=7, cmap="viridis")
->>> plt.gca().invert_xaxis()
->>> plt.xlabel("Teff")
->>> plt.ylabel("logg")
->>> plt.colorbar(label="M/H")
->>> plt.savefig("teff_logg_training.png")
->>> plt.close()
-
-Note that there are very few stars at low metallicity,
-so it will probably be challenging to do as good of a job
-or get as precise results here.
-
->>> print(wl.shape)
->>> print(tr_ID.shape)
->>> print(tr_flux.shape)
->>> print(tr_ivar.shape)
-
-[num_training_objects, num_pixels]
-(1339, 3626)
-Fine. Not normalized yet, but we will do that later.
-
-Now we need a block of training labels
-[num_training_objects, num_labels]
-Right now we have them separate, combine into an array of this shape:
-
->>> tr_label = np.vstack((tr_teff, tr_logg, tr_mh, tr_alpham))
-
-Note that that gives us (4,1339) which is (num_labels, num_tr_obj),
-So we need to take the transpose
-
-Now we need to define our "test set": a bunch of other
-spectra whose labels we want to determine and don't know yet.
-Let's use some of the other spectra in the dataset
-Say, the ones with 80 < SNR < 100
 >>> test_ID = filenames[1000:]
 >>> test_flux = flux[1000:]
 >>> test_ivar = ivar[1000:]
 
-Check the sizes
+Check the sizes:
+
 >>> print(test_ID.shape)
 >>> print(test_flux.shape)
 >>> print(test_ivar.shape)
 
+There are 387 test objects, each with 3626 spectral pixels, as expected.
 
 Now, all the input data has been packaged properly, and we can begin running
 ``TheCannon.``
@@ -245,7 +197,7 @@ Now, all the input data has been packaged properly, and we can begin running
 The first step is to initialize a ``Dataset`` object:
 
 >>> ds = dataset.Dataset(
->>> ...wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
+>>> ...wl, ref_ID, ref_flux, ref_ivar, ref_label, test_ID, test_flux, test_ivar)
 
 ``TheCannon`` has a number of optional diagnostic plots built-in, to help the
 user visualize the results. Some of these plots require knowing the names
@@ -263,7 +215,7 @@ every label's set of training values against every other.
 
     >>> fig = ds.diagnostics_SNR()
 
-.. image:: lamostplots/SNRdist.png
+.. image:: lamost_images/lamost_SNR_hist.png
 
 We can also plot the reference labels against each other:
 
@@ -271,7 +223,7 @@ We can also plot the reference labels against each other:
 
 That figure should look like this:
 
-.. image:: images_lamost/ref_labels.png
+.. image:: lamost_images/lamost_ref_labels.png
 
 Again, ``TheCannon`` requires incoming spectra to be normalized
 in a way that is independent of signal to noise. If the data does not satisfy
@@ -286,7 +238,7 @@ Let's take a look at a normalized spectrum.
 >>> plt.xlabel("Wavelength (Angstroms)")
 >>> plt.ylabel("Flux")
 
-.. image:: images_lamost/norm_spec.png
+.. image:: lamost_images/lamost_norm_spec.png
 
 Now, the data munging is over and we're ready to run ``TheCannon``!
 
@@ -305,7 +257,7 @@ the spectral model:
 The second is a plot of the leading coefficients and scatter of the model
 as a function of wavelength
 
-.. image:: images_lamost/leading_coeffs.png
+.. image:: lamost_images/lamost_leading_coeffs.png
 
 If the model fitting worked, then we can proceed to the test step. This 
 command automatically updates the dataset with the fitted-for test labels,
@@ -325,7 +277,7 @@ A set of diagnostic output:
 The second generates a triangle plot of the survey (Cannon) labels,
 shown below.
 
-.. image:: images_lamost/survey_labels.png
+.. image:: lamost_images/lamost_survey_labels.png
 
 Now we can compare the "real" values to the Cannon values, for the test objects.
 
@@ -339,11 +291,13 @@ Now we can compare the "real" values to the Cannon values, for the test objects.
 
 >>> ds.diagnostics_1to1()
 
-.. image:: images_lamost/1to1_label_0.png
+.. image:: lamost_images/lamost_1to1_label_0.png
 
-.. image:: images_lamost/1to1_label_1.png
+.. image:: lamost_images/lamost_1to1_label_1.png
 
-.. image:: images_lamost/1to1_label_2.png
+.. image:: lamost_images/lamost_1to1_label_2.png
+
+.. image:: lamost_images/lamost_1to1_label_3.png
 
 .. _Ho et al. 2017: http://iopscience.iop.org/article/10.3847/1538-4357/836/1/5/pdf
 

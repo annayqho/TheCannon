@@ -183,6 +183,11 @@ test set by comparing them to the real APOGEE DR12 values
 for these 387 objects.
 So, in summary: in addition to the spectra from LAMOST that we already downloaded,
 we need reference labels from APOGEE DR12,</p>
+<p>Before the data can be run through <code class="docutils literal"><span class="pre">TheCannon</span></code>, it must be prepared
+according to the specifications laid out in the &#8220;Requirements for Input&#8221;
+section. One of the requirements is for data to be normalized
+in a SNR-independent way. <code class="docutils literal"><span class="pre">TheCannon</span></code> has built-in
+options for normalizing spectra, and we illustrate that in this tutorial.</p>
 <p>You can download the APOGEE labels for these 1387 objects by clicking
 <a class="reference download internal" href="_downloads/lamost_labels.fits"><code class="xref download docutils literal"><span class="pre">here</span></code></a>.
 Let&#8217;s use the <code class="docutils literal"><span class="pre">astropy</span></code> module to examine the contents of this file.</p>
@@ -273,81 +278,33 @@ color-coded by metallicity.</p>
 <p>Note that there are very few stars at low metallicity,
 so it will probably be challenging to do as good of a job
 or get as precise results here.</p>
-<p>Before the data can be run through <code class="docutils literal"><span class="pre">TheCannon</span></code>, it must be prepared
-according to the specifications laid out in the &#8220;Requirements for Input&#8221;
-section. One of the requirements is for data to be continuum normalized
-in a SNR-independent way. <code class="docutils literal"><span class="pre">TheCannon</span></code> does have built-in
-options for continuum normalizing spectra, and we illustrate that here.</p>
-<p>Here are the steps for reading in the data. In practice, the user would
-write his own code; for this example, we provide the module <code class="docutils literal"><span class="pre">apogee.py</span></code>.
-The procedure for reading in spectra and training labels of course depends on
-the survey, the file type, etc, and it is up to the user to package this
-all appropriately before feeding it into <code class="docutils literal"><span class="pre">TheCannon</span></code>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">filenames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LAMOST_ID&#39;</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filenames_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">specdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span> <span class="o">=</span> <span class="n">load_spectra</span><span class="p">(</span><span class="n">filenames_full</span><span class="p">)</span>
+<p>According to the Requirements for Input section,
+we need a block of training labels of dimensions
+[num_training_objects, num_labels].
+Right now we have them in separate arrays,
+so we combine into an array of the appropriate shape:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">ref_teff</span><span class="p">,</span> <span class="n">ref_logg</span><span class="p">,</span> <span class="n">ref_mh</span><span class="p">,</span> <span class="n">ref_alpham</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>There should be XXXX spectra with 3626 pixels each.
-We&#8217;ll choose the first 1000 stars for the training set,
-and use the rest for the test set.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_ID</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
+<p>For the test set, we will use the remaining spectra.
+Recall that we used the first thousand for the reference set.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="mi">1000</span><span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="mi">1000</span><span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">ivar</span><span class="p">[</span><span class="mi">1000</span><span class="p">:]</span>
 </pre></div>
 </div>
-<p>Let&#8217;s get the reference labels</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">filenames</span><span class="o">==</span><span class="n">val</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">tr_ID</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TEFF&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_logg</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LOGG&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_mh</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;PARAM_M_H&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tr_alpham</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;PARAM_ALPHA_M&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
+<p>Check the sizes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">test_ID</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">test_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">test_ivar</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Take a look at the teff-logg diagram, color-coded by metallicity
-&gt;&gt;&gt; plt.scatter(tr_teff, tr_logg, c=tr_mh, lw=0, s=7, cmap=&#8221;viridis&#8221;)
-&gt;&gt;&gt; plt.gca().invert_xaxis()
-&gt;&gt;&gt; plt.xlabel(&#8220;Teff&#8221;)
-&gt;&gt;&gt; plt.ylabel(&#8220;logg&#8221;)
-&gt;&gt;&gt; plt.colorbar(label=&#8221;M/H&#8221;)
-&gt;&gt;&gt; plt.savefig(&#8220;teff_logg_training.png&#8221;)
-&gt;&gt;&gt; plt.close()</p>
-<p>Note that there are very few stars at low metallicity,
-so it will probably be challenging to do as good of a job
-or get as precise results here.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">wl</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_ID</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_ivar</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>[num_training_objects, num_pixels]
-(1339, 3626)
-Fine. Not normalized yet, but we will do that later.</p>
-<p>Now we need a block of training labels
-[num_training_objects, num_labels]
-Right now we have them separate, combine into an array of this shape:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">tr_teff</span><span class="p">,</span> <span class="n">tr_logg</span><span class="p">,</span> <span class="n">tr_mh</span><span class="p">,</span> <span class="n">tr_alpham</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>Note that that gives us (4,1339) which is (num_labels, num_tr_obj),
-So we need to take the transpose</p>
-<p>Now we need to define our &#8220;test set&#8221;: a bunch of other
-spectra whose labels we want to determine and don&#8217;t know yet.
-Let&#8217;s use some of the other spectra in the dataset
-Say, the ones with 80 &lt; SNR &lt; 100
-&gt;&gt;&gt; test_ID = filenames[1000:]
-&gt;&gt;&gt; test_flux = flux[1000:]
-&gt;&gt;&gt; test_ivar = ivar[1000:]</p>
-<p>Check the sizes
-&gt;&gt;&gt; print(test_ID.shape)
-&gt;&gt;&gt; print(test_flux.shape)
-&gt;&gt;&gt; print(test_ivar.shape)</p>
+<p>There are 387 test objects, each with 3626 spectral pixels, as expected.</p>
 <p>Now, all the input data has been packaged properly, and we can begin running
 <code class="docutils literal"><span class="pre">TheCannon.</span></code></p>
 <p>The first step is to initialize a <code class="docutils literal"><span class="pre">Dataset</span></code> object:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">wl</span><span class="p">,</span> <span class="n">ref_ID</span><span class="p">,</span> <span class="n">ref_flux</span><span class="p">,</span> <span class="n">ref_ivar</span><span class="p">,</span> <span class="n">ref_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><code class="docutils literal"><span class="pre">TheCannon</span></code> has a number of optional diagnostic plots built-in, to help the
@@ -366,13 +323,13 @@ every label&#8217;s set of training values against every other.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_SNR</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="lamostplots/SNRdist.png" src="lamostplots/SNRdist.png" />
+<img alt="_images/lamost_SNR_hist.png" src="_images/lamost_SNR_hist.png" />
 <p>We can also plot the reference labels against each other:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>That figure should look like this:</p>
-<img alt="images_lamost/ref_labels.png" src="images_lamost/ref_labels.png" />
+<img alt="_images/lamost_ref_labels.png" src="_images/lamost_ref_labels.png" />
 <p>Again, <code class="docutils literal"><span class="pre">TheCannon</span></code> requires incoming spectra to be normalized
 in a way that is independent of signal to noise. If the data does not satisfy
 this criteria already, the user can use the
@@ -386,7 +343,7 @@ functions built into <code class="docutils literal"><span class="pre">TheCannon<
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Flux&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="images_lamost/norm_spec.png" src="images_lamost/norm_spec.png" />
+<img alt="_images/lamost_norm_spec.png" src="_images/lamost_norm_spec.png" />
 <p>Now, the data munging is over and we&#8217;re ready to run <code class="docutils literal"><span class="pre">TheCannon</span></code>!</p>
 <p>For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model.
@@ -402,7 +359,7 @@ the spectral model:</p>
 </div>
 <p>The second is a plot of the leading coefficients and scatter of the model
 as a function of wavelength</p>
-<img alt="images_lamost/leading_coeffs.png" src="images_lamost/leading_coeffs.png" />
+<img alt="_images/lamost_leading_coeffs.png" src="_images/lamost_leading_coeffs.png" />
 <p>If the model fitting worked, then we can proceed to the test step. This
 command automatically updates the dataset with the fitted-for test labels,
 and returns the corresponding covariance matrix.</p>
@@ -420,7 +377,7 @@ and returns the corresponding covariance matrix.</p>
 </div>
 <p>The second generates a triangle plot of the survey (Cannon) labels,
 shown below.</p>
-<img alt="images_lamost/survey_labels.png" src="images_lamost/survey_labels.png" />
+<img alt="_images/lamost_survey_labels.png" src="_images/lamost_survey_labels.png" />
 <p>Now we can compare the &#8220;real&#8221; values to the Cannon values, for the test objects.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">filenames</span><span class="o">==</span><span class="n">val</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">test_ID</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TEFF&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
@@ -434,9 +391,10 @@ shown below.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="images_lamost/1to1_label_0.png" src="images_lamost/1to1_label_0.png" />
-<img alt="images_lamost/1to1_label_1.png" src="images_lamost/1to1_label_1.png" />
-<img alt="images_lamost/1to1_label_2.png" src="images_lamost/1to1_label_2.png" />
+<img alt="_images/lamost_1to1_label_0.png" src="_images/lamost_1to1_label_0.png" />
+<img alt="_images/lamost_1to1_label_1.png" src="_images/lamost_1to1_label_1.png" />
+<img alt="_images/lamost_1to1_label_2.png" src="_images/lamost_1to1_label_2.png" />
+<img alt="_images/lamost_1to1_label_3.png" src="_images/lamost_1to1_label_3.png" />
 </div>
 
 
