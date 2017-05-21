@@ -29,10 +29,10 @@ those with SNR > 100. This SNR cut leaves 1387 stars.
 
 The spectra for those 1387 stars can be found in the folder
 ``lamost_spectra``, which you can download by clicking
-:download:`here <lamost_spectra.zip>`. You can unzip the files using
+:download:`here <lamost_spectra.tar.gz>`. You can unzip the files using
 the command
 
-    $ unzip lamost_spectra.zip
+    $ tar -xvzf lamost_spectra.tar.gz
 
 Next, navigate into the ``spectra`` directory
 and count the number of files using
