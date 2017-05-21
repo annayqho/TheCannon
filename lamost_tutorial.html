@@ -185,9 +185,16 @@ So, in summary: in addition to the spectra from LAMOST that we already downloade
 we need reference labels from APOGEE DR12,</p>
 <p>Before the data can be run through <code class="docutils literal"><span class="pre">TheCannon</span></code>, it must be prepared
 according to the specifications laid out in the <a class="reference external" href="https://annayqho.github.io/TheCannon/input_requirements.html">Requirements for Input</a>
-section. One of the requirements is for data to be normalized
-in a SNR-independent way. <code class="docutils literal"><span class="pre">TheCannon</span></code> has built-in
-options for normalizing spectra, and we illustrate that in this tutorial.</p>
+section.
+As you can see on that page, the wavelength grid, reference set,
+and test set all need to have particular dimensions.
+Furthermore, the data must be normalized
+in a SNR-independent way.
+Shaping the data to the right dimensions is left to the user,
+as it depends on the particular application.
+Here we provide some simple functions particular to LAMOST spectra.
+We also illustrate a build-in option from <code class="docutils literal"><span class="pre">TheCannon</span></code>
+for normalizing LAMOST spectra.</p>
 <p>You can download the APOGEE labels for these 1387 objects by clicking
 <a class="reference download internal" href="_downloads/lamost_labels.fits"><code class="xref download docutils literal"><span class="pre">here</span></code></a>.
 Let&#8217;s use the <code class="docutils literal"><span class="pre">astropy</span></code> module to examine the contents of this file.</p>
@@ -247,6 +254,20 @@ we&#8217;ll load the whole set of 1387 spectra.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">wl</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ivar</span> <span class="o">=</span> <span class="n">load_spectra</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Let&#8217;s check the shape of the wl array:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">wl</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This gives (3626), which tells us that there are 3626 pixels in each LAMOST spectrum.
+Next, let&#8217;s check the shape of the flux and ivar arrays (they should be the same,
+since each inverse variance value corresponds to a flux value):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">flux</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">ivar</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The shape is [1387, 3626]: [number of objects, number of pixels].
+Note that this is consistent with the requirements for the training
+and test sets outlined in the documentation.</p>
 <p>We&#8217;ll use the first 1000 stars as the reference set.
 Let&#8217;s define the IDs of the reference set objects,
 and pull out their flux values and corresponding inverse variance values.</p>
@@ -283,7 +304,11 @@ we need a block of training labels of dimensions
 [num_training_objects, num_labels].
 Right now we have them in separate arrays,
 so we combine into an array of the appropriate shape:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">ref_teff</span><span class="p">,</span> <span class="n">ref_logg</span><span class="p">,</span> <span class="n">ref_mh</span><span class="p">,</span> <span class="n">ref_alpham</span><span class="p">))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">ref_teff</span><span class="p">,</span> <span class="n">ref_logg</span><span class="p">,</span> <span class="n">ref_mh</span><span class="p">,</span> <span class="n">ref_alpham</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<p>Check the shape to make sure it matches [num_training_objects, num_labels]:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>For the test set, we will use the remaining spectra.
@@ -347,22 +372,29 @@ functions built into <code class="docutils literal"><span class="pre">TheCannon<
 <p>Now, the data munging is over and we&#8217;re ready to run <code class="docutils literal"><span class="pre">TheCannon</span></code>!</p>
 <p>For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model.
+There is also a new functionality in the works that will let the user
+incorporate error bars on the reference values, but for now we
+turn that off by using <code class="docutils literal"><span class="pre">useErrors=False</span></code>.
 In this case, we use a quadratic model: order = 2</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">useErrors</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>At this stage, more optional diagnostic plots can be produced to examine
-the spectral model:</p>
+<p>At this stage, you can plot the leading coefficients and scatter
+of the model as a function of wavelength:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">diagnostics_leading_coeffs</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;lamost_leading_coeffs.png&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The second is a plot of the leading coefficients and scatter of the model
-as a function of wavelength</p>
 <img alt="_images/lamost_leading_coeffs.png" src="_images/lamost_leading_coeffs.png" />
 <p>If the model fitting worked, then we can proceed to the test step. This
 command automatically updates the dataset with the fitted-for test labels,
-and returns the corresponding covariance matrix.</p>
+and returns the corresponding covariance matrix.
+It&#8217;s good to use a physical starting guess, which we do below.
+In practice, particularly if you are fitting for many parameters,
+you should loop through a number of different starting guesses
+dsitributed widely through parameter space, and pick the one
+that results in the best fit. This will help you get around local minima.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">starting_guess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">tr_label</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="n">m</span><span class="o">.</span><span class="n">pivots</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">errs</span><span class="p">,</span> <span class="n">chisq</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">infer_labels</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">starting_guess</span><span class="p">)</span>
 </pre></div>
@@ -371,14 +403,15 @@ and returns the corresponding covariance matrix.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_labels</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">test_label_vals</span>
 </pre></div>
 </div>
-<p>A set of diagnostic output:</p>
+<p>And plot them against each other using a triangle plot as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_survey_labels</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;lamost_survey_labels.png&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The second generates a triangle plot of the survey (Cannon) labels,
-shown below.</p>
 <img alt="_images/lamost_survey_labels.png" src="_images/lamost_survey_labels.png" />
-<p>Now we can compare the &#8220;real&#8221; values to the Cannon values, for the test objects.</p>
+<p>Now we can compare the &#8220;real&#8221; values to the Cannon values, for the test objects.
+To do that (this is a bit hack-ish at the moment, sorry) you can set the <code class="docutils literal"><span class="pre">tr_label</span></code>
+attribute to the &#8220;real&#8221; label values for the test set.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">filenames</span><span class="o">==</span><span class="n">val</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">test_ID</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_teff</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TEFF&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_logg</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LOGG&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">]</span>
@@ -388,6 +421,7 @@ shown below.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">test_label</span>
 </pre></div>
 </div>
+<p>You can now use a built-in function to produce the 1-to-1 comparison plots:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_1to1</span><span class="p">()</span>
 </pre></div>
 </div>
