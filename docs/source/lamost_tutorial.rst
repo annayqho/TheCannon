@@ -4,7 +4,7 @@
 Tutorial with LAMOST DR2 Spectra
 *********************************
 
-In this tutorial, we're going to use The Cannon 
+In this tutorial, we're going to use *The Cannon*
 to transfer a system of labels from APOGEE to LAMOST. 
 More specifically, we're going to model LAMOST spectra as a function of 
 four labels from APOGEE DR12 (the 12th data release): 
@@ -16,7 +16,7 @@ and LAMOST.
 We will then be able to use this model 
 to determine these four APOGEE-scale labels
 from any new LAMOST spectrum, 
-provided that the parameters of that star falls 
+provided that the parameters of that star lie
 within the range of the reference set.
 For more details on this procedure,
 see the accompanying paper `Ho et al. 2017`_.
@@ -34,7 +34,7 @@ the command
 
     $ unzip lamost_spectra.zip
 
-Next, navigate into the ``lamost_spectra`` directory
+Next, navigate into the ``spectra`` directory
 and count the number of files using
 
     $ ls | wc -l
@@ -42,21 +42,29 @@ and count the number of files using
 There should be 1387 files, one for each SNR > 100 spectrum.
 
 Since all of these stars were observed both by APOGEE and by LAMOST,
-they both have a spectrum measured by APOGEE, a spectrum measured by
-LAMOST, and a set of parameters from each survey's corresponding pipeline.
-In this tutorial, our goal is to use the *LAMOST* spectra to measure a set
-of parameters consistent with those measured by the *APOGEE* pipeline,
-whcih only used *APOGEE* spectra. Thus, this amounts to a kind of
-cross-calibration between the two surveys.
-We will use 1000 of these stars to train the model
+each one has: 
+a spectrum measured by APOGEE, 
+a spectrum measured by LAMOST, 
+a set of parameters measured by the APOGEE pipeline using the APOGEE spectrum,
+and a set of parameters measured by the LAMOST pipeline using the LAMOST spectrum.
+In this tutorial, our goal is to fit a model that can, directly from a LAMOST spectrum,
+measure a set of parameters consistent with those that *would* have been 
+measured by the APOGEE pipeline from the corresponding APOGEE spectrum.
+In other words, even without an APOGEE spectrum for a star, we aim to measure
+a set of parameters that is on the physical scale of APOGEE stellar labels.
+Thus, this amounts to a kind of cross-calibration between the two surveys.
+
+We will use 1000 of our 1387 stars to train the model
 (these 1000 stars constitute our *reference set*)
 then test the model on the remaining 387 objects
 (these 387 stars constitutes our *test set*).
 At the end, we will check our Cannon values for the
-test set by comparing them to the actual APOGEE values
+test set by comparing them to the real APOGEE DR12 values
 for these 387 objects.
+So, in summary: in addition to the spectra from LAMOST that we already downloaded,
+we need reference labels from APOGEE DR12,
 
-Next, download the APOGEE labels for these 1387 objects by clicking 
+You can download the APOGEE labels for these 1387 objects by clicking 
 :download:`here <lamost_labels.fits>`.
 Let's use the ``astropy`` module to examine the contents of this file.
 
@@ -70,36 +78,47 @@ and the rest are ``RA``, ``Dec``, ``APOGEE_ID``,
 All of these stars were observed by both LAMOST and APOGEE,
 which is why they have a LAMOST ID as well as an APOGEE ID.
 The Teff, logg, [M/H], and [alpha/M] values are taken from
-APOGEE. In this tutorial, we will use the APOGEE values because
-it is the higher quality (higher SNR, higher resolution) survey.
-For our model, we will be using LAMOST spectra and APOGEE labels,
-and modeling the LAMOST spectra as a function of APOGEE labels.
+APOGEE.
 
-Next, let's plot one spectrum. We will use the ``load_spectra``
-module in ``TheCannon`` code.
+Let's take a look at the data.
+
+First, we'll plot one spectrum.
+The ``load_spectra`` module in ``TheCannon`` code
+provides a way to load the data.
 
 >>> from TheCannon.lamost import load_spectra
 
 The filenames of the spectra correspond to the IDs in the LAMOST_ID column
 described above. Let's pick the first one:
 
->>> filename = data['LAMOST_ID'][0]
-
-To get rid of trailing white spaces:
-
 >>> filename = data['LAMOST_ID'][0].strip()
 
-And now load the spectrum by feeding the filename into the function:
+You need the ``strip()`` at the end to get rid of white spaces.
 
->>> specdir = "spectra"
->>> wl, flux, ivar = load_spectra("%s/" %specdir + filename)
+Load the spectrum by feeding the filename into the ``load_spectra`` function.
+This function returns an array of wavelength values,
+an array of corresponding flux values at each wavelength,
+and an array of corresponding inverse variance values at each wavelength.
 
-Now, plot the thing
+>>> wl, flux, ivar = load_spectra("spectra/" + filename)
 
+Plot the spectrum, first importing ``matplotlib``:
+
+>>> import matplotlib.pyplot as plt
 >>> plt.step(wl, flux, where='mid', linewidth=0.5, color='k')
 >>> plt.xlabel("Wavelength (Angstroms)")
 >>> plt.ylabel("Flux")
+
+You can look at the spectrum either using 
 >>> plt.show()
+
+Or by saving the file and then opening it using whatever you usually use
+to view .png files:
+>>> plt.savefig("sample_spectrum.png")
+
+This is what it should look like:
+
+.. image:: images_lamost/sample_spec.png
 
 Now, get all of the files
 

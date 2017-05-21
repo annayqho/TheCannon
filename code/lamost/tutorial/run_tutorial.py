@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from TheCannon import dataset
 from TheCannon import model
 
-data = Table.read("lamost_labels.fits")
+labdir = "/Users/annaho/Github_Repositories/TheCannon/docs/source"
+data = Table.read("%s/lamost_labels.fits" %labdir)
 print(data.colnames)
 filename = data['LAMOST_ID'][0].strip()
 print(filename)
@@ -13,9 +14,11 @@ print(filename)
 specdir = "/Users/annaho/Github_Repositories/TheCannon/docs/source/spectra"
 wl, flux, ivar = load_spectra("%s/" %specdir + filename)
 
-#plt.step(wl, flux, where='mid', linewidth=0.5, color='k')
-#plt.xlabel("Wavelength (Angstroms)")
-#plt.ylabel("Flux")
+plt.step(wl, flux, where='mid', linewidth=0.5, color='k')
+plt.xlabel("Wavelength (Angstroms)")
+plt.ylabel("Flux")
+plt.savefig("sample_spec.png")
+plt.close()
 # Now, do all of the files
 filenames = np.array([val.strip() for val in data['LAMOST_ID']])
 filenames_full = np.array([specdir+"/"+val.strip() for val in filenames])
