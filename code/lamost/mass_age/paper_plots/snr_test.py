@@ -29,13 +29,13 @@ names = ['\mbox{T}_{\mbox{eff}}', '\mbox{log g}', '\mbox{[M/H]}',
 '\mbox{[C/M]}', '\mbox{[N/M]}', r'[\alpha/\mbox{M}]']
 units = ['K', 'dex', 'dex', 'dex', 'dex', 'dex']
 
-direc = "/Users/annaho/Data/LAMOST/Mass_And_Age"
-data_direc = direc + "/with_col_mask/xval_with_cuts"
-ref_ids = np.load("%s/ref_id.npz" %data_direc)['arr_0']
+direc = "/Users/annaho/Github_Repositories/TheCannon/data/LAMOST/Mass_And_Age"
+data_direc = direc + "/with_col_mask"
+ref_ids = np.load("%s/ref_id_col.npz" %data_direc)['arr_0']
 snr = np.load("%s/ref_snr.npz" %data_direc)['arr_0']
 apogee = np.load("%s/ref_label.npz" %data_direc)['arr_0']
 cannon = np.load(
-        "%s/xval_cannon_label_vals.npz" %data_direc)['arr_0']
+        "%s/all_colors_xval_cannon_label_vals.npz" %data_direc)['arr_0']
 
 data_direc = direc + "/with_col_mask/excised_obj"
 add_ids = np.load("%s/excised_ids.npz" %data_direc)['arr_0']
@@ -50,17 +50,17 @@ snr = np.hstack((snr, add_snr))
 apogee = np.vstack((apogee, add_apogee))
 cannon = np.vstack((cannon, add_cannon))
 
-hdulist = pyfits.open(direc + "/catalog_paper.fits")
+hdulist = pyfits.open(direc + "/Ho2016b_Catalog.fits")
 tbdata = hdulist[1].data
 hdulist.close()
-snrg = tbdata.field("snr")
+snrg = tbdata.field("SNR")
 is_ref = tbdata.field("is_ref_obj")
 choose = is_ref == 1.
-lamost_id = tbdata.field("lamost_id_1")[choose]
+lamost_id = tbdata.field("LAMOST_ID")[choose]
 inds = np.array([np.where(lamost_id==val)[0][0] for val in ref_ids])
-lamost_teff = tbdata.field("teff")[choose][inds]
+lamost_teff = tbdata.field("Teff")[choose][inds]
 lamost_logg = tbdata.field("logg")[choose][inds]
-lamost_feh = tbdata.field("feh")[choose][inds]
+lamost_feh = tbdata.field("MH")[choose][inds]
 lamost = np.vstack((lamost_teff, lamost_logg, lamost_feh)).T
 
 print("Loading excised data")
@@ -138,5 +138,5 @@ fig.legend(
         ("LAMOST", "Cannon", r"$\propto \,(\mathrm{%s})^{-1}$" %snr_label), 
         fontsize=16)
 
-#plt.show()
+plt.show()
 plt.savefig("snr_test.png")
