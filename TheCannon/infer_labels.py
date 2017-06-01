@@ -110,7 +110,7 @@ def _infer_labels(model, dataset, starting_guess=None):
         chi2 = (flux_piv-_func(coeffs, *labels))**2 * ivar / (1 + ivar * scatters**2)
         chisq_all[jj] = sum(chi2)
         labels_all[jj,:] = model.scales * labels + model.pivots
-        errs_all[jj,:] = covs.diagonal()
+        errs_all[jj,:] = np.sqrt(covs.diagonal())
 
     dataset.set_test_label_vals(labels_all)
     return errs_all, chisq_all
