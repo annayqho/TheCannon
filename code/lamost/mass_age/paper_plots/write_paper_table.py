@@ -10,7 +10,7 @@ def fmt_id(id_val):
     split_val = id_val.split('_')
     return split_val[0] + "\_" + split_val[1]
 
-inputf = pyfits.open("/Users/annaho/Data/LAMOST/Mass_And_Age/Ho2016b_Catalog.fits")
+inputf = pyfits.open("/Users/annaho/Github_Repositories/TheCannon/data/LAMOST/Mass_And_Age/Ho2017_Catalog.fits")
 dat = inputf[1].data
 inputf.close()
 choose = dat['in_martig_range']

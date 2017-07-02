@@ -12,16 +12,18 @@ def quad_fit(x, y, yerr, name, unit):
     """ Fit a qudratic to the SNR to make a lookup error table """
     print("performing quad fit")
     qfit = np.polyfit(x, y, deg=2, w = 1 / yerr)
+    print(qfit)
     plt.figure()
     #plt.scatter(x, y)
     plt.errorbar(x, y, yerr=yerr, fmt='.', c='k')
     xvals = np.linspace(min(x), max(x), 100)
+    print(xvals)
     yvals = qfit[2] + qfit[1]*xvals + qfit[0]*xvals**2
+    print(yvals)
     plt.plot(xvals, yvals, color='r', lw=2)
     plt.xlabel("%s" %snr_label, fontsize=16)
     plt.ylabel(r"$\sigma %s \mathrm{(%s)}$" %(name,unit), fontsize=16)
     plt.show()
-    print(qfit)
 
 
 
