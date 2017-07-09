@@ -15,9 +15,9 @@ from TheCannon import model
 from matplotlib.ticker import MaxNLocator
 
 
-def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, figname):
-    xmin = 6000
-    xmax = 6800
+def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, start_wl, end_wl, figname):
+    xmin = start_wl
+    xmax = end_wl 
 
     r_ymin = -0.05
     r_ymax = 0.05
@@ -29,7 +29,7 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, fignam
     model_spec = model_all[ii,:]
 
     # err = scat ^2 + uncertainty^2
-    m = model.CannonModel(2)
+    m = model.CannonModel(2, useErrors = False)
     m.coeffs = coeffs
     m.scatters = scatters
     m.chisqs = chisqs
