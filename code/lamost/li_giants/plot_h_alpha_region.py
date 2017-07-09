@@ -41,7 +41,7 @@ m.scales = np.ones(len(pivot))
 
 # labels
 labeldir = "/Users/annaho/Github_Repositories/TheCannon/data/LAMOST/Label_Transfer"
-inputf = pyfits.open("%s/Ho_et_all_catalog_v2.fits" %labeldir)
+inputf = pyfits.open("%s/Ho_et_all_catalog_resubmit.fits" %labeldir)
 cat = inputf[1].data
 inputf.close()
 
