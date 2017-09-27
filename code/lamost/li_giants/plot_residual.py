@@ -19,15 +19,13 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, start_
     xmin = start_wl
     xmax = end_wl 
 
-    r_ymin = -0.05
-    r_ymax = 0.05
-    ymin = 0.6
-    ymax = 1.15
-
     f = flux[ii,:]
     iv = ivar[ii,:]
     model_spec = model_all[ii,:]
-
+    choose = np.logical_and(wl > xmin, wl < xmax)
+    ymin = min(f[choose])-0.05
+    ymax = max(f[choose])+0.05
+    
     # err = scat ^2 + uncertainty^2
     m = model.CannonModel(2, useErrors = False)
     m.coeffs = coeffs
@@ -66,6 +64,8 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, start_
     ax_spectrum.legend(loc="lower right")
 
     resid = f-model_spec
+    r_ymin = min(resid[choose])-0.01
+    r_ymax = max(resid[choose])+0.01
     ax_residual.plot(wl, resid, c='k', alpha=0.8, drawstyle='steps-mid')
     ax_residual.fill_between(wl, resid+err, resid-err, alpha=0.1, color='k')
     ax_residual.set_ylim(r_ymin,r_ymax)

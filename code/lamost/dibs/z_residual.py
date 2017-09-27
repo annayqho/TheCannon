@@ -19,7 +19,7 @@ rc("font", family="serif")
 
 # load
 specdir = "/Users/annaho/Github/TheCannon/data/LAMOST/Li_Giants/Spectra_Random_1000"
-files = np.array(glob.glob(specdir+"/*.fits"))
+files = np.array(glob.glob(specdir+"/spec-56595-HD213801N41045*171.fits"))
 ids = []
 for ii,val in enumerate(files):
     ids.append(val.split("/")[-1])
@@ -77,4 +77,8 @@ lat = np.abs(c.icrs.galactic.b)
 
 for ii in range(0, len(ids)):
     prefix = ids[ii].split(".")[0]
-    plot(ii, wl, norm_flux, norm_ivar, m.model_spectra, m.coeffs, m.scatters, m.chisq, m.pivots, 5600, 6400, [5780, 5797, 6283], "%s.png" %prefix) 
+    plot(
+            ii, wl, norm_flux, norm_ivar, m.model_spectra, m.coeffs, 
+            m.scatters, m.chisq, m.pivots, 6200, 6700, 
+            [5577, 5890, 5896, 6384, 6300, 6363, 6562, 6584], 
+            "%s.png" %prefix) 
