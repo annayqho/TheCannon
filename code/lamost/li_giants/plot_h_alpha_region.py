@@ -6,7 +6,7 @@ import sys
 import pyfits
 from plot_residual import plot
 from residuals import load_model
-sys.path.append("/Users/annaho/Github_Repositories/Spectra")
+sys.path.append("/Users/annaho/Github/Spectra")
 from normalize import normalize
 import glob
 import numpy as np
@@ -14,7 +14,7 @@ from TheCannon import model
 from TheCannon import dataset
 
 # load
-specdir = "/Users/annaho/Github_Repositories/TheCannon/data/LAMOST/Li_Giants/Spectra_Random_1000"
+specdir = "/Users/annaho/Github/TheCannon/data/LAMOST/Li_Giants/Spectra_Random_1000"
 files = np.array(glob.glob(specdir+"/*.fits"))
 ids = []
 for ii,val in enumerate(files):
@@ -25,7 +25,7 @@ wl, flux, ivar = load_spectra(files)
 norm_flux, norm_ivar = normalize(wl, flux, ivar, L=50)
 
 # import model parameters
-modeldir = "/Users/annaho/Github_Repositories/TheCannon/data/LAMOST/Label_Transfer"
+modeldir = "/Users/annaho/Github/TheCannon/data/LAMOST/Label_Transfer"
 chisq = np.load(modeldir + "/chisqs.npz")['arr_0']
 coeff = np.load(modeldir + "/coeffs.npz")['arr_0']
 scat = np.load(modeldir + "/scatters.npz")['arr_0']
@@ -40,7 +40,7 @@ m.pivots = pivot
 m.scales = np.ones(len(pivot))
 
 # labels
-labeldir = "/Users/annaho/Github_Repositories/TheCannon/data/LAMOST/Label_Transfer"
+labeldir = "/Users/annaho/Github/TheCannon/data/LAMOST/Label_Transfer"
 inputf = pyfits.open("%s/Ho_et_all_catalog_resubmit.fits" %labeldir)
 cat = inputf[1].data
 inputf.close()

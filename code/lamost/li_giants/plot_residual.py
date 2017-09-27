@@ -15,7 +15,7 @@ from TheCannon import model
 from matplotlib.ticker import MaxNLocator
 
 
-def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, start_wl, end_wl, figname):
+def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, start_wl, end_wl, highlights, figname):
     xmin = start_wl
     xmax = end_wl 
 
@@ -71,8 +71,8 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, start_
     ax_residual.set_ylim(r_ymin,r_ymax)
     ax_residual.set_xlim(ax_spectrum.get_xlim())
     ax_residual.axhline(0, c="k", linestyle=":", zorder=-1)
-    ax_residual.axvline(x=6708, c='r', linewidth=2, linestyle='--')
-    ax_residual.axvline(x=6103, c='r', linewidth=2, linestyle='--')
+    for highlight in highlights:
+        ax_residual.axvline(x=highlight, c='r', linewidth=2, linestyle='--')
     ax_residual.set_xticklabels([])
 
     ax_residual.yaxis.set_major_locator(MaxNLocator(3))
@@ -85,8 +85,8 @@ def plot(ii, wl, flux, ivar, model_all, coeffs, scatters, chisqs, pivots, start_
     ax_residual.tick_params(axis="both", labelsize=18)
 
     fig.tight_layout()
-    plt.axvline(x=6708, c='r', linewidth=2, linestyle='--')
-    plt.axvline(x=6103, c='r', linewidth=2, linestyle='--')
+    for highlight in highlights:
+        plt.axvline(x=highlight, c='r', linewidth=2, linestyle='--')
     #plt.show()
     plt.savefig(figname)
     plt.close()
