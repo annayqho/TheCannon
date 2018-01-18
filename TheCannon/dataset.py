@@ -9,7 +9,7 @@ rc('font', family='serif')
 from .helpers.corner import corner
 from .helpers import Table
 from .find_continuum_pixels import * 
-from .continuum_normalization import \
+from .normalization import \
     (_cont_norm_gaussian_smooth,
      _cont_norm_running_quantile,
      _cont_norm_running_quantile_regions,
