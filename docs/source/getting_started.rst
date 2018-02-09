@@ -10,6 +10,10 @@ Option (2) is recommended, since this version is more stable.
 Instructions for installing and using the public release version
 are below.
 
+.. The code should be compatible with Python 2 and 3, 
+.. numpy versions 1.7-1.9 and scipy versions 0.13-0.15
+.. (and if it's not, please let me know!)
+
 
 Installation
 ------------
@@ -22,15 +26,14 @@ Installation
 Before Use
 ----------
 
-The code should be compatible with Python 2 and 3, 
-numpy versions 1.7-1.9 and scipy versions 0.13-0.15
-(and if it's not, please let me know!)
-
-Before using the code, make sure you understand
+The most difficult part of using *The Cannon*
+is getting your data into the right format.
+So, you jump into using the code,
+make sure you understand
 the input requirements:
 
-Input Requirements
-``````````````````
+Requirements
+````````````
 :ref:`input_requirements`
 
 
