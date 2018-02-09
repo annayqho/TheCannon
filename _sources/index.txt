@@ -25,4 +25,7 @@ Table of Contents
    getting_started 
    api 
 
+
+*Website last updated 8 Feb. 2018*
+
 .. _Anna Ho: https://annayqho.github.io
