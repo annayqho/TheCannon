@@ -2,6 +2,18 @@
 Getting Started
 ***************
 
+If you want to use *The Cannon*,
+there are two options.
+A working version of the code is
+open source and `available on github`_.
+However, this is less reliable than the public release version,
+and will not necessarily be compatible with the tutorials
+on this website.
+Instructions for installing and using the public release version
+are below.
+The choice is yours.
+
+
 Installation
 ------------
 
@@ -12,6 +24,9 @@ Installation
 
 Requirements
 ------------
+
+It is compatible with Python 2 and 3, 
+numpy versions 1.7-1.9 and scipy versions 0.13-0.15. 
 
 Before using the code, make sure you understand
 the input requirements.
