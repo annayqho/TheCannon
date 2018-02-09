@@ -80,7 +80,7 @@ def _infer_labels(model, dataset, starting_guess=None):
     chisq_all = np.zeros(nstars)
     scales = model.scales
 
-    if starting_guess == None:
+    if starting_guess is None:
         starting_guess = np.ones(nlabels)
 
     # print("starting guess: %s" %starting_guess)
