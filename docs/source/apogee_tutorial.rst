@@ -19,6 +19,9 @@ Inside the folder ``example_DR10`` you will see the following:
 * ``reference_labels.csv``: 
   a table with reference label values to use in the training step
 
+Data-Munging
+------------
+
 Before the data can be run through *The Cannon*, it must be prepared
 according to the specifications laid out in the "Requirements for Input"
 section. One of the requirements is for data to be normalized
@@ -73,54 +76,67 @@ Let's plot the spectrum only with pixels that are good
 >>> plt.plot(wl[choose], flux[choose], c='k')
 >>> plt.show()
 
-For simplicity, we set the test set is set as equal to the training set, so that
-``TheCannon`` is simply re-determining labels for the reference objects. In
-practice, the test IDs, fluxes, and inverse variances would be read in 
-separately.
+That's better.
+(Note that the spectrum is flat because APOGEE spectra are already
+continuum normalized.)
+
+To keep things simple in this exercise,
+we're going to fit a model using the training objects
+and then use that model to re-determine the labels
+for those very same objects.
+That is, our test objects are identical to our training objects.
+In practice, you would almost never do this --
+your test set would be different from your training set.
 
 >>> test_ID = tr_ID
 >>> test_flux = tr_flux
 >>> test_ivar = tr_ivar
 
-Now, all the input data has been packaged properly, and we can begin running
-``TheCannon.``
-
-The first step is to initialize a ``Dataset`` object:
+Now that we have all six numpy arrays that we need,
+we initialize a ``Dataset`` object:
 
     >>> from TheCannon import dataset
-    >>> ds = dataset.Dataset(
-    >>> ...wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
+    >>> ds = dataset.Dataset(wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar)
 
-``TheCannon`` has a number of optional diagnostic plots built-in, to help the
-user visualize the results. Some of these plots require knowing the names
-of the labels. If the user wants to produce these diagnostic plots, he or
-she must specify the label names in LaTeX format: 
+You can access the arrays through this object:
+
+    >>> print(ds.tr_ID)
+    >>> print(ds.tr_flux)
+    >>> print(ds.wl)
+    
+and so on.
+
+Next: ``TheCannon`` has a number of optional diagnostic plots built-in, 
+to help the user visualize the results. 
+Some of these plots require knowing the names of the labels. 
+If the user wants to produce these diagnostic plots, 
+the label names must be specified (LaTeX format works): 
 
     >>> ds.set_label_names(['T_{eff}', '\log g', '[Fe/H]'])
 
 At this stage, two diagnotic plots can already be produced, 
 one with the distribution
-of SNR in the training and test set (in practice, the training set 
-should consist of higher SNR spectra than the test set) 
+of SNR in the training and test set (they will be identical
+in this case)
 and the other using ``triangle.py`` to plot
-every label's set of training values against every other.  
+the training label values against each other.  
 
     >>> fig = ds.diagnostics_SNR()
 
 .. image:: images/SNRdist.png
 
-We can also plot the reference labels against each other:
+We can also plot the reference labels against each other,
+to understand the phase space we are dealing with.
+This plot shows both the distribution of each individual label,
+as well as its correlations with other labels.
 
     >>> fig = ds.diagnostics_ref_labels()
 
-That figure should look like this:
-
 .. image:: images/ref_labels_triangle.png
 
-Again, ``TheCannon`` requires incoming spectra to be continuum normalized
-in a way that is independent of signal to noise. If the data does not satisfy
-this criteria already, the user can use the continuum identification and
-normalization functions built into ``TheCannon``. 
+Next, we normalize the spectra (APOGEE spectra are continuum normalized
+but not quite in the way *The Cannon* needs them to be.
+What you do at this stage will depend on your own unique dataset.)
 
 First, continuum pixels are identified from a pseudo-continuum normalized
 version of the training set spectra. Pseudo-continuum normalization is
@@ -142,9 +158,9 @@ spectra.
 
 Pseudo continuum normalization can then be performed as follows:
 
-    >>> pseudo_tr_flux, pseudo_tr_ivar = ds.continuum_normalize_training_q(
-    >>> ...q=0.90, delta_lambda=50)
+    >>> pseudo_tr_flux, pseudo_tr_ivar = ds.continuum_normalize_training_q(q=0.90, delta_lambda=50)
 
+This can take a while.
 Once the pseudo continuum has been calculated, a continuum mask is created:
 True values correspond to pixels that are continuum, False to those that are
 not. "True" continuum pixels are identified using a median and variance flux
@@ -159,8 +175,7 @@ evenly spread the pixels are.
 In this case, we choose 7% of the pixels in the spectrum as continuum, but the
 best value should be determined through experimentation.
 
-    >>> contmask = ds.make_contmask(
-    >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
+    >>> contmask = ds.make_contmask(pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
 
 At this stage, the user should plot spectra overlaid with the identified
 continuum pixels to ensure that they look reasonable and that they roughly
@@ -170,8 +185,7 @@ do not look evenly sampled enough, the range can be changed and the process
 repeated. For this example, we change it as follows:
 
     >>> ds.ranges = [[371,3192], [3697,5500], [5500,5997], [6461,8255]]
-    >>> contmask = ds.make_contmask(
-    >>> ...pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
+    >>> contmask = ds.make_contmask(pseudo_tr_flux, pseudo_tr_ivar, frac=0.07)
 
 Once a satisfactory set of continuum pixels has been identified, the dataset's
 continuum mask attribute is set as follows:
@@ -188,10 +202,15 @@ but should be determined through experimentation.
 Once a satisfactory continuum has been fit, the normalized training and test
 spectra can be calculated:
 
-    >>> norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = \
-    >>> ds.continuum_normalize(cont)
+    >>> norm_tr_flux, norm_tr_ivar, norm_test_flux, norm_test_ivar = ds.continuum_normalize(cont)
 
-If these normalized spectra look acceptable, then they can be set:
+You can plot a normalized spectrum as follows:
+
+    >>> plt.plot(wl, norm_tr_flux[10,:])
+
+Take a look at a few of them.
+If these normalized spectra look acceptable, then they can replace the
+non-normalized spectra:
 
     >>> ds.tr_flux = norm_tr_flux
     >>> ds.tr_ivar = norm_tr_ivar
@@ -199,13 +218,19 @@ If these normalized spectra look acceptable, then they can be set:
     >>> ds.test_ivar = norm_test_ivar
 
 Now, the data munging is over and we're ready to run ``TheCannon``!
+Note that the steps above **all depend on your particular dataset,
+and your particular science goals.**
+The steps below are the real core of *TheCannon*.
+
+Running *The Cannon*
+--------------------
 
 For the training step (fitting for the spectral model) all the user needs to 
 specify is the desired polynomial order of the spectral model. 
 In this case, we use a quadratic model: order = 2
 
 >>> from TheCannon import model
->>> md = model.CannonModel(2) 
+>>> md = model.CannonModel(2, useErrors=False) 
 >>> md.fit(ds) 
 
 At this stage, more optional diagnostic plots can be produced to examine
