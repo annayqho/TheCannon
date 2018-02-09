@@ -3,9 +3,9 @@ Getting Started
 ***************
 
 If you want to use *The Cannon*,
-there are two options.
-(1) You can ``git clone`` the code directly from `github`_.
-(2) You can use the public release version.
+there are two options:
+(1) You can ``git clone`` the code directly from `github`_,
+or (2) You can use the public release version.
 Option (2) is recommended, since this version is more stable.
 Instructions for installing and using the public release version
 are below.
@@ -37,7 +37,7 @@ The procedure is roughly:
 
 1. Get your dataset into the right format,
    which may involve normalizing the spectra (see below)
-2. Use the reference set to train a spectral model (*training step*)
+2. Use the reference set to fit a spectral model (*training step*)
 3. To make sure that the model is sensible, 
    perform a leave-n-out cross-validation
 4. Once you feel comfortable with the model, 
@@ -64,7 +64,7 @@ One tutorial uses APOGEE DR10 data to infer labels for the same objects
 used to train the model (to keep things simple),
 without doing any cross-validation (Step 3). 
 The second tutorial uses LAMOST data to perform a full 
-leave-1/8-out cross-validation (as in `Ho et al. 2016`_).
+leave-1/8-out cross-validation.
 
 
 APOGEE Tutorial
