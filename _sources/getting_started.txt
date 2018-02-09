@@ -19,15 +19,18 @@ Installation
     $ pip install TheCannon
 
 
-Requirements
-------------
+Before Use
+----------
 
-It is compatible with Python 2 and 3, 
-numpy versions 1.7-1.9 and scipy versions 0.13-0.15. 
+The code should be compatible with Python 2 and 3, 
+numpy versions 1.7-1.9 and scipy versions 0.13-0.15
+(and if it's not, please let me know!)
 
 Before using the code, make sure you understand
-the input requirements.
+the input requirements:
 
+Input Requirements
+``````````````````
 :ref:`input_requirements`
 
 
