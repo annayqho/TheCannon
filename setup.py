@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='TheCannon',
-        version='0.7.2',
+        version='0.7.3',
         description='Data-driven stellar parameters and abundances from spectra',
         url='https://annayqho.github.io/TheCannon',
         author='Anna Y. Q. Ho',
