@@ -26,7 +26,8 @@ Applications
 - Detailed element abundances (using regularization): `Casey et al. 2016a`_
 - Analysis of GALAH spectra: `Martell et al. 2017`_
 - Re-analysis of RAVE using TGAS and K2: `Casey et al. 2016b`_
-- Largest catalog to-date of stellar masses, ages, and individual abundances 
+- Masses and ages for 230,000 LAMOST giants via carbon and nitrogen abundances:
+  `Ho et al. 2017b`_
   (alpha enhancement, carbon, and nitrogen): `Ho et al. 2017b`_
 - Galactic Doppelganger (chemical similarity): `Ness et al. 2017`_
 
