@@ -85,7 +85,7 @@
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#before-use">Before Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-workflow">Basic Workflow</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
 </ul>
 </li>
@@ -156,10 +156,25 @@ are below.</p>
 <blockquote>
 <div>$ pip install TheCannon</div></blockquote>
 </div>
-<div class="section" id="before-use">
-<h2>Before Use<a class="headerlink" href="#before-use" title="Permalink to this headline">¶</a></h2>
-<p>The most difficult part of using <em>The Cannon</em>
-is getting your data into the right format.
+<div class="section" id="basic-workflow">
+<h2>Basic Workflow<a class="headerlink" href="#basic-workflow" title="Permalink to this headline">¶</a></h2>
+<p>Typically, you have some large dataset of stellar spectra.
+You want to measure some set of labels from those spectra.
+For a subset &#8211; called the <em>reference set</em> of objects,
+or the <em>reference objects</em> &#8211;
+you already know those labels with high fidelity
+(for any reason, perhaps because they were measured by a different survey
+or at higher SNR).
+The procedure is roughly:</p>
+<ol class="arabic simple">
+<li>Get your dataset into the right format
+which may involved normalizing the spectra (described below)</li>
+<li>Use the reference set to train a spectral model</li>
+<li>Apply that model to all the other spectra in the dataset
+in order to infer their corresponding labels</li>
+</ol>
+<p>The most difficult part of using <em>The Cannon</em> (by far)
+is Step 1: getting your data into the right format.
 So, before you jump into using the code,
 make sure you understand
 the input requirements:</p>
@@ -170,11 +185,12 @@ the input requirements:</p>
 </div>
 <div class="section" id="tutorials">
 <h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
-<p>Once you have installed the package and read the input requirements,
-you can get an overview of the basic workflow via two simple illustrations:
-one with APOGEE DR10 data in which the test set is identical to the training set,
-and one with LAMOST data in which we perform a leave-1/8-out cross-validation
-(as in <a class="reference external" href="https://arxiv.org/abs/1602.00303">Ho et al. 2016</a>).</p>
+<p>Once you have installed the package and understood the input requirements,
+you can work through two applications of the workflow outlined above.
+One tutorial uses APOGEE DR10 data to infer labels for the same objects
+used to train the model (to keep things simple),
+and one tutorial uses LAMOST data to perform a full
+leave-1/8-out cross-validation (as in <a class="reference external" href="https://arxiv.org/abs/1602.00303">Ho et al. 2016</a>).</p>
 <div class="section" id="apogee-tutorial">
 <h3>APOGEE Tutorial<a class="headerlink" href="#apogee-tutorial" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference internal" href="apogee_tutorial.html#apogee-tutorial"><span>Tutorial with APOGEE DR10 Spectra</span></a></p>
