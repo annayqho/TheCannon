@@ -20,15 +20,13 @@ Applications
 ------------
 (Current as of 8 Feb. 2018)
 
-For an application of *The Cannon* to bringing two spectroscopic surveys
-(APOGEE and LAMOST) onto the same physical scale,
-see `Ho et al. 2016`_.
-Here is a list (current as of 8 Feb. 2018) 
-of publications making use of *The Cannon*:
 * Re-analysis of APOGEE DR10: `Ness et al. 2015`_
+* Measuring mass (and inferring age) from spectra: `Ness et al. 2016`_
+* Chemical tagging: `Hogg et al. 2016`_
 * Tying LAMOST to the APOGEE label scale: `Ho et al. 2017a`_
-* Largest catalog to-date of stellar masses, ages, and individual abundances (alpha enhancement, carbon, and nitrogen): `Ho et al. 2017`_
-  
+* Detailed element abundances (with regularization): `Casey et al. 2016`_
+* Largest catalog to-date of stellar masses, ages, and individual abundances 
+  (alpha enhancement, carbon, and nitrogen): `Ho et al. 2017b`_
 
 
 Documentation
@@ -55,6 +53,9 @@ Before you use the code, you need to make sure you have all the requirements
 for input. Click "Next" below to see what those are.
 
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
+.. _Ness et al. 2016: https://arxiv.org/abs/1511.08204
+.. _Hogg et al. 2016: https://arxiv.org/abs/1601.05413
 .. _Ho et al. 2017a: https://arxiv.org/abs/1602.00303
+.. _Casey et al. 2017: https://arxiv.org/abs/1603.03040
 .. _Ho et al. 2017b: https://arxiv.org/abs/1609.03195
 .. _available on github: https://github.com/annayqho/TheCannon
