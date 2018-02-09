@@ -1,3 +1,5 @@
+.. _input_requirements:
+
 Requirements for Input
 ======================
 
