@@ -178,42 +178,87 @@ nor the shifting of lines due to a nonzero radial velocity.
 It also doesn&#8217;t know about bad data or skylines &#8211; it will simply weight
 every pixel in the spectrum using its associated formal uncertainty.</p>
 <p>When you are sure that your data obey all of the above criteria,
-you need to create four different Python <code class="docutils literal"><span class="pre">numpy</span></code> arrays:</p>
-<ul>
+you need to create six different Python <code class="docutils literal"><span class="pre">numpy</span></code> arrays.
+They are described below, together with the required shape.</p>
+<p>In case you&#8217;re new to Python, here&#8217;s a quick note on how to check the shape
+of a numpy array called <code class="docutils literal"><span class="pre">my_array</span></code>:</p>
+<p>&gt;&gt; import numpy as np
+&gt;&gt; my_array = np.array([1,2,3,4,5])
+&gt;&gt; print(my_array.shape)</p>
+<p>That 1-D array has a shape (length) of 5.
+It is the same for a 2-D array:</p>
+<p>&gt;&gt; my_array = np.array([[1,2,3,4,5],[6,7,8,9,10]])
+&gt;&gt; print(my_array.shape)</p>
+<p>That 2-D array is a shape (2,5): 2 rows, 5 columns.</p>
+<p>Now that you know how to check the shapes of your arrays,
+here is what you need:</p>
+<ol class="arabic">
 <li><p class="first"><strong>Wavelength Grid</strong></p>
 <blockquote>
-<div><ul class="simple">
-<li>an array of wavelength values with shape [num_pixels] corresponding to all      of the spectra (both training spectra and test spectra)</li>
+<div><ul>
+<li><p class="first">This is a 1-D array of wavelength values with length [num_pixels].
+This is the wavelength grid for all of the spectra in your dataset.
+It will look something like</p>
+<p>np.array([3600, 3605, 3610, 3615, ...])</p>
+<p>where each value is the wavelength in Angstroms
+(or whatever unit you would like).</p>
+</li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first"><strong>Training Set</strong></p>
-<ul class="simple">
-<li>Training Spectra<ul>
-<li>a block of continuum-normalized pixel intensity (flux) values with shape
+<li><p class="first"><strong>Flux Values of Training Spectra</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>This is a 2-D array of flux (pixel intensity) values with the shape
 [num_training_objects x num_pixels]</li>
-<li>a block of inverse variance values corresponding to the block of
-pixel intensity values described above</li>
 </ul>
+</div></blockquote>
 </li>
-<li>Training Labels<ul>
-<li>a block of training labels with shape [num_training_objects x num_labels]</li>
+<li><p class="first"><strong>Uncertainties in Flux Values of Training Spectra</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>This is a 2-D array of inverse variance values with an identical
+shape to the training spectra:
+[num_training objects x num_pixels].</li>
+<li>The objects must be in the same order as in the Training Spectra array.
+That is, if Object A has its spectrum in Row 10
+of the training spectra array, then it should have its uncertainties
+in Row 10 of the uncertainties array.</li>
+<li>Each inverse variance encodes the uncertainty on the corresponding flux
+value in the training spectra.</li>
 </ul>
+</div></blockquote>
 </li>
+<li><p class="first"><strong>Training Labels</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>This is a 2-D array of reference (high-fidelity) labels with shape
+[num_training_objects x num_labels]</li>
+<li>Again, the row order must correspond to the row order
+in the training spectra arrays.</li>
 </ul>
+</div></blockquote>
 </li>
-<li><p class="first"><strong>Test Set</strong></p>
-<ul class="simple">
-<li>Test Spectra<ul>
-<li>a block of continuum-normalized pixel intensity (flux) values with shape
+<li><p class="first"><strong>Flux Values of Test Spectra</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>Same as (2), except these are the objects you want to measure labels for,
+not the ones you have labels for already. So the shape should be
 [num_test_objects x num_pixels]</li>
-<li>a block of inverse variance values corresponding to the block of
-pixel intensity values described above</li>
 </ul>
+</div></blockquote>
 </li>
+<li><p class="first"><strong>Uncertainties in Flux Values of Test Specra</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li>Same as (3), except these correspond to the flux values in (5).</li>
 </ul>
+</div></blockquote>
 </li>
-</ul>
+</ol>
+<p>Phew! Once you have all of those spectra in hand,
+and they meet the requirements listed above,
+you are ready to use <strong>The Cannon</strong>.</p>
 </div>
 
 
