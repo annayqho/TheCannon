@@ -28,7 +28,7 @@ Before Use
 
 The most difficult part of using *The Cannon*
 is getting your data into the right format.
-So, you jump into using the code,
+So, before you jump into using the code,
 make sure you understand
 the input requirements:
 
@@ -40,8 +40,8 @@ Requirements
 Tutorials
 ---------
 
-Once you have installed the package, you can get
-an overview of the basic workflow using two simple illustrations:
+Once you have installed the package and read the input requirements,
+you can get an overview of the basic workflow via two simple illustrations:
 one with APOGEE DR10 data in which the test set is identical to the training set,
 and one with LAMOST data in which we perform a leave-1/8-out cross-validation
 (as in `Ho et al. 2016`_).
