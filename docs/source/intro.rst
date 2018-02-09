@@ -65,5 +65,4 @@ for input. Click "Next" below to see what those are.
 .. _Casey et al. 2016b: https://arxiv.org/abs/1609.02914
 .. _Ho et al. 2017b: https://arxiv.org/abs/1609.03195
 .. _Ness et al. 2017: https://arxiv.org/abs/1701.07829
-.. _Martell et al. 2017: 
 .. _available on github: https://github.com/annayqho/TheCannon
