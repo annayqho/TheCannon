@@ -4,34 +4,38 @@
 Tutorial with APOGEE DR10 Spectra
 *********************************
 
-To run this example, download the file ``example_DR10.tar.gz`` by clicking 
+In this example, we're going to use spectra and labels from the 10th
+APOGEE data release (DR10).
+You will need to download the file
+``example_DR10.tar.gz`` by clicking 
 :download:`here <example_DR10.tar.gz>`
 and unzip it using the command
 
     $ tar -zxvf example_DR10.tar.gz
 
-This file contains the following:
+Inside the folder ``example_DR10`` you will see the following:
 
-* ``Data``: a folder with .fits data files
-* ``reference_labels.csv``: a table with reference label values for the training step
+* ``Data``: a folder with .fits data files (spectra)
+* ``reference_labels.csv``: 
+  a table with reference label values to use in the training step
 
-Before the data can be run through ``TheCannon``, it must be prepared
+Before the data can be run through *The Cannon*, it must be prepared
 according to the specifications laid out in the "Requirements for Input"
-section. One of the requirements is for data to be continuum normalized
-in a SNR-independent way. ``TheCannon`` does have built-in 
-options for continuum normalizing spectra, and we illustrate that here.
+section. One of the requirements is for data to be normalized
+in a SNR-independent way. ``TheCannon`` package does have built-in 
+options for performing the normalization, and we illustrate that here.
 
-Here are the steps for reading in the data. In practice, the user would
-write his own code; for this example, we provide the module ``apogee.py``. 
-The procedure for reading in spectra and training labels of course depends on
-the survey, the file type, etc, and it is up to the user to package this
-all appropriately before feeding it into ``TheCannon``.
+For your own project, you would write your own code to read in the data.
+For this tutorial, we provide the module ``apogee.py``
+so that you don't have to figure out how to access all of the relevant
+information from the .fits files.
 
 >>> from TheCannon import apogee
 >>> tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
 >>> tr_label = apogee.load_labels("example_DR10/reference_labels.csv")
 
-There should be 548 spectra with 8575 pixels each. 
+There should be 548 spectra with 8575 pixels each,
+and 3 labels.
 
 For simplicity, we set the test set is set as equal to the training set, so that
 ``TheCannon`` is simply re-determining labels for the reference objects. In
