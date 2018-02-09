@@ -24,7 +24,7 @@ Applications
 - Measuring mass (and inferring age) from spectra: `Ness et al. 2016`_
 - Chemical tagging: `Hogg et al. 2016`_
 - Tying LAMOST to the APOGEE label scale: `Ho et al. 2017a`_
-- Detailed element abundances (with regularization): `Casey et al. 2016`_
+- Detailed element abundances (using regularization): `Casey et al. 2016`_
 - Largest catalog to-date of stellar masses, ages, and individual abundances 
   (alpha enhancement, carbon, and nitrogen): `Ho et al. 2017b`_
 
@@ -34,6 +34,8 @@ Documentation
 
 A version of the code for *The Cannon*
 is open source and `available on github`_. 
+If you want to use it, the public release version
+is recommended (``pip install TheCannon``).
 It is compatible with Python 2 and 3, 
 numpy versions 1.7-1.9 and scipy versions 0.13-0.15. 
 
