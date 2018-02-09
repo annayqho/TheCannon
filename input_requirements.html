@@ -182,13 +182,17 @@ you need to create six different Python <code class="docutils literal"><span cla
 They are described below, together with the required shape.</p>
 <p>In case you&#8217;re new to Python, here&#8217;s a quick note on how to check the shape
 of a numpy array called <code class="docutils literal"><span class="pre">my_array</span></code>:</p>
-<p>&gt;&gt; import numpy as np
-&gt;&gt; my_array = np.array([1,2,3,4,5])
-&gt;&gt; print(my_array.shape)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">my_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>That 1-D array has a shape (length) of 5.
 It is the same for a 2-D array:</p>
-<p>&gt;&gt; my_array = np.array([[1,2,3,4,5],[6,7,8,9,10]])
-&gt;&gt; print(my_array.shape)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">my_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">my_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>That 2-D array is a shape (2,5): 2 rows, 5 columns.</p>
 <p>Now that you know how to check the shapes of your arrays,
 here is what you need:</p>
