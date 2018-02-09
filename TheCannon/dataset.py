@@ -9,7 +9,7 @@ rc('font', family='serif')
 from .helpers.corner import corner
 from .helpers import Table
 from .find_continuum_pixels import * 
-from .continuum_normalization import \
+from .normalization import \
     (_cont_norm_gaussian_smooth,
      _cont_norm_running_quantile,
      _cont_norm_running_quantile_regions,
@@ -37,7 +37,20 @@ else:
 class Dataset(object):
     """ A class to represent Cannon input: a dataset of spectra and labels """
 
-    def __init__(self, wl, tr_ID, tr_flux, tr_ivar, tr_label, tr_delta, test_ID, test_flux, test_ivar, coeff_old, scatter_old):
+    def __init__(self, wl, tr_ID, tr_flux, tr_ivar, tr_label, test_ID, test_flux, test_ivar):
+        """ Initiate a Dataset object
+
+        Parameters
+        ----------
+        wl: grid of wavelength values, onto which all spectra are mapped
+        tr_ID: array of IDs of training objects
+        tr_flux: array of flux values for training objects, [nobj, npix]
+        tr_ivar: array [nobj, npix] of inverse variance values for training objects
+        tr_label: array [nobj, nlabel]
+        test_ID: array [nobj[ of IDs of test objects
+        test_flux: array [nobj, npix] of flux values for test objects
+        test_ivar: array [nobj, npix] of inverse variance values for test objects
+        """
         print("Loading dataset")
         print("This may take a while...")
         self.wl = wl
@@ -45,12 +58,9 @@ class Dataset(object):
         self.tr_flux = tr_flux
         self.tr_ivar = tr_ivar
         self.tr_label = tr_label
-        self.tr_delta = tr_delta
         self.test_ID = test_ID
         self.test_flux = test_flux
         self.test_ivar = test_ivar
-        self.coeff_old = coeff_old
-        self.scatter_old = scatter_old
         self._label_names = None
         self.ranges = None
         
@@ -75,7 +85,7 @@ class Dataset(object):
         -------
         SNR: float
         """
-        take = ivar != 0
+        take = ivar > 0
         SNR = float(np.median(flux[take]*(ivar[take]**0.5)))
         return SNR  
 
@@ -472,9 +482,9 @@ class Dataset(object):
             npoints = len(diff)
             mu = np.mean(diff)
             sig = np.std(diff)
-            ax2.hist(diff)
-            #ax2.hist(diff, range=[-3*sig,3*sig], color='k', bins=np.sqrt(npoints),
-            #        orientation='horizontal', alpha=0.3, histtype='stepfilled')
+            #ax2.hist(diff, orientation='horizontal')
+            ax2.hist(diff, range=[-3*sig,3*sig], color='k', bins=int(np.sqrt(npoints)),
+                    orientation='horizontal', alpha=0.3, histtype='stepfilled')
             ax2.tick_params(axis='x', labelsize=14)
             ax2.tick_params(axis='y', labelsize=14)
             ax2.set_xlabel("Count", fontsize=14)

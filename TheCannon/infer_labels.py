@@ -75,12 +75,12 @@ def _infer_labels(model, dataset, starting_guess=None):
     nstars = fluxes.shape[0]
     labels_all = np.zeros((nstars, nlabels))
     MCM_rotate_all = np.zeros((nstars, coeffs_all.shape[1] - 1,
-                               coeffs_all.shape[1]-1.))
+                               coeffs_all.shape[1] - 1))
     errs_all = np.zeros((nstars, nlabels))
     chisq_all = np.zeros(nstars)
     scales = model.scales
 
-    if starting_guess == None:
+    if starting_guess is None:
         starting_guess = np.ones(nlabels)
 
     # print("starting guess: %s" %starting_guess)
@@ -110,7 +110,7 @@ def _infer_labels(model, dataset, starting_guess=None):
         chi2 = (flux_piv-_func(coeffs, *labels))**2 * ivar / (1 + ivar * scatters**2)
         chisq_all[jj] = sum(chi2)
         labels_all[jj,:] = model.scales * labels + model.pivots
-        errs_all[jj,:] = covs.diagonal()
+        errs_all[jj,:] = np.sqrt(covs.diagonal())
 
     dataset.set_test_label_vals(labels_all)
     return errs_all, chisq_all
