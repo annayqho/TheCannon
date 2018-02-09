@@ -32,6 +32,7 @@ Applications
 - Galactic Doppelganger (chemical similarity): `Ness et al. 2017`_
 
 
+.. _Ness et al. 2015: https://arxiv.org/abs/1501.07604
 .. _Ness et al. 2016: https://arxiv.org/abs/1511.08204
 .. _Hogg et al. 2016: https://arxiv.org/abs/1601.05413
 .. _Ho et al. 2017a: https://arxiv.org/abs/1602.00303
