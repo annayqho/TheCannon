@@ -143,6 +143,8 @@ and unzip it using the command</p>
 <li><code class="docutils literal"><span class="pre">reference_labels.csv</span></code>:
 a table with reference label values to use in the training step</li>
 </ul>
+<div class="section" id="data-munging">
+<h2>Data-Munging<a class="headerlink" href="#data-munging" title="Permalink to this headline">¶</a></h2>
 <p>Before the data can be run through <em>The Cannon</em>, it must be prepared
 according to the specifications laid out in the &#8220;Requirements for Input&#8221;
 section. One of the requirements is for data to be normalized
@@ -194,50 +196,63 @@ Let&#8217;s plot the spectrum only with pixels that are good
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>For simplicity, we set the test set is set as equal to the training set, so that
-<code class="docutils literal"><span class="pre">TheCannon</span></code> is simply re-determining labels for the reference objects. In
-practice, the test IDs, fluxes, and inverse variances would be read in
-separately.</p>
+<p>That&#8217;s better.
+(Note that the spectrum is flat because APOGEE spectra are already
+continuum normalized.)</p>
+<p>To keep things simple in this exercise,
+we&#8217;re going to fit a model using the training objects
+and then use that model to re-determine the labels
+for those very same objects.
+That is, our test objects are identical to our training objects.
+In practice, you would almost never do this &#8211;
+your test set would be different from your training set.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">test_ID</span> <span class="o">=</span> <span class="n">tr_ID</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">tr_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">tr_ivar</span>
 </pre></div>
 </div>
-<p>Now, all the input data has been packaged properly, and we can begin running
-<code class="docutils literal"><span class="pre">TheCannon.</span></code></p>
-<p>The first step is to initialize a <code class="docutils literal"><span class="pre">Dataset</span></code> object:</p>
+<p>Now that we have all six numpy arrays that we need,
+we initialize a <code class="docutils literal"><span class="pre">Dataset</span></code> object:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">dataset</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">tr_ID</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span><span class="p">,</span> <span class="n">tr_label</span><span class="p">,</span> <span class="n">test_ID</span><span class="p">,</span> <span class="n">test_flux</span><span class="p">,</span> <span class="n">test_ivar</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">TheCannon</span></code> has a number of optional diagnostic plots built-in, to help the
-user visualize the results. Some of these plots require knowing the names
-of the labels. If the user wants to produce these diagnostic plots, he or
-she must specify the label names in LaTeX format:</p>
+<p>You can access the arrays through this object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">tr_ID</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">wl</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and so on.</p>
+<p>Next: <code class="docutils literal"><span class="pre">TheCannon</span></code> has a number of optional diagnostic plots built-in,
+to help the user visualize the results.
+Some of these plots require knowing the names of the labels.
+If the user wants to produce these diagnostic plots,
+the label names must be specified (LaTeX format works):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">set_label_names</span><span class="p">([</span><span class="s1">&#39;T_{eff}&#39;</span><span class="p">,</span> <span class="s1">&#39;\log g&#39;</span><span class="p">,</span> <span class="s1">&#39;[Fe/H]&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>At this stage, two diagnotic plots can already be produced,
 one with the distribution
-of SNR in the training and test set (in practice, the training set
-should consist of higher SNR spectra than the test set)
+of SNR in the training and test set (they will be identical
+in this case)
 and the other using <code class="docutils literal"><span class="pre">triangle.py</span></code> to plot
-every label&#8217;s set of training values against every other.</p>
+the training label values against each other.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_SNR</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/SNRdist.png" src="_images/SNRdist.png" />
-<p>We can also plot the reference labels against each other:</p>
+<p>We can also plot the reference labels against each other,
+to understand the phase space we are dealing with.
+This plot shows both the distribution of each individual label,
+as well as its correlations with other labels.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">diagnostics_ref_labels</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>That figure should look like this:</p>
 <img alt="_images/ref_labels_triangle.png" src="_images/ref_labels_triangle.png" />
-<p>Again, <code class="docutils literal"><span class="pre">TheCannon</span></code> requires incoming spectra to be continuum normalized
-in a way that is independent of signal to noise. If the data does not satisfy
-this criteria already, the user can use the continuum identification and
-normalization functions built into <code class="docutils literal"><span class="pre">TheCannon</span></code>.</p>
+<p>Next, we normalize the spectra (APOGEE spectra are continuum normalized
+but not quite in the way <em>The Cannon</em> needs them to be.
+What you do at this stage will depend on your own unique dataset.)</p>
 <p>First, continuum pixels are identified from a pseudo-continuum normalized
 version of the training set spectra. Pseudo-continuum normalization is
 performed using a running quantile. In this case, the
@@ -256,11 +271,11 @@ The user should make sure to examine the results of continuum normalization,
 for example plotting fifty sample continuum fits and continuum normalized
 spectra.</p>
 <p>Pseudo continuum normalization can then be performed as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize_training_q</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">q</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize_training_q</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span> <span class="n">delta_lambda</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Once the pseudo continuum has been calculated, a continuum mask is created:
+<p>This can take a while.
+Once the pseudo continuum has been calculated, a continuum mask is created:
 True values correspond to pixels that are continuum, False to those that are
 not. &#8220;True&#8221; continuum pixels are identified using a median and variance flux
 cut across the training objects: in other words, continuum pixels are those
@@ -272,8 +287,7 @@ region (in this case, three regions). This enables the user to control how
 evenly spread the pixels are.</p>
 <p>In this case, we choose 7% of the pixels in the spectrum as continuum, but the
 best value should be determined through experimentation.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>At this stage, the user should plot spectra overlaid with the identified
@@ -283,8 +297,7 @@ poor continuum normalization in those regions. If the continuum pixels
 do not look evenly sampled enough, the range can be changed and the process
 repeated. For this example, we change it as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">371</span><span class="p">,</span><span class="mi">3192</span><span class="p">],</span> <span class="p">[</span><span class="mi">3697</span><span class="p">,</span><span class="mi">5500</span><span class="p">],</span> <span class="p">[</span><span class="mi">5500</span><span class="p">,</span><span class="mi">5997</span><span class="p">],</span> <span class="p">[</span><span class="mi">6461</span><span class="p">,</span><span class="mi">8255</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contmask</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">make_contmask</span><span class="p">(</span><span class="n">pseudo_tr_flux</span><span class="p">,</span> <span class="n">pseudo_tr_ivar</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once a satisfactory set of continuum pixels has been identified, the dataset&#8217;s
@@ -301,23 +314,34 @@ but should be determined through experimentation.</p>
 </div>
 <p>Once a satisfactory continuum has been fit, the normalized training and test
 spectra can be calculated:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> \
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize</span><span class="p">(</span><span class="n">cont</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">norm_tr_flux</span><span class="p">,</span> <span class="n">norm_tr_ivar</span><span class="p">,</span> <span class="n">norm_test_flux</span><span class="p">,</span> <span class="n">norm_test_ivar</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">continuum_normalize</span><span class="p">(</span><span class="n">cont</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If these normalized spectra look acceptable, then they can be set:</p>
+<p>You can plot a normalized spectrum as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">norm_tr_flux</span><span class="p">[</span><span class="mi">10</span><span class="p">,:])</span>
+</pre></div>
+</div>
+<p>Take a look at a few of them.
+If these normalized spectra look acceptable, then they can replace the
+non-normalized spectra:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tr_flux</span> <span class="o">=</span> <span class="n">norm_tr_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">norm_tr_ivar</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">test_flux</span> <span class="o">=</span> <span class="n">norm_test_flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">test_ivar</span> <span class="o">=</span> <span class="n">norm_test_ivar</span>
 </pre></div>
 </div>
-<p>Now, the data munging is over and we&#8217;re ready to run <code class="docutils literal"><span class="pre">TheCannon</span></code>!</p>
+<p>Now, the data munging is over and we&#8217;re ready to run <code class="docutils literal"><span class="pre">TheCannon</span></code>!
+Note that the steps above <strong>all depend on your particular dataset,
+and your particular science goals.</strong>
+The steps below are the real core of <em>TheCannon</em>.</p>
+</div>
+<div class="section" id="running-the-cannon">
+<h2>Running <em>The Cannon</em><a class="headerlink" href="#running-the-cannon" title="Permalink to this headline">¶</a></h2>
 <p>For the training step (fitting for the spectral model) all the user needs to
 specify is the desired polynomial order of the spectral model.
 In this case, we use a quadratic model: order = 2</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">CannonModel</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">useErrors</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">md</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -363,6 +387,7 @@ as in this example, then one final diagnostic plot can be produced:</p>
 <img alt="_images/1to1_label_0.png" src="_images/1to1_label_0.png" />
 <img alt="_images/1to1_label_1.png" src="_images/1to1_label_1.png" />
 <img alt="_images/1to1_label_2.png" src="_images/1to1_label_2.png" />
+</div>
 </div>
 
 
