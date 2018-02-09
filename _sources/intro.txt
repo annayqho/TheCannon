@@ -20,12 +20,12 @@ Applications
 ------------
 (Current as of 8 Feb. 2018)
 
-* Re-analysis of APOGEE DR10: `Ness et al. 2015`_
-* Measuring mass (and inferring age) from spectra: `Ness et al. 2016`_
-* Chemical tagging: `Hogg et al. 2016`_
-* Tying LAMOST to the APOGEE label scale: `Ho et al. 2017a`_
-* Detailed element abundances (with regularization): `Casey et al. 2016`_
-* Largest catalog to-date of stellar masses, ages, and individual abundances 
+- Re-analysis of APOGEE DR10: `Ness et al. 2015`_
+- Measuring mass (and inferring age) from spectra: `Ness et al. 2016`_
+- Chemical tagging: `Hogg et al. 2016`_
+- Tying LAMOST to the APOGEE label scale: `Ho et al. 2017a`_
+- Detailed element abundances (with regularization): `Casey et al. 2016`_
+- Largest catalog to-date of stellar masses, ages, and individual abundances 
   (alpha enhancement, carbon, and nitrogen): `Ho et al. 2017b`_
 
 
