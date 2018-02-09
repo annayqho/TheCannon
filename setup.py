@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(name='TheCannon',
-        version='0.7.1',
+        version='0.7.2',
         description='Data-driven stellar parameters and abundances from spectra',
-        url='http://github.com/annayqho/TheCannon',
+        url='https://annayqho.github.io/TheCannon',
         author='Anna Y. Q. Ho',
         author_email='annayqho@gmail.com',
         license='MIT',
