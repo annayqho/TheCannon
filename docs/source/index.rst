@@ -10,7 +10,8 @@ describe how it has been applied,
 and provide code and tutorials for the community.
 If you have any questions, please don't hesitate
 to contact `Anna Ho`_ (ah@astro.caltech.edu).
-In the meantime, begin at the ref:`intro`.
+In the meantime, begin at the Introduction,
+linked below in the Table of Contents.
 
 
 Table of Contents
