@@ -111,7 +111,7 @@ def get_data_to_fit(ds, m, resid):
     iv_tot = (ds.test_ivar/(scat**2 * ds.test_ivar + 1))
     err = np.ones(iv_tot.shape)*1000
     err[iv_tot > 0] = 1/iv_tot[iv_tot>0]**0.5
-    inds = np.logical_and(ds.wl >= 6700, ds.wl <= 6720)
+    inds = np.logical_and(ds.wl >= 6690, ds.wl <= 6730)
     x = ds.wl[inds]
     y = resid[:,inds]
     yerr=err[:,inds]
@@ -228,5 +228,11 @@ def run_all():
 
 
 if __name__=="__main__":
+    specdir = "/Users/annaho/Github/TheCannon/data/LAMOST/Li_Giants/Spectra_Missing"
+    files = np.array(glob.glob(specdir+"/*.fits"))
+    ids = []
+    for ii,val in enumerate(files):
+        ids.append(val.split("/")[-1])
+    wl, flux, ivar = load_spectra(files)
     #run_one_date("20140522")
-    run_all()
+    #run_all()
