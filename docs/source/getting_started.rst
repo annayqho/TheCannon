@@ -23,11 +23,26 @@ Installation
     $ pip install TheCannon
 
 
-Before Use
-----------
+Basic Workflow
+--------------
 
-The most difficult part of using *The Cannon*
-is getting your data into the right format.
+Typically, you have some large dataset of stellar spectra.
+You want to measure some set of labels from those spectra.
+For a subset -- called the *reference set* of objects, 
+or the *reference objects* --
+you already know those labels with high fidelity
+(for any reason, perhaps because they were measured by a different survey
+or at higher SNR).
+The procedure is roughly:
+
+1. Get your dataset into the right format
+   which may involved normalizing the spectra (described below)
+2. Use the reference set to train a spectral model
+3. Apply that model to all the other spectra in the dataset 
+   in order to infer their corresponding labels
+
+The most difficult part of using *The Cannon* (by far)
+is Step 1: getting your data into the right format.
 So, before you jump into using the code,
 make sure you understand
 the input requirements:
@@ -40,11 +55,12 @@ Requirements
 Tutorials
 ---------
 
-Once you have installed the package and read the input requirements,
-you can get an overview of the basic workflow via two simple illustrations:
-one with APOGEE DR10 data in which the test set is identical to the training set,
-and one with LAMOST data in which we perform a leave-1/8-out cross-validation
-(as in `Ho et al. 2016`_).
+Once you have installed the package and understood the input requirements,
+you can work through two applications of the workflow outlined above. 
+One tutorial uses APOGEE DR10 data to infer labels for the same objects
+used to train the model (to keep things simple),
+and one tutorial uses LAMOST data to perform a full 
+leave-1/8-out cross-validation (as in `Ho et al. 2016`_).
 
 
 APOGEE Tutorial
