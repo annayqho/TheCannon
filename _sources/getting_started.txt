@@ -35,11 +35,14 @@ you already know those labels with high fidelity
 or at higher SNR).
 The procedure is roughly:
 
-1. Get your dataset into the right format
-   which may involved normalizing the spectra (described below)
-2. Use the reference set to train a spectral model
-3. Apply that model to all the other spectra in the dataset 
-   in order to infer their corresponding labels
+1. Get your dataset into the right format,
+   which may involve normalizing the spectra (see below)
+2. Use the reference set to train a spectral model (*training step*)
+3. To make sure that the model is sensible, 
+   perform a leave-n-out cross-validation
+4. Once you feel comfortable with the model, 
+   use it to infer labels from all the other spectra in the dataset 
+   (*test step*)
 
 The most difficult part of using *The Cannon* (by far)
 is Step 1: getting your data into the right format.
@@ -59,7 +62,8 @@ Once you have installed the package and understood the input requirements,
 you can work through two applications of the workflow outlined above. 
 One tutorial uses APOGEE DR10 data to infer labels for the same objects
 used to train the model (to keep things simple),
-and one tutorial uses LAMOST data to perform a full 
+without doing any cross-validation (Step 3). 
+The second tutorial uses LAMOST data to perform a full 
 leave-1/8-out cross-validation (as in `Ho et al. 2016`_).
 
 
