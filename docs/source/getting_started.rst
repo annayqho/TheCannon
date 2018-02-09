@@ -6,8 +6,7 @@ If you want to use *The Cannon*,
 there are two options.
 (1) You can ``git clone`` the code directly from `github`_.
 (2) You can use the public release version.
-Options (2) is recommended, since it is more stable 
-and more likely to be compatible with the tutorials on this website.
+Option (2) is recommended, since this version is more stable.
 Instructions for installing and using the public release version
 are below.
 
