@@ -24,4 +24,4 @@ Table of Contents
    getting_started 
    api 
 
-.. _Anna Ho: annayqho.github.io
+.. _Anna Ho: https://annayqho.github.io
