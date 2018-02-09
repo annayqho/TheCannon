@@ -57,15 +57,15 @@ They are described below, together with the required shape.
 In case you're new to Python, here's a quick note on how to check the shape
 of a numpy array called ``my_array``:
 
->> import numpy as np
->> my_array = np.array([1,2,3,4,5])
->> print(my_array.shape)
+>>> import numpy as np
+>>> my_array = np.array([1,2,3,4,5])
+>>> print(my_array.shape)
 
 That 1-D array has a shape (length) of 5.
 It is the same for a 2-D array:
 
->> my_array = np.array([[1,2,3,4,5],[6,7,8,9,10]])
->> print(my_array.shape)
+>>> my_array = np.array([[1,2,3,4,5],[6,7,8,9,10]])
+>>> print(my_array.shape)
 
 That 2-D array is a shape (2,5): 2 rows, 5 columns.
 
