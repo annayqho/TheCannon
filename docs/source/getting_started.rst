@@ -4,14 +4,12 @@ Getting Started
 
 If you want to use *The Cannon*,
 there are two options.
-A version of the code is
-open source and `available on github`_.
-However, this is less reliable than the public release version,
-and will not necessarily be compatible with the tutorials
-on this website.
+(1) You can ``git clone`` the code directly from `github`_.
+(2) You can use the public release version.
+Options (2) is recommended, since it is more stable 
+and more likely to be compatible with the tutorials on this website.
 Instructions for installing and using the public release version
 are below.
-The choice is yours.
 
 
 Installation
@@ -51,5 +49,5 @@ LAMOST Tutorial
 ```````````````
 :ref:`lamost_tutorial`
 
-.. _available on github: https://github.com/annayqho/TheCannon
+.. _github: https://github.com/annayqho/TheCannon
 .. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
