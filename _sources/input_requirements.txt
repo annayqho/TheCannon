@@ -78,10 +78,18 @@ here is what you need:
       This is the wavelength grid for all of the spectra in your dataset.
       It will look something like
 
-      np.array([3600, 3605, 3610, 3615, ...]) 
+      >>> my_wavelength_grid = np.array([3600, 3605, 3610, 3615, ...]) 
 
       where each value is the wavelength in Angstroms 
       (or whatever unit you would like).
+      To make this more concrete, if the number of pixels in your spectrum
+      is 10,000, then running 
+
+      >>> print(my_wavelength_grid.shape)
+
+      should print (10000).
+      (You can name the array whatever you want; this is just an example.)
+
 
 2. **Flux Values of Training Spectra**
 

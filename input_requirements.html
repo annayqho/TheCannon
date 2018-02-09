@@ -203,9 +203,18 @@ here is what you need:</p>
 <li><p class="first">This is a 1-D array of wavelength values with length [num_pixels].
 This is the wavelength grid for all of the spectra in your dataset.
 It will look something like</p>
-<p>np.array([3600, 3605, 3610, 3615, ...])</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">my_wavelength_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3600</span><span class="p">,</span> <span class="mi">3605</span><span class="p">,</span> <span class="mi">3610</span><span class="p">,</span> <span class="mi">3615</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+</pre></div>
+</div>
 <p>where each value is the wavelength in Angstroms
-(or whatever unit you would like).</p>
+(or whatever unit you would like).
+To make this more concrete, if the number of pixels in your spectrum
+is 10,000, then running</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">my_wavelength_grid</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>should print (10000).
+(You can name the array whatever you want; this is just an example.)</p>
 </li>
 </ul>
 </div></blockquote>
