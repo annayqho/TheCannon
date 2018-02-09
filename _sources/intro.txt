@@ -1,4 +1,3 @@
-<<<<<<< HEAD:_sources/intro.txt
 Introduction
 ============
 ``TheCannon`` provides functionality for *The Cannon*,
@@ -31,23 +30,3 @@ Python 2 and 3, numpy versions 1.7-1.9 and scipy versions 0.13-0.15.
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
 .. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
 .. _available on github: https://github.com/annayqho/TheCannon
-=======
-****************************
-*The Cannon* (``TheCannon``)
-****************************
-Data-Driven Modeling of Large Datasets of Stellar Spectra
-*********************************************************
-
-Welcome to the documentation for *The Cannon*!
-
-Table of Contents
-=================
-
-.. toctree::
-   :maxdepth: 2
-
-   intro
-   input_requirements
-   getting_started 
-   api 
->>>>>>> d29821c5b6051b465e7b7761110941648362ef5f:docs/source/index.rst
