@@ -82,7 +82,6 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Reference/API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-TheCannon.apogee">APOGEE Data</a></li>
@@ -160,7 +159,7 @@
 <code class="descclassname">TheCannon.apogee.</code><code class="descname">get_pixmask</code><span class="sig-paren">(</span><em>fluxes</em>, <em>flux_errs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/apogee.html#get_pixmask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.apogee.get_pixmask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create and return a bad pixel mask for an APOGEE spectrum</p>
 <p>Bad pixels are defined as follows: fluxes or errors are not finite, or 
-reported errors are &lt;= 0</p>
+reported errors are &lt;= 0, or fluxes are 0</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -598,29 +597,7 @@ as laid out in Holzman et al 2015 and on the APOGEE DR12 website</p>
 
 </dd></dl>
 
-<span class="target" id="module-TheCannon.find_continuum_pixels"></span><span class="target" id="module-TheCannon.continuum_normalization"></span><dl class="function">
-<dt id="TheCannon.continuum_normalization.gaussian_weight_matrix">
-<code class="descclassname">TheCannon.continuum_normalization.</code><code class="descname">gaussian_weight_matrix</code><span class="sig-paren">(</span><em>wl</em>, <em>L</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TheCannon/continuum_normalization.html#gaussian_weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TheCannon.continuum_normalization.gaussian_weight_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Matrix of Gaussian weights</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wl: numpy ndarray</strong></p>
-<blockquote>
-<div><p>pixel wavelength values</p>
-</div></blockquote>
-<p><strong>L: float</strong></p>
-<blockquote class="last">
-<div><p>width of Gaussian</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
+<span class="target" id="module-TheCannon.find_continuum_pixels"></span></div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
 <dl class="class">

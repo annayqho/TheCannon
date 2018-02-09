@@ -81,7 +81,6 @@
             
                 <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="input_requirements.html">Requirements for Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Reference/API</a></li>
 </ul>
@@ -130,32 +129,71 @@
             
   <div class="section" id="tutorial-with-apogee-dr10-spectra">
 <span id="apogee-tutorial"></span><h1>Tutorial with APOGEE DR10 Spectra<a class="headerlink" href="#tutorial-with-apogee-dr10-spectra" title="Permalink to this headline">¶</a></h1>
-<p>To run this example, download the file <code class="docutils literal"><span class="pre">example_DR10.tar.gz</span></code> by clicking
+<p>In this example, we&#8217;re going to use spectra and labels from the 10th
+APOGEE data release (DR10).
+You will need to download the file
+<code class="docutils literal"><span class="pre">example_DR10.tar.gz</span></code> by clicking
 <a class="reference download internal" href="_downloads/example_DR10.tar.gz"><code class="xref download docutils literal"><span class="pre">here</span></code></a>
 and unzip it using the command</p>
 <blockquote>
 <div>$ tar -zxvf example_DR10.tar.gz</div></blockquote>
-<p>This file contains the following:</p>
+<p>Inside the folder <code class="docutils literal"><span class="pre">example_DR10</span></code> you will see the following:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">Data</span></code>: a folder with .fits data files</li>
-<li><code class="docutils literal"><span class="pre">reference_labels.csv</span></code>: a table with reference label values for the training step</li>
+<li><code class="docutils literal"><span class="pre">Data</span></code>: a folder with .fits data files (spectra)</li>
+<li><code class="docutils literal"><span class="pre">reference_labels.csv</span></code>:
+a table with reference label values to use in the training step</li>
 </ul>
-<p>Before the data can be run through <code class="docutils literal"><span class="pre">TheCannon</span></code>, it must be prepared
+<p>Before the data can be run through <em>The Cannon</em>, it must be prepared
 according to the specifications laid out in the &#8220;Requirements for Input&#8221;
-section. One of the requirements is for data to be continuum normalized
-in a SNR-independent way. <code class="docutils literal"><span class="pre">TheCannon</span></code> does have built-in
-options for continuum normalizing spectra, and we illustrate that here.</p>
-<p>Here are the steps for reading in the data. In practice, the user would
-write his own code; for this example, we provide the module <code class="docutils literal"><span class="pre">apogee.py</span></code>.
-The procedure for reading in spectra and training labels of course depends on
-the survey, the file type, etc, and it is up to the user to package this
-all appropriately before feeding it into <code class="docutils literal"><span class="pre">TheCannon</span></code>.</p>
+section. One of the requirements is for data to be normalized
+in a SNR-independent way. <code class="docutils literal"><span class="pre">TheCannon</span></code> package does have built-in
+options for performing the normalization, and we illustrate that here.</p>
+<p>For your own project, you would write your own code to read in the data.
+For this tutorial, we provide the module <code class="docutils literal"><span class="pre">apogee.py</span></code>
+so that you don&#8217;t have to figure out how to access all of the relevant
+information from the .fits files.</p>
+<p>First, import the necessary Python packages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+<p>Now, get the data:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">TheCannon</span> <span class="kn">import</span> <span class="n">apogee</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tr_ID</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">tr_flux</span><span class="p">,</span> <span class="n">tr_ivar</span> <span class="o">=</span> <span class="n">apogee</span><span class="o">.</span><span class="n">load_spectra</span><span class="p">(</span><span class="s2">&quot;example_DR10/Data&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tr_label</span> <span class="o">=</span> <span class="n">apogee</span><span class="o">.</span><span class="n">load_labels</span><span class="p">(</span><span class="s2">&quot;example_DR10/reference_labels.csv&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>There should be 548 spectra with 8575 pixels each.</p>
+<p>Print each of the arrays to inspect the contents.
+<code class="docutils literal"><span class="pre">tr_ID</span></code> is an array of IDs (unique identifiers) for all of the stars.
+<code class="docutils literal"><span class="pre">wl</span></code> is the array of wavelength values.
+<code class="docutils literal"><span class="pre">tr_flux</span></code> is the 2-D array of flux values (spectra for all the objects).
+<code class="docutils literal"><span class="pre">tr_ivar</span></code> is the inverse variances corresponding to <code class="docutils literal"><span class="pre">tr_flux</span></code>.
+<code class="docutils literal"><span class="pre">tr_label</span></code> has all of the reference labels for the training step.</p>
+<p>Check to make sure that there are 548 spectra with 8575 pixels each,
+and 3 labels:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_ID</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">wl</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tr_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, plot the spectrum for the object with ID &#8216;2M21332216-0048247&#8217;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tr_ID</span><span class="o">==</span><span class="s1">&#39;2M21332216-0048247&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flux</span> <span class="o">=</span> <span class="n">tr_flux</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wl</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Clearly, some of the pixels have bad values: the flux is 0.
+Those should have zero inverse variances.
+Let&#8217;s plot the spectrum only with pixels that are good
+(that is, inverse variance &gt; 0):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ivar</span> <span class="o">=</span> <span class="n">tr_ivar</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">choose</span> <span class="o">=</span> <span class="n">ivar</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wl</span><span class="p">[</span><span class="n">choose</span><span class="p">],</span> <span class="n">flux</span><span class="p">[</span><span class="n">choose</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>For simplicity, we set the test set is set as equal to the training set, so that
 <code class="docutils literal"><span class="pre">TheCannon</span></code> is simply re-determining labels for the reference objects. In
 practice, the test IDs, fluxes, and inverse variances would be read in

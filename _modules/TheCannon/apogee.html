@@ -154,7 +154,7 @@
     <span class="sd">&quot;&quot;&quot; Create and return a bad pixel mask for an APOGEE spectrum</span>
 
 <span class="sd">    Bad pixels are defined as follows: fluxes or errors are not finite, or </span>
-<span class="sd">    reported errors are &lt;= 0</span>
+<span class="sd">    reported errors are &lt;= 0, or fluxes are 0</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -169,7 +169,7 @@
 <span class="sd">    mask: ndarray</span>
 <span class="sd">        Bad pixel mask, value of True corresponds to bad pixels</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">bad_flux</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">fluxes</span><span class="p">))</span> 
+    <span class="n">bad_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">fluxes</span><span class="p">),</span> <span class="n">fluxes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">bad_err</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">flux_errs</span><span class="p">))</span> <span class="o">|</span> <span class="p">(</span><span class="n">flux_errs</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">bad_pix</span> <span class="o">=</span> <span class="n">bad_err</span> <span class="o">|</span> <span class="n">bad_flux</span>
     <span class="k">return</span> <span class="n">bad_pix</span></div>
@@ -233,7 +233,6 @@
 <span class="sd">    ivars: ndarray</span>
 <span class="sd">        Inverse variance values corresponding to flux values</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;This is the right version&quot;</span><span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Loading spectra from directory </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">data_dir</span><span class="p">)</span>
     <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">filename</span>
              <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)]))</span>
@@ -257,8 +256,11 @@
         <span class="n">ivar</span><span class="p">[</span><span class="o">~</span><span class="n">badpix</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">flux_err</span><span class="p">[</span><span class="o">~</span><span class="n">badpix</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">fluxes</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">flux</span>
         <span class="n">ivars</span><span class="p">[</span><span class="n">jj</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">ivar</span>
+    <span class="c1"># convert filenames to actual IDs</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;v304-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.fits&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Spectra loaded&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">files</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="n">ivars</span></div>
+    <span class="c1"># make sure they are numpy arrays</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wl</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fluxes</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ivars</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="load_labels"><a class="viewcode-back" href="../../api.html#TheCannon.apogee.load_labels">[docs]</a><span class="k">def</span> <span class="nf">load_labels</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
