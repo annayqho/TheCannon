@@ -10,8 +10,9 @@ describe how it has been applied,
 and provide code and tutorials for the community.
 If you have any questions, please don't hesitate
 to contact `Anna Ho`_ (ah@astro.caltech.edu).
-In the meantime, begin at the Introduction,
-linked below in the Table of Contents.
+To learn about *The Cannon*, begin at the Introduction.
+If you know all about it and want to get straight
+to using the code, begin at Getting Started.
 
 
 Table of Contents
@@ -21,7 +22,6 @@ Table of Contents
    :maxdepth: 2
 
    intro
-   input_requirements
    getting_started 
    api 
 

@@ -10,6 +10,14 @@ Installation
     $ pip install TheCannon
 
 
+Requirements
+------------
+
+Before using the code, make sure you understand
+the input requirements.
+:ref:`input_requirements`
+
+
 Tutorials
 ---------
 
