@@ -4,7 +4,7 @@ Getting Started
 
 If you want to use *The Cannon*,
 there are two options.
-A working version of the code is
+A version of the code is
 open source and `available on github`_.
 However, this is less reliable than the public release version,
 and will not necessarily be compatible with the tutorials
@@ -42,7 +42,6 @@ one with APOGEE DR10 data in which the test set is identical to the training set
 and one with LAMOST data in which we perform a leave-1/8-out cross-validation
 (as in `Ho et al. 2016`_).
 
-.. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
 
 APOGEE Tutorial
 ```````````````
@@ -51,3 +50,6 @@ APOGEE Tutorial
 LAMOST Tutorial
 ```````````````
 :ref:`lamost_tutorial`
+
+.. _available on github: https://github.com/annayqho/TheCannon
+.. _Ho et al. 2016: https://arxiv.org/abs/1602.00303
