@@ -128,7 +128,7 @@ here is what you need:
 
 Phew! Once you have all of those spectra in hand,
 and they meet the requirements listed above,
-you are ready to use **The Cannon**.
+you are ready to use *The Cannon*.
 
 
 .. _Ness et al. 2015: http://arxiv.org/abs/1501.07604 
