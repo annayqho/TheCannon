@@ -30,12 +30,48 @@ For this tutorial, we provide the module ``apogee.py``
 so that you don't have to figure out how to access all of the relevant
 information from the .fits files.
 
+First, import the necessary Python packages:
+
+>>> import numpy as np
+>>> import matplotlib.pyplot as plt
+
+Now, get the data:
+
 >>> from TheCannon import apogee
 >>> tr_ID, wl, tr_flux, tr_ivar = apogee.load_spectra("example_DR10/Data")
 >>> tr_label = apogee.load_labels("example_DR10/reference_labels.csv")
 
-There should be 548 spectra with 8575 pixels each,
-and 3 labels.
+Print each of the arrays to inspect the contents.
+``tr_ID`` is an array of IDs (unique identifiers) for all of the stars.
+``wl`` is the array of wavelength values.
+``tr_flux`` is the 2-D array of flux values (spectra for all the objects).
+``tr_ivar`` is the inverse variances corresponding to ``tr_flux``.
+``tr_label`` has all of the reference labels for the training step.
+
+Check to make sure that there are 548 spectra with 8575 pixels each,
+and 3 labels:
+
+>>> print(tr_ID.shape)
+>>> print(wl.shape)
+>>> print(tr_flux.shape)
+>>> print(tr_label.shape)
+
+Now, print the spectrum for the object with ID '2M21332216-0048247':
+
+>>> index = np.where(tr_ID=='2M21332216-0048247')[0][0]
+>>> flux = tr_flux[index]
+>>> plt.plot(wl, flux, c='k')
+>>> plt.show()
+
+Clearly, some of the pixels have bad values: the flux is 0.
+Those should have zero inverse variances.
+Let's plot the spectrum only with pixels that are good
+(that is, inverse variance > 0):
+
+>>> ivar = tr_ivar[index]
+>>> choose = ivar > 0
+>>> plt.plot(wl[choose], flux[choose], c='k')
+>>> plt.show()
 
 For simplicity, we set the test set is set as equal to the training set, so that
 ``TheCannon`` is simply re-determining labels for the reference objects. In

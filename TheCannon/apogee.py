@@ -23,7 +23,7 @@ def get_pixmask(fluxes, flux_errs):
     """ Create and return a bad pixel mask for an APOGEE spectrum
 
     Bad pixels are defined as follows: fluxes or errors are not finite, or 
-    reported errors are <= 0
+    reported errors are <= 0, or fluxes are 0
 
     Parameters
     ----------
@@ -38,7 +38,7 @@ def get_pixmask(fluxes, flux_errs):
     mask: ndarray
         Bad pixel mask, value of True corresponds to bad pixels
     """
-    bad_flux = (~np.isfinite(fluxes)) 
+    bad_flux = np.logical_or(~np.isfinite(fluxes), fluxes == 0)
     bad_err = (~np.isfinite(flux_errs)) | (flux_errs <= 0)
     bad_pix = bad_err | bad_flux
     return bad_pix
@@ -125,8 +125,11 @@ def load_spectra(data_dir):
         ivar[~badpix] = 1. / flux_err[~badpix]**2
         fluxes[jj,:] = flux
         ivars[jj,:] = ivar
+    # convert filenames to actual IDs
+    names = np.array([f.split('-')[2][:-5] for f in files])
     print("Spectra loaded")
-    return np.array(files), np.array(wl), np.array(fluxes), np.array(ivars)
+    # make sure they are numpy arrays
+    return np.array(names), np.array(wl), np.array(fluxes), np.array(ivars)
 
 
 def load_labels(filename):
