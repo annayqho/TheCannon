@@ -126,7 +126,7 @@ def load_spectra(data_dir):
         fluxes[jj,:] = flux
         ivars[jj,:] = ivar
     # convert filenames to actual IDs
-    names = np.array([f.split('-')[2][:-5] for f in files])
+    names = np.array([f.split('v304-')[1].split('.fits')[0] for f in files])
     print("Spectra loaded")
     # make sure they are numpy arrays
     return np.array(names), np.array(wl), np.array(fluxes), np.array(ivars)

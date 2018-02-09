@@ -56,7 +56,7 @@ and 3 labels:
 >>> print(tr_flux.shape)
 >>> print(tr_label.shape)
 
-Now, print the spectrum for the object with ID '2M21332216-0048247':
+Now, plot the spectrum for the object with ID '2M21332216-0048247':
 
 >>> index = np.where(tr_ID=='2M21332216-0048247')[0][0]
 >>> flux = tr_flux[index]
