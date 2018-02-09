@@ -22,7 +22,7 @@ import numpydoc
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
 #sys.path.append('/home/annaho/aida41040/annaho/TheCannon')
-sys.path.append('/Users/annaho/Dropbox/Research/TheCannon')
+sys.path.append('/Users/annaho/Dropbox/Projects/TheCannon/TheCannon')
 
 # -- General configuration ------------------------------------------------
 
